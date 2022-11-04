@@ -16,4 +16,14 @@ val accounts = mutableStateListOf(
         balance = 16_345_78_00,
         color = Color(0xFF005D57),
     ),
+    Account(
+        name = "Robinhood",
+        balance = 6_017_38_00,
+        color = Color(0xFF04B97F),
+    ),
+    Account(
+        name = "IRA",
+        balance = 26_607_39_00,
+        color = Color(0xFF37EFBA),
+    ),
 )
