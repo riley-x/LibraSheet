@@ -1,24 +1,26 @@
-package com.example.zygos.ui.graphing
+package com.example.librasheet.ui.graphing
 
-import android.util.Log
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.HasName
-import com.example.librasheet.viewModel.dataClasses.HasValue
 import com.example.librasheet.viewModel.preview.previewBalanceHistoryState
 
+
+fun Path.moveTo(offset: Offset) = moveTo(offset.x, offset.y)
+fun Path.lineTo(offset: Offset) = lineTo(offset.x, offset.y)
 
 @Composable
 fun lineGraph(
@@ -34,20 +36,25 @@ fun lineGraph(
         minX: Float,
         minY: Float,
     ) {
-        for (i in 1 until values.size) {
-            drawScope.drawLine(
-                start = Offset(
-                    x = deltaX * (i - 1 - minX),
-                    y = startY + deltaY * (values[i - 1] - minY)
-                ),
-                end = Offset(
-                    x = deltaX * (i - minX),
-                    y = startY + deltaY * (values[i] - minY)
-                ),
-                color = color,
-                strokeWidth = size,
-            )
+        fun loc(i: Int) = Offset(
+            x = deltaX * (i - minX),
+            y = startY + deltaY * (values[i] - minY)
+        )
+
+        val path = Path().apply {
+            moveTo(loc(0))
+            for (i in 1 until values.size) {
+                 lineTo(loc(i))
+            }
         }
+
+        drawScope.drawPath(
+            path = path,
+            color = color,
+            style = Stroke(
+                width = size,
+            )
+        )
     }
 }
 

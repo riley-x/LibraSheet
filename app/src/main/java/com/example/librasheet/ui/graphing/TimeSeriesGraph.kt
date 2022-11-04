@@ -1,4 +1,4 @@
-package com.example.zygos.ui.graphing
+package com.example.librasheet.ui.graphing
 
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
@@ -24,9 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils.clamp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.HasName
 import com.example.librasheet.viewModel.dataClasses.NamedValue
 import com.example.librasheet.viewModel.preview.previewBalanceHistoryState
 import kotlin.math.roundToInt

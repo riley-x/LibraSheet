@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.zygos.ui.graphing.TimeSeriesGraphState
+import com.example.librasheet.ui.graphing.TimeSeriesGraphState
 
 
 val previewAccounts = mutableStateListOf(
