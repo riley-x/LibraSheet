@@ -100,7 +100,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
     ),
-    overline = TextStyle( // Monospaced for grids/etc.
+    overline = TextStyle( // Monospaced for graph/etc.
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         fontFamily = UmTypewriter,

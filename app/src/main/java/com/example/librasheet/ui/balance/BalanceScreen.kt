@@ -4,17 +4,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.DialSelector
 import com.example.librasheet.ui.components.HeaderBar
-import com.example.librasheet.ui.graphing.PieChart
+import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.previewAccounts
+import com.example.librasheet.viewModel.preview.previewStackedLineGraph
+import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 
 
 val tabs = listOf("Pie Chart", "History")
@@ -23,9 +28,11 @@ val tabs = listOf("Pie Chart", "History")
 @Composable
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
+    historyAxes: State<AxesState>,
+    history: State<StackedLineGraphValues>,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by rememberSaveable { mutableStateOf(0) }
 
     Column(
         modifier = modifier
@@ -34,11 +41,13 @@ fun BalanceScreen(
 
         LazyColumn {
             item("graphic") {
+                val boxSize = remember { mutableStateOf(IntSize(10, 10)) }
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .height(300.dp)
                         .fillMaxWidth()
+                        .onGloballyPositioned { boxSize.value = it.size }
                 ) {
                     when (selectedTab) {
                         0 -> PieChart(
@@ -46,7 +55,12 @@ fun BalanceScreen(
                             modifier = Modifier
                                 .padding(start = 30.dp, end = 30.dp)
                         )
-                        else -> { }
+                        else -> Graph(
+                            axesState = historyAxes,
+                            boxSize = boxSize,
+                            content = stackedLineGraph(values = history),
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }
@@ -73,7 +87,9 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             BalanceScreen(
-                accounts = previewAccounts
+                accounts = previewAccounts,
+                historyAxes = previewStackedLineGraphAxes,
+                history = previewStackedLineGraph,
             )
         }
     }

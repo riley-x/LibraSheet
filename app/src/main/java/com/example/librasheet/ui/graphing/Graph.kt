@@ -70,6 +70,7 @@ typealias Grapher = DrawScope.(
 fun Graph(
     axesState: State<AxesState>,
     modifier: Modifier = Modifier,
+    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(960, 960)) },
     labelYStartPad: Dp = 8.dp, // padding left of label
     labelXTopPad: Dp = 2.dp, // padding top of label
     onHover: (isHover: Boolean, x: Float, y: Float) -> Unit = { _, _, _ -> },
@@ -109,15 +110,14 @@ fun Graph(
     val labelXOffsetPx = with(LocalDensity.current) { labelXTopPad.toPx() }
 
     /** States **/
-    var boxSize by remember { mutableStateOf(IntSize(960, 960)) } // 960 x 1644
     val disallowIntercept = RequestDisallowInterceptTouchEvent()
 
     /** User <-> pixel conversions **/
     val startX = 0
-    val endX = boxSize.width - labelYWidth - labelYOffsetPx
+    val endX = boxSize.value.width - labelYWidth - labelYOffsetPx
     val deltaX = (endX - startX) / (axesState.value.maxX - axesState.value.minX)
 
-    val startY = boxSize.height - labelXHeight - labelXOffsetPx
+    val startY = boxSize.value.height - labelXHeight - labelXOffsetPx
     val endY = 0
     val deltaY = (endY - startY) / (axesState.value.maxY - axesState.value.minY)
 
@@ -128,7 +128,6 @@ fun Graph(
 
     /** Main canvas **/
     Canvas(modifier = modifier
-        .onGloballyPositioned { boxSize = it.size }
         .pointerInteropFilter(
             requestDisallowInterceptTouchEvent = disallowIntercept
         ) { motionEvent ->
@@ -211,7 +210,6 @@ private fun Preview() {
         Surface {
             Graph(
                 axesState = previewLineGraphAxes,
-                content = lineGraph(previewLineGraph),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }

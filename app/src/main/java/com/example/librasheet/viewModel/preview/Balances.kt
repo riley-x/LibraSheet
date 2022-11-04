@@ -63,7 +63,7 @@ val previewLineGraphAxes = mutableStateOf(AxesState(
     maxY = 95_000f,
     ticksY = List(4) {
         val value = 83_000f + it * 3_000f
-        NamedValue(value, formatDollar(value))
+        NamedValue(value, "${value / 1000}k")
     },
     ticksX = List(4) { NamedValue(value = 2f + 2f * it, name = "$it/$it/$it") }
 ))
@@ -75,7 +75,7 @@ val previewStackedLineGraphAxes = mutableStateOf(AxesState(
     maxY = 100_000f,
     ticksY = List(4) {
         val value = 20_000f + it * 20_000f
-        NamedValue(value, formatDollar(value))
+        NamedValue(value, "${value / 1000}k")
     },
     ticksX = List(4) { NamedValue(value = 2f + 2f * it, name = "$it/$it/$it") }
 ))
