@@ -23,7 +23,7 @@ import com.example.librasheet.viewModel.preview.previewGraphLabels
 @Composable
 fun DialSelector(
     selectedIndex: Int,
-    labels: SnapshotStateList<String>,
+    labels: List<String>,
     modifier: Modifier = Modifier,
     onSelection: (Int) -> Unit = { },
 ) {
@@ -68,9 +68,9 @@ fun DialSelector(
             ) {
                 val color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
                 labels.indices.forEach {
-                    Canvas(modifier = Modifier.size(10.dp)) {
+                    Canvas(modifier = Modifier.size(7.dp)) {
                         val r = size.minDimension / 2.0f
-                        val border = 2.dp.toPx()
+                        val border = 1.dp.toPx()
                         drawCircle(
                             color = color,
                             radius = if (it == selectedIndex) r else r - border / 2f,
