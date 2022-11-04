@@ -1,7 +1,9 @@
 package com.example.librasheet.ui.balance
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -14,6 +16,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.DialSelector
 import com.example.librasheet.ui.components.HeaderBar
+import com.example.librasheet.ui.components.RowDivider
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
@@ -30,7 +33,8 @@ fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAccountClick: (Account) -> Unit = { },
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(0) }
 
@@ -70,6 +74,16 @@ fun BalanceScreen(
                     labels = tabs,
                     onSelection = { selectedTab = it },
                     modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp)
+                )
+            }
+
+            itemsIndexed(accounts) { index, account ->
+                if (index > 0) RowDivider()
+                
+                BalanceRow(
+                    account = account,
+                    modifier = Modifier
+                        .clickable { onAccountClick(account) }
                 )
             }
         }

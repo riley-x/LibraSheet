@@ -2,6 +2,7 @@ package com.example.librasheet.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -13,10 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
-val LibraRowHeight = 50.dp
+val LibraRowHorizontalPadding = 20.dp
+
 
 /**
- * Base row composable for various lists, like accounts, income, or expenses
+ * Base row composable for various lists, like accounts, income, or expenses.
  */
 @Composable
 fun ColorCodedRow(
@@ -27,8 +29,9 @@ fun ColorCodedRow(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .height(50.dp)
             .fillMaxWidth()
-            .height(LibraRowHeight)
+            .padding(horizontal = LibraRowHorizontalPadding)
     ) {
         Spacer(
             Modifier
@@ -37,9 +40,20 @@ fun ColorCodedRow(
                 .fillMaxHeight()
                 .background(color = color)
         )
+        Spacer(Modifier.width(12.dp))
 
         content()
     }
+}
+
+@Composable
+fun RowDivider(modifier: Modifier = Modifier) {
+    Divider(
+        color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+        thickness = 1.dp,
+        modifier = modifier
+            .padding(horizontal = LibraRowHorizontalPadding)
+    )
 }
 
 

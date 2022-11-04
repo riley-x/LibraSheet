@@ -22,3 +22,12 @@ fun formatDollarNoSymbol(value: Float, length: Int = 0): String {
     val out = format.format(value)
     return out.padStart(length)
 }
+
+// NOTE: do not pre-multiply by 100!
+@Stable
+fun formatPercent(value: Float): String {
+    val format = NumberFormat.getPercentInstance()
+    format.minimumFractionDigits = 2
+    format.maximumFractionDigits = 2
+    return format.format(value)
+}

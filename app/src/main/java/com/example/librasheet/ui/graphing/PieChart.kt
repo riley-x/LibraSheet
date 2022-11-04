@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.formatDollar
+import com.example.librasheet.ui.components.formatPercent
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.previewAccounts
@@ -108,7 +109,7 @@ fun PieChart(
         val centerText = if (focusIndex < 0 || focusIndex >= accounts.size) {
             "Total\n" + formatDollar(total)
         } else {
-            accounts[focusIndex].name + "\n" + formatDollar(accounts[focusIndex].balance)
+            accounts[focusIndex].name + "\n" + formatPercent(accounts[focusIndex].balance.toFloat() / total)
         }
         Text(centerText,
             style = MaterialTheme.typography.h2,
