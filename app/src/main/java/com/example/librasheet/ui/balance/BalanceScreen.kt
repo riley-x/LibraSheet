@@ -47,18 +47,15 @@ fun BalanceScreen(
                     modifier = Modifier
                         .height(300.dp)
                         .fillMaxWidth()
-                        .onGloballyPositioned { boxSize.value = it.size }
                 ) {
                     when (selectedTab) {
                         0 -> PieChart(
                             accounts = accounts,
-                            boxSize = boxSize,
                             modifier = Modifier
                                 .padding(start = 30.dp, end = 30.dp)
                         )
                         else -> Graph(
                             axesState = historyAxes,
-                            boxSize = boxSize,
                             gridAbove = true,
                             content = stackedLineGraph(values = history),
                             modifier = Modifier.fillMaxSize()

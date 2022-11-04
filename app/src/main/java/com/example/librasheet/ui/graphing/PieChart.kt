@@ -40,7 +40,6 @@ private const val DividerLengthInDegrees = 1.8f
 fun PieChart(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
-    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(0, 0)) },
     stroke: Dp = 30.dp,
 ) {
     val total = accounts.sumOf(Account::balance)
@@ -49,20 +48,22 @@ fun PieChart(
         angles[index + 1] = angles[index] + 360f * accounts[index].balance / total
     }
 
+    var boxSize by remember { mutableStateOf(IntSize(0, 0)) }
     var focusIndex by remember { mutableStateOf(-1) }
     val disallowIntercept = RequestDisallowInterceptTouchEvent()
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
+            .onGloballyPositioned { boxSize = it.size }
             .pointerInteropFilter(
                 requestDisallowInterceptTouchEvent = disallowIntercept
             ) { motionEvent ->
                 if (motionEvent.action == MotionEvent.ACTION_MOVE ||
                     motionEvent.action == MotionEvent.ACTION_DOWN) {
                     disallowIntercept(true)
-                    val x = motionEvent.x - boxSize.value.width / 2
-                    val y = motionEvent.y - boxSize.value.height / 2
+                    val x = motionEvent.x - boxSize.width / 2
+                    val y = motionEvent.y - boxSize.height / 2
 
                     // Here we map y -> (Right = +x) and x -> (Up = -y)
                     // since we start at the top and move clockwise

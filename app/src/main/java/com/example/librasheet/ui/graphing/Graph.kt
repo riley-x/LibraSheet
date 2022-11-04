@@ -61,10 +61,7 @@ typealias Grapher = DrawScope.(
  * @param gridAbove         If true, will plot the grid lines above [content].
  * @param content           The main graphing function. It should call draw functions on the
  *                          passed drawScope parameter.
- * @param boxSize           The size of the canvas in pixels. This should be determined with
- *                          Modifier.onGloballyPositioned { boxSize.value = it.size }. This is used
- *                          for determining the hover position, and can be set to (0, 0) to disable
- *                          checking the hover.
+ * @param hover             Enable hover functionality
  * @param labelXTopPad      Padding above the x tick labels
  * @param labelYStartPad    Padding to the left of the y tick labels
  * @param onPress           Callback on first press down. Can be used to clear focus, for example
@@ -77,9 +74,9 @@ fun Graph(
     axesState: State<AxesState>,
     modifier: Modifier = Modifier,
     gridAbove: Boolean = false,
+    hover: Boolean = true,
     labelYStartPad: Dp = 8.dp, // padding left of label
     labelXTopPad: Dp = 2.dp, // padding top of label
-    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(0, 0)) },
     onHover: (isHover: Boolean, x: Float, y: Float) -> Unit = { _, _, _ -> },
     onPress: () -> Unit = { },
     content: Grapher = { _, _, _ -> },
@@ -117,40 +114,42 @@ fun Graph(
     val labelXOffsetPx = with(LocalDensity.current) { labelXTopPad.toPx() }
 
     /** Hover. These need to use boxSize instead of DrawScope.size **/
-    val hover by remember { derivedStateOf { boxSize.value.width > 0 && boxSize.value.height > 0 } }
+    var boxSize by remember { mutableStateOf(IntSize(0, 0)) }
     val disallowIntercept = RequestDisallowInterceptTouchEvent()
     fun pxToUserX(pxX: Float): Float {
         val startX = 0
-        val endX = boxSize.value.width - labelYWidth - labelYOffsetPx
+        val endX = boxSize.width - labelYWidth - labelYOffsetPx
         val deltaX = (endX - startX) / (axesState.value.maxX - axesState.value.minX)
         return axesState.value.minX + (pxX - startX) / deltaX
     }
     fun pxToUserY(pxY: Float): Float {
-        val startY = boxSize.value.height - labelXHeight - labelXOffsetPx
+        val startY = boxSize.height - labelXHeight - labelXOffsetPx
         val endY = 0
         val deltaY = (endY - startY) / (axesState.value.maxY - axesState.value.minY)
         return axesState.value.minY + (pxY - startY) / deltaY
     }
-    fun Modifier.hover() = pointerInteropFilter(
-        requestDisallowInterceptTouchEvent = disallowIntercept
-    ) { motionEvent ->
-        if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-            onPress()
+    fun Modifier.hover() = this
+        .onGloballyPositioned { boxSize = it.size }
+        .pointerInteropFilter(
+            requestDisallowInterceptTouchEvent = disallowIntercept
+        ) { motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                onPress()
+            }
+            if (
+                motionEvent.action == MotionEvent.ACTION_MOVE ||
+                motionEvent.action == MotionEvent.ACTION_DOWN
+            ) {
+                disallowIntercept(true)
+                val userX = pxToUserX(motionEvent.x)
+                val userY = pxToUserY(motionEvent.y)
+                onHover(true, userX, userY)
+            } else {
+                disallowIntercept(false)
+                onHover(false, 0f, 0f)
+            }
+            true
         }
-        if (
-            motionEvent.action == MotionEvent.ACTION_MOVE ||
-            motionEvent.action == MotionEvent.ACTION_DOWN
-        ) {
-            disallowIntercept(true)
-            val userX = pxToUserX(motionEvent.x)
-            val userY = pxToUserY(motionEvent.y)
-            onHover(true, userX, userY)
-        } else {
-            disallowIntercept(false)
-            onHover(false, 0f, 0f)
-        }
-        true
-    }
 
     /** Main canvas **/
     Canvas(modifier = if (hover) modifier.hover() else modifier,
