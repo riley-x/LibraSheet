@@ -52,6 +52,7 @@ fun BalanceScreen(
                     when (selectedTab) {
                         0 -> PieChart(
                             accounts = accounts,
+                            boxSize = boxSize,
                             modifier = Modifier
                                 .padding(start = 30.dp, end = 30.dp)
                         )

@@ -40,6 +40,7 @@ private const val DividerLengthInDegrees = 1.8f
 fun PieChart(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
+    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(960, 960)) },
     stroke: Dp = 30.dp,
 ) {
     val total = accounts.sumOf(Account::balance)
@@ -49,10 +50,10 @@ fun PieChart(
     }
 
     var focusIndex by remember { mutableStateOf(-1) }
-    var boxSize by remember { mutableStateOf(IntSize(10, 10)) } // 960 x 1644
     val disallowIntercept = RequestDisallowInterceptTouchEvent()
 
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .pointerInteropFilter(
                 requestDisallowInterceptTouchEvent = disallowIntercept
@@ -60,8 +61,8 @@ fun PieChart(
                 if (motionEvent.action == MotionEvent.ACTION_MOVE ||
                     motionEvent.action == MotionEvent.ACTION_DOWN) {
                     disallowIntercept(true)
-                    val x = motionEvent.x - boxSize.width / 2
-                    val y = motionEvent.y - boxSize.height / 2
+                    val x = motionEvent.x - boxSize.value.width / 2
+                    val y = motionEvent.y - boxSize.value.height / 2
 
                     // Here we map y -> (Right = +x) and x -> (Up = -y)
                     // since we start at the top and move clockwise
@@ -74,10 +75,8 @@ fun PieChart(
                     disallowIntercept(false)
                     focusIndex = -1
                 }
-            true
+                true
             }
-            .onGloballyPositioned { boxSize = it.size },
-        contentAlignment = Alignment.Center,
     ) {
         val strokeNormalPx = with(LocalDensity.current) { Stroke(stroke.toPx()) }
         val strokeFocusPx = with(LocalDensity.current) { Stroke((10.dp + stroke).toPx()) }
