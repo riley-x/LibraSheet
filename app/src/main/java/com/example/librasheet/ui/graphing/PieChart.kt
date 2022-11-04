@@ -35,7 +35,6 @@ import java.lang.Math.toDegrees
 private const val DividerLengthInDegrees = 1.8f
 
 /**
- * @param values do not need to be normalized
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -94,7 +93,7 @@ fun PieChart(
             var startAngle = -90f
             val totalAngle = 360f
             accounts.forEachIndexed { index, account ->
-                val sweep = account.balance / total * totalAngle
+                val sweep = totalAngle * account.balance / total
                 drawArc(
                     color = account.color,
                     startAngle = startAngle + DividerLengthInDegrees / 2,
@@ -113,7 +112,7 @@ fun PieChart(
             accounts[focusIndex].name + "\n" + formatDollar(accounts[focusIndex].balance)
         }
         Text(centerText,
-            style = MaterialTheme.typography.h1,
+            style = MaterialTheme.typography.h2,
             textAlign = TextAlign.Center,
         )
     }

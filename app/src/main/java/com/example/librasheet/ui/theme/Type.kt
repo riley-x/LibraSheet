@@ -36,9 +36,12 @@ val Typography = Typography(
         letterSpacing = 1.5.sp,
         lineHeight = 26.sp,
     ),
+    // Pie chart, list titles
     h2 = TextStyle(
-        fontWeight = FontWeight.W100,
-        fontSize = 96.sp,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp,
+        lineHeight = 24.sp,
+        fontFamily = EczarFontFamily,
     ),
     // List titles
     h3 = TextStyle(

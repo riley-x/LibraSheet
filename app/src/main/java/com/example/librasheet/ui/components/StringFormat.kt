@@ -11,7 +11,7 @@ fun formatDollar(value: Float): String {
 @Stable
 fun formatDollar(value: Long): String {
     val format: NumberFormat = NumberFormat.getCurrencyInstance()
-    return format.format(value)
+    return format.format(value.toFloatDollar())
 }
 
 @Stable

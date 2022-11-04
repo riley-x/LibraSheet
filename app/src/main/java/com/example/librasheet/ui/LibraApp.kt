@@ -11,8 +11,9 @@ import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.*
+import com.example.librasheet.ui.graphing.PieChart
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
-
+import com.example.librasheet.viewModel.preview.accounts
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -63,7 +64,7 @@ fun LibraApp(
             navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
                 composable(route = BalanceTab.route) {
 //                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
-                    Text("Balance Tab")
+                    PieChart(accounts = accounts, modifier = Modifier.size(300.dp))
                 }
             }
 
