@@ -1,28 +1,26 @@
 package com.example.librasheet.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.Greeting
 import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.*
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 
+
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LibraApp(
     viewModel: LibraViewModel = viewModel(),
 ) {
-    /** Get the nav controller and current tab **/
+    /** Navigation **/
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
@@ -44,6 +42,7 @@ fun LibraApp(
         }
     }
 
+    /** Main Layout Scaffold **/
     Scaffold(
         bottomBar = {
             LibraBottomNav(
@@ -89,6 +88,5 @@ fun LibraApp(
                 }
             }
         }
-
     }
 }
