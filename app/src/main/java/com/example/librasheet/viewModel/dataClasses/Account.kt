@@ -1,4 +1,4 @@
-package com.example.librasheet.viewModel
+package com.example.librasheet.viewModel.dataClasses
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color

@@ -13,7 +13,7 @@ import com.example.librasheet.ui.components.DialSelector
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.graphing.PieChart
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.Account
+import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.previewAccounts
 
 
