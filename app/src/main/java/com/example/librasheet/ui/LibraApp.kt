@@ -14,8 +14,7 @@ import com.example.librasheet.Greeting
 import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -56,7 +55,40 @@ fun LibraApp(
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
     ) { innerPadding ->
         val bottomPadding = if (WindowInsets.isImeVisible) 0.dp else innerPadding.calculateBottomPadding()
-        Text("Hello!")
+        NavHost(
+            navController = navController,
+            startDestination = BalanceTab.graph,
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.ime)
+        ) {
+            navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
+                composable(route = BalanceTab.route) {
+//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
+                    Text("Balance Tab")
+                }
+            }
+
+            navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
+                composable(route = IncomeTab.route) {
+//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
+                    Text("Income Tab")
+                }
+            }
+
+            navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
+                composable(route = SpendingTab.route) {
+//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
+                    Text("Spending Tab")
+                }
+            }
+
+            navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
+                composable(route = SettingsTab.route) {
+//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
+                    Text("Settings Tab")
+                }
+            }
+        }
 
     }
 }
