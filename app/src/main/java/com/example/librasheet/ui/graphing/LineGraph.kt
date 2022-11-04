@@ -14,10 +14,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.preview.previewBalanceHistory
-import com.example.librasheet.viewModel.preview.previewBalanceHistoryAxes
+import com.example.librasheet.viewModel.preview.previewLineGraph
+import com.example.librasheet.viewModel.preview.previewLineGraphAxes
 
 
+/**
+ * A line graph has equally spaced values joined by line segments. The user x coordinates in this
+ * case are simply 0..lastIndex.
+ */
 @Composable
 fun lineGraph(
     values: List<Float>,
@@ -25,6 +29,7 @@ fun lineGraph(
     size: Float = with(LocalDensity.current) { 2.dp.toPx() },
 ): Grapher {
     return fun DrawScope.(
+        _: AxesState,
         userToPxX: (Float) -> Float,
         userToPxY: (Float) -> Float,
     ) {
@@ -56,8 +61,8 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             Graph(
-                axesState = previewBalanceHistoryAxes,
-                content = lineGraph(previewBalanceHistory),
+                axesState = previewLineGraphAxes,
+                content = lineGraph(previewLineGraph),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }

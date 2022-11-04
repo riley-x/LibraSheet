@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.viewModel.preview.previewBalanceHistory
-import com.example.librasheet.viewModel.preview.previewBalanceHistoryAxes
+import com.example.librasheet.viewModel.preview.previewLineGraph
+import com.example.librasheet.viewModel.preview.previewLineGraphAxes
 
 /**
  * Main state class for the graph. When any of these variables changes, the whole graph
@@ -48,6 +48,7 @@ data class AxesState(
 )
 
 typealias Grapher = DrawScope.(
+    axesState: AxesState,
     userToPxX: (Float) -> Float,
     userToPxY: (Float) -> Float,
 ) -> Unit
@@ -73,7 +74,7 @@ fun Graph(
     labelXTopPad: Dp = 2.dp, // padding top of label
     onHover: (isHover: Boolean, x: Float, y: Float) -> Unit = { _, _, _ -> },
     onPress: () -> Unit = { },
-    content: Grapher = { _, _ -> },
+    content: Grapher = { _, _, _ -> },
 ) {
     /** Cache some text variables (note MaterialTheme is not accessible in DrawScope) **/
     val textMeasurer = rememberTextMeasurer()
@@ -198,7 +199,7 @@ fun Graph(
         }
 
         /** Main Plot **/
-        content(::userToPxX, ::userToPxY)
+        content(axesState.value, ::userToPxX, ::userToPxY)
     }
 }
 
@@ -209,8 +210,8 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             Graph(
-                axesState = previewBalanceHistoryAxes,
-                content = lineGraph(previewBalanceHistory),
+                axesState = previewLineGraphAxes,
+                content = lineGraph(previewLineGraph),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }
