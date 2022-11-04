@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.librasheet.ui.navigation.navigateSingleTopTo
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -26,15 +27,32 @@ fun LibraApp(
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
-//    val isColor = currentDestination?.route?.equals(ColorSelectorDestination.routeWithArgs)
-//    fun ZygosTab.isActive(): Boolean? {
-//        if (isColor == true) return currentBackStack?.arguments?.getString(ColorSelectorDestination.routeArgName)?.equals(graph)
-//        return currentDestination?.hierarchy?.any { it.route == graph || it.route == route }
-//    }
-//    val currentTab = zygosTabs.drop(1).find { it.isActive() == true } ?: zygosTabs[0]
+    fun LibraTab.isActive(): Boolean? {
+        return currentDestination?.hierarchy?.any { it.route == graph || it.route == route }
+    }
+    val currentTab = libraTabs.find { it.isActive() == true } ?: libraTabs[0]
+
+    fun onTabSelected(tab: LibraTab) {
+        if (tab.route != currentDestination?.route) {
+            if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
+                navController.navigateSingleTopTo(
+                    tab.route,
+                    shouldSaveState = false
+                )
+            } else {
+                navController.navigateSingleTopTo(tab.graph)
+            }
+        }
+    }
 
     Scaffold(
-        bottomBar = {},
+        bottomBar = {
+            LibraBottomNav(
+                tabs = libraTabs,
+                currentTab = currentTab.route,
+                onTabSelected = ::onTabSelected,
+            )
+        },
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
     ) { innerPadding ->
         val bottomPadding = if (WindowInsets.isImeVisible) 0.dp else innerPadding.calculateBottomPadding()
