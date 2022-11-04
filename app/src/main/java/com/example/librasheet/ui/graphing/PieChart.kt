@@ -15,7 +15,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -29,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.Account
-import com.example.librasheet.viewModel.preview.accounts
+import com.example.librasheet.viewModel.preview.previewAccounts
 import java.lang.Math.toDegrees
 
 private const val DividerLengthInDegrees = 1.8f
@@ -125,7 +124,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             PieChart(
-                accounts = accounts,
+                accounts = previewAccounts,
                 modifier = Modifier.size(300.dp),
             )
         }

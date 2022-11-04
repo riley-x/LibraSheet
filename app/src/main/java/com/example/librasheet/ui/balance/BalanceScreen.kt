@@ -15,7 +15,7 @@ import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.graphing.PieChart
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.Account
-import com.example.librasheet.viewModel.preview.accounts
+import com.example.librasheet.viewModel.preview.previewAccounts
 
 @Composable
 fun BalanceScreen(
@@ -51,7 +51,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             BalanceScreen(
-                accounts = accounts
+                accounts = previewAccounts
             )
         }
     }

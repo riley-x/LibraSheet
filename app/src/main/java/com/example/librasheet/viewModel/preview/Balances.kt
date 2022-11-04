@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.librasheet.viewModel.Account
 
 
-val accounts = mutableStateListOf(
+val previewAccounts = mutableStateListOf(
     Account(
         name = "BofA Checking",
         balance = 2_345_01_00,
@@ -27,3 +27,5 @@ val accounts = mutableStateListOf(
         color = Color(0xFF37EFBA),
     ),
 )
+
+val previewGraphLabels = mutableStateListOf("Pie Chart", "History")
