@@ -2,6 +2,7 @@ package com.example.librasheet.ui.graphing
 
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -23,7 +24,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.viewModel.preview.previewLineGraph
 import com.example.librasheet.viewModel.preview.previewLineGraphAxes
 
 /**
@@ -57,8 +57,14 @@ typealias Grapher = DrawScope.(
  * This is an "abstract" class that handles the grid, axes, labels, and callbacks of a graph.
  * Users should implement the main graph drawing via the [content] lambda
  *
+ * @param axesState         This sets the grid lines and axes labels, and also the x/y axes ranges.
+ * @param gridAbove         If true, will plot the grid lines above [content].
  * @param content           The main graphing function. It should call draw functions on the
  *                          passed drawScope parameter.
+ * @param boxSize           The size of the canvas in pixels. This should be determined with
+ *                          Modifier.onGloballyPositioned { boxSize.value = it.size }. This is used
+ *                          for determining the hover position, and can be set to (0, 0) to disable
+ *                          checking the hover.
  * @param labelXTopPad      Padding above the x tick labels
  * @param labelYStartPad    Padding to the left of the y tick labels
  * @param onPress           Callback on first press down. Can be used to clear focus, for example
@@ -70,9 +76,10 @@ typealias Grapher = DrawScope.(
 fun Graph(
     axesState: State<AxesState>,
     modifier: Modifier = Modifier,
-    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(960, 960)) },
+    gridAbove: Boolean = false,
     labelYStartPad: Dp = 8.dp, // padding left of label
     labelXTopPad: Dp = 2.dp, // padding top of label
+    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(0, 0)) },
     onHover: (isHover: Boolean, x: Float, y: Float) -> Unit = { _, _, _ -> },
     onPress: () -> Unit = { },
     content: Grapher = { _, _, _ -> },
@@ -109,46 +116,60 @@ fun Graph(
     val labelYOffsetPx = with(LocalDensity.current) { labelYStartPad.toPx() }
     val labelXOffsetPx = with(LocalDensity.current) { labelXTopPad.toPx() }
 
-    /** States **/
+    /** Hover. These need to use boxSize instead of DrawScope.size **/
+    val hover by remember { derivedStateOf { boxSize.value.width > 0 && boxSize.value.height > 0 } }
     val disallowIntercept = RequestDisallowInterceptTouchEvent()
-
-    /** User <-> pixel conversions **/
-    val startX = 0
-    val endX = boxSize.value.width - labelYWidth - labelYOffsetPx
-    val deltaX = (endX - startX) / (axesState.value.maxX - axesState.value.minX)
-
-    val startY = boxSize.value.height - labelXHeight - labelXOffsetPx
-    val endY = 0
-    val deltaY = (endY - startY) / (axesState.value.maxY - axesState.value.minY)
-
-    fun userToPxX(userX: Float) = startX + deltaX * (userX - axesState.value.minX)
-    fun userToPxY(userY: Float) = startY + deltaY * (userY - axesState.value.minY)
-    fun pxToUserX(pxX: Float) = axesState.value.minX + (pxX - startX) / deltaX
-    fun pxToUserY(pxY: Float) = axesState.value.minY + (pxY - startY) / deltaY
+    fun pxToUserX(pxX: Float): Float {
+        val startX = 0
+        val endX = boxSize.value.width - labelYWidth - labelYOffsetPx
+        val deltaX = (endX - startX) / (axesState.value.maxX - axesState.value.minX)
+        return axesState.value.minX + (pxX - startX) / deltaX
+    }
+    fun pxToUserY(pxY: Float): Float {
+        val startY = boxSize.value.height - labelXHeight - labelXOffsetPx
+        val endY = 0
+        val deltaY = (endY - startY) / (axesState.value.maxY - axesState.value.minY)
+        return axesState.value.minY + (pxY - startY) / deltaY
+    }
+    fun Modifier.hover() = pointerInteropFilter(
+        requestDisallowInterceptTouchEvent = disallowIntercept
+    ) { motionEvent ->
+        if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+            onPress()
+        }
+        if (
+            motionEvent.action == MotionEvent.ACTION_MOVE ||
+            motionEvent.action == MotionEvent.ACTION_DOWN
+        ) {
+            disallowIntercept(true)
+            val userX = pxToUserX(motionEvent.x)
+            val userY = pxToUserY(motionEvent.y)
+            onHover(true, userX, userY)
+        } else {
+            disallowIntercept(false)
+            onHover(false, 0f, 0f)
+        }
+        true
+    }
 
     /** Main canvas **/
-    Canvas(modifier = modifier
-        .pointerInteropFilter(
-            requestDisallowInterceptTouchEvent = disallowIntercept
-        ) { motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                onPress()
-            }
-            if (
-                motionEvent.action == MotionEvent.ACTION_MOVE ||
-                motionEvent.action == MotionEvent.ACTION_DOWN
-            ) {
-                disallowIntercept(true)
-                val userX = pxToUserX(motionEvent.x)
-                val userY = pxToUserY(motionEvent.y)
-                onHover(true, userX, userY)
-            } else {
-                disallowIntercept(false)
-                onHover(false, 0f, 0f)
-            }
-            true
-        },
+    Canvas(modifier = if (hover) modifier.hover() else modifier,
     ) {
+        /** User -> pixel conversions **/
+        val startX = 0
+        val endX = size.width - labelYWidth - labelYOffsetPx
+        val deltaX = (endX - startX) / (axesState.value.maxX - axesState.value.minX)
+
+        val startY = size.height - labelXHeight - labelXOffsetPx
+        val endY = 0
+        val deltaY = (endY - startY) / (axesState.value.maxY - axesState.value.minY)
+
+        fun userToPxX(userX: Float) = startX + deltaX * (userX - axesState.value.minX)
+        fun userToPxY(userY: Float) = startY + deltaY * (userY - axesState.value.minY)
+
+        /** Main Plot **/
+        if (gridAbove) content(axesState.value, ::userToPxX, ::userToPxY)
+
         /** Y Gridlines and Axis Labels **/
         for (tick in axesState.value.ticksY) {
             val y = startY + deltaY * (tick.value - axesState.value.minY)
@@ -198,7 +219,7 @@ fun Graph(
         }
 
         /** Main Plot **/
-        content(axesState.value, ::userToPxX, ::userToPxY)
+        if (!gridAbove) content(axesState.value, ::userToPxX, ::userToPxY)
     }
 }
 

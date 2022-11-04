@@ -40,7 +40,7 @@ private const val DividerLengthInDegrees = 1.8f
 fun PieChart(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
-    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(960, 960)) },
+    boxSize: State<IntSize> = remember { mutableStateOf(IntSize(0, 0)) },
     stroke: Dp = 30.dp,
 ) {
     val total = accounts.sumOf(Account::balance)

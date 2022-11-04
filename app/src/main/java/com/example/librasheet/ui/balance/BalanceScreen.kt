@@ -59,6 +59,7 @@ fun BalanceScreen(
                         else -> Graph(
                             axesState = historyAxes,
                             boxSize = boxSize,
+                            gridAbove = true,
                             content = stackedLineGraph(values = history),
                             modifier = Modifier.fillMaxSize()
                         )
