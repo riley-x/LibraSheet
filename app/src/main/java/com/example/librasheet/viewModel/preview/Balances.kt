@@ -3,9 +3,9 @@ package com.example.librasheet.viewModel.preview
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.ui.graphing.TimeSeriesGraphState
 
 
 val previewAccounts = mutableStateListOf(
@@ -31,12 +31,13 @@ val previewAccounts = mutableStateListOf(
     ),
 )
 
-private val history = List(20) {
+val previewBalanceHistory = List(20) {
     10_000f + (it % 3 - 1) * it * 100f
 }
 
-val previewBalanceHistoryState = mutableStateOf(TimeSeriesGraphState(
-    values = history,
+val previewBalanceHistoryAxes = mutableStateOf(AxesState(
+    minX = 0f,
+    maxX = 20f,
     minY = 8000f,
     maxY = 12000f,
     ticksY = List(4) {

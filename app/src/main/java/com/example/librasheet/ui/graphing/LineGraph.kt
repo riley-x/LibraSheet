@@ -8,37 +8,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.preview.previewBalanceHistoryState
+import com.example.librasheet.viewModel.preview.previewBalanceHistory
+import com.example.librasheet.viewModel.preview.previewBalanceHistoryAxes
 
-
-fun Path.moveTo(offset: Offset) = moveTo(offset.x, offset.y)
-fun Path.lineTo(offset: Offset) = lineTo(offset.x, offset.y)
 
 @Composable
 fun lineGraph(
+    values: List<Float>,
     color: Color = MaterialTheme.colors.onSurface,
     size: Float = with(LocalDensity.current) { 2.dp.toPx() },
-): TimeSeriesGrapher<Float> {
-    return fun(
-        drawScope: DrawScope,
-        values: List<Float>,
-        deltaX: Float,
-        deltaY: Float,
-        startY: Float,
-        minX: Float,
-        minY: Float,
+): Grapher {
+    return fun DrawScope.(
+        userToPxX: (Float) -> Float,
+        userToPxY: (Float) -> Float,
     ) {
         fun loc(i: Int) = Offset(
-            x = deltaX * (i - minX),
-            y = startY + deltaY * (values[i] - minY)
+            x = userToPxX(i.toFloat()),
+            y = userToPxY(values[i])
         )
 
         val path = Path().apply {
@@ -48,7 +40,7 @@ fun lineGraph(
             }
         }
 
-        drawScope.drawPath(
+        drawPath(
             path = path,
             color = color,
             style = Stroke(
@@ -63,9 +55,9 @@ fun lineGraph(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            TimeSeriesGraph(
-                state = previewBalanceHistoryState,
-                grapher = lineGraph(),
+            Graph(
+                axesState = previewBalanceHistoryAxes,
+                content = lineGraph(previewBalanceHistory),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }
