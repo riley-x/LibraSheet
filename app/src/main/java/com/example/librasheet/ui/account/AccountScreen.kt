@@ -20,6 +20,7 @@ import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
+import com.example.librasheet.viewModel.dataClasses.Transaction
 import com.example.librasheet.viewModel.preview.*
 
 private val tabs = ImmutableList(listOf("Balance", "Net Income", "Income", "Spending"))
@@ -33,7 +34,9 @@ fun AccountScreen(
     netIncome: DiscreteGraphState,
     income: StackedLineGraphState,
     spending: StackedLineGraphState,
+    transactions: SnapshotStateList<Transaction>,
     modifier: Modifier = Modifier,
+    onBack: () -> Unit = { },
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -41,7 +44,11 @@ fun AccountScreen(
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = account.value.name, backArrow = true) {
+        HeaderBar(
+            title = account.value.name,
+            backArrow = true,
+            onBack = onBack,
+        ) {
             Spacer(Modifier.weight(10f))
             if (hoverText.isNotBlank()) {
                 Text(hoverText, textAlign = TextAlign.End)
@@ -104,15 +111,15 @@ fun AccountScreen(
                 }
             }
 
-//            itemsIndexed(accounts) { index, account ->
-//                if (index > 0) RowDivider()
-//
-//                BalanceRow(
-//                    account = account,
-//                    modifier = Modifier
-//                        .clickable { onAccountClick(account) }
-//                )
-//            }
+            itemsIndexed(transactions) { index, t ->
+                if (index > 0) RowDivider()
+
+                TransactionRow(
+                    transaction = t,
+                    modifier = Modifier
+                        .clickable { /* TODO */ }
+                )
+            }
         }
     }
 }
@@ -133,6 +140,7 @@ private fun Preview() {
                 netIncome = previewNetIncomeState,
                 income = previewStackedLineGraphState,
                 spending = previewStackedLineGraphState,
+                transactions = previewTransactions,
             )
         }
     }

@@ -2,6 +2,9 @@ package com.example.librasheet.ui.components
 
 import android.icu.text.NumberFormat
 import androidx.compose.runtime.Stable
+import com.example.librasheet.data.getDay
+import com.example.librasheet.data.getMonth
+import com.example.librasheet.data.getYearShort
 
 @Stable
 fun formatDollar(value: Float): String {
@@ -30,4 +33,14 @@ fun formatPercent(value: Float): String {
     format.minimumFractionDigits = 2
     format.maximumFractionDigits = 2
     return format.format(value)
+}
+
+
+@Stable
+fun formatDateInt(date: Int): String {
+    if (date == 0) return ""
+    val day = getDay(date)
+    val month = getMonth(date)
+    val year = getYearShort(date).toString().padStart(2, '0')
+    return "$month/$day/$year"
 }
