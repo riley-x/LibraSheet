@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.*
 import com.example.librasheet.ui.balance.BalanceScreen
-import com.example.librasheet.ui.graphing.PieChart
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.ui.transaction.TransactionScreen
 import com.example.librasheet.viewModel.preview.*
@@ -73,7 +72,7 @@ fun LibraApp(
                     BalanceScreen(
                         accounts = previewAccounts,
                         history = previewStackedLineGraphState,
-                        historyDates = previewLineGraphDates,
+                        dates = previewLineGraphDates,
                         netIncome = previewNetIncome,
                         netIncomeAxes = previewNetIncomeAxes,
                         modifier = Modifier.padding(bottom = bottomPadding),

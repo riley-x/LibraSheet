@@ -64,26 +64,25 @@ fun binaryBarGraphDrawer(
 
 @Composable
 fun BinaryBarGraph(
-    axes: State<AxesState>,
-    values: SnapshotStateList<Float>,
+    state: DiscreteGraphState,
     modifier: Modifier = Modifier,
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
     val hoverLoc = remember { mutableStateOf(-1) }
     val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-    val graph = binaryBarGraphDrawer(values = values)
+    val graph = binaryBarGraphDrawer(values = state.values)
     val graphHover = discreteHover(loc = hoverLoc)
     fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
-        if (values.isEmpty()) return
+        if (state.values.isEmpty()) return
         if (isHover) {
-            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, values.lastIndex)
+            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.lastIndex)
         } else {
             hoverLoc.value = -1
         }
         onHover(isHover, hoverLoc.value)
     }
     Graph(
-        axesState = axes,
+        axesState = state.axes,
         contentBefore = graph,
         contentAfter = { if (showHover) graphHover(it) },
         onHover = ::onHoverInner,

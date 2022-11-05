@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.ui.graphing.AxesState
+import com.example.librasheet.ui.graphing.DiscreteGraphState
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.NamedValue
@@ -42,4 +43,9 @@ val previewNetIncomeAxes = mutableStateOf(AxesState(
     },
     ticksX = List(3) { NamedValue(value = 1f + 2f * it, name = "$it/$it/$it") }
 ))
+
+val previewNetIncomeState = DiscreteGraphState(
+    values = previewNetIncome,
+    axes = previewNetIncomeAxes,
+)
 

@@ -1,7 +1,5 @@
 package com.example.librasheet.ui.balance
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,18 +9,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.math.MathUtils.clamp
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
-import kotlin.math.roundToInt
 
 
 private val tabs = ImmutableList(listOf("Pie Chart", "History", "Net Income"))
@@ -32,9 +27,8 @@ private val tabs = ImmutableList(listOf("Pie Chart", "History", "Net Income"))
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
     history: StackedLineGraphState,
-    historyDates: SnapshotStateList<String>,
-    netIncomeAxes: State<AxesState>,
-    netIncome: SnapshotStateList<Float>,
+    netIncome: DiscreteGraphState,
+    dates: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
 ) {
@@ -70,16 +64,15 @@ fun BalanceScreen(
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(history.values.value.first().second[loc]) + "\n" + historyDates[loc]
+                                formatDollar(history.values.value.first().second[loc]) + "\n" + dates[loc]
                             else ""
                         }
                         else -> BinaryBarGraph(
-                            axes = netIncomeAxes,
-                            values = netIncome,
+                            state = netIncome,
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(netIncome[loc]) + "\n" + historyDates[loc]
+                                formatDollar(netIncome.values[loc]) + "\n" + dates[loc]
                             else ""
                         }
                     }
@@ -111,9 +104,8 @@ private fun Preview() {
             BalanceScreen(
                 accounts = previewAccounts,
                 history = previewStackedLineGraphState,
-                historyDates = previewEmptyStringList,
-                netIncome = previewNetIncome,
-                netIncomeAxes = previewNetIncomeAxes,
+                dates = previewEmptyStringList,
+                netIncome = previewNetIncomeState,
             )
         }
     }
