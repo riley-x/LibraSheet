@@ -4,22 +4,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewNetIncome
 import com.example.librasheet.viewModel.preview.previewNetIncomeAxes
-import com.example.librasheet.viewModel.preview.previewStackedLineGraph
-import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 import kotlin.math.abs
 
 /**
@@ -41,13 +36,13 @@ fun binaryBarGraphDrawer(
     axisColor: Color = MaterialTheme.colors.onSurface,
     barWidth: Float = 0.9f,
 ): DrawScope.(GrapherInputs) -> Unit {
-    return fun DrawScope.(grapherInputs: GrapherInputs) {
-        val width = barWidth * (grapherInputs.userToPxX(1f) - grapherInputs.userToPxX(0f))
-        val axis = grapherInputs.userToPxY(xAxisLoc)
+    return fun DrawScope.(it: GrapherInputs) {
+        val width = barWidth * (it.userToPxX(1f) - it.userToPxX(0f))
+        val axis = it.userToPxY(xAxisLoc)
 
         values.forEachIndexed { index, value ->
-            val x = grapherInputs.userToPxX(index.toFloat())
-            val y = grapherInputs.userToPxY(value)
+            val x = it.userToPxX(index.toFloat())
+            val y = it.userToPxY(value)
             drawRect(
                 color = if (value > xAxisLoc) aboveColor else belowColor,
                 topLeft = Offset(x - width / 2, minOf(y, axis)),
@@ -57,8 +52,8 @@ fun binaryBarGraphDrawer(
 
         drawLine(
             color = axisColor,
-            start = Offset(grapherInputs.userToPxX(grapherInputs.axesState.minX), axis),
-            end = Offset(grapherInputs.userToPxX(grapherInputs.axesState.maxX), axis),
+            start = Offset(it.userToPxX(it.axesState.minX), axis),
+            end = Offset(it.userToPxX(it.axesState.maxX), axis),
             strokeWidth = 1.dp.toPx(),
         )
     }

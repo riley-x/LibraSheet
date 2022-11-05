@@ -60,20 +60,24 @@ fun stackedLineGraphDrawer(
     }
 }
 
-
+/**
+ * When hovering over a stacked line graph, display a vertical line at the hover position. Also,
+ * For each series, draw a colored flag above the y-axis labels, at the y-value of the current hover,
+ * with the value as a label.
+ */
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun stackedLineGraphHover(
     values: State<StackedLineGraphValues>,
     hoverLoc: State<Int>,
-    crosshairColor: Color = MaterialTheme.colors.onSurface,
+    indicatorColor: Color = MaterialTheme.colors.onSurface,
     labelYStartPad: Dp = 8.dp,
 ): DrawScope.(GrapherInputs) -> Unit {
     val textStyle = MaterialTheme.typography.overline
     return fun DrawScope.(it: GrapherInputs) {
-        /** Crosshairs **/
+        /** Indicator line **/
         drawLine(
-            color = crosshairColor,
+            color = indicatorColor,
             start = Offset(
                 it.userToPxX(hoverLoc.value.toFloat()),
                 it.userToPxY(it.axesState.minY)
@@ -84,8 +88,7 @@ fun stackedLineGraphHover(
             ),
         )
 
-        /** Value flags. For each series, draw a colored flag at the value of the current hover,
-         * with the value as a label. **/
+        /** Value flags **/
         val endX = it.userToPxX(it.axesState.maxX)
         val flagPointX = endX + 2f
         val flagBaseX = endX + labelYStartPad.toPx()
@@ -126,7 +129,7 @@ fun stackedLineGraphHover(
             )
             drawText(
                 textLayoutResult = layoutResult,
-                color = crosshairColor,
+                color = indicatorColor,
                 topLeft = Offset(
                     x = labelStartX,
                     y = labelCenterY - labelHalfHeight
