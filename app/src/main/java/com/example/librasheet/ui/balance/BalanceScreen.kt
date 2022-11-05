@@ -64,7 +64,7 @@ fun BalanceScreen(
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(history.values.value.first().second[loc]) + "\n" + dates[loc]
+                                formatDollar(history.values.first().second[loc]) + "\n" + dates[loc]
                             else ""
                         }
                         else -> BinaryBarGraph(

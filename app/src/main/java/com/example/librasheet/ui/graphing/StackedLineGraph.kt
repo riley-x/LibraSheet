@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -24,12 +25,12 @@ import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 import kotlin.math.roundToInt
 
 
-typealias StackedLineGraphValues = List<Pair<Color, List<Float>>>
+typealias StackedLineGraphValue = Pair<Color, List<Float>>
 
 @Immutable
 data class StackedLineGraphState(
     val axes: State<AxesState>,
-    val values: State<StackedLineGraphValues>,
+    val values: SnapshotStateList<StackedLineGraphValue>,
 )
 
 
@@ -42,10 +43,10 @@ data class StackedLineGraphState(
  */
 @Composable
 fun stackedLineGraphDrawer(
-    values: State<StackedLineGraphValues>,
+    values: SnapshotStateList<StackedLineGraphValue>,
 ): DrawScope.(GrapherInputs) -> Unit {
     return fun DrawScope.(grapherInputs: GrapherInputs) {
-        values.value.forEach { (color, series) ->
+        values.forEach { (color, series) ->
             fun loc(i: Int) = Offset(
                 x = grapherInputs.userToPxX(i.toFloat()),
                 y = grapherInputs.userToPxY(series[i])
@@ -75,7 +76,7 @@ fun stackedLineGraphDrawer(
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun stackedLineGraphHover(
-    values: State<StackedLineGraphValues>,
+    values: SnapshotStateList<StackedLineGraphValue>,
     hoverLoc: State<Int>,
     indicatorColor: Color = MaterialTheme.colors.onSurface,
     indicatorWidth: Dp = 1.dp,
@@ -101,11 +102,11 @@ fun stackedLineGraphHover(
         val endX = it.userToPxX(it.axesState.maxX)
         val flagPointX = endX + 2f
         val flagBaseX = endX + labelYStartPad.toPx()
-        values.value.forEachIndexed { index, (color, series) ->
+        values.forEachIndexed { index, (color, series) ->
             /** Get the label text layout **/
             val value = series[hoverLoc.value] -
-                if (index < values.value.lastIndex)
-                    values.value[index + 1].second[hoverLoc.value]
+                if (index < values.lastIndex)
+                    values[index + 1].second[hoverLoc.value]
                 else 0f
             val layoutResult = it.textMeasurer.measure(
                 text = AnnotatedString(
@@ -161,9 +162,9 @@ fun StackedLineGraph(
     val graph = stackedLineGraphDrawer(values = state.values)
     val graphHover = stackedLineGraphHover(values = state.values, hoverLoc = hoverLoc)
     fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
-        if (state.values.value.isEmpty()) return
+        if (state.values.isEmpty()) return
         if (isHover) {
-            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.value.first().second.lastIndex)
+            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.first().second.lastIndex)
         } else {
             hoverLoc.value = -1
         }

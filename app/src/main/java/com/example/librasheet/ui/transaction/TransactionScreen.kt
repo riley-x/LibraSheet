@@ -87,7 +87,7 @@ fun TransactionScreen(
                                     .fillMaxWidth()
                             ) { isHover, loc ->
                                 hoverText = if (isHover)
-                                    formatDollar(history.values.value.first().second[loc]) + "\n" + historyDates[loc]
+                                    formatDollar(history.values.first().second[loc]) + "\n" + historyDates[loc]
                                 else ""
                             }
                             ButtonGroup(
