@@ -65,12 +65,21 @@ fun BalanceScreen(
                     AnimatedContent(
                         targetState = selectedTab,
                         transitionSpec = {
+                            val towards =
+                                if (targetState == 0 && initialState == tabs.lastIndex)
+                                    AnimatedContentScope.SlideDirection.Start
+                                else if (targetState == tabs.lastIndex && initialState == 0)
+                                    AnimatedContentScope.SlideDirection.End
+                                else if (targetState > initialState)
+                                    AnimatedContentScope.SlideDirection.Start
+                                else
+                                    AnimatedContentScope.SlideDirection.End
                             slideIntoContainer(
-                                towards = AnimatedContentScope.SlideDirection.Start,
+                                towards = towards,
                                 animationSpec = tween(400 )
                             ) + fadeIn(animationSpec = tween(400)) with
                             slideOutOfContainer(
-                                towards = AnimatedContentScope.SlideDirection.Start,
+                                towards = towards,
                                 animationSpec = tween(200)
                             ) + fadeOut(animationSpec = tween(200))
                         }
