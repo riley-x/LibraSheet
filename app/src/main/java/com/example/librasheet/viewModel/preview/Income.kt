@@ -3,9 +3,14 @@ package com.example.librasheet.viewModel.preview
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
+import com.example.librasheet.viewModel.dataClasses.NamedValue
 import com.example.librasheet.viewModel.dataClasses.TransactionCategory
+
+val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
+val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
 
 val previewIncomeCategories = mutableStateListOf(
     TransactionCategory(
@@ -16,5 +21,25 @@ val previewIncomeCategories = mutableStateListOf(
     ),
 )
 
-val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
-val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
+val previewNetIncome = mutableStateListOf(
+    1151.21f,
+    -352.3f,
+    203.65f,
+    1036.98f,
+    -405.31f,
+    625.82f,
+    410.2f
+)
+
+val previewNetIncomeAxes = mutableStateOf(AxesState(
+    minX = -0.5f,
+    maxX = previewNetIncome.lastIndex + 0.5f,
+    minY = -500f,
+    maxY = 1200f,
+    ticksY = List(4) {
+        val value = -400f + it * 400f
+        NamedValue(value, "$value")
+    },
+    ticksX = List(3) { NamedValue(value = 1f + 2f * it, name = "$it/$it/$it") }
+))
+
