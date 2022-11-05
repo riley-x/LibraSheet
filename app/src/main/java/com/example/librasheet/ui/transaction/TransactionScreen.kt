@@ -17,7 +17,11 @@ import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.CategoryTimeRange
+import com.example.librasheet.viewModel.HistoryTimeRange
+import com.example.librasheet.viewModel.categoryTimeRanges
 import com.example.librasheet.viewModel.dataClasses.TransactionCategory
+import com.example.librasheet.viewModel.historyTimeRanges
 import com.example.librasheet.viewModel.preview.*
 
 
@@ -26,10 +30,13 @@ private val tabs = listOf("Categories", "History")
 
 @Composable
 fun TransactionScreen(
+    title: String,
     categories: SnapshotStateList<TransactionCategory>,
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
     historyDates: SnapshotStateList<String>,
+    categoryTimeRange: State<CategoryTimeRange>,
+    historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
     onCategoryClick: (TransactionCategory) -> Unit = { },
 ) {
@@ -39,7 +46,7 @@ fun TransactionScreen(
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = "Income") {
+        HeaderBar(title = title) {
             Spacer(Modifier.weight(10f))
             Text(hoverText, textAlign = TextAlign.End)
         }
@@ -68,6 +75,21 @@ fun TransactionScreen(
                                 else ""
                         }
                     }
+                }
+            }
+
+            item("time range") {
+                when (selectedTab) {
+                    0 -> ButtonGroup(
+                        options = categoryTimeRanges,
+                        currentSelection = categoryTimeRange,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)
+                    )
+                    else -> ButtonGroup(
+                        options = historyTimeRanges,
+                        currentSelection = historyTimeRange,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)
+                    )
                 }
             }
 
@@ -103,10 +125,13 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             TransactionScreen(
+                title = "Income",
                 categories = previewIncomeCategories,
                 historyAxes = previewStackedLineGraphAxes,
                 history = previewStackedLineGraph,
                 historyDates = previewEmptyStringList,
+                categoryTimeRange = previewIncomeCategoryTimeRange,
+                historyTimeRange = previewIncomeHistoryTimeRange,
             )
         }
     }

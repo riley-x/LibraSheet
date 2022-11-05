@@ -6,6 +6,10 @@ interface HasName {
     val name: String
 }
 
+interface HasDisplayName {
+    val displayName: String
+}
+
 interface HasValue {
     val value: Float
 }
