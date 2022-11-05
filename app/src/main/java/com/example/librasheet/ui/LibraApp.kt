@@ -14,10 +14,8 @@ import androidx.navigation.compose.*
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.graphing.PieChart
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewLineGraphDates
-import com.example.librasheet.viewModel.preview.previewStackedLineGraph
-import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
+import com.example.librasheet.ui.transaction.TransactionScreen
+import com.example.librasheet.viewModel.preview.*
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -85,7 +83,15 @@ fun LibraApp(
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
 //                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
-                    Text("Income Tab")
+                    TransactionScreen(
+                        title = "Income",
+                        categories = previewIncomeCategories,
+                        historyAxes = previewStackedLineGraphAxes,
+                        history = previewStackedLineGraph,
+                        historyDates = previewLineGraphDates,
+                        categoryTimeRange = previewIncomeCategoryTimeRange,
+                        historyTimeRange = previewIncomeHistoryTimeRange
+                    )
                 }
             }
 

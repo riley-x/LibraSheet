@@ -38,7 +38,10 @@ fun TransactionScreen(
     categoryTimeRange: State<CategoryTimeRange>,
     historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
+    headerBackArrow: Boolean = false,
     onCategoryClick: (TransactionCategory) -> Unit = { },
+    onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
+    onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -46,7 +49,7 @@ fun TransactionScreen(
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = title) {
+        HeaderBar(title = title, backArrow = headerBackArrow) {
             Spacer(Modifier.weight(10f))
             Text(hoverText, textAlign = TextAlign.End)
         }
@@ -83,11 +86,13 @@ fun TransactionScreen(
                     0 -> ButtonGroup(
                         options = categoryTimeRanges,
                         currentSelection = categoryTimeRange,
+                        onSelection = onCategoryTimeRange,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)
                     )
                     else -> ButtonGroup(
                         options = historyTimeRanges,
                         currentSelection = historyTimeRange,
+                        onSelection = onHistoryTimeRange,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)
                     )
                 }

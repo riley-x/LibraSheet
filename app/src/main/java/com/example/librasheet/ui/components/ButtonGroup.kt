@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -53,20 +54,19 @@ fun CustomTextButton(
     text: String,
     enabled: Boolean,
     modifier: Modifier = Modifier,
-    colorBackground: Color = MaterialTheme.colors.primary,
-    colorText: Color =  MaterialTheme.colors.onPrimary,
+    colorBackground: Color = MaterialTheme.colors.background,
+    colorText: Color =  MaterialTheme.colors.primary,
     colorBackgroundDisabled: Color = MaterialTheme.colors.background,
-    colorTextDisabled: Color = MaterialTheme.colors.primary,
+    colorTextDisabled: Color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled),
     onSelection: (String) -> Unit = { },
 ) {
     Surface(
         shape = MaterialTheme.shapes.small,
         color = if (enabled) colorBackground else colorBackgroundDisabled,
-        contentColor = if (enabled) colorText else colorTextDisabled,
         modifier = modifier
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = MaterialTheme.colors.primary),
+                indication = rememberRipple(color = MaterialTheme.colors.onBackground),
             ) {
                 onSelection(text)
             }
@@ -77,6 +77,7 @@ fun CustomTextButton(
         ) {
             Text(
                 text = text,
+                color = if (enabled) colorText else colorTextDisabled,
                 style = MaterialTheme.typography.button,
             )
         }

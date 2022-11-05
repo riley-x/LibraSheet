@@ -29,7 +29,7 @@ import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 import kotlin.math.roundToInt
 
 
-private val tabs = listOf("Pie Chart", "History")
+private val tabs = listOf("Pie Chart", "History", "Net Income")
 
 
 @Composable
@@ -38,6 +38,8 @@ fun BalanceScreen(
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
     historyDates: SnapshotStateList<String>,
+//    netIncomeAxes: State<AxesState>,
+//    netIncome: SnapshotStateList<Float>,
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
 ) {
@@ -66,29 +68,16 @@ fun BalanceScreen(
                             modifier = Modifier
                                 .padding(start = 30.dp, end = 30.dp)
                         )
-                        else -> {
-                            val hoverLoc = remember { mutableStateOf(-1) }
-                            val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-                            val graph = stackedLineGraphDrawer(values = history)
-                            val graphHover = stackedLineGraphHover(values = history, hoverLoc = hoverLoc)
-                            fun onHover(isHover: Boolean, x: Float, y: Float) {
-                                if (history.value.isEmpty()) return
-                                if (isHover) {
-                                    hoverLoc.value = clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
-                                    hoverText = formatDollar(history.value.first().second[hoverLoc.value]) + "\n" + historyDates[hoverLoc.value]
-                                } else {
-                                    hoverLoc.value = -1
-                                    hoverText = ""
-                                }
-                            }
-                            Graph(
-                                axesState = historyAxes,
-                                contentBefore = graph,
-                                contentAfter = { if (showHover) graphHover(it) },
-                                onHover = ::onHover,
-                                modifier = Modifier.fillMaxSize(),
-                            )
+                        1-> StackedLineGraph(
+                            axes = historyAxes,
+                            history = history,
+                            modifier = Modifier.fillMaxSize()
+                        ) { isHover, loc ->
+                            hoverText = if (isHover)
+                                formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                            else ""
                         }
+                        else -> { }
                     }
                 }
             }
