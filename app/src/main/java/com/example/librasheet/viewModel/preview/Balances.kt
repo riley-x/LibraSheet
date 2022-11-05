@@ -6,6 +6,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.ui.components.ImmutableList
 import com.example.librasheet.ui.graphing.AxesState
+import com.example.librasheet.ui.graphing.DiscreteGraphState
 import com.example.librasheet.ui.graphing.StackedLineGraphState
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.dataClasses.NamedValue
@@ -71,6 +72,11 @@ val previewLineGraphAxes = mutableStateOf(AxesState(
     },
     ticksX = List(4) { NamedValue(value = 2f + 2f * it, name = "$it/$it/$it") }
 ))
+
+val previewLineGraphState = DiscreteGraphState(
+    values = previewLineGraph,
+    axes = previewLineGraphAxes,
+)
 
 val previewStackedLineGraphAxes = mutableStateOf(AxesState(
     minX = 0f,

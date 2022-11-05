@@ -34,7 +34,6 @@ fun AccountScreen(
     income: StackedLineGraphState,
     spending: StackedLineGraphState,
     modifier: Modifier = Modifier,
-    onAccountClick: (Account) -> Unit = { },
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -130,7 +129,7 @@ private fun Preview() {
             AccountScreen(
                 account = previewAccount,
                 dates = previewLineGraphDates,
-                balance = previewNetIncomeState,
+                balance = previewLineGraphState,
                 netIncome = previewNetIncomeState,
                 income = previewStackedLineGraphState,
                 spending = previewStackedLineGraphState,

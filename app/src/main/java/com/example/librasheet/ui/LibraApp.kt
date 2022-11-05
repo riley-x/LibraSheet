@@ -11,9 +11,11 @@ import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.*
+import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.ui.transaction.TransactionScreen
+import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
 
 
@@ -44,6 +46,14 @@ fun LibraApp(
         }
     }
 
+    fun onAccountClick(account: Account) {
+        // TODO view model set
+        navController.navigate(AccountDestination.route) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     /** Main Layout Scaffold **/
     Scaffold(
         bottomBar = {
@@ -68,20 +78,29 @@ fun LibraApp(
         ) {
             navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
                 composable(route = BalanceTab.route) {
-//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
                     BalanceScreen(
                         accounts = previewAccounts,
                         history = previewStackedLineGraphState,
                         dates = previewLineGraphDates,
                         netIncome = previewNetIncomeState,
+                        onAccountClick = ::onAccountClick,
                         modifier = Modifier.padding(bottom = bottomPadding),
+                    )
+                }
+                composable(route = AccountDestination.route) {
+                    AccountScreen(
+                        account = previewAccount,
+                        dates = previewLineGraphDates,
+                        balance = previewLineGraphState,
+                        netIncome = previewNetIncomeState,
+                        income = previewStackedLineGraphState,
+                        spending = previewStackedLineGraphState,
                     )
                 }
             }
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
-//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
                     TransactionScreen(
                         title = "Income",
                         categories = previewIncomeCategories,
@@ -95,14 +114,12 @@ fun LibraApp(
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
                     Text("Spending Tab")
                 }
             }
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {
-//                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
                     Text("Settings Tab")
                 }
             }

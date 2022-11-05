@@ -70,3 +70,8 @@ object SettingsTab : LibraTab {
 }
 
 val libraTabs = listOf(BalanceTab, IncomeTab, SpendingTab, SettingsTab)
+
+
+object AccountDestination {
+    const val route = "account_details"
+}
