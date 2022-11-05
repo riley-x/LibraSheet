@@ -1,5 +1,7 @@
 package com.example.librasheet.ui.balance
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +31,7 @@ import kotlin.math.roundToInt
 private val tabs = listOf("Pie Chart", "History", "Net Income")
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
@@ -59,28 +62,43 @@ fun BalanceScreen(
                         .height(300.dp)
                         .fillMaxWidth()
                 ) {
-                    when (selectedTab) {
-                        0 -> PieChart(
-                            values = accounts,
-                            modifier = Modifier
-                                .padding(start = 30.dp, end = 30.dp)
-                        )
-                        1-> StackedLineGraph(
-                            axes = historyAxes,
-                            history = history,
-                            modifier = Modifier.fillMaxSize()
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
-                            else ""
+                    AnimatedContent(
+                        targetState = selectedTab,
+                        transitionSpec = {
+                            slideIntoContainer(
+                                towards = AnimatedContentScope.SlideDirection.Start,
+                                animationSpec = tween(400 )
+                            ) + fadeIn(animationSpec = tween(400)) with
+                            slideOutOfContainer(
+                                towards = AnimatedContentScope.SlideDirection.Start,
+                                animationSpec = tween(200)
+                            ) + fadeOut(animationSpec = tween(200))
                         }
-                        else -> BinaryBarGraph(
-                            axes = netIncomeAxes,
-                            values = netIncome,
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(netIncome[loc]) + "\n" + historyDates[loc]
-                            else ""
+                    ) {
+                        when (it) {
+                            0 -> PieChart(
+                                values = accounts,
+                                modifier = Modifier
+                                    .padding(start = 30.dp, end = 30.dp)
+                            )
+                            1 -> StackedLineGraph(
+                                axes = historyAxes,
+                                history = history,
+                                modifier = Modifier.fillMaxSize()
+                            ) { isHover, loc ->
+                                hoverText = if (isHover)
+                                    formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                                else ""
+                            }
+                            else -> BinaryBarGraph(
+                                axes = netIncomeAxes,
+                                values = netIncome,
+                                modifier = Modifier.fillMaxSize()
+                            ) { isHover, loc ->
+                                hoverText = if (isHover)
+                                    formatDollar(netIncome[loc]) + "\n" + historyDates[loc]
+                                else ""
+                            }
                         }
                     }
                 }

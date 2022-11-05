@@ -71,6 +71,7 @@ fun stackedLineGraphHover(
     values: State<StackedLineGraphValues>,
     hoverLoc: State<Int>,
     indicatorColor: Color = MaterialTheme.colors.onSurface,
+    indicatorWidth: Dp = 1.dp,
     labelYStartPad: Dp = 8.dp,
 ): DrawScope.(GrapherInputs) -> Unit {
     val textStyle = MaterialTheme.typography.overline
@@ -86,6 +87,7 @@ fun stackedLineGraphHover(
                 it.userToPxX(hoverLoc.value.toFloat()),
                 it.userToPxY(it.axesState.maxY)
             ),
+            strokeWidth = indicatorWidth.toPx(),
         )
 
         /** Value flags **/
