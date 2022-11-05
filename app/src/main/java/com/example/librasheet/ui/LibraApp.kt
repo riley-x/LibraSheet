@@ -72,8 +72,7 @@ fun LibraApp(
 //                    LogCompositions("Zygos", "ZygosApp/Scaffold/Performance.route")
                     BalanceScreen(
                         accounts = previewAccounts,
-                        historyAxes = previewStackedLineGraphAxes,
-                        history = previewStackedLineGraph,
+                        history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         netIncome = previewNetIncome,
                         netIncomeAxes = previewNetIncomeAxes,
@@ -88,8 +87,7 @@ fun LibraApp(
                     TransactionScreen(
                         title = "Income",
                         categories = previewIncomeCategories,
-                        historyAxes = previewStackedLineGraphAxes,
-                        history = previewStackedLineGraph,
+                        history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
                         historyTimeRange = previewIncomeHistoryTimeRange

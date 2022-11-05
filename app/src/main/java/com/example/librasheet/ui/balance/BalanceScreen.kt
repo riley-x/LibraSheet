@@ -31,8 +31,7 @@ private val tabs = ImmutableList(listOf("Pie Chart", "History", "Net Income"))
 @Composable
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
-    historyAxes: State<AxesState>,
-    history: State<StackedLineGraphValues>,
+    history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
     netIncomeAxes: State<AxesState>,
     netIncome: SnapshotStateList<Float>,
@@ -67,12 +66,11 @@ fun BalanceScreen(
                                 .padding(start = 30.dp, end = 30.dp)
                         )
                         1 -> StackedLineGraph(
-                            axes = historyAxes,
-                            history = history,
+                            state = history,
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                                formatDollar(history.values.value.first().second[loc]) + "\n" + historyDates[loc]
                             else ""
                         }
                         else -> BinaryBarGraph(
@@ -112,8 +110,7 @@ private fun Preview() {
         Surface {
             BalanceScreen(
                 accounts = previewAccounts,
-                historyAxes = previewStackedLineGraphAxes,
-                history = previewStackedLineGraph,
+                history = previewStackedLineGraphState,
                 historyDates = previewEmptyStringList,
                 netIncome = previewNetIncome,
                 netIncomeAxes = previewNetIncomeAxes,

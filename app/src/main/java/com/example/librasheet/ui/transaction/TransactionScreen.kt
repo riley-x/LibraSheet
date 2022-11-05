@@ -32,8 +32,7 @@ private val tabs = ImmutableList(listOf("Categories", "History"))
 fun TransactionScreen(
     title: String,
     categories: SnapshotStateList<TransactionCategory>,
-    historyAxes: State<AxesState>,
-    history: State<StackedLineGraphValues>,
+    history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
     categoryTimeRange: State<CategoryTimeRange>,
     historyTimeRange: State<HistoryTimeRange>,
@@ -82,14 +81,13 @@ fun TransactionScreen(
                         }
                         else -> Column {
                             StackedLineGraph(
-                                axes = historyAxes,
-                                history = history,
+                                state = history,
                                 modifier = Modifier
                                     .height(300.dp)
                                     .fillMaxWidth()
                             ) { isHover, loc ->
                                 hoverText = if (isHover)
-                                    formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                                    formatDollar(history.values.value.first().second[loc]) + "\n" + historyDates[loc]
                                 else ""
                             }
                             ButtonGroup(
@@ -130,8 +128,7 @@ private fun Preview() {
             TransactionScreen(
                 title = "Income",
                 categories = previewIncomeCategories,
-                historyAxes = previewStackedLineGraphAxes,
-                history = previewStackedLineGraph,
+                history = previewStackedLineGraphState,
                 historyDates = previewEmptyStringList,
                 categoryTimeRange = previewIncomeCategoryTimeRange,
                 historyTimeRange = previewIncomeHistoryTimeRange,

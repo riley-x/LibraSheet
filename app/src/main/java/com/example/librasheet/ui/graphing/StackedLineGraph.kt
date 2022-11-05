@@ -26,6 +26,13 @@ import kotlin.math.roundToInt
 
 typealias StackedLineGraphValues = List<Pair<Color, List<Float>>>
 
+@Immutable
+data class StackedLineGraphState(
+    val axes: State<AxesState>,
+    val values: State<StackedLineGraphValues>,
+)
+
+
 /**
  * A stacked line graph draws a fill between each series. The user x coordinates in this
  * case are simply 0..lastIndex.
@@ -145,26 +152,25 @@ fun stackedLineGraphHover(
 
 @Composable
 fun StackedLineGraph(
-    axes: State<AxesState>,
-    history: State<StackedLineGraphValues>,
+    state: StackedLineGraphState,
     modifier: Modifier = Modifier,
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
     val hoverLoc = remember { mutableStateOf(-1) }
     val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-    val graph = stackedLineGraphDrawer(values = history)
-    val graphHover = stackedLineGraphHover(values = history, hoverLoc = hoverLoc)
+    val graph = stackedLineGraphDrawer(values = state.values)
+    val graphHover = stackedLineGraphHover(values = state.values, hoverLoc = hoverLoc)
     fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
-        if (history.value.isEmpty()) return
+        if (state.values.value.isEmpty()) return
         if (isHover) {
-            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
+            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.value.first().second.lastIndex)
         } else {
             hoverLoc.value = -1
         }
         onHover(isHover, hoverLoc.value)
     }
     Graph(
-        axesState = axes,
+        axesState = state.axes,
         contentBefore = graph,
         contentAfter = { if (showHover) graphHover(it) },
         onHover = ::onHoverInner,

@@ -11,7 +11,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-
+/**
+ * This allows the user to switch between different visuals using a dial selector. The switching is
+ * animated as a sliding transition matching the dial direction.
+ *
+ * @param content The content for each tab needs to be defined here. This should usually be a when
+ * case on the passed argument, which is the target tab index. DO NOT use [selectedTab].
+ * @param modifier Note this is passed to the AnimatedContent, and doesn't affect the dial selector
+ * or the containing column.
+ */
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun GraphSelector(
@@ -21,8 +29,10 @@ fun GraphSelector(
     onSelection: (Int) -> Unit = { },
     content: @Composable AnimatedVisibilityScope.(Int) -> Unit = { },
 ) {
-    /** This needs to be passed into AnimatedContent as part of the state, but the hoisted states
-     * don't need to include it. **/
+    /** This needs to be passed into AnimatedContent as part of the state so the animation knows
+     * which direction to move (which CAN'T be figured out with just the indices when there are exactly
+     * two tabs). However, the hoisted states don't need to care about it. **/
+    // TODO do we need to hoist the selected tab state at all?
     val wasFromDialRight = remember { mutableStateOf(true) }
 
     Column {
