@@ -73,8 +73,7 @@ fun LibraApp(
                         accounts = previewAccounts,
                         history = previewStackedLineGraphState,
                         dates = previewLineGraphDates,
-                        netIncome = previewNetIncome,
-                        netIncomeAxes = previewNetIncomeAxes,
+                        netIncome = previewNetIncomeState,
                         modifier = Modifier.padding(bottom = bottomPadding),
                     )
                 }
