@@ -57,7 +57,7 @@ data class GrapherInputs (
 
 /**
  * This is an "abstract" class that handles the grid, axes, labels, and callbacks of a graph.
- * Users should implement the main graph drawing via the [content] lambda
+ * Users should implement the main graph drawing via the [contentBefore] and [contentAfter] lambdas
  *
  * @param axesState         This sets the grid lines and axes labels, and also the x/y axes ranges.
  * @param contentBefore     This content is painted before the grid and labels
@@ -227,7 +227,6 @@ fun Graph(
 }
 
 
-@OptIn(ExperimentalTextApi::class)
 @Preview
 @Composable
 private fun Preview() {

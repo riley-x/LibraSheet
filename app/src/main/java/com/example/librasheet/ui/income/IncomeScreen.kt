@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.balance
+package com.example.librasheet.ui.income
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.math.MathUtils.clamp
+import androidx.core.math.MathUtils
+import com.example.librasheet.ui.balance.BalanceRow
+import com.example.librasheet.ui.balance.tabs
 import com.example.librasheet.ui.components.DialSelector
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowDivider
@@ -28,12 +30,8 @@ import com.example.librasheet.viewModel.preview.previewStackedLineGraph
 import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 import kotlin.math.roundToInt
 
-
-val tabs = listOf("Pie Chart", "History")
-
-
 @Composable
-fun BalanceScreen(
+fun IncomeScreen(
     accounts: SnapshotStateList<Account>,
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
@@ -74,7 +72,7 @@ fun BalanceScreen(
                             fun onHover(isHover: Boolean, x: Float, y: Float) {
                                 if (history.value.isEmpty()) return
                                 if (isHover) {
-                                    hoverLoc.value = clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
+                                    hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
                                     hoverText = formatDollar(history.value.first().second[hoverLoc.value]) + "\n" + historyDates[hoverLoc.value]
                                 } else {
                                     hoverLoc.value = -1
@@ -104,7 +102,7 @@ fun BalanceScreen(
 
             itemsIndexed(accounts) { index, account ->
                 if (index > 0) RowDivider()
-                
+
                 BalanceRow(
                     account = account,
                     modifier = Modifier
@@ -124,7 +122,7 @@ fun BalanceScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            BalanceScreen(
+            IncomeScreen(
                 accounts = previewAccounts,
                 historyAxes = previewStackedLineGraphAxes,
                 history = previewStackedLineGraph,

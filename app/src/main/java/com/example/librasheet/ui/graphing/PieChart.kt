@@ -15,6 +15,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -34,19 +35,25 @@ import java.lang.Math.toDegrees
 
 private const val DividerLengthInDegrees = 1.8f
 
+interface PieChartValue {
+    val name: String
+    val value: Float
+    val color: Color
+}
+
 /**
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PieChart(
-    accounts: SnapshotStateList<Account>,
+fun <T: PieChartValue> PieChart(
+    values: SnapshotStateList<T>,
     modifier: Modifier = Modifier,
     stroke: Dp = 30.dp,
 ) {
-    val total = accounts.sumOf(Account::balance)
-    val angles = FloatArray(accounts.size + 1) // first entry is 0, last entry is 360
-    for (index in accounts.indices) {
-        angles[index + 1] = angles[index] + 360f * accounts[index].balance / total
+    val total = values.sumOf { it.value.toDouble() }.toFloat()
+    val angles = FloatArray(values.size + 1) // first entry is 0, last entry is 360
+    for (index in values.indices) {
+        angles[index + 1] = angles[index] + 360f * values[index].value / total
     }
 
     var boxSize by remember { mutableStateOf(IntSize(0, 0)) }
@@ -92,8 +99,8 @@ fun PieChart(
             val size = Size(innerRadius * 2, innerRadius * 2)
             var startAngle = -90f
             val totalAngle = 360f
-            accounts.forEachIndexed { index, account ->
-                val sweep = totalAngle * account.balance / total
+            values.forEachIndexed { index, account ->
+                val sweep = totalAngle * account.value / total
                 drawArc(
                     color = account.color,
                     startAngle = startAngle + DividerLengthInDegrees / 2,
@@ -106,10 +113,10 @@ fun PieChart(
                 startAngle += sweep
             }
         }
-        val centerText = if (focusIndex < 0 || focusIndex >= accounts.size) {
+        val centerText = if (focusIndex < 0 || focusIndex >= values.size) {
             "Total\n" + formatDollar(total)
         } else {
-            accounts[focusIndex].name + "\n" + formatPercent(accounts[focusIndex].balance.toFloat() / total)
+            values[focusIndex].name + "\n" + formatPercent(values[focusIndex].value / total)
         }
         Text(centerText,
             style = MaterialTheme.typography.h2,
@@ -125,7 +132,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             PieChart(
-                accounts = previewAccounts,
+                values = previewAccounts,
                 modifier = Modifier.size(300.dp),
             )
         }
