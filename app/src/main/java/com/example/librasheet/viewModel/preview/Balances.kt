@@ -34,6 +34,7 @@ val previewAccounts = mutableStateListOf(
 )
 
 
+val previewGraphLabels = mutableStateListOf("Pie Chart", "History")
 
 val previewStackedLineGraph = mutableStateOf(listOf(
     Pair(
@@ -59,10 +60,10 @@ val previewLineGraph = previewStackedLineGraph.value[0].second
 val previewLineGraphAxes = mutableStateOf(AxesState(
     minX = 0f,
     maxX = previewLineGraph.lastIndex.toFloat(),
-    minY = 80_000f,
+    minY = 75_000f,
     maxY = 95_000f,
     ticksY = List(4) {
-        val value = 83_000f + it * 3_000f
+        val value = 79_000f + it * 4_000f
         NamedValue(value, "${value / 1000}k")
     },
     ticksX = List(4) { NamedValue(value = 2f + 2f * it, name = "$it/$it/$it") }
@@ -80,7 +81,17 @@ val previewStackedLineGraphAxes = mutableStateOf(AxesState(
     ticksX = List(4) { NamedValue(value = 2f + 2f * it, name = "$it/$it/$it") }
 ))
 
+val previewLineGraphDates = mutableStateListOf(
+    "January 21",
+    "February 21",
+    "March 21",
+    "April 21",
+    "May 21",
+    "June 21",
+    "July 21",
+    "August 21",
+    "September 21",
+)
 
 
 
-val previewGraphLabels = mutableStateListOf("Pie Chart", "History")

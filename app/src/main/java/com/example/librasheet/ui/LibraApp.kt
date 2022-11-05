@@ -15,6 +15,7 @@ import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.graphing.PieChart
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.viewModel.preview.previewAccounts
+import com.example.librasheet.viewModel.preview.previewLineGraphDates
 import com.example.librasheet.viewModel.preview.previewStackedLineGraph
 import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 
@@ -57,6 +58,10 @@ fun LibraApp(
         },
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
     ) { innerPadding ->
+        /** If you try to pad the NavHost, there will be a flicker when the soft keyboard animates
+         * open. Instead, need to pad the columns inside each screen composable. Only need the special
+         * case for screens that have an edit text field though.
+         */
         val bottomPadding = if (WindowInsets.isImeVisible) 0.dp else innerPadding.calculateBottomPadding()
         NavHost(
             navController = navController,
@@ -71,6 +76,8 @@ fun LibraApp(
                         accounts = previewAccounts,
                         historyAxes = previewStackedLineGraphAxes,
                         history = previewStackedLineGraph,
+                        historyDates = previewLineGraphDates,
+                        modifier = Modifier.padding(bottom = bottomPadding),
                     )
                 }
             }

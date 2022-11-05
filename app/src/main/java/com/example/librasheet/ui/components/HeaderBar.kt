@@ -17,6 +17,7 @@ fun HeaderBar(
     modifier: Modifier = Modifier,
     backArrow: Boolean = false,
     onBack: () -> Unit = { },
+    content: @Composable RowScope.() -> Unit = { },
 ) {
     Surface(
         modifier = modifier
@@ -42,6 +43,8 @@ fun HeaderBar(
                 text = title,
                 style = MaterialTheme.typography.h1,
             )
+
+            content()
         }
     }
 }
