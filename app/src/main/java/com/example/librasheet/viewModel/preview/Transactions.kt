@@ -7,11 +7,11 @@ import com.example.librasheet.viewModel.dataClasses.Transaction
 val previewTransactions = mutableStateListOf(
     Transaction(
         account = "BofA Checking",
-        name = "TARGET STORE",
+        name = "TARGET STORE REALLY LONG LOREM IPSUM IDK 243734568973897563894768934768937987",
         date = 20221105,
         value = -3_88_00,
         color = Color.Blue,
-        category = "",
+        category = "Utilities",
     ),
     Transaction(
         account = "BofA Checking",
@@ -19,7 +19,7 @@ val previewTransactions = mutableStateListOf(
         date = 20221104,
         value = -42_49_00,
         color = Color.Blue,
-        category = "",
+        category = "Groceries",
     ),
     Transaction(
         account = "BofA Checking",
@@ -27,7 +27,7 @@ val previewTransactions = mutableStateListOf(
         date = 20221103,
         value = -28_59_00,
         color = Color.Blue,
-        category = "",
+        category = "Luxury",
     ),
     Transaction(
         account = "BofA Checking",
@@ -35,6 +35,6 @@ val previewTransactions = mutableStateListOf(
         date = 20221103,
         value = 2_500_00_00,
         color = Color.Green,
-        category = "",
+        category = "Compensation",
     ),
 )

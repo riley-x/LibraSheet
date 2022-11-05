@@ -95,6 +95,7 @@ fun LibraApp(
                         netIncome = previewNetIncomeState,
                         income = previewStackedLineGraphState,
                         spending = previewStackedLineGraphState,
+                        transactions = previewTransactions,
                         onBack = navController::popBackStack,
                     )
                 }
