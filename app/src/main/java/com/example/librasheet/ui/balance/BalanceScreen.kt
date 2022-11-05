@@ -4,16 +4,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.math.MathUtils.clamp
 import com.example.librasheet.ui.components.DialSelector
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowDivider
@@ -23,11 +30,13 @@ import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewStackedLineGraph
 import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
+import kotlin.math.roundToInt
 
 
 val tabs = listOf("Pie Chart", "History")
 
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
@@ -45,7 +54,6 @@ fun BalanceScreen(
 
         LazyColumn {
             item("graphic") {
-                val boxSize = remember { mutableStateOf(IntSize(10, 10)) }
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -58,12 +66,25 @@ fun BalanceScreen(
                             modifier = Modifier
                                 .padding(start = 30.dp, end = 30.dp)
                         )
-                        else -> Graph(
-                            axesState = historyAxes,
-                            gridAbove = true,
-                            content = stackedLineGraph(values = history),
-                            modifier = Modifier.fillMaxSize()
-                        )
+                        else -> {
+                            val hoverLoc = remember { mutableStateOf(-1) }
+                            val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
+                            val graph = stackedLineGraph(values = history)
+                            val graphHover = stackedLineGraphHover(values = history, hoverLoc = hoverLoc)
+                            fun onHover(isHover: Boolean, x: Float, y: Float) {
+                                hoverLoc.value =
+                                    if (isHover)
+                                        clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
+                                    else -1
+                            }
+                            Graph(
+                                axesState = historyAxes,
+                                contentBefore = graph,
+                                contentAfter = { if (showHover) graphHover(it) },
+                                onHover = ::onHover,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
                     }
                 }
             }

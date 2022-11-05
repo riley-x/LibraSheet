@@ -15,7 +15,7 @@ fun formatDollar(value: Long): String {
 }
 
 @Stable
-fun formatDollarNoSymbol(value: Float, length: Int = 0): String {
+fun format2Decimals(value: Float, length: Int = 0): String {
     val format = NumberFormat.getNumberInstance()
     format.minimumFractionDigits = 2
     format.maximumFractionDigits = 2

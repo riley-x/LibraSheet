@@ -47,20 +47,21 @@ data class AxesState(
     val maxX: Float = 100f,
 )
 
-typealias Grapher = DrawScope.(
-    axesState: AxesState,
-    userToPxX: (Float) -> Float,
-    userToPxY: (Float) -> Float,
-) -> Unit
+@OptIn(ExperimentalTextApi::class)
+data class GrapherInputs (
+    val axesState: AxesState,
+    val userToPxX: (Float) -> Float,
+    val userToPxY: (Float) -> Float,
+    val textMeasurer: TextMeasurer,
+)
 
 /**
  * This is an "abstract" class that handles the grid, axes, labels, and callbacks of a graph.
  * Users should implement the main graph drawing via the [content] lambda
  *
  * @param axesState         This sets the grid lines and axes labels, and also the x/y axes ranges.
- * @param gridAbove         If true, will plot the grid lines above [content].
- * @param content           The main graphing function. It should call draw functions on the
- *                          passed drawScope parameter.
+ * @param contentBefore     This content is painted before the grid and labels
+ * @param contentAfter      This content is painted after the grid and labels
  * @param hover             Enable hover functionality
  * @param labelXTopPad      Padding above the x tick labels
  * @param labelYStartPad    Padding to the left of the y tick labels
@@ -73,13 +74,13 @@ typealias Grapher = DrawScope.(
 fun Graph(
     axesState: State<AxesState>,
     modifier: Modifier = Modifier,
-    gridAbove: Boolean = false,
     hover: Boolean = true,
     labelYStartPad: Dp = 8.dp, // padding left of label
     labelXTopPad: Dp = 2.dp, // padding top of label
     onHover: (isHover: Boolean, x: Float, y: Float) -> Unit = { _, _, _ -> },
     onPress: () -> Unit = { },
-    content: Grapher = { _, _, _ -> },
+    contentBefore: DrawScope.(GrapherInputs) -> Unit = { _ -> },
+    contentAfter: DrawScope.(GrapherInputs) -> Unit = { _ -> },
 ) {
     /** Cache some text variables (note MaterialTheme is not accessible in DrawScope) **/
     val textMeasurer = rememberTextMeasurer()
@@ -166,8 +167,12 @@ fun Graph(
         fun userToPxX(userX: Float) = startX + deltaX * (userX - axesState.value.minX)
         fun userToPxY(userY: Float) = startY + deltaY * (userY - axesState.value.minY)
 
+        val grapherInputs = GrapherInputs(
+            axesState.value, ::userToPxX, ::userToPxY, textMeasurer
+        )
+
         /** Main Plot **/
-        if (gridAbove) content(axesState.value, ::userToPxX, ::userToPxY)
+        contentBefore(grapherInputs)
 
         /** Y Gridlines and Axis Labels **/
         for (tick in axesState.value.ticksY) {
@@ -178,11 +183,10 @@ fun Graph(
                 color = gridColor,
                 pathEffect = gridPathEffect,
             )
-            val layoutResult: TextLayoutResult =
-                textMeasurer.measure(
-                    text = AnnotatedString(tick.name),
-                    style = textStyle,
-                )
+            val layoutResult = textMeasurer.measure(
+                text = AnnotatedString(tick.name),
+                style = textStyle,
+            )
             drawText(
                 textLayoutResult = layoutResult,
                 color = textColor,
@@ -218,11 +222,12 @@ fun Graph(
         }
 
         /** Main Plot **/
-        if (!gridAbove) content(axesState.value, ::userToPxX, ::userToPxY)
+        contentAfter(grapherInputs)
     }
 }
 
 
+@OptIn(ExperimentalTextApi::class)
 @Preview
 @Composable
 private fun Preview() {

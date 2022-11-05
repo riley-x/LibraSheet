@@ -27,15 +27,11 @@ fun lineGraph(
     values: List<Float>,
     color: Color = MaterialTheme.colors.onSurface,
     size: Float = with(LocalDensity.current) { 2.dp.toPx() },
-): Grapher {
-    return fun DrawScope.(
-        _: AxesState,
-        userToPxX: (Float) -> Float,
-        userToPxY: (Float) -> Float,
-    ) {
+): DrawScope.(GrapherInputs) -> Unit {
+    return fun DrawScope.(grapherInputs: GrapherInputs) {
         fun loc(i: Int) = Offset(
-            x = userToPxX(i.toFloat()),
-            y = userToPxY(values[i])
+            x = grapherInputs.userToPxX(i.toFloat()),
+            y = grapherInputs.userToPxY(values[i])
         )
 
         val path = Path().apply {
@@ -62,7 +58,7 @@ private fun Preview() {
         Surface {
             Graph(
                 axesState = previewLineGraphAxes,
-                content = lineGraph(previewLineGraph),
+                contentAfter = lineGraph(previewLineGraph),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }
