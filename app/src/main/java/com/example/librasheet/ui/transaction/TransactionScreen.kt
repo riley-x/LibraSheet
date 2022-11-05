@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.income
+package com.example.librasheet.ui.transaction
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,7 +25,7 @@ private val tabs = listOf("Categories", "History")
 
 
 @Composable
-fun IncomeScreen(
+fun TransactionScreen(
     categories: SnapshotStateList<TransactionCategory>,
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
@@ -102,7 +102,7 @@ fun IncomeScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            IncomeScreen(
+            TransactionScreen(
                 categories = previewIncomeCategories,
                 historyAxes = previewStackedLineGraphAxes,
                 history = previewStackedLineGraph,
