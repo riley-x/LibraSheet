@@ -3,10 +3,7 @@ package com.example.librasheet.ui.graphing
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -19,10 +16,12 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.math.MathUtils
 import com.example.librasheet.ui.components.format2Decimals
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewStackedLineGraph
 import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
+import kotlin.math.roundToInt
 
 
 typealias StackedLineGraphValues = List<Pair<Color, List<Float>>>
@@ -35,7 +34,7 @@ typealias StackedLineGraphValues = List<Pair<Color, List<Float>>>
  * stack, with values pre-added.
  */
 @Composable
-fun stackedLineGraph(
+fun stackedLineGraphDrawer(
     values: State<StackedLineGraphValues>,
 ): DrawScope.(GrapherInputs) -> Unit {
     return fun DrawScope.(grapherInputs: GrapherInputs) {
@@ -139,6 +138,37 @@ fun stackedLineGraphHover(
 
 
 
+@Composable
+fun StackedLineGraph(
+    axes: State<AxesState>,
+    history: State<StackedLineGraphValues>,
+    modifier: Modifier = Modifier,
+    onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
+) {
+    val hoverLoc = remember { mutableStateOf(-1) }
+    val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
+    val graph = stackedLineGraphDrawer(values = history)
+    val graphHover = stackedLineGraphHover(values = history, hoverLoc = hoverLoc)
+    fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
+        if (history.value.isEmpty()) return
+        if (isHover) {
+            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
+        } else {
+            hoverLoc.value = -1
+        }
+        onHover(isHover, hoverLoc.value)
+    }
+    Graph(
+        axesState = axes,
+        contentBefore = graph,
+        contentAfter = { if (showHover) graphHover(it) },
+        onHover = ::onHoverInner,
+        modifier = modifier,
+    )
+}
+
+
+
 
 @Preview
 @Composable
@@ -147,7 +177,7 @@ private fun Preview() {
         Surface {
             Graph(
                 axesState = previewStackedLineGraphAxes,
-                contentBefore = stackedLineGraph(previewStackedLineGraph),
+                contentBefore = stackedLineGraphDrawer(previewStackedLineGraph),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }
@@ -161,7 +191,7 @@ private fun PreviewHover() {
     LibraSheetTheme {
         Surface {
             val hoverLoc = remember { mutableStateOf(2) }
-            val graph = stackedLineGraph(previewStackedLineGraph)
+            val graph = stackedLineGraphDrawer(previewStackedLineGraph)
             val graphHover = stackedLineGraphHover(previewStackedLineGraph, hoverLoc)
             Graph(
                 axesState = previewStackedLineGraphAxes,

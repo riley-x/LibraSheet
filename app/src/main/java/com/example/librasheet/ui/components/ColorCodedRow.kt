@@ -9,13 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
-val LibraRowHorizontalPadding = 20.dp
-
+val libraRowHorizontalPadding = 20.dp
+val libraRowHeight = 50.dp
 
 /**
  * Base row composable for various lists, like accounts, income, or expenses.
@@ -29,9 +28,9 @@ fun ColorCodedRow(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .height(50.dp)
+            .height(libraRowHeight)
             .fillMaxWidth()
-            .padding(horizontal = LibraRowHorizontalPadding)
+            .padding(horizontal = libraRowHorizontalPadding)
     ) {
         Spacer(
             Modifier
@@ -52,7 +51,7 @@ fun RowDivider(modifier: Modifier = Modifier) {
         color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
         thickness = 1.dp,
         modifier = modifier
-            .padding(horizontal = LibraRowHorizontalPadding)
+            .padding(horizontal = libraRowHorizontalPadding)
     )
 }
 

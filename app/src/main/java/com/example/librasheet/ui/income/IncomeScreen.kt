@@ -14,30 +14,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.math.MathUtils
-import com.example.librasheet.ui.balance.BalanceRow
-import com.example.librasheet.ui.balance.tabs
-import com.example.librasheet.ui.components.DialSelector
-import com.example.librasheet.ui.components.HeaderBar
-import com.example.librasheet.ui.components.RowDivider
-import com.example.librasheet.ui.components.formatDollar
+import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.Account
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewEmptyStringList
-import com.example.librasheet.viewModel.preview.previewStackedLineGraph
-import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
-import kotlin.math.roundToInt
+import com.example.librasheet.viewModel.dataClasses.TransactionCategory
+import com.example.librasheet.viewModel.preview.*
+
+
+private val tabs = listOf("Categories", "History")
+
 
 @Composable
 fun IncomeScreen(
-    accounts: SnapshotStateList<Account>,
+    categories: SnapshotStateList<TransactionCategory>,
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
     historyDates: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
-    onAccountClick: (Account) -> Unit = { },
+    onCategoryClick: (TransactionCategory) -> Unit = { },
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -45,7 +39,7 @@ fun IncomeScreen(
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = "Balances") {
+        HeaderBar(title = "Income") {
             Spacer(Modifier.weight(10f))
             Text(hoverText, textAlign = TextAlign.End)
         }
@@ -60,32 +54,18 @@ fun IncomeScreen(
                 ) {
                     when (selectedTab) {
                         0 -> PieChart(
-                            values = accounts,
+                            values = categories,
                             modifier = Modifier
                                 .padding(start = 30.dp, end = 30.dp)
                         )
-                        else -> {
-                            val hoverLoc = remember { mutableStateOf(-1) }
-                            val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-                            val graph = stackedLineGraph(values = history)
-                            val graphHover = stackedLineGraphHover(values = history, hoverLoc = hoverLoc)
-                            fun onHover(isHover: Boolean, x: Float, y: Float) {
-                                if (history.value.isEmpty()) return
-                                if (isHover) {
-                                    hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, history.value.first().second.lastIndex)
-                                    hoverText = formatDollar(history.value.first().second[hoverLoc.value]) + "\n" + historyDates[hoverLoc.value]
-                                } else {
-                                    hoverLoc.value = -1
-                                    hoverText = ""
-                                }
-                            }
-                            Graph(
-                                axesState = historyAxes,
-                                contentBefore = graph,
-                                contentAfter = { if (showHover) graphHover(it) },
-                                onHover = ::onHover,
-                                modifier = Modifier.fillMaxSize(),
-                            )
+                        else -> StackedLineGraph(
+                            axes = historyAxes,
+                            history = history,
+                            modifier = Modifier.fillMaxSize()
+                        ) { isHover, loc ->
+                            hoverText = if (isHover)
+                                formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                                else ""
                         }
                     }
                 }
@@ -100,13 +80,13 @@ fun IncomeScreen(
                 )
             }
 
-            itemsIndexed(accounts) { index, account ->
+            itemsIndexed(categories) { index, category ->
                 if (index > 0) RowDivider()
 
-                BalanceRow(
-                    account = account,
+                CategoryRow(
+                    category = category,
                     modifier = Modifier
-                        .clickable { onAccountClick(account) }
+                        .clickable { onCategoryClick(category) }
                 )
             }
         }
@@ -123,7 +103,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             IncomeScreen(
-                accounts = previewAccounts,
+                categories = previewIncomeCategories,
                 historyAxes = previewStackedLineGraphAxes,
                 history = previewStackedLineGraph,
                 historyDates = previewEmptyStringList,

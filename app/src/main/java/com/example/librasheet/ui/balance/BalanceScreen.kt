@@ -29,7 +29,7 @@ import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 import kotlin.math.roundToInt
 
 
-val tabs = listOf("Pie Chart", "History")
+private val tabs = listOf("Pie Chart", "History")
 
 
 @Composable
@@ -69,7 +69,7 @@ fun BalanceScreen(
                         else -> {
                             val hoverLoc = remember { mutableStateOf(-1) }
                             val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-                            val graph = stackedLineGraph(values = history)
+                            val graph = stackedLineGraphDrawer(values = history)
                             val graphHover = stackedLineGraphHover(values = history, hoverLoc = hoverLoc)
                             fun onHover(isHover: Boolean, x: Float, y: Float) {
                                 if (history.value.isEmpty()) return
