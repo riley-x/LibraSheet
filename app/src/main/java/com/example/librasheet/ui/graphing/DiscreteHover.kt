@@ -23,7 +23,7 @@ import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
  */
 @Composable
 fun discreteHover(
-    hoverLoc: State<Int>,
+    loc: State<Int>,
     width: Dp = 1.dp,
     color: Color = MaterialTheme.colors.onSurface,
 ): DrawScope.(GrapherInputs) -> Unit {
@@ -31,11 +31,11 @@ fun discreteHover(
         drawLine(
             color = color,
             start = Offset(
-                it.userToPxX(hoverLoc.value.toFloat()),
+                it.userToPxX(loc.value.toFloat()),
                 it.userToPxY(it.axesState.minY)
             ),
             end = Offset(
-                it.userToPxX(hoverLoc.value.toFloat()),
+                it.userToPxX(loc.value.toFloat()),
                 it.userToPxY(it.axesState.maxY)
             ),
             strokeWidth = width.toPx()

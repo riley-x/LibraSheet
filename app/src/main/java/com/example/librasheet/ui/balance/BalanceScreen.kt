@@ -22,10 +22,7 @@ import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewEmptyStringList
-import com.example.librasheet.viewModel.preview.previewStackedLineGraph
-import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
+import com.example.librasheet.viewModel.preview.*
 import kotlin.math.roundToInt
 
 
@@ -38,8 +35,8 @@ fun BalanceScreen(
     historyAxes: State<AxesState>,
     history: State<StackedLineGraphValues>,
     historyDates: SnapshotStateList<String>,
-//    netIncomeAxes: State<AxesState>,
-//    netIncome: SnapshotStateList<Float>,
+    netIncomeAxes: State<AxesState>,
+    netIncome: SnapshotStateList<Float>,
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
 ) {
@@ -77,7 +74,14 @@ fun BalanceScreen(
                                 formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
                             else ""
                         }
-                        else -> { }
+                        else -> BinaryBarGraph(
+                            axes = netIncomeAxes,
+                            values = netIncome,
+                        ) { isHover, loc ->
+                            hoverText = if (isHover)
+                                formatDollar(netIncome[loc]) + "\n" + historyDates[loc]
+                            else ""
+                        }
                     }
                 }
             }
@@ -118,6 +122,8 @@ private fun Preview() {
                 historyAxes = previewStackedLineGraphAxes,
                 history = previewStackedLineGraph,
                 historyDates = previewEmptyStringList,
+                netIncome = previewNetIncome,
+                netIncomeAxes = previewNetIncomeAxes,
             )
         }
     }

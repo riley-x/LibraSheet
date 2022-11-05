@@ -32,7 +32,7 @@ val previewNetIncome = mutableStateListOf(
 )
 
 val previewNetIncomeAxes = mutableStateOf(AxesState(
-    minX = -0.5f,
+    minX = -0.75f,
     maxX = previewNetIncome.lastIndex + 0.5f,
     minY = -500f,
     maxY = 1200f,

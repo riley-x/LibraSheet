@@ -3,7 +3,7 @@ package com.example.librasheet.ui.graphing
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -12,10 +12,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.math.MathUtils
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewNetIncome
 import com.example.librasheet.viewModel.preview.previewNetIncomeAxes
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * A bar graph that draws the fill color based on whether the value is above or below a threshold.
@@ -59,6 +61,38 @@ fun binaryBarGraphDrawer(
     }
 }
 
+
+@Composable
+fun BinaryBarGraph(
+    axes: State<AxesState>,
+    values: SnapshotStateList<Float>,
+    modifier: Modifier = Modifier,
+    onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
+) {
+    val hoverLoc = remember { mutableStateOf(-1) }
+    val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
+    val graph = binaryBarGraphDrawer(values = values)
+    val graphHover = discreteHover(loc = hoverLoc)
+    fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
+        if (values.isEmpty()) return
+        if (isHover) {
+            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, values.lastIndex)
+        } else {
+            hoverLoc.value = -1
+        }
+        onHover(isHover, hoverLoc.value)
+    }
+    Graph(
+        axesState = axes,
+        contentBefore = graph,
+        contentAfter = { if (showHover) graphHover(it) },
+        onHover = ::onHoverInner,
+        modifier = modifier,
+    )
+}
+
+
+
 @Preview
 @Composable
 private fun Preview() {
@@ -66,7 +100,7 @@ private fun Preview() {
         Surface {
             Graph(
                 axesState = previewNetIncomeAxes,
-                contentAfter = binaryBarGraphDrawer(previewNetIncome),
+                contentBefore = binaryBarGraphDrawer(previewNetIncome),
                 modifier = Modifier.size(360.dp, 360.dp)
             )
         }

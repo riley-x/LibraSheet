@@ -75,6 +75,8 @@ fun LibraApp(
                         historyAxes = previewStackedLineGraphAxes,
                         history = previewStackedLineGraph,
                         historyDates = previewLineGraphDates,
+                        netIncome = previewNetIncome,
+                        netIncomeAxes = previewNetIncomeAxes,
                         modifier = Modifier.padding(bottom = bottomPadding),
                     )
                 }
