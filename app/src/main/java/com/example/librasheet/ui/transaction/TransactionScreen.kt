@@ -25,7 +25,7 @@ import com.example.librasheet.viewModel.historyTimeRanges
 import com.example.librasheet.viewModel.preview.*
 
 
-private val tabs = listOf("Categories", "History")
+private val tabs = ImmutableList(listOf("Categories", "History"))
 
 
 @Composable
@@ -43,7 +43,7 @@ fun TransactionScreen(
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf(0) }
+    val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
 
     Column(
@@ -56,55 +56,53 @@ fun TransactionScreen(
 
         LazyColumn {
             item("graphic") {
-                Box(
-                    contentAlignment = Alignment.Center,
+                GraphSelector(
+                    tabs = tabs,
+                    selectedTab = selectedTab,
+                    onSelection = { selectedTab.value = it },
                     modifier = Modifier
-                        .height(300.dp)
                         .fillMaxWidth()
                 ) {
-                    when (selectedTab) {
-                        0 -> PieChart(
-                            values = categories,
-                            modifier = Modifier
-                                .padding(start = 30.dp, end = 30.dp)
-                        )
-                        else -> StackedLineGraph(
-                            axes = historyAxes,
-                            history = history,
-                            modifier = Modifier.fillMaxSize()
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                    when (it) {
+                        0 -> Column {
+                            PieChart(
+                                values = categories,
+                                modifier = Modifier
+                                    .height(300.dp)
+                                    .padding(start = 30.dp, end = 30.dp)
+                            )
+                            ButtonGroup(
+                                options = categoryTimeRanges,
+                                currentSelection = categoryTimeRange,
+                                onSelection = onCategoryTimeRange,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 30.dp, vertical = 5.dp)
+                            )
+                        }
+                        else -> Column {
+                            StackedLineGraph(
+                                axes = historyAxes,
+                                history = history,
+                                modifier = Modifier
+                                    .height(300.dp)
+                                    .fillMaxWidth()
+                            ) { isHover, loc ->
+                                hoverText = if (isHover)
+                                    formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
                                 else ""
+                            }
+                            ButtonGroup(
+                                options = historyTimeRanges,
+                                currentSelection = historyTimeRange,
+                                onSelection = onHistoryTimeRange,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 30.dp, vertical = 5.dp)
+                            )
                         }
                     }
                 }
-            }
-
-            item("time range") {
-                when (selectedTab) {
-                    0 -> ButtonGroup(
-                        options = categoryTimeRanges,
-                        currentSelection = categoryTimeRange,
-                        onSelection = onCategoryTimeRange,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)
-                    )
-                    else -> ButtonGroup(
-                        options = historyTimeRanges,
-                        currentSelection = historyTimeRange,
-                        onSelection = onHistoryTimeRange,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)
-                    )
-                }
-            }
-
-            item("selector") {
-                DialSelector(
-                    selectedIndex = selectedTab,
-                    labels = tabs,
-                    onSelection = { selectedTab = it },
-                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp)
-                )
             }
 
             itemsIndexed(categories) { index, category ->

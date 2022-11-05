@@ -17,10 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils.clamp
-import com.example.librasheet.ui.components.DialSelector
-import com.example.librasheet.ui.components.HeaderBar
-import com.example.librasheet.ui.components.RowDivider
-import com.example.librasheet.ui.components.formatDollar
+import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
@@ -28,10 +25,9 @@ import com.example.librasheet.viewModel.preview.*
 import kotlin.math.roundToInt
 
 
-private val tabs = listOf("Pie Chart", "History", "Net Income")
+private val tabs = ImmutableList(listOf("Pie Chart", "History", "Net Income"))
 
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
@@ -43,7 +39,7 @@ fun BalanceScreen(
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf(0) }
+    val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
 
     Column(
@@ -56,70 +52,40 @@ fun BalanceScreen(
 
         LazyColumn {
             item("graphic") {
-                Box(
-                    contentAlignment = Alignment.Center,
+                GraphSelector(
+                    tabs = tabs,
+                    selectedTab = selectedTab,
+                    onSelection = { selectedTab.value = it },
                     modifier = Modifier
                         .height(300.dp)
                         .fillMaxWidth()
                 ) {
-                    AnimatedContent(
-                        targetState = selectedTab,
-                        transitionSpec = {
-                            val towards =
-                                if (targetState == 0 && initialState == tabs.lastIndex)
-                                    AnimatedContentScope.SlideDirection.Start
-                                else if (targetState == tabs.lastIndex && initialState == 0)
-                                    AnimatedContentScope.SlideDirection.End
-                                else if (targetState > initialState)
-                                    AnimatedContentScope.SlideDirection.Start
-                                else
-                                    AnimatedContentScope.SlideDirection.End
-                            slideIntoContainer(
-                                towards = towards,
-                                animationSpec = tween(400 )
-                            ) + fadeIn(animationSpec = tween(400)) with
-                            slideOutOfContainer(
-                                towards = towards,
-                                animationSpec = tween(200)
-                            ) + fadeOut(animationSpec = tween(200))
+                    when (it) {
+                        0 -> PieChart(
+                            values = accounts,
+                            modifier = Modifier
+                                .padding(start = 30.dp, end = 30.dp)
+                        )
+                        1 -> StackedLineGraph(
+                            axes = historyAxes,
+                            history = history,
+                            modifier = Modifier.fillMaxSize()
+                        ) { isHover, loc ->
+                            hoverText = if (isHover)
+                                formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
+                            else ""
                         }
-                    ) {
-                        when (it) {
-                            0 -> PieChart(
-                                values = accounts,
-                                modifier = Modifier
-                                    .padding(start = 30.dp, end = 30.dp)
-                            )
-                            1 -> StackedLineGraph(
-                                axes = historyAxes,
-                                history = history,
-                                modifier = Modifier.fillMaxSize()
-                            ) { isHover, loc ->
-                                hoverText = if (isHover)
-                                    formatDollar(history.value.first().second[loc]) + "\n" + historyDates[loc]
-                                else ""
-                            }
-                            else -> BinaryBarGraph(
-                                axes = netIncomeAxes,
-                                values = netIncome,
-                                modifier = Modifier.fillMaxSize()
-                            ) { isHover, loc ->
-                                hoverText = if (isHover)
-                                    formatDollar(netIncome[loc]) + "\n" + historyDates[loc]
-                                else ""
-                            }
+                        else -> BinaryBarGraph(
+                            axes = netIncomeAxes,
+                            values = netIncome,
+                            modifier = Modifier.fillMaxSize()
+                        ) { isHover, loc ->
+                            hoverText = if (isHover)
+                                formatDollar(netIncome[loc]) + "\n" + historyDates[loc]
+                            else ""
                         }
                     }
                 }
-            }
-
-            item("selector") {
-                DialSelector(
-                    selectedIndex = selectedTab,
-                    labels = tabs,
-                    onSelection = { selectedTab = it },
-                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp)
-                )
             }
 
             itemsIndexed(accounts) { index, account ->

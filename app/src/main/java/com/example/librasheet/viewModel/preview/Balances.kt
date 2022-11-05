@@ -3,6 +3,7 @@ package com.example.librasheet.viewModel.preview
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import com.example.librasheet.ui.components.ImmutableList
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.StackedLineGraphValues
@@ -34,7 +35,7 @@ val previewAccounts = mutableStateListOf(
 )
 
 
-val previewGraphLabels = mutableStateListOf("Pie Chart", "History")
+val previewGraphLabels = ImmutableList(listOf("Pie Chart", "History"))
 
 val previewStackedLineGraph = mutableStateOf(listOf(
     Pair(
