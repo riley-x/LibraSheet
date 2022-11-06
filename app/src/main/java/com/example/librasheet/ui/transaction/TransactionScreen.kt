@@ -20,7 +20,7 @@ import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.categoryTimeRanges
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.dataClasses.CategoryTotal
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.historyTimeRanges
 import com.example.librasheet.viewModel.preview.*
 
@@ -31,14 +31,14 @@ private val tabs = ImmutableList(listOf("Categories", "History"))
 @Composable
 fun TransactionScreen(
     title: String,
-    categories: SnapshotStateList<CategoryTotal>,
+    categories: SnapshotStateList<CategoryValue>,
     history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
     categoryTimeRange: State<CategoryTimeRange>,
     historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
-    onCategoryClick: (CategoryTotal) -> Unit = { },
+    onCategoryClick: (CategoryValue) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
@@ -106,7 +106,7 @@ fun TransactionScreen(
             itemsIndexed(categories) { index, category ->
                 if (index > 0) RowDivider()
 
-                CategoryRow(
+                CategoryValueRow(
                     category = category,
                     modifier = Modifier
                         .clickable { onCategoryClick(category) }

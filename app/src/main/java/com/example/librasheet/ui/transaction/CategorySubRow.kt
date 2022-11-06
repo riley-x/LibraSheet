@@ -15,12 +15,12 @@ import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.components.libraRowHorizontalPadding
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.CategoryTotal
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
 fun CategorySubRow(
-    category: CategoryTotal,
+    category: CategoryValue,
     last: Boolean,
     modifier: Modifier = Modifier,
 ) {

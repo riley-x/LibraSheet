@@ -14,10 +14,10 @@ data class Category(
 
 
 @Immutable
-data class CategoryTotal(
+data class CategoryValue(
     val category: Category,
     val amount: Long,
-    val subCategories: List<CategoryTotal>,
+    val subCategories: List<CategoryValue>,
 ) : PieChartValue {
     override val value: Float
         get() = amount.toFloatDollar()
