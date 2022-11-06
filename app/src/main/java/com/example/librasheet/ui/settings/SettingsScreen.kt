@@ -58,7 +58,6 @@ fun SettingsScreen(
                 )
             }
 
-
             item(key = "backup database") {
                 BackupDatabaseCard(
                     onClick = onBackupDatabase,

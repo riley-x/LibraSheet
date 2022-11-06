@@ -16,7 +16,7 @@ import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
-import com.example.librasheet.ui.transaction.TransactionScreen
+import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
 
@@ -139,7 +139,7 @@ fun LibraApp(
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
-                    TransactionScreen(
+                    CashFlowScreen(
                         title = "Income",
                         categories = previewIncomeCategories,
                         history = previewStackedLineGraphState,
@@ -152,7 +152,7 @@ fun LibraApp(
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-                    TransactionScreen(
+                    CashFlowScreen(
                         title = "Spending",
                         categories = previewIncomeCategories,
                         history = previewStackedLineGraphState,

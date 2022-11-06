@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.transaction
+package com.example.librasheet.ui.cashFlow
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
