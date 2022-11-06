@@ -23,6 +23,9 @@ fun SettingsScreen(
     toIncomeCategories: () -> Unit = { },
     toSpendingCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
+    toAddTransaction: () -> Unit = { },
+    toAddCSV: () -> Unit = { },
+    toAllTransactions: () -> Unit = { },
     onBackupDatabase: () -> Unit = { },
 ) {
     // TODO: Maybe this screen is a good place for dividend and option summaries
@@ -51,7 +54,12 @@ fun SettingsScreen(
             }
 
             item(key = "transactions") {
-
+                TransactionCard(
+                    toAddTransaction = toAddTransaction,
+                    toAddCSV = toAddCSV,
+                    toAllTransactions = toAllTransactions,
+                    modifier = Modifier.padding(10.dp)
+                )
             }
 
 

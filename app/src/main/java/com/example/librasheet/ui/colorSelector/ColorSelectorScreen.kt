@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.settings
+package com.example.librasheet.ui.colorSelector
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures

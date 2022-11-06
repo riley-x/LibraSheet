@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.settings
+package com.example.librasheet.ui.colorSelector
 
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas

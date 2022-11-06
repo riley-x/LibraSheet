@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.settings
+package com.example.librasheet.ui.colorSelector
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color

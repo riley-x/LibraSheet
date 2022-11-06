@@ -2,7 +2,6 @@ package com.example.librasheet.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +14,7 @@ import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
-import com.example.librasheet.ui.settings.ColorSelectorScreen
+import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.transaction.TransactionScreen
 import com.example.librasheet.viewModel.dataClasses.Account
@@ -174,6 +173,9 @@ fun LibraApp(
                         toIncomeCategories = { },
                         toSpendingCategories = { },
                         toCategoryRules = { },
+                        toAddTransaction = { },
+                        toAddCSV = { },
+                        toAllTransactions = { },
                         onBackupDatabase = { },
                     )
                 }
