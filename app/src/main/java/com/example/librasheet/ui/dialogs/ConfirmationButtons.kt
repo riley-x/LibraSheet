@@ -17,6 +17,8 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 @Composable
 fun ConfirmationButtons(
     modifier: Modifier = Modifier,
+    cancelText: String = "Cancel",
+    okText: String = "Ok",
     onCancel: () -> Unit = { },
     onOk: () -> Unit = { },
 ) {
@@ -32,13 +34,13 @@ fun ConfirmationButtons(
                 backgroundColor = MaterialTheme.colors.error,
             )
         ) {
-            Text("Cancel")
+            Text(cancelText)
         }
 
         Button(
             onClick = onOk,
         ) {
-            Text("OK")
+            Text(okText)
         }
     }
 }

@@ -3,8 +3,7 @@ package com.example.librasheet.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -14,6 +13,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.*
 import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
+import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.ui.settings.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
@@ -65,6 +65,29 @@ fun LibraApp(
     fun onSaveColor(color: Color) {
         // TODO
         navController.popBackStack()
+    }
+
+    /** Dialogs **/
+    var openAddAccountDialog by remember { mutableStateOf(false) }
+    var openEditAccountDialog by remember { mutableStateOf(false) }
+    fun onAddAccountClick() {
+        openAddAccountDialog = true
+    }
+    fun onEditAccountClick(account: Account) {
+        // TODO view model current edit
+        openEditAccountDialog = true
+    }
+    fun onAddAccount(account: String) {
+        openAddAccountDialog = false
+        if (account.isNotBlank()) {
+            // TODO
+        }
+    }
+    fun onEditAccount(account: String) {
+        openEditAccountDialog = false
+        if (account.isNotBlank()) {
+            // TODO
+        }
     }
 
     /** Main Layout Scaffold **/
@@ -145,8 +168,8 @@ fun LibraApp(
                 composable(route = SettingsTab.route) {
                     SettingsScreen(
                         accounts = previewAccounts,
-                        onAddAccount = { },
-                        onEditAccount = { },
+                        onAddAccount = ::onAddAccountClick,
+                        onEditAccount = ::onEditAccountClick,
                         onBackupDatabase = { },
                     )
                 }
@@ -157,6 +180,22 @@ fun LibraApp(
                     )
                 }
             }
+        }
+
+        if (openAddAccountDialog) {
+            TextFieldDialog(
+                title = "Add Account",
+                placeholder = "Account name",
+                onDismiss = ::onAddAccount
+            )
+        }
+        if (openEditAccountDialog) {
+            TextFieldDialog(
+                title = "Edit Account",
+                initialText = "ASDF",
+                placeholder = "Account name",
+                onDismiss = ::onEditAccount
+            )
         }
     }
 }

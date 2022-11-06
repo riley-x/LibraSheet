@@ -24,7 +24,8 @@ fun ColorCircle(
     Canvas(
         modifier
             .aspectRatio(1f)
-            .fillMaxSize()) {
+            .fillMaxSize()
+    ) {
         drawCircle(brush = Brush.sweepGradient(colors.items))
 
         drawCircle(

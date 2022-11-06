@@ -15,11 +15,14 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 @Composable
 fun TextFieldDialog(
     modifier: Modifier = Modifier,
+    initialText: String = "",
     title: String = "",
     placeholder: String = "",
+    cancelText: String = "Cancel",
+    okText: String = "Ok",
     onDismiss: (String) -> Unit = { },
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(initialText) }
 
     AlertDialog(
         onDismissRequest = { onDismiss("") },
@@ -52,6 +55,8 @@ fun TextFieldDialog(
         },
         buttons = {
             ConfirmationButtons(
+                cancelText = cancelText,
+                okText = okText,
                 onCancel = { onDismiss("") },
                 onOk = { onDismiss(text) },
             )

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import com.example.librasheet.data.getDay
 import com.example.librasheet.data.getMonth
 import com.example.librasheet.data.getYearShort
+import com.example.librasheet.data.toFloatDollar
 
 @Stable
 fun formatDollar(value: Float): String {
