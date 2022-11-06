@@ -65,7 +65,7 @@ fun LibraApp(
             restoreState = true
         }
     }
-    fun onSaveColor(color: Color) {
+    fun onSaveColor(spec: String, color: Color) {
         // TODO
         navController.popBackStack()
     }
@@ -114,7 +114,7 @@ fun LibraApp(
             composable(route = ColorDestination.route(graph), arguments = ColorDestination.arguments) {
                 val spec = it.arguments?.getString(ColorDestination.argSpec) ?: ""
                 ColorSelectorScreen(
-                    title = spec.substringAfter("_"),
+                    spec = spec,
                     initialColor = Color.White,
                     onSave = ::onSaveColor,
                     onCancel = navController::popBackStack,

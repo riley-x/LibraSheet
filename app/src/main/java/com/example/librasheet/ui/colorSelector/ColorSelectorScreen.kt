@@ -27,14 +27,18 @@ import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import kotlin.math.*
 
+/**
+ * @param spec Which color we're currently editing. This should have the format category_name. name
+ * will be displayed as the title.
+ */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun ColorSelectorScreen(
+    spec: String,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
-    title: String = "Pick Color",
     initialColor: Color = Color.White,
-    onSave: (Color) -> Unit = { },
+    onSave: (String, Color) -> Unit = { _, _ -> },
     onCancel: () -> Unit = { },
 ) {
     /** Keyboard and focus **/
@@ -101,7 +105,7 @@ fun ColorSelectorScreen(
             updateSelection()
         }
     }
-    fun onClickSave() = onSave(currentColor.color)
+    fun onClickSave() = onSave(spec, currentColor.color)
 
     /** Composable **/
     Column(
@@ -115,7 +119,7 @@ fun ColorSelectorScreen(
             .windowInsetsPadding(WindowInsets.ime)
             .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
     ) {
-        HeaderBar(title = title, backArrow = true, onBack = onCancel)
+        HeaderBar(title = spec.substringAfter("_"), backArrow = true, onBack = onCancel)
 
         ColorSelector(
             currentColor = currentColor,
@@ -243,6 +247,7 @@ fun PreviewColorSelectorScreen() {
     LibraSheetTheme {
         Surface {
             ColorSelectorScreen(
+                spec = "misc_Pick Color"
             )
         }
     }
