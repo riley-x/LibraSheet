@@ -1,4 +1,4 @@
-package com.example.librasheet.ui
+package com.example.librasheet.ui.navigation
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.librasheet.R
 
 interface LibraTab {
@@ -75,6 +77,21 @@ val libraTabs = listOf(BalanceTab, IncomeTab, SpendingTab, SettingsTab)
 object AccountDestination {
     const val route = "account_details"
 }
+
 object ColorDestination {
-    const val route = "color_selector"
+    const val routeBase = "color_selector"
+    const val argSpec = "spec"
+    val arguments = listOf(
+        navArgument(argSpec) { type = NavType.StringType }
+    )
+
+    /** This is the route used to declare the destination target. Since the color selector can be
+     * part of multiple graphs, the parent [graph] must be specified.
+     */
+    fun route(graph: String) = "${routeBase}_${graph}/{$argSpec}"
+
+    /** This is the route used to navigate to a color destination. In addition to the [graph], the
+     * [spec] specifies which color is being edited. The [spec] format is "category_name".
+     */
+    fun argRoute(graph: String, spec: String) = "${routeBase}_${graph}/${spec}"
 }

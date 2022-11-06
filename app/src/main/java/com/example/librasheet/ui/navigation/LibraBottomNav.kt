@@ -1,7 +1,6 @@
-package com.example.librasheet.ui
+package com.example.librasheet.ui.navigation
 
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

@@ -1,22 +1,23 @@
 package com.example.librasheet.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
 import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.dialogs.TextFieldDialog
-import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
+import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
 
@@ -34,6 +35,9 @@ fun LibraApp(
         return currentDestination?.hierarchy?.any { it.route == graph || it.route == route }
     }
     val currentTab = libraTabs.find { it.isActive() == true } ?: libraTabs[0]
+
+    Log.d("Libra", "Current destination: ${currentDestination?.route}")
+    Log.d("Libra", "Current tab: ${currentTab.graph}")
 
     fun onTabSelected(tab: LibraTab) {
         if (tab.route != currentDestination?.route) {
@@ -54,9 +58,9 @@ fun LibraApp(
             restoreState = true
         }
     }
-    fun toColorSelector(spec: String) {
+    fun toBalanceColorSelector(spec: String) {
         // TODO view model set
-        navController.navigate(ColorDestination.route) {
+        navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec)) {
             launchSingleTop = true
             restoreState = true
         }
@@ -100,6 +104,25 @@ fun LibraApp(
         },
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
     ) { innerPadding ->
+
+        /** The color selector screen is reused by multiple tabs, and exists as a destination across
+         * the respective nested navigation graphs. The parent [graph] needs to be specified in the
+         * route to choose the correct one. The initial ui state of the tab is entirely determined
+         * by the "spec" argument.
+         */
+        fun NavGraphBuilder.colorSelector(graph: String) {
+            composable(route = ColorDestination.route(graph), arguments = ColorDestination.arguments) {
+                val spec = it.arguments?.getString(ColorDestination.argSpec) ?: ""
+                ColorSelectorScreen(
+                    title = spec.substringAfter("_"),
+                    initialColor = Color.White,
+                    onSave = ::onSaveColor,
+                    onCancel = navController::popBackStack,
+                    bottomPadding = innerPadding.calculateBottomPadding(),
+                )
+            }
+        }
+
         /** If you try to pad the NavHost, there will be a flicker when the soft keyboard animates
          * open. Instead, need to pad the columns inside each screen composable. Only need the special
          * case for screens that have an edit text field though.
@@ -130,9 +153,10 @@ fun LibraApp(
                         spending = previewStackedLineGraphState,
                         transactions = previewTransactions,
                         onBack = navController::popBackStack,
-                        onClickColor = ::toColorSelector,
+                        onClickColor = ::toBalanceColorSelector,
                     )
                 }
+                colorSelector(BalanceTab.graph)
             }
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
@@ -177,15 +201,9 @@ fun LibraApp(
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
-                composable(route = ColorDestination.route) {
-                    ColorSelectorScreen(
-                        title = "Robinhood",
-                        onSave = ::onSaveColor,
-                        onCancel = navController::popBackStack,
-                        bottomPadding = innerPadding.calculateBottomPadding(),
-                    )
-                }
             }
+
+
         }
 
         if (openAddAccountDialog) {

@@ -57,7 +57,7 @@ fun AccountScreen(
                     modifier = Modifier
                         .padding(end = 15.dp)
                         .size(30.dp)
-                        .clickable { onClickColor("account:" + account.value.name) }
+                        .clickable { onClickColor("account_" + account.value.name) }
                 ) {
                     drawRect(color = account.value.color)
                 }
