@@ -71,9 +71,9 @@ val Typography = Typography(
         fontWeight = FontWeight.Light,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        letterSpacing = 2.5.sp // TODO TextField sometimes crashes because it tries to lerp between sp and em.
+        letterSpacing = 2.5.sp
     ),
-    subtitle2 = TextStyle( // Monospaced, i.e. apiKey
+    subtitle2 = TextStyle( // Monospaced, i.e. account numbers
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         fontFamily = UmTypewriter,
