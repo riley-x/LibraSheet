@@ -14,6 +14,7 @@ import androidx.navigation.compose.*
 import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
+import com.example.librasheet.ui.settings.ColorSelectorScreen
 import com.example.librasheet.ui.transaction.TransactionScreen
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
@@ -116,13 +117,23 @@ fun LibraApp(
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-                    Text("Spending Tab")
+                    TransactionScreen(
+                        title = "Spending",
+                        categories = previewIncomeCategories,
+                        history = previewStackedLineGraphState,
+                        historyDates = previewLineGraphDates,
+                        categoryTimeRange = previewIncomeCategoryTimeRange,
+                        historyTimeRange = previewIncomeHistoryTimeRange
+                    )
                 }
             }
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {
                     Text("Settings Tab")
+                }
+                composable(route = SettingsTab.route) {
+                    ColorSelectorScreen()
                 }
             }
         }
