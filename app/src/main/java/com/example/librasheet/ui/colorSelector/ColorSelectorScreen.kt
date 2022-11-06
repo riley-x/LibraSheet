@@ -115,7 +115,7 @@ fun ColorSelectorScreen(
             .windowInsetsPadding(WindowInsets.ime)
             .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
     ) {
-        HeaderBar(title = title)
+        HeaderBar(title = title, backArrow = true, onBack = onCancel)
 
         ColorSelector(
             currentColor = currentColor,

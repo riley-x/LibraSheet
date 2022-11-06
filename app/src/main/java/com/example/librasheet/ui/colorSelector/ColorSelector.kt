@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -78,6 +79,7 @@ fun ColorSelector(
      * from ACTION_MOVE or ACTION_DOWN **/
     val currentSelection = fromPolar(currentColor.r, currentColor.phi)
     var dragStart by remember { mutableStateOf(Offset(0f, 0f)) }
+    val disallowIntercept = RequestDisallowInterceptTouchEvent()
 
     /** Main draw **/
     Box(
@@ -89,9 +91,12 @@ fun ColorSelector(
             .onGloballyPositioned {
                 boxSize = it.size
             }
-            .pointerInteropFilter { motionEvent ->
+            .pointerInteropFilter(
+                requestDisallowInterceptTouchEvent = disallowIntercept
+            ) { motionEvent ->
                 when (motionEvent.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        disallowIntercept(true)
                         dragStart = Offset(motionEvent.x, motionEvent.y)
                         onPress()
                     }
@@ -102,6 +107,7 @@ fun ColorSelector(
                         dragStart = Offset(motionEvent.x, motionEvent.y)
                         onChange(minOf(r, 1f), phi)
                     }
+                    else -> disallowIntercept(false)
                 }
                 true
             }
