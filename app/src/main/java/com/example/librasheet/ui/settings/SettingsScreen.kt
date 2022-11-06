@@ -19,6 +19,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     onAddAccount: () -> Unit = { },
     onEditAccount: (Account) -> Unit = { },
+    onSeeAllAccounts: () -> Unit = { },
+    toIncomeCategories: () -> Unit = { },
+    toSpendingCategories: () -> Unit = { },
+    toCategoryRules: () -> Unit = { },
     onBackupDatabase: () -> Unit = { },
 ) {
     // TODO: Maybe this screen is a good place for dividend and option summaries
@@ -27,15 +31,29 @@ fun SettingsScreen(
         HeaderBar(title = "Settings")
 
         LazyColumn {
-
             item(key = "accounts") {
                 AccountCard(
                     accounts = accounts,
                     onAddAccount = onAddAccount,
                     onEditAccount = onEditAccount,
+                    onSeeAllAccounts = onSeeAllAccounts,
                     modifier = Modifier.padding(10.dp)
                 )
             }
+
+            item(key = "categories") {
+                CategoriesCard(
+                    toIncomeCategories = toIncomeCategories,
+                    toSpendingCategories = toSpendingCategories,
+                    toCategoryRules = toCategoryRules,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+
+            item(key = "transactions") {
+
+            }
+
 
             item(key = "backup database") {
                 BackupDatabaseCard(

@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
@@ -23,6 +24,7 @@ val libraRowHeight = 50.dp
 fun ColorCodedRow(
     color: Color,
     modifier: Modifier = Modifier,
+    horizontalPadding: Dp = libraRowHorizontalPadding,
     content: @Composable (RowScope.() -> Unit) = { },
 ) {
     Row(
@@ -30,7 +32,7 @@ fun ColorCodedRow(
         modifier = modifier
             .height(libraRowHeight)
             .fillMaxWidth()
-            .padding(horizontal = libraRowHorizontalPadding)
+            .padding(horizontal = horizontalPadding)
     ) {
         Spacer(
             Modifier

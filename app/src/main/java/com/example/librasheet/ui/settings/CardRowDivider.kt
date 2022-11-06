@@ -10,6 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+val cardRowHorizontalPadding = 10.dp
+
+
 @Composable
 fun CardRowDivider(
     modifier: Modifier = Modifier,
@@ -26,4 +29,4 @@ fun CardRowDivider(
 
 
 fun Modifier.cardRow() = heightIn(min = 40.dp)
-    .padding(horizontal = 10.dp, vertical = 6.dp)
+    .padding(horizontal = cardRowHorizontalPadding, vertical = 6.dp)

@@ -94,7 +94,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         lineHeight = 16.sp,
-        letterSpacing = 1.sp,
+        letterSpacing = 2.sp,
     ),
     caption = TextStyle( // Used by OutlinedTextField for the label
         fontWeight = FontWeight.Normal,

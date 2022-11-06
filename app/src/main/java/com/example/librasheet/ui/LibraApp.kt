@@ -170,6 +170,10 @@ fun LibraApp(
                         accounts = previewAccounts,
                         onAddAccount = ::onAddAccountClick,
                         onEditAccount = ::onEditAccountClick,
+                        onSeeAllAccounts = { },
+                        toIncomeCategories = { },
+                        toSpendingCategories = { },
+                        toCategoryRules = { },
                         onBackupDatabase = { },
                     )
                 }
