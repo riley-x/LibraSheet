@@ -13,7 +13,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 
 
 @Composable
-fun CategoriesCard(
+fun CategoryCard(
     modifier: Modifier = Modifier,
     toEditCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
@@ -37,7 +37,7 @@ fun CategoriesCard(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            CategoriesCard()
+            CategoryCard()
         }
     }
 }

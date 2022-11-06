@@ -42,7 +42,7 @@ fun SettingsScreen(
             }
 
             item(key = "categories") {
-                CategoriesCard(
+                CategoryCard(
                     toEditCategories = toEditCategories,
                     toCategoryRules = toCategoryRules,
                     modifier = Modifier.padding(10.dp)
