@@ -2,8 +2,12 @@ package com.example.librasheet.ui.colorSelector
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,14 +20,19 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import kotlin.math.*
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun ColorSelectorScreen(
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
+    title: String = "Pick Color",
     initialColor: Color = Color.White,
     onSave: (Color) -> Unit = { },
     onCancel: () -> Unit = { },
@@ -99,17 +108,21 @@ fun ColorSelectorScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectTapGestures(onPress = { clearFocus() })
-            }
+            .verticalScroll(rememberScrollState())
+            /** These paddings need to be placed after the scroll modifier or else they will cause
+             * a flicker. The only problem with this is that the bottom ripple doesn't appear anymore.
+             */
+            .windowInsetsPadding(WindowInsets.ime)
+            .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
     ) {
+        HeaderBar(title = title)
 
         ColorSelector(
             currentColor = currentColor,
             brightness = brightness,
             onPress = ::clearFocus,
             onChange = ::onSelection,
-            modifier = Modifier.padding(top = 20.dp)
+            modifier = Modifier
         )
 
         BrightnessSelector(
@@ -150,7 +163,14 @@ fun ColorSelectorScreen(
                 label = { Text("Blue") },
                 onValueChange = ::onBlue,
                 colors = textFieldColors(Color(94, 131, 241, 255)),
-                keyboardOptions = keyboardOptions,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    autoCorrect = false,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { clearFocus() }
+                ),
                 modifier = Modifier.weight(10f)
             )
         }

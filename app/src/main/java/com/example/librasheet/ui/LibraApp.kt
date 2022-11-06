@@ -104,12 +104,10 @@ fun LibraApp(
          * open. Instead, need to pad the columns inside each screen composable. Only need the special
          * case for screens that have an edit text field though.
          */
-        val bottomPadding = if (WindowInsets.isImeVisible) 0.dp else innerPadding.calculateBottomPadding()
         NavHost(
             navController = navController,
             startDestination = BalanceTab.graph,
             modifier = Modifier
-                .windowInsetsPadding(WindowInsets.ime)
         ) {
             navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
                 composable(route = BalanceTab.route) {
@@ -119,7 +117,7 @@ fun LibraApp(
                         dates = previewLineGraphDates,
                         netIncome = previewNetIncomeState,
                         onAccountClick = ::toAccountDetails,
-                        modifier = Modifier.padding(bottom = bottomPadding),
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
                 composable(route = AccountDestination.route) {
@@ -176,13 +174,15 @@ fun LibraApp(
                         toAddCSV = { },
                         toAllTransactions = { },
                         onBackupDatabase = { },
-                        modifier = Modifier.padding(bottom = bottomPadding),
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
                 composable(route = ColorDestination.route) {
                     ColorSelectorScreen(
+                        title = "Robinhood",
                         onSave = ::onSaveColor,
                         onCancel = navController::popBackStack,
+                        bottomPadding = innerPadding.calculateBottomPadding(),
                     )
                 }
             }
