@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.settings
 
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -22,3 +23,7 @@ fun CardRowDivider(
             .padding(horizontal = 4.dp)
     )
 }
+
+
+fun Modifier.cardRow() = heightIn(min = 40.dp)
+    .padding(horizontal = 10.dp, vertical = 6.dp)

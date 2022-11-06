@@ -48,8 +48,7 @@ fun AccountCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clickable { onEditAccount(account) }
-                        .heightIn(min = 40.dp)
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                        .cardRow()
                 ) {
                     Text(account.name, modifier = Modifier.weight(10f))
                     Text("••••${account.number.takeLast(4)}", style = MaterialTheme.typography.subtitle2)

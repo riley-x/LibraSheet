@@ -7,16 +7,21 @@ import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.DiscreteGraphState
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
+import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.viewModel.dataClasses.TransactionCategory
+import com.example.librasheet.viewModel.dataClasses.CategoryTotal
 
 val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
 
+
 val previewIncomeCategories = mutableStateListOf(
-    TransactionCategory(
-        name = "Compensation",
-        color = Color(0xFF00BFA5),
+    CategoryTotal(
+        category = Category(
+            name = "Compensation",
+            color = Color(0xFF00BFA5),
+            subCategories = emptyList(),
+        ),
         amount = 2_750_00_00,
         subCategories = emptyList(),
     ),

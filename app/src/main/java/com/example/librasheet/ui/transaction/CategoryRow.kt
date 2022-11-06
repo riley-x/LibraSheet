@@ -21,12 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.librasheet.ui.components.ColorCodedRow
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.TransactionCategory
+import com.example.librasheet.viewModel.dataClasses.CategoryTotal
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
 fun CategoryRow(
-    category: TransactionCategory,
+    category: CategoryTotal,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
