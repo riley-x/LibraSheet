@@ -20,16 +20,13 @@ fun SettingsScreen(
     onAddAccount: () -> Unit = { },
     onEditAccount: (Account) -> Unit = { },
     onSeeAllAccounts: () -> Unit = { },
-    toIncomeCategories: () -> Unit = { },
-    toSpendingCategories: () -> Unit = { },
+    toEditCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
     toAddTransaction: () -> Unit = { },
     toAddCSV: () -> Unit = { },
     toAllTransactions: () -> Unit = { },
     onBackupDatabase: () -> Unit = { },
 ) {
-    // TODO: Maybe this screen is a good place for dividend and option summaries
-
     Column(modifier) {
         HeaderBar(title = "Settings")
 
@@ -46,8 +43,7 @@ fun SettingsScreen(
 
             item(key = "categories") {
                 CategoriesCard(
-                    toIncomeCategories = toIncomeCategories,
-                    toSpendingCategories = toSpendingCategories,
+                    toEditCategories = toEditCategories,
                     toCategoryRules = toCategoryRules,
                     modifier = Modifier.padding(10.dp)
                 )

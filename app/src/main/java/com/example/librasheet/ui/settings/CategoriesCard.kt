@@ -14,11 +14,8 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 
 @Composable
 fun CategoriesCard(
-//    incomeCategories: SnapshotStateList<Category>,
-//    spendingCategories: SnapshotStateList<Category>,
     modifier: Modifier = Modifier,
-    toIncomeCategories: () -> Unit = { },
-    toSpendingCategories: () -> Unit = { },
+    toEditCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
 ) {
     Card(
@@ -28,9 +25,7 @@ fun CategoriesCard(
         Column {
             CardTitle(title = "Categories")
             CardRowDivider(color = MaterialTheme.colors.primary)
-            ClickableRow("Income", toIncomeCategories)
-            CardRowDivider()
-            ClickableRow("Spending", toSpendingCategories)
+            ClickableRow("Edit", toEditCategories)
             CardRowDivider()
             ClickableRow("Rules", toCategoryRules)
         }
