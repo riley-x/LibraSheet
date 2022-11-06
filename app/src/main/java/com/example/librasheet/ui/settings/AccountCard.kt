@@ -42,7 +42,6 @@ fun AccountCard(
             CardRowDivider(color = MaterialTheme.colors.primary)
 
             accounts.take(4).forEach { account ->
-
                 ColorCodedRow(
                     color = account.color,
                     horizontalPadding = cardRowHorizontalPadding,

@@ -177,6 +177,7 @@ fun LibraApp(
                         toAddCSV = { },
                         toAllTransactions = { },
                         onBackupDatabase = { },
+                        modifier = Modifier.padding(bottom = bottomPadding),
                     )
                 }
                 composable(route = ColorDestination.route) {
