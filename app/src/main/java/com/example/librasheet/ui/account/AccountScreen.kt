@@ -37,6 +37,7 @@ fun AccountScreen(
     transactions: SnapshotStateList<Transaction>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
+    onClickColor: (String) -> Unit = { },
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -57,7 +58,7 @@ fun AccountScreen(
                     modifier = Modifier
                         .padding(end = 15.dp)
                         .size(30.dp)
-//                    .clickable { onChangeColor(position.ticker) }
+                        .clickable { onClickColor("account:" + account.value.name) }
                 ) {
                     drawRect(color = account.value.color)
                 }

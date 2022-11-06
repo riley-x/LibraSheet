@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,13 +47,23 @@ fun LibraApp(
             }
         }
     }
-
-    fun onAccountClick(account: Account) {
+    fun toAccountDetails(account: Account) {
         // TODO view model set
         navController.navigate(AccountDestination.route) {
             launchSingleTop = true
             restoreState = true
         }
+    }
+    fun toColorSelector(spec: String) {
+        // TODO view model set
+        navController.navigate(ColorDestination.route) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+    fun onSaveColor(color: Color) {
+        // TODO
+        navController.popBackStack()
     }
 
     /** Main Layout Scaffold **/
@@ -84,7 +95,7 @@ fun LibraApp(
                         history = previewStackedLineGraphState,
                         dates = previewLineGraphDates,
                         netIncome = previewNetIncomeState,
-                        onAccountClick = ::onAccountClick,
+                        onAccountClick = ::toAccountDetails,
                         modifier = Modifier.padding(bottom = bottomPadding),
                     )
                 }
@@ -98,6 +109,7 @@ fun LibraApp(
                         spending = previewStackedLineGraphState,
                         transactions = previewTransactions,
                         onBack = navController::popBackStack,
+                        onClickColor = ::toColorSelector,
                     )
                 }
             }
@@ -132,8 +144,11 @@ fun LibraApp(
                 composable(route = SettingsTab.route) {
                     Text("Settings Tab")
                 }
-                composable(route = SettingsTab.route) {
-                    ColorSelectorScreen()
+                composable(route = ColorDestination.route) {
+                    ColorSelectorScreen(
+                        onSave = ::onSaveColor,
+                        onCancel = navController::popBackStack,
+                    )
                 }
             }
         }
