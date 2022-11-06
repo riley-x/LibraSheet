@@ -49,10 +49,10 @@ fun TransactionRow(
                     else MaterialTheme.colors.primary,
             )
             Text(
-                text= formatDateInt(transaction.date),
+                text = formatDateInt(transaction.date),
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
+                style = MaterialTheme.typography.body2,
             )
-
         }
     }
 }

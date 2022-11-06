@@ -15,7 +15,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.CategoryTimeRange
+import com.example.librasheet.viewModel.categoryTimeRanges
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 
 @Composable
@@ -79,6 +83,21 @@ fun CustomTextButton(
                 text = text,
                 color = if (enabled) colorText else colorTextDisabled,
                 style = MaterialTheme.typography.button,
+            )
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun Preview() {
+    val cur = remember { mutableStateOf(CategoryTimeRange.ONE_MONTH) }
+    LibraSheetTheme {
+        Surface {
+            ButtonGroup(
+                options = categoryTimeRanges,
+                currentSelection = cur,
             )
         }
     }
