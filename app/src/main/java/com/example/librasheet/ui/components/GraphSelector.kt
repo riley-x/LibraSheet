@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 
 /**
  * This allows the user to switch between different visuals using a dial selector. The switching is

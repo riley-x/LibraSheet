@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
-import com.example.librasheet.ui.components.ImmutableList
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.DiscreteGraphState
 import com.example.librasheet.ui.graphing.StackedLineGraphState

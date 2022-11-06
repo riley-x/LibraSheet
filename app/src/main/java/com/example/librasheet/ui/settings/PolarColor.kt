@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
 import androidx.core.math.MathUtils
-import com.example.librasheet.ui.components.ImmutableList
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 
 
 val colors = ImmutableList(listOf(

@@ -21,6 +21,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.categoryTimeRanges
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 
 @Composable
 fun <T: HasDisplayName> ButtonGroup(

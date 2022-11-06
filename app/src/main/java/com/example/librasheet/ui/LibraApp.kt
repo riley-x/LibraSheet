@@ -16,6 +16,7 @@ import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.navigation.navigateSingleTopTo
 import com.example.librasheet.ui.settings.ColorSelectorScreen
+import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.transaction.TransactionScreen
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
@@ -142,7 +143,12 @@ fun LibraApp(
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {
-                    Text("Settings Tab")
+                    SettingsScreen(
+                        accounts = previewAccounts,
+                        onAddAccount = { },
+                        onEditAccount = { },
+                        onBackupDatabase = { },
+                    )
                 }
                 composable(route = ColorDestination.route) {
                     ColorSelectorScreen(

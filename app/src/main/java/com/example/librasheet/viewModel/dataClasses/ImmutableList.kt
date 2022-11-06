@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.components
+package com.example.librasheet.viewModel.dataClasses
 
 import androidx.compose.runtime.Immutable
 

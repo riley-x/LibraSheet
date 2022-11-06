@@ -1,6 +1,6 @@
 package com.example.librasheet.viewModel
 
-import com.example.librasheet.ui.components.ImmutableList
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 
 enum class CategoryTimeRange(override val displayName: String) : HasDisplayName {
