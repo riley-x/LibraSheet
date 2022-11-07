@@ -41,8 +41,6 @@ fun DragToReorder(
     parentId: Int,
     content: @Composable () -> Unit = { },
 ) {
-    Log.d("Libra", "index=$index parentId=$parentId")
-
     val haptic = LocalHapticFeedback.current
     val dragInfo = LocalDragInfo.current
 
@@ -65,8 +63,7 @@ fun DragToReorder(
         }
         else 0
     } }
-    if (index == 2 && parentId == 0)
-        Log.d("Libra", "height=$height originalY=$originalY")
+    if (index == 2) Log.d("Libra", "($parentId, $index) height=$height originalY=$originalY offset=$offset")
 
     Box(
         modifier = Modifier
