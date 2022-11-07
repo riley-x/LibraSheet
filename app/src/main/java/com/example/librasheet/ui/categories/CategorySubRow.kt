@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.cashFlow
+package com.example.librasheet.ui.categories
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -11,18 +11,20 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.components.ComponentIndicatorLine
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.components.libraRowHorizontalPadding
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.CategoryValue
+import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
 fun CategorySubRow(
-    category: CategoryValue,
+    category: Category,
     last: Boolean,
     modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit = { },
 ) {
     val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
@@ -50,10 +52,8 @@ fun CategorySubRow(
                 .padding(start = 26.dp, end = 4.dp)
                 .size(width = 22.dp, height = libraRowHeight)
         )
-
         Text(category.name)
-        Spacer(modifier = Modifier.weight(10f))
-        Text(formatDollar(category.value))
+        content()
     }
 }
 

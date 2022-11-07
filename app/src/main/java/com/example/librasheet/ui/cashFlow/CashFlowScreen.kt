@@ -13,14 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.categories.CategoryRow
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.categoryTimeRanges
+import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.historyTimeRanges
 import com.example.librasheet.viewModel.preview.*
 
@@ -31,14 +32,14 @@ private val tabs = ImmutableList(listOf("Categories", "History"))
 @Composable
 fun CashFlowScreen(
     title: String,
-    categories: SnapshotStateList<CategoryValue>,
+    categories: SnapshotStateList<Category>,
     history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
     categoryTimeRange: State<CategoryTimeRange>,
     historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
-    onCategoryClick: (CategoryValue) -> Unit = { },
+    onCategoryClick: (Category) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
@@ -106,11 +107,18 @@ fun CashFlowScreen(
             itemsIndexed(categories) { index, category ->
                 if (index > 0) RowDivider()
 
-                CategoryValueRow(
+                CategoryRow(
                     category = category,
+                    subRowContent = {
+                        Spacer(modifier = Modifier.weight(10f))
+                        Text(formatDollar(it.value))
+                    },
                     modifier = Modifier
                         .clickable { onCategoryClick(category) }
-                )
+                ) {
+                    Spacer(modifier = Modifier.weight(10f))
+                    Text(formatDollar(category.value))
+                }
             }
         }
     }

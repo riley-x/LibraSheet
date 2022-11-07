@@ -36,6 +36,7 @@ fun TransactionRow(
             Text(
                 text = transaction.category,
                 style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
                 maxLines = 1,
             )
         }

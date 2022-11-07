@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,13 +58,39 @@ fun RowDivider(modifier: Modifier = Modifier) {
     )
 }
 
+@Composable
+fun RowTitle(
+    title: String,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit = { },
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .padding(start = libraRowHorizontalPadding)
+            .heightIn(min = 48.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.h2,
+            modifier = Modifier.weight(10f)
+        )
+
+        content()
+    }
+}
+
 
 @Preview
 @Composable
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            ColorCodedRow(color = Color.Green)
+            Column {
+                RowTitle(title = "Income")
+                RowDivider()
+                ColorCodedRow(color = Color.Green)
+            }
         }
     }
 }

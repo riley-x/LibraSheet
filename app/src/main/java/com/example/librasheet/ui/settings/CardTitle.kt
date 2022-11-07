@@ -27,7 +27,7 @@ fun CardTitle(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.h3,
+            style = MaterialTheme.typography.h2,
             modifier = Modifier.weight(10f)
         )
 

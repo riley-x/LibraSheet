@@ -1,8 +1,8 @@
-package com.example.librasheet.ui.cashFlow
+package com.example.librasheet.ui.categories
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
@@ -19,15 +19,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.librasheet.ui.components.ColorCodedRow
-import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.CategoryValue
+import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
-fun CategoryValueRow(
-    category: CategoryValue,
-    modifier: Modifier = Modifier
+fun CategoryRow(
+    category: Category,
+    modifier: Modifier = Modifier,
+    subRowContent: @Composable RowScope.(Category) -> Unit = { },
+    content: @Composable RowScope.() -> Unit = { },
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
 
@@ -40,8 +41,7 @@ fun CategoryValueRow(
                     else Icon(imageVector = Icons.Sharp.ExpandMore, contentDescription = null)
                 }
             }
-            Spacer(modifier = Modifier.weight(10f))
-            Text(formatDollar(category.value))
+            content()
         }
 
         if (category.subCategories.isNotEmpty()) {
@@ -58,7 +58,9 @@ fun CategoryValueRow(
 //                            .clickable { onPositionClick(pos) }
 //                            .padding(horizontal = horizontalPadding)
                         // padding needs to be here so that the clickable animation covers the full width
-                    )
+                    ) {
+                        subRowContent(cat)
+                    }
                 }
             }
         }
@@ -70,7 +72,7 @@ fun CategoryValueRow(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            CategoryValueRow(
+            CategoryRow(
                 category = previewIncomeCategories[0]
             )
         }

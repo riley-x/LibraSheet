@@ -9,21 +9,17 @@ import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.viewModel.dataClasses.CategoryValue
 
 val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
 
 
 val previewIncomeCategories = mutableStateListOf(
-    CategoryValue(
-        category = Category(
-            name = "Compensation",
-            color = Color(0xFF00BFA5),
-            subCategories = emptyList(),
-        ),
-        amount = 2_750_00_00,
+    Category(
+        name = "Compensation",
+        color = Color(0xFF00BFA5),
         subCategories = emptyList(),
+        amount = 2_750_00_00,
     ),
 )
 

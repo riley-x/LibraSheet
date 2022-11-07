@@ -211,6 +211,7 @@ fun LibraApp(
             TextFieldDialog(
                 title = "Account Name",
                 initialText = changeAccountNameOld,
+                placeholder = "Account name",
                 onDismiss = ::changeAccountName
             )
         }
