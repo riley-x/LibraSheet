@@ -25,9 +25,23 @@ val previewIncomeCategories = mutableStateListOf(
     Category(
         id = 1,
         name = "Cash Back",
-        color = Color(0xFF48AD70),
+        color = Color(0xFF6FAD48),
         subCategories = emptyList(),
         amount = 50_69_00,
+    ),
+    Category(
+        id = 7,
+        name = "Tax Return",
+        color = Color(0xFF4899AD),
+        subCategories = emptyList(),
+        amount = 666_66_00,
+    ),
+    Category(
+        id = 7,
+        name = "Interest",
+        color = Color(0xFF03C416),
+        subCategories = emptyList(),
+        amount = 52_36_00,
     ),
 )
 

@@ -1,5 +1,7 @@
 package com.example.librasheet.ui.categories
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -21,6 +24,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -64,17 +68,20 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
+    val rowHeight = with(LocalDensity.current) { (libraRowHeight + 1.dp).toPx().roundToInt() }
+    val haptic = LocalHapticFeedback.current
     var currentDragIndex by remember { mutableStateOf(-1) }
     var currentParentId by remember { mutableStateOf(-3) } // use -1 for income, -2 for expense
     var dragOffset by remember { mutableStateOf(0f) }
+    val currentHoverIndex by remember { derivedStateOf { currentDragIndex + (dragOffset / rowHeight).toInt() } }
 
     @Composable
     fun Modifier.drag(index: Int, parentId: Int): Modifier {
-        val rowHeight = with(LocalDensity.current) { libraRowHeight.toPx().roundToInt() }
-        val haptic = LocalHapticFeedback.current
-        val currentHoverIndex = currentDragIndex + (dragOffset / rowHeight).toInt()
+        val zIndex = if (parentId == currentParentId && index == currentDragIndex) 10f else 0f
+        Log.d("Libra", "$parentId $index $zIndex")
 
-        return offset { IntOffset(0,
+        return this
+            .offset { IntOffset(0,
                 if (parentId != currentParentId) 0
                 else if (index == currentDragIndex) dragOffset.roundToInt()
                 else if (currentHoverIndex > currentDragIndex
@@ -87,6 +94,8 @@ fun CategoriesScreen(
                 ) rowHeight
                 else 0
             ) }
+            .background(MaterialTheme.colors.surface)
+            .zIndex(zIndex) // THIS NEEDS TO BE APPLIES TO THE COLUMN!!!!
             .pointerInput(Unit) { detectDragGesturesAfterLongPress(
                 onDragStart = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -96,9 +105,11 @@ fun CategoriesScreen(
                 },
                 onDragEnd = {
                     currentDragIndex = -1
+                    dragOffset = 0f
                 },
                 onDragCancel = {
                     currentDragIndex = -1
+                    dragOffset = 0f
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
@@ -144,7 +155,7 @@ fun CategoriesScreen(
     Column(modifier) {
         HeaderBar(title = "Categories", backArrow = true, onBack = onBack)
         
-        LazyColumn {
+        LazyColumn(Modifier.fillMaxSize()) {
             item("income_title") {
                 RowTitle(title = "Income")
             }

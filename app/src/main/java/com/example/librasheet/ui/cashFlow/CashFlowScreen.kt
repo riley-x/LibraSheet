@@ -109,7 +109,7 @@ fun CashFlowScreen(
 
                 CategoryRow(
                     category = category,
-                    subRowContent = {
+                    subRowContent = { _, it ->
                         Spacer(modifier = Modifier.weight(10f))
                         Text(formatDollar(it.value))
                     },
