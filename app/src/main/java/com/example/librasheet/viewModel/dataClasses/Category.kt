@@ -12,6 +12,7 @@ data class Category(
     override val color: Color,
     val amount: Long,
     val subCategories: List<Category>,
+    val id: Int, // unique id, since name isn't guaranteed to be
 ) : PieChartValue {
     override val value: Float
         get() = amount.toFloatDollar()

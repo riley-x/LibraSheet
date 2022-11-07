@@ -16,12 +16,14 @@ val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
 
 val previewIncomeCategories = mutableStateListOf(
     Category(
+        id = 0,
         name = "Compensation",
         color = Color(0xFF00BFA5),
         subCategories = emptyList(),
         amount = 2_750_00_00,
     ),
     Category(
+        id = 1,
         name = "Cash Back",
         color = Color(0xFF48AD70),
         subCategories = emptyList(),
@@ -32,23 +34,27 @@ val previewIncomeCategories = mutableStateListOf(
 
 val previewExpenseCategories = mutableStateListOf(
     Category(
+        id = 2,
         name = "Housing",
         color = Color(0xFFCF814D),
         amount = 2_000_00_00,
         subCategories = listOf(
             Category(
+                id = 3,
                 name = "Rent",
                 color = Color(0xFFE04A4A),
                 amount = 1_700_00_00,
                 subCategories = emptyList(),
             ),
             Category(
+                id = 4,
                 name = "Electricity",
                 color = Color(0xFFDDC318),
                 amount = 200_00_00,
                 subCategories = emptyList(),
             ),
             Category(
+                id = 5,
                 name = "Water",
                 color = Color(0xFF228FC2),
                 amount = 100_00_00,
@@ -57,6 +63,7 @@ val previewExpenseCategories = mutableStateListOf(
         ),
     ),
     Category(
+        id = 6,
         name = "Social",
         color = Color(0xFF8C56B3),
         subCategories = emptyList(),

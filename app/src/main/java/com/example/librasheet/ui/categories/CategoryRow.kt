@@ -27,7 +27,7 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
-    subRowModifier: (Category) -> Modifier = { Modifier },
+    subRowModifier: @Composable (Category) -> Modifier = { Modifier },
     subRowContent: @Composable RowScope.(Category) -> Unit = { },
     content: @Composable RowScope.() -> Unit = { },
 ) {
