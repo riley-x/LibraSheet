@@ -1,6 +1,8 @@
 package com.example.librasheet.ui.categories
 
 import android.util.Log
+import androidx.compose.animation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -15,7 +17,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -55,6 +59,7 @@ private val subCategoryOptions = ImmutableList(SubCategoryOptions.values().toLis
 
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoriesScreen(
     incomeCategories: SnapshotStateList<Category>,
@@ -81,71 +86,95 @@ fun CategoriesScreen(
         Log.d("Libra", "$parentId $index $zIndex")
 
         return this
-            .offset { IntOffset(0,
-                if (parentId != currentParentId) 0
-                else if (index == currentDragIndex) dragOffset.roundToInt()
-                else if (currentHoverIndex > currentDragIndex
-                    && index > currentDragIndex
-                    && index <= currentHoverIndex
-                ) -rowHeight
-                else if (currentHoverIndex < currentDragIndex
-                    && index < currentDragIndex
-                    && index >= currentHoverIndex
-                ) rowHeight
-                else 0
-            ) }
+            .offset {
+                IntOffset(
+                    0,
+                    if (parentId != currentParentId) 0
+                    else if (index == currentDragIndex) dragOffset.roundToInt()
+                    else if (currentHoverIndex > currentDragIndex
+                        && index > currentDragIndex
+                        && index <= currentHoverIndex
+                    ) -rowHeight
+                    else if (currentHoverIndex < currentDragIndex
+                        && index < currentDragIndex
+                        && index >= currentHoverIndex
+                    ) rowHeight
+                    else 0
+                )
+            }
             .background(MaterialTheme.colors.surface)
             .zIndex(zIndex) // THIS NEEDS TO BE APPLIES TO THE COLUMN!!!!
-            .pointerInput(Unit) { detectDragGesturesAfterLongPress(
-                onDragStart = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    currentDragIndex = index
-                    currentParentId = parentId
-                    dragOffset = 0f
-                },
-                onDragEnd = {
-                    currentDragIndex = -1
-                    dragOffset = 0f
-                },
-                onDragCancel = {
-                    currentDragIndex = -1
-                    dragOffset = 0f
-                },
-                onDrag = { change, dragAmount ->
-                    change.consume()
-                    dragOffset += dragAmount.y
-                }
-            )
-        }
+            .pointerInput(Unit) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        currentDragIndex = index
+                        currentParentId = parentId
+                        dragOffset = 0f
+                    },
+                    onDragEnd = {
+                        currentDragIndex = -1
+                        dragOffset = 0f
+                    },
+                    onDragCancel = {
+                        currentDragIndex = -1
+                        dragOffset = 0f
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        dragOffset += dragAmount.y
+                    }
+                )
+            }
     }
 
-    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, id: Int) {
-        itemsIndexed(list) { index, category ->
-            if (index > 0) RowDivider()
+    val incomeExpanded = remember(incomeCategories) { incomeCategories.map { false }.toMutableStateList() }
+    val expenseExpanded = remember(expenseCategories) { expenseCategories.map { false }.toMutableStateList() }
 
-            CategoryRow(
-                category = category,
-                modifier = Modifier.drag(index, id),
-                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
-                subRowContent = { _, subCategory ->
+    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, expanded: SnapshotStateList<Boolean>, id: Int) {
+        list.forEachIndexed { index, category ->
+            item(category.id) {
+                if (index > 0) RowDivider()
+
+                CategoryRow(
+                    category = category,
+                    expanded = expanded[index],
+                    onExpand = { expanded[index] = !expanded[index] },
+                    modifier = Modifier.drag(index, id),
+//                    subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
+//                    subRowContent = { _, subCategory ->
+//                        Spacer(modifier = Modifier.weight(10f))
+//                        DropdownOptions(options = subCategoryOptions) {
+//                            when (it) {
+//                                SubCategoryOptions.RENAME -> onChangeName(subCategory)
+//                                SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
+//                                SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+//                                SubCategoryOptions.DELETE -> onDelete(subCategory)
+//                            }
+//                        }
+//                    },
+                ) {
                     Spacer(modifier = Modifier.weight(10f))
-                    DropdownOptions(options = subCategoryOptions) {
+                    DropdownOptions(options = categoryOptions) {
                         when (it) {
-                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
-                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
-                            SubCategoryOptions.DELETE -> onDelete(subCategory)
+                            CategoryOptions.RENAME -> onChangeName(category)
+                            CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
+                            CategoryOptions.ADD -> onAddSubCategory(category)
+                            CategoryOptions.DELETE -> onDelete(category)
                         }
                     }
-                },
-            ) {
-                Spacer(modifier = Modifier.weight(10f))
-                DropdownOptions(options = categoryOptions) {
-                    when (it) {
-                        CategoryOptions.RENAME -> onChangeName(category)
-                        CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
-                        CategoryOptions.ADD -> onAddSubCategory(category)
-                        CategoryOptions.DELETE -> onDelete(category)
+                }
+            }
+
+            if (category.subCategories.isNotEmpty() && expanded[index]) {
+                itemsIndexed(category.subCategories, key = { _, it -> it.id }) { subIndex, subCat ->
+                    CategorySubRow(
+                        category = subCat,
+                        indicatorColor = category.color.copy(alpha = 0.5f),
+                        last = subIndex == category.subCategories.lastIndex,
+                        modifier = Modifier.animateItemPlacement()
+                    ) {
+//                                subRowContent(subIndex, cat)
                     }
                 }
             }
@@ -159,11 +188,11 @@ fun CategoriesScreen(
             item("income_title") {
                 RowTitle(title = "Income")
             }
-            categoryItems(incomeCategories, -1)
+            categoryItems(incomeCategories, incomeExpanded, -1)
             item("expense_title") {
                 RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
             }
-            categoryItems(expenseCategories, -2)
+            categoryItems(expenseCategories, expenseExpanded, -2)
         }
     }
 }

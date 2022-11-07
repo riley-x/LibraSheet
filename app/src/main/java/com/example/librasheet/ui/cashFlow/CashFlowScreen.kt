@@ -107,18 +107,18 @@ fun CashFlowScreen(
             itemsIndexed(categories) { index, category ->
                 if (index > 0) RowDivider()
 
-                CategoryRow(
-                    category = category,
-                    subRowContent = { _, it ->
-                        Spacer(modifier = Modifier.weight(10f))
-                        Text(formatDollar(it.value))
-                    },
-                    modifier = Modifier
-                        .clickable { onCategoryClick(category) }
-                ) {
-                    Spacer(modifier = Modifier.weight(10f))
-                    Text(formatDollar(category.value))
-                }
+//                CategoryRow(
+//                    category = category,
+//                    subRowContent = { _, it ->
+//                        Spacer(modifier = Modifier.weight(10f))
+//                        Text(formatDollar(it.value))
+//                    },
+//                    modifier = Modifier
+//                        .clickable { onCategoryClick(category) }
+//                ) {
+//                    Spacer(modifier = Modifier.weight(10f))
+//                    Text(formatDollar(category.value))
+//                }
             }
         }
     }
