@@ -14,24 +14,26 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.IntSize
 
 // See also https://blog.canopas.com/android-drag-and-drop-ui-element-in-jetpack-compose-14922073b3f1
 
 class DragScope {
     var groupId by mutableStateOf(-1)
     var index by mutableStateOf(-1)
+
     var content by mutableStateOf<(@Composable () -> Unit)?>(null)
-    var height by mutableStateOf(0)
+    var size by mutableStateOf(IntSize.Zero)
+    var originalPos by mutableStateOf(Offset.Zero)
 
     var offset by mutableStateOf(0f)
-    var originalPos by mutableStateOf(Offset.Zero)
 
     fun reset() {
         groupId = -1
         index = -1
         content = null
-        height = 0
         offset = 0f
+        size = IntSize.Zero
         originalPos = Offset.Zero
     }
     fun isTarget(groupId: Int, index: Int) = groupId == this.groupId && index == this.index
@@ -53,20 +55,20 @@ fun DragToReorder(
         val haptic = LocalHapticFeedback.current
         val dragScope = LocalDragScope.current
 
-        var height by remember { mutableStateOf(0) }
+        var size by remember { mutableStateOf(IntSize.Zero) }
         var originalPos by remember { mutableStateOf(Offset.Zero) }
 
         fun getOffset() =
             if (groupId != dragScope.groupId) 0
             else if (index > dragScope.index) {
-                val targetY = originalPos.y - dragScope.height
-                val thresholdY = targetY + height - minOf(height, dragScope.height) / 2f
-                if (dragScope.originalPos.y + dragScope.offset > thresholdY) -dragScope.height
+                val targetY = originalPos.y - dragScope.size.height
+                val thresholdY = targetY + size.height - minOf(size.height, dragScope.size.height) / 2f
+                if (dragScope.originalPos.y + dragScope.offset > thresholdY) -dragScope.size.height
                 else 0
             }
             else if (index < dragScope.index) {
-                val thresholdY = originalPos.y + minOf(height, dragScope.height) / 2f
-                if (dragScope.originalPos.y + dragScope.offset < thresholdY) dragScope.height
+                val thresholdY = originalPos.y + minOf(size.height, dragScope.size.height) / 2f
+                if (dragScope.originalPos.y + dragScope.offset < thresholdY) dragScope.size.height
                 else 0
             }
             else 0
@@ -79,7 +81,7 @@ fun DragToReorder(
 
         Box(modifier = modifier
             .onGloballyPositioned {
-                height = it.size.height
+                size = it.size
                 originalPos = it.localToRoot(Offset.Zero)
             }
             .alpha(alpha)
@@ -96,7 +98,7 @@ fun DragToReorder(
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             dragScope.groupId = groupId
                             dragScope.index = index
-                            dragScope.height = height
+                            dragScope.size = size
                             dragScope.originalPos = originalPos
                             dragScope.content = content
                             dragScope.offset = 0f

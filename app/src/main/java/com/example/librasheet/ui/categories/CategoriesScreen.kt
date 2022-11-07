@@ -119,10 +119,13 @@ fun CategoriesScreen(
                 }
 
                 Box(modifier = Modifier
-                    .offset { IntOffset(
-                        (dragScope.originalPos.x - startPos.x).roundToInt(),
-                        (dragScope.offset + dragScope.originalPos.y - startPos.y).roundToInt()
-                    ) }
+                    .size(dragScope.size.toDpSize())
+                    .offset {
+                        IntOffset(
+                            (dragScope.originalPos.x - startPos.x).roundToInt(),
+                            (dragScope.offset + dragScope.originalPos.y - startPos.y).roundToInt()
+                        )
+                    }
                 ) {
                     dragScope.content?.invoke()
                 }
