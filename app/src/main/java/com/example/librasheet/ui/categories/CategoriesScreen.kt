@@ -70,30 +70,29 @@ fun CategoriesScreen(
         itemsIndexed(list) { index, category ->
             if (index > 0) RowDivider()
 
-            DragToReorder(dragInfo = dragInfo, index = index) {
-                CategoryRow(
-                    category = category,
+            CategoryRow(
+                category = category,
+                modifier = Modifier.dragToReorder(dragInfo = dragInfo, index = index),
 //                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
-                    subRowContent = { _, subCategory ->
-                        Spacer(modifier = Modifier.weight(10f))
-                        DropdownOptions(options = subCategoryOptions) {
-                            when (it) {
-                                SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                                SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
-                                SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
-                                SubCategoryOptions.DELETE -> onDelete(subCategory)
-                            }
-                        }
-                    },
-                ) {
+                subRowContent = { _, subCategory ->
                     Spacer(modifier = Modifier.weight(10f))
-                    DropdownOptions(options = categoryOptions) {
+                    DropdownOptions(options = subCategoryOptions) {
                         when (it) {
-                            CategoryOptions.RENAME -> onChangeName(category)
-                            CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
-                            CategoryOptions.ADD -> onAddSubCategory(category)
-                            CategoryOptions.DELETE -> onDelete(category)
+                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
+                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
+                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+                            SubCategoryOptions.DELETE -> onDelete(subCategory)
                         }
+                    }
+                },
+            ) {
+                Spacer(modifier = Modifier.weight(10f))
+                DropdownOptions(options = categoryOptions) {
+                    when (it) {
+                        CategoryOptions.RENAME -> onChangeName(category)
+                        CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
+                        CategoryOptions.ADD -> onAddSubCategory(category)
+                        CategoryOptions.DELETE -> onDelete(category)
                     }
                 }
             }

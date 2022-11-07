@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.librasheet.ui.components.ColorCodedRow
+import com.example.librasheet.ui.components.LogCompositions
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.preview.previewIncomeCategories

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -32,15 +33,11 @@ class DragInfo {
         currentY = 0f
     }
 }
-//val LocalDragInfo = compositionLocalOf { DragInfo() }
-//val dragInfo = LocalDragInfo.current
 
-@Composable
-fun DragToReorder(
+fun Modifier.dragToReorder(
     dragInfo: DragInfo,
     index: Int,
-    content: @Composable () -> Unit = { },
-) {
+) = composed {
     val haptic = LocalHapticFeedback.current
 
     val zIndex = if (index == dragInfo.index) 10f else 0f
@@ -62,7 +59,6 @@ fun DragToReorder(
         }
         else 0
 
-
     val offset =
         if (index != dragInfo.index) {
             val targetOffset by remember { derivedStateOf { getOffset() } }
@@ -70,44 +66,34 @@ fun DragToReorder(
         }
         else getOffset()
 
-
-    if (index == 2) Log.d("Libra", "$offset")
-
-    Box(
-        modifier = Modifier
-            .onGloballyPositioned {
-                height = it.size.height
-                originalY = it.localToRoot(Offset.Zero).y
-            }
-            .offset { IntOffset(0, offset) }
-            .background(MaterialTheme.colors.surface)
-            .zIndex(zIndex)
-            .pointerInput(Unit) {
-                detectDragGesturesAfterLongPress(
-                    onDragStart = {
-                        Log.d("Libra", "Drag Start: $index")
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        dragInfo.index = index
-                        dragInfo.height = height
-                        dragInfo.offset = 0f
-                        dragInfo.currentY = originalY
-                    },
-                    onDragEnd = {
-                        Log.d("Libra", "Drag End: $index")
-                        dragInfo.reset()
-                    },
-                    onDragCancel = {
-                        Log.d("Libra", "Drag Cancel: $index")
-                        dragInfo.reset()
-                    },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        dragInfo.offset += dragAmount.y
-                        dragInfo.currentY += dragAmount.y
-                    }
-                )
-            }
-    ) {
-        content()
-    }
+    Modifier
+        .onGloballyPositioned {
+            height = it.size.height
+            originalY = it.localToRoot(Offset.Zero).y
+        }
+        .offset { IntOffset(0, offset) }
+        .background(MaterialTheme.colors.surface)
+        .zIndex(zIndex)
+        .pointerInput(Unit) {
+            detectDragGesturesAfterLongPress(
+                onDragStart = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    dragInfo.index = index
+                    dragInfo.height = height
+                    dragInfo.offset = 0f
+                    dragInfo.currentY = originalY
+                },
+                onDragEnd = {
+                    dragInfo.reset()
+                },
+                onDragCancel = {
+                    dragInfo.reset()
+                },
+                onDrag = { change, dragAmount ->
+                    change.consume()
+                    dragInfo.offset += dragAmount.y
+                    dragInfo.currentY += dragAmount.y
+                }
+            )
+        }
 }
