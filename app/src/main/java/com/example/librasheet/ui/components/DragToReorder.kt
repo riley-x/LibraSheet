@@ -22,7 +22,7 @@ class DragScope {
     var groupId by mutableStateOf(-1)
     var index by mutableStateOf(-1)
 
-    var content by mutableStateOf<(@Composable () -> Unit)?>(null)
+    var content by mutableStateOf<(@Composable (DragScope) -> Unit)?>(null)
     var size by mutableStateOf(IntSize.Zero)
     var originalPos by mutableStateOf(Offset.Zero)
 
@@ -37,6 +37,11 @@ class DragScope {
         originalPos = Offset.Zero
     }
     fun isTarget(groupId: Int, index: Int) = groupId == this.groupId && index == this.index
+
+    @Composable
+    fun PlaceContent() {
+        content?.invoke(this)
+    }
 }
 
 val LocalDragScope = compositionLocalOf { DragScope() }
@@ -47,10 +52,10 @@ fun DragToReorder(
     groupId: Int,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit = { },
+    content: @Composable (DragScope) -> Unit = { },
 ) {
     if (!enabled || index < 0) {
-        content()
+        content(DragScope())
     } else {
         val haptic = LocalHapticFeedback.current
         val dragScope = LocalDragScope.current
@@ -119,7 +124,7 @@ fun DragToReorder(
                 )
             }
         ) {
-            content()
+            content(dragScope)
         }
     }
 }

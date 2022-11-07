@@ -24,11 +24,11 @@ fun CategorySubRow(
     modifier: Modifier = Modifier,
     dragIndex: Int = -1,
     dragGroup: Int = 0,
+    divider: Boolean = true,
+    dividerColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     colorRowModifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit = { },
 ) {
-    val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
-
     Row(modifier) {
         ComponentIndicatorLine(
             last = last,
@@ -43,7 +43,7 @@ fun CategorySubRow(
                 horizontalPadding = 0.dp,
                 modifier = colorRowModifier
                     .padding(end = libraRowHorizontalPadding)
-                    .rowDivider(padding = 0.dp, color = dividerColor)
+                    .rowDivider(padding = 0.dp, color = dividerColor, enabled = !it.isTarget(dragGroup, dragIndex))
             ) {
                 Text(category.name)
                 content()

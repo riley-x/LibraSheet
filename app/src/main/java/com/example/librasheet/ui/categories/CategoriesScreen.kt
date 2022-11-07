@@ -127,7 +127,7 @@ fun CategoriesScreen(
                         )
                     }
                 ) {
-                    dragScope.content?.invoke()
+                    dragScope.PlaceContent()
                 }
             }
         }
