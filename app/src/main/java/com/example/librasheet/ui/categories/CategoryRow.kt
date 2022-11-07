@@ -2,6 +2,7 @@ package com.example.librasheet.ui.categories
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -27,9 +28,16 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
-    subRowModifier: @Composable (Int, Category) -> Modifier = { _, _ -> Modifier },
-    subRowContent: @Composable RowScope.(Int, Category) -> Unit = { _, _ -> },
-    content: @Composable RowScope.() -> Unit = { },
+    content: @Composable RowScope.(Category) -> Unit = { },
+    subRow: @Composable ColumnScope.(Int, Category) -> Unit = { index, cat ->
+        CategorySubRow(
+            category = cat,
+            indicatorColor = category.color.copy(alpha = 0.5f),
+            last = index == category.subCategories.lastIndex,
+        ) {
+            content(cat)
+        }
+    },
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
 
@@ -48,7 +56,7 @@ fun CategoryRow(
                         else Icon(imageVector = Icons.Sharp.ExpandMore, contentDescription = null)
                     }
                 }
-                content()
+                content(category)
             }
 
             if (category.subCategories.isNotEmpty()) {
@@ -59,14 +67,7 @@ fun CategoryRow(
                 ) {
                     Column {
                         category.subCategories.forEachIndexed { index, cat ->
-                            CategorySubRow(
-                                category = cat,
-                                indicatorColor = category.color.copy(alpha = 0.5f),
-                                last = index == category.subCategories.lastIndex,
-                                colorRowModifier = subRowModifier(index, cat)
-                            ) {
-                                subRowContent(index, cat)
-                            }
+                            subRow(index, cat)
                         }
                     }
                 }

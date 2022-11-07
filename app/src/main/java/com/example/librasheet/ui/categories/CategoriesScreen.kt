@@ -76,27 +76,34 @@ fun CategoriesScreen(
                         DragToReorder(index = index, groupId = groupId) {
                             CategoryRow(
                                 category = category,
-                                modifier = Modifier
-                                    .rowDivider(enabled = index > 0, color = dividerColor),
-                                subRowContent = { _, subCategory ->
+                                modifier = Modifier.rowDivider(enabled = index > 0, color = dividerColor),
+                                content = { category ->
                                     Spacer(modifier = Modifier.weight(10f))
-                                    DropdownOptions(options = subCategoryOptions) {
+                                    DropdownOptions(options = categoryOptions) {
                                         when (it) {
-                                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
-                                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
-                                            SubCategoryOptions.DELETE -> onDelete(subCategory)
+                                            CategoryOptions.RENAME -> onChangeName(category)
+                                            CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
+                                            CategoryOptions.ADD -> onAddSubCategory(category)
+                                            CategoryOptions.DELETE -> onDelete(category)
                                         }
                                     }
                                 },
-                            ) {
-                                Spacer(modifier = Modifier.weight(10f))
-                                DropdownOptions(options = categoryOptions) {
-                                    when (it) {
-                                        CategoryOptions.RENAME -> onChangeName(category)
-                                        CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
-                                        CategoryOptions.ADD -> onAddSubCategory(category)
-                                        CategoryOptions.DELETE -> onDelete(category)
+                            ) { subIndex, subCategory ->
+                                DragToReorder(index = subIndex, groupId = category.id) {
+                                    CategorySubRow(
+                                        category = subCategory,
+                                        indicatorColor = category.color,
+                                        last = subIndex == category.subCategories.lastIndex,
+                                    ) {
+                                        Spacer(modifier = Modifier.weight(10f))
+                                        DropdownOptions(options = subCategoryOptions) {
+                                            when (it) {
+                                                SubCategoryOptions.RENAME -> onChangeName(subCategory)
+                                                SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
+                                                SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+                                                SubCategoryOptions.DELETE -> onDelete(subCategory)
+                                            }
+                                        }
                                     }
                                 }
                             }

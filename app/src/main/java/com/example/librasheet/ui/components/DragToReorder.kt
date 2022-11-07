@@ -82,7 +82,6 @@ fun DragToReorder(
     val alpha by remember { derivedStateOf {
         if (dragScope.isTarget(groupId, index)) 0.3f else 1f
     } }
-    if (index == 2) Log.d("Libra", "offset=$offset alpha=$alpha")
 
     Box(modifier = modifier
         .onGloballyPositioned {
@@ -98,19 +97,24 @@ fun DragToReorder(
         .pointerInput(Unit) {
             detectDragGesturesAfterLongPress(
                 onDragStart = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    dragScope.groupId = groupId
-                    dragScope.index = index
-                    dragScope.height = height
-                    dragScope.content = content
-                    dragScope.offset = 0f
-                    dragScope.currentY = originalY
+                    if (dragScope.index == -1) {
+                        Log.d("Libra/DragToReorder", "drag start: $groupId $index")
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        dragScope.groupId = groupId
+                        dragScope.index = index
+                        dragScope.height = height
+                        dragScope.content = content
+                        dragScope.offset = 0f
+                        dragScope.currentY = originalY
+                    }
                 },
                 onDragEnd = {
+                    Log.d("Libra/DragToReorder", "drag end: $groupId $index")
                     dragScope.reset()
                 },
                 onDragCancel = {
-                    dragScope.reset()
+                    Log.d("Libra/DragToReorder", "drag cancel: $groupId $index")
+                    if (dragScope.isTarget(groupId, index)) dragScope.reset()
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
