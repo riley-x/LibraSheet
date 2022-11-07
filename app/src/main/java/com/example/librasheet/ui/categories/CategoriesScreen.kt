@@ -1,6 +1,5 @@
 package com.example.librasheet.ui.categories
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -10,10 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -61,9 +57,9 @@ fun CategoriesScreen(
     Column(modifier) {
         HeaderBar(title = "Categories", backArrow = true, onBack = onBack)
 
-        var startY by remember { mutableStateOf(0f) }
+        var startPos by remember { mutableStateOf(Offset.Zero) }
         Box(
-            modifier.onGloballyPositioned { startY = it.localToRoot(Offset.Zero).y }
+            modifier.onGloballyPositioned { startPos = it.localToRoot(Offset.Zero) }
         ) {
             val dragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
 
@@ -89,20 +85,20 @@ fun CategoriesScreen(
                                     }
                                 },
                             ) { subIndex, subCategory ->
-                                DragToReorder(index = subIndex, groupId = category.id) {
-                                    CategorySubRow(
-                                        category = subCategory,
-                                        indicatorColor = category.color,
-                                        last = subIndex == category.subCategories.lastIndex,
-                                    ) {
-                                        Spacer(modifier = Modifier.weight(10f))
-                                        DropdownOptions(options = subCategoryOptions) {
-                                            when (it) {
-                                                SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                                                SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
-                                                SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
-                                                SubCategoryOptions.DELETE -> onDelete(subCategory)
-                                            }
+                                CategorySubRow(
+                                    category = subCategory,
+                                    indicatorColor = category.color.copy(alpha = 0.5f),
+                                    last = subIndex == category.subCategories.lastIndex,
+                                    dragIndex = subIndex,
+                                    dragGroup = category.id,
+                                ) {
+                                    Spacer(modifier = Modifier.weight(10f))
+                                    DropdownOptions(options = subCategoryOptions) {
+                                        when (it) {
+                                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
+                                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
+                                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+                                            SubCategoryOptions.DELETE -> onDelete(subCategory)
                                         }
                                     }
                                 }
@@ -123,7 +119,10 @@ fun CategoriesScreen(
                 }
 
                 Box(modifier = Modifier
-                    .offset { IntOffset(0, (dragScope.currentY - startY).roundToInt()) }
+                    .offset { IntOffset(
+                        (dragScope.originalPos.x - startPos.x).roundToInt(),
+                        (dragScope.offset + dragScope.originalPos.y - startPos.y).roundToInt()
+                    ) }
                 ) {
                     dragScope.content?.invoke()
                 }

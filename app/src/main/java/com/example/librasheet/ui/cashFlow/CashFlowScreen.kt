@@ -109,16 +109,13 @@ fun CashFlowScreen(
 
                 CategoryRow(
                     category = category,
-                    subRowContent = { _, it ->
+                    content = {
                         Spacer(modifier = Modifier.weight(10f))
                         Text(formatDollar(it.value))
                     },
                     modifier = Modifier
                         .clickable { onCategoryClick(category) }
-                ) {
-                    Spacer(modifier = Modifier.weight(10f))
-                    Text(formatDollar(category.value))
-                }
+                )
             }
         }
     }

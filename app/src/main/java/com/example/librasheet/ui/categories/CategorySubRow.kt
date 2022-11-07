@@ -22,6 +22,8 @@ fun CategorySubRow(
     indicatorColor: Color,
     last: Boolean,
     modifier: Modifier = Modifier,
+    dragIndex: Int = -1,
+    dragGroup: Int = 0,
     colorRowModifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit = { },
 ) {
@@ -35,18 +37,23 @@ fun CategorySubRow(
                 .padding(start = libraRowHorizontalPadding + 1.dp)
                 .size(width = 22.dp, height = libraRowHeight)
         )
-        ColorCodedRow(
-            color = category.color,
-            horizontalPadding = 0.dp,
-            modifier = colorRowModifier
-                .padding(end = libraRowHorizontalPadding)
-                .rowDivider(padding = 0.dp, color = dividerColor)
-        ) {
-            Text(category.name)
-            content()
+        DragToReorder(index = dragIndex, groupId = dragGroup, enabled = dragIndex != -1) {
+            ColorCodedRow(
+                color = category.color,
+                horizontalPadding = 0.dp,
+                modifier = colorRowModifier
+                    .padding(end = libraRowHorizontalPadding)
+                    .rowDivider(padding = 0.dp, color = dividerColor)
+            ) {
+                Text(category.name)
+                content()
+            }
         }
     }
 }
+
+
+
 
 
 @Preview
