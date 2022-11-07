@@ -26,6 +26,13 @@ import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.preview.*
 import kotlin.math.exp
 
+
+private enum class CategoryOptions {
+
+}
+
+
+
 @Composable
 fun CategoriesScreen(
     incomeCategories: SnapshotStateList<Category>,

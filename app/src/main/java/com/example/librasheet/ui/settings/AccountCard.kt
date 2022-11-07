@@ -13,10 +13,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.ColorCodedRow
+import com.example.librasheet.ui.components.DropdownOptions
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Account
+import com.example.librasheet.viewModel.dataClasses.HasDisplayName
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewAccounts
+
+
+private enum class AccountOptions(override val displayName: String): HasDisplayName {
+    RENAME("Rename"),
+    COLOR("Change Color"),
+    DELETE("Delete"),
+}
+private val accountOptions = ImmutableList(AccountOptions.values().toList())
 
 @Composable
 fun AccountCard(
@@ -56,37 +67,7 @@ fun AccountCard(
                         .padding(start = cardRowHorizontalPadding)
                 ) {
                     Text(account.name, modifier = Modifier.weight(10f))
-
-                    var expanded by remember { mutableStateOf(false) }
-
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = null)
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(onClick = {
-                                onChangeName(account.name)
-                                expanded = false
-                            }) {
-                                Text("Rename")
-                            }
-                            DropdownMenuItem(onClick = {
-                                onChangeColor("account_${account.name}")
-                                expanded = false
-                            }) {
-                                Text("Change Color")
-                            }
-                            DropdownMenuItem(onClick = {
-                                onDelete(account.name)
-                                expanded = false
-                            }) {
-                                Text("Delete")
-                            }
-                        }
-                    }
+                    DropdownOptions(options = accountOptions)
                 }
             }
 
