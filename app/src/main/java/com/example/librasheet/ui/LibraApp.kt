@@ -202,8 +202,6 @@ fun LibraApp(
                     )
                 }
             }
-
-
         }
 
         if (openAddAccountDialog) {

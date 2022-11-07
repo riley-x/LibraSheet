@@ -4,8 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.sharp.Add
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +23,9 @@ fun AccountCard(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onAddAccount: () -> Unit = { },
-    onEditAccount: (Account) -> Unit = { },
+    onChangeName: (String) -> Unit = { },
+    onChangeColor: (String) -> Unit = { },
+    onDelete: (String) -> Unit = { },
     onSeeAllAccounts: () -> Unit = { },
 ) {
     Card(
@@ -41,28 +44,52 @@ fun AccountCard(
 
             CardRowDivider(color = MaterialTheme.colors.primary)
 
-            accounts.take(4).forEach { account ->
+            accounts.asReversed().take(if (accounts.size > 4) 3 else 4).forEachIndexed { i, account ->
+                if (i > 0) CardRowDivider()
+
                 ColorCodedRow(
                     color = account.color,
                     horizontalPadding = cardRowHorizontalPadding,
-                    modifier = Modifier
-                        .clickable { onEditAccount(account) }
                 ) {
                     Text(account.name, modifier = Modifier.weight(10f))
-                    Text("••••${account.number.takeLast(4)}", style = MaterialTheme.typography.subtitle2)
-                }
 
-                CardRowDivider()
+                    var expanded by remember { mutableStateOf(false) }
+
+                    Box(modifier = Modifier
+                        .wrapContentSize(Alignment.TopStart)
+                    ) {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = null)
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(onClick = { onChangeName(account.name) }) {
+                                Text("Rename")
+                            }
+                            DropdownMenuItem(onClick = { onChangeColor("account_${account.name}") }) {
+                                Text("Change Color")
+                            }
+                            DropdownMenuItem(onClick = { onDelete(account.name) }) {
+                                Text("Delete")
+                            }
+                        }
+                    }
+                }
             }
 
-            TextButton(
-                onClick = onSeeAllAccounts,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 4.dp)
-                    .fillMaxWidth()
-            ) {
-                Text("SEE ALL")
+            if (accounts.size > 4) {
+                CardRowDivider()
+                TextButton(
+                    onClick = onSeeAllAccounts,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(horizontal = 4.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("SEE ALL")
+                }
             }
         }
     }

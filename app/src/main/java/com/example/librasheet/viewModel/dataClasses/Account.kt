@@ -10,7 +10,6 @@ data class Account(
     override val name: String,
     override val color: Color,
     val balance: Long,
-    val number: String,
 ) : PieChartValue {
     override val value: Float
         get() = balance.toFloatDollar()

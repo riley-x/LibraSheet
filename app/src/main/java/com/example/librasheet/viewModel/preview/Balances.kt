@@ -17,25 +17,21 @@ val previewAccounts = mutableStateListOf(
         name = "BofA Checking",
         balance = 2_345_01_00,
         color = Color(0xFF004940),
-        number = "1234-5678-3456",
     ),
     Account(
         name = "BofA Savings",
         balance = 16_345_78_00,
         color = Color(0xFF005D57),
-        number = "asdf-1234-qwer",
     ),
     Account(
         name = "Robinhood",
         balance = 6_017_38_00,
         color = Color(0xFF04B97F),
-        number = "f84jsj38sdfj9",
     ),
     Account(
         name = "IRA",
         balance = 26_607_39_00,
         color = Color(0xFF37EFBA),
-        number = "aaa99e9f921",
     ),
 )
 
