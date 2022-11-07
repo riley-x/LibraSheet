@@ -67,13 +67,22 @@ fun AccountCard(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
                         ) {
-                            DropdownMenuItem(onClick = { onChangeName(account.name) }) {
+                            DropdownMenuItem(onClick = {
+                                onChangeName(account.name)
+                                expanded = false
+                            }) {
                                 Text("Rename")
                             }
-                            DropdownMenuItem(onClick = { onChangeColor("account_${account.name}") }) {
+                            DropdownMenuItem(onClick = {
+                                onChangeColor("account_${account.name}")
+                                expanded = false
+                            }) {
                                 Text("Change Color")
                             }
-                            DropdownMenuItem(onClick = { onDelete(account.name) }) {
+                            DropdownMenuItem(onClick = {
+                                onDelete(account.name)
+                                expanded = false
+                            }) {
                                 Text("Delete")
                             }
                         }

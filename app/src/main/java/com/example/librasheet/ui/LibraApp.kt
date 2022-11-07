@@ -53,18 +53,10 @@ fun LibraApp(
     }
     fun toAccountDetails(account: Account) {
         // TODO view model set
-        navController.navigate(AccountDestination.route) {
-            launchSingleTop = true
-            restoreState = true
-        }
+        navController.navigate(AccountDestination.route)
     }
-    fun toBalanceColorSelector(spec: String) {
-        // TODO view model set
-        navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec)) {
-            launchSingleTop = true
-            restoreState = true
-        }
-    }
+    fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
+    fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
     fun onSaveColor(spec: String, color: Color) {
         // TODO
         navController.popBackStack()
@@ -72,13 +64,13 @@ fun LibraApp(
 
     /** Dialogs **/
     var openAddAccountDialog by remember { mutableStateOf(false) }
-    var openEditAccountDialog by remember { mutableStateOf(false) }
+    var changeAccountNameOld by remember { mutableStateOf("") }
     fun onAddAccountClick() {
         openAddAccountDialog = true
     }
-    fun onEditAccountClick(account: Account) {
+    fun onChangeAccountName(account: String) {
         // TODO view model current edit
-        openEditAccountDialog = true
+        changeAccountNameOld = account
     }
     fun onAddAccount(account: String) {
         openAddAccountDialog = false
@@ -86,11 +78,11 @@ fun LibraApp(
             // TODO
         }
     }
-    fun onEditAccount(account: String) {
-        openEditAccountDialog = false
-        if (account.isNotBlank()) {
+    fun changeAccountName(newName: String) {
+        if (newName.isNotBlank()) {
             // TODO
         }
+        changeAccountNameOld = ""
     }
 
     /** Main Layout Scaffold **/
@@ -106,12 +98,12 @@ fun LibraApp(
     ) { innerPadding ->
 
         /** The color selector screen is reused by multiple tabs, and exists as a destination across
-         * the respective nested navigation graphs. The parent [graph] needs to be specified in the
-         * route to choose the correct one. The initial ui state of the tab is entirely determined
-         * by the "spec" argument.
+         * the respective nested navigation graphs. The parent route is appended to the base route to
+         * make them unique. The initial ui state of the tab is entirely determined by the "spec"
+         * argument.
          */
-        fun NavGraphBuilder.colorSelector(graph: String) {
-            composable(route = ColorDestination.route(graph), arguments = ColorDestination.arguments) {
+        fun NavGraphBuilder.colorSelector() {
+            composable(route = ColorDestination.route(route!!), arguments = ColorDestination.arguments) {
                 val spec = it.arguments?.getString(ColorDestination.argSpec) ?: ""
                 ColorSelectorScreen(
                     spec = spec,
@@ -156,7 +148,7 @@ fun LibraApp(
                         onClickColor = ::toBalanceColorSelector,
                     )
                 }
-                colorSelector(BalanceTab.graph)
+                colorSelector()
             }
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
@@ -191,8 +183,8 @@ fun LibraApp(
                         accounts = previewAccounts,
                         onAddAccount = ::onAddAccountClick,
                         onClickAccount = { },
-                        onChangeAccountName = { },
-                        onChangeAccountColor = { },
+                        onChangeAccountName = ::onChangeAccountName,
+                        onChangeAccountColor = ::toSettingsColorSelector,
                         onDeleteAccount = { },
                         onSeeAllAccounts = { },
                         toEditCategories = { },
@@ -204,6 +196,7 @@ fun LibraApp(
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
+                colorSelector()
             }
         }
 
@@ -214,12 +207,11 @@ fun LibraApp(
                 onDismiss = ::onAddAccount
             )
         }
-        if (openEditAccountDialog) {
+        if (changeAccountNameOld.isNotEmpty()) {
             TextFieldDialog(
-                title = "Edit Account",
-                initialText = "ASDF",
-                placeholder = "Account name",
-                onDismiss = ::onEditAccount
+                title = "Account Name",
+                initialText = changeAccountNameOld,
+                onDismiss = ::changeAccountName
             )
         }
     }
