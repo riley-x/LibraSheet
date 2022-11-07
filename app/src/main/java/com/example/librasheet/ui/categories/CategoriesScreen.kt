@@ -45,8 +45,8 @@ fun CategoriesScreen(
                     Spacer(modifier = Modifier.weight(10f))
                     Text(formatDollar(it.value))
                 },
-                modifier = Modifier
-                    .clickable { onCategoryClick(category) }
+                modifier = Modifier.clickable { onCategoryClick(category) },
+                subRowModifier = { Modifier.clickable { onCategoryClick(it) } }
             ) {
                 Spacer(modifier = Modifier.weight(10f))
                 Text(formatDollar(category.value))

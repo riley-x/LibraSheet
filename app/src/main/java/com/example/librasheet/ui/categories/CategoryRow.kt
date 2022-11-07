@@ -27,13 +27,17 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
+    subRowModifier: (Category) -> Modifier = { Modifier },
     subRowContent: @Composable RowScope.(Category) -> Unit = { },
     content: @Composable RowScope.() -> Unit = { },
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
 
-    Column(modifier = modifier) {
-        ColorCodedRow(color = category.color) {
+    Column {
+        ColorCodedRow(
+            color = category.color,
+            modifier = modifier,
+        ) {
             Text(category.name)
             if (category.subCategories.isNotEmpty()) {
                 IconButton(onClick = { expanded = !expanded }) {
@@ -50,14 +54,11 @@ fun CategoryRow(
                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                (category.subCategories).forEachIndexed { index, cat ->
+                category.subCategories.forEachIndexed { index, cat ->
                     CategorySubRow(
                         category = cat,
                         last = index == category.subCategories.lastIndex,
-                        modifier = Modifier
-//                            .clickable { onPositionClick(pos) }
-//                            .padding(horizontal = horizontalPadding)
-                        // padding needs to be here so that the clickable animation covers the full width
+                        modifier = subRowModifier(cat)
                     ) {
                         subRowContent(cat)
                     }
