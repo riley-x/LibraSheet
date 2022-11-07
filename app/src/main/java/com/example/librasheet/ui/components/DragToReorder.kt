@@ -1,6 +1,7 @@
 package com.example.librasheet.ui.components
 
 import android.util.Log
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
@@ -45,7 +46,8 @@ fun DragToReorder(
     val zIndex = if (index == dragInfo.index) 10f else 0f
     var height by remember { mutableStateOf(0) }
     var originalY by remember { mutableStateOf(0f) }
-    val offset by remember(dragInfo) { derivedStateOf {
+
+    fun getOffset() =
         if (index == dragInfo.index) dragInfo.offset.roundToInt()
         else if (index > dragInfo.index) {
             val targetY = originalY - dragInfo.height
@@ -59,7 +61,15 @@ fun DragToReorder(
             else 0
         }
         else 0
-    } }
+
+
+    val offset =
+        if (index != dragInfo.index) {
+            val targetOffset by remember { derivedStateOf { getOffset() } }
+            animateIntAsState(targetValue = targetOffset).value
+        }
+        else getOffset()
+
 
     if (index == 2) Log.d("Libra", "$offset")
 
