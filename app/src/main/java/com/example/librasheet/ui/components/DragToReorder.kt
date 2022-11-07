@@ -19,7 +19,6 @@ import kotlin.math.roundToInt
 
 class DragInfo {
     var index by mutableStateOf(-1)
-    var parentId by mutableStateOf(-1)
     var height by mutableStateOf(0)
 
     var offset by mutableStateOf(0f)
@@ -27,43 +26,42 @@ class DragInfo {
 
     fun reset() {
         index = -1
-        parentId = -1
         offset = 0f
         height = 0
         currentY = 0f
     }
 }
-val LocalDragInfo = compositionLocalOf { DragInfo() }
+//val LocalDragInfo = compositionLocalOf { DragInfo() }
+//val dragInfo = LocalDragInfo.current
 
 @Composable
 fun DragToReorder(
+    dragInfo: DragInfo,
     index: Int,
-    parentId: Int,
     content: @Composable () -> Unit = { },
 ) {
     val haptic = LocalHapticFeedback.current
-    val dragInfo = LocalDragInfo.current
 
-    val zIndex = if (parentId == dragInfo.parentId && index == dragInfo.index) 10f else 0f
+    val zIndex = if (index == dragInfo.index) 10f else 0f
     var height by remember { mutableStateOf(0) }
     var originalY by remember { mutableStateOf(0f) }
     val offset by remember(dragInfo) { derivedStateOf {
-        if (parentId != dragInfo.parentId) 0
-        else if (index == dragInfo.index) dragInfo.offset.roundToInt()
+        if (index == dragInfo.index) dragInfo.offset.roundToInt()
         else if (index > dragInfo.index) {
             val targetY = originalY - dragInfo.height
             val thresholdY = targetY + height - minOf(height, dragInfo.height) / 2f
             if (dragInfo.currentY > thresholdY) -dragInfo.height
             else 0
         }
-        else if (index < dragInfo.index)  {
+        else if (index < dragInfo.index) {
             val thresholdY = originalY + minOf(height, dragInfo.height) / 2f
             if (dragInfo.currentY < thresholdY) dragInfo.height
             else 0
         }
         else 0
     } }
-    if (index == 2) Log.d("Libra", "($parentId, $index) height=$height originalY=$originalY offset=$offset")
+
+    if (index == 2) Log.d("Libra", "$offset")
 
     Box(
         modifier = Modifier
@@ -77,20 +75,19 @@ fun DragToReorder(
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = {
-                        Log.d("Libra", "Drag Start: $index $parentId")
+                        Log.d("Libra", "Drag Start: $index")
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         dragInfo.index = index
-                        dragInfo.parentId = parentId
                         dragInfo.height = height
                         dragInfo.offset = 0f
                         dragInfo.currentY = originalY
                     },
                     onDragEnd = {
-                        Log.d("Libra", "Drag End: $index $parentId")
+                        Log.d("Libra", "Drag End: $index")
                         dragInfo.reset()
                     },
                     onDragCancel = {
-                        Log.d("Libra", "Drag Cancel: $index $parentId")
+                        Log.d("Libra", "Drag Cancel: $index")
                         dragInfo.reset()
                     },
                     onDrag = { change, dragAmount ->

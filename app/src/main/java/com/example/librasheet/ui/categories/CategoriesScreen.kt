@@ -63,11 +63,14 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
-    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, id: Int) {
+    val incomeDragInfo = remember { DragInfo() } // Don't need state here since this is only passed into other composables.
+    val expenseDragInfo = remember { DragInfo() } // Don't need state here since this is only passed into other composables.
+
+    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, dragInfo: DragInfo) {
         itemsIndexed(list) { index, category ->
             if (index > 0) RowDivider()
 
-            DragToReorder(index = index, parentId = id) {
+            DragToReorder(dragInfo = dragInfo, index = index) {
                 CategoryRow(
                     category = category,
 //                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
@@ -104,11 +107,11 @@ fun CategoriesScreen(
             item("income_title") {
                 RowTitle(title = "Income")
             }
-            categoryItems(incomeCategories, 0)
+            categoryItems(incomeCategories, incomeDragInfo)
             item("expense_title") {
                 RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
             }
-            categoryItems(expenseCategories, 1)
+            categoryItems(expenseCategories, expenseDragInfo)
         }
     }
 }
