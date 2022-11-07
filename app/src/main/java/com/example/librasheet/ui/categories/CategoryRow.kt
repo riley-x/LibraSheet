@@ -27,8 +27,8 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
-    subRowModifier: @Composable (Category) -> Modifier = { Modifier },
-    subRowContent: @Composable RowScope.(Category) -> Unit = { },
+    subRowModifier: @Composable (Int, Category) -> Modifier = { _, _ -> Modifier },
+    subRowContent: @Composable RowScope.(Int, Category) -> Unit = { _, _ -> },
     content: @Composable RowScope.() -> Unit = { },
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
@@ -60,9 +60,9 @@ fun CategoryRow(
                             category = cat,
                             indicatorColor = category.color.copy(alpha = 0.5f),
                             last = index == category.subCategories.lastIndex,
-                            modifier = subRowModifier(cat)
+                            modifier = subRowModifier(index, cat)
                         ) {
-                            subRowContent(cat)
+                            subRowContent(index, cat)
                         }
                     }
                 }

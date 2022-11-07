@@ -16,6 +16,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -27,8 +28,10 @@ import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
+import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 
 private enum class CategoryOptions(override val displayName: String): HasDisplayName {
@@ -61,26 +64,41 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
-    var currentDragId by remember { mutableStateOf(-1) }
+    var currentDragIndex by remember { mutableStateOf(-1) }
+    var currentParentId by remember { mutableStateOf(-3) } // use -1 for income, -2 for expense
     var dragOffset by remember { mutableStateOf(0f) }
 
     @Composable
-    fun Modifier.drag(category: Category): Modifier {
+    fun Modifier.drag(index: Int, parentId: Int): Modifier {
+        val rowHeight = with(LocalDensity.current) { libraRowHeight.toPx().roundToInt() }
         val haptic = LocalHapticFeedback.current
-        var out = this
-        if (category.id == currentDragId) out = out.offset { IntOffset(0, dragOffset.roundToInt()) }
-        return out.pointerInput(Unit) {
-            detectDragGesturesAfterLongPress(
+        val currentHoverIndex = currentDragIndex + (dragOffset / rowHeight).toInt()
+
+        return offset { IntOffset(0,
+                if (parentId != currentParentId) 0
+                else if (index == currentDragIndex) dragOffset.roundToInt()
+                else if (currentHoverIndex > currentDragIndex
+                    && index > currentDragIndex
+                    && index <= currentHoverIndex
+                ) -rowHeight
+                else if (currentHoverIndex < currentDragIndex
+                    && index < currentDragIndex
+                    && index >= currentHoverIndex
+                ) rowHeight
+                else 0
+            ) }
+            .pointerInput(Unit) { detectDragGesturesAfterLongPress(
                 onDragStart = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    currentDragId = category.id
+                    currentDragIndex = index
+                    currentParentId = parentId
                     dragOffset = 0f
                 },
                 onDragEnd = {
-                    currentDragId = -1
+                    currentDragIndex = -1
                 },
                 onDragCancel = {
-                    currentDragId = -1
+                    currentDragIndex = -1
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
@@ -90,17 +108,15 @@ fun CategoriesScreen(
         }
     }
 
-
-
-    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>) {
+    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, id: Int) {
         itemsIndexed(list) { index, category ->
             if (index > 0) RowDivider()
 
             CategoryRow(
                 category = category,
-                modifier = Modifier.drag(category),
-                subRowModifier = { Modifier.drag(it) },
-                subRowContent = { subCategory ->
+                modifier = Modifier.drag(index, id),
+                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
+                subRowContent = { _, subCategory ->
                     Spacer(modifier = Modifier.weight(10f))
                     DropdownOptions(options = subCategoryOptions) {
                         when (it) {
@@ -132,11 +148,11 @@ fun CategoriesScreen(
             item("income_title") {
                 RowTitle(title = "Income")
             }
-            categoryItems(incomeCategories)
+            categoryItems(incomeCategories, -1)
             item("expense_title") {
                 RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
             }
-            categoryItems(expenseCategories)
+            categoryItems(expenseCategories, -2)
         }
     }
 }
