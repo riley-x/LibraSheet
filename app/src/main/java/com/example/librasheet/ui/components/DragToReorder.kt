@@ -70,7 +70,6 @@ fun Modifier.dragToReorder(
             originalY = it.localToRoot(Offset.Zero).y
         }
         .offset { IntOffset(0, offset) }
-        .background(MaterialTheme.colors.surface)
         .zIndex(zIndex)
         .pointerInput(Unit) {
             detectDragGesturesAfterLongPress(

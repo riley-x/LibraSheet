@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.librasheet.ui.components.ColorCodedRow
-import com.example.librasheet.ui.components.LogCompositions
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
@@ -34,35 +33,40 @@ fun CategoryRow(
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
 
-    Column(modifier) {
-        ColorCodedRow(
-            color = category.color,
-        ) {
-            Text(category.name)
-            if (category.subCategories.isNotEmpty()) {
-                IconButton(onClick = { expanded = !expanded }) {
-                    if (expanded) Icon(imageVector = Icons.Sharp.ExpandLess, contentDescription = null)
-                    else Icon(imageVector = Icons.Sharp.ExpandMore, contentDescription = null)
-                }
-            }
-            content()
-        }
-
-        if (category.subCategories.isNotEmpty()) {
-            AnimatedVisibility(
-                visible = expanded,
-                enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
-                exit = shrinkVertically() + fadeOut()
+    Surface(modifier) {
+        Column {
+            ColorCodedRow(
+                color = category.color,
             ) {
-                Column {
-                    category.subCategories.forEachIndexed { index, cat ->
-                        CategorySubRow(
-                            category = cat,
-                            indicatorColor = category.color.copy(alpha = 0.5f),
-                            last = index == category.subCategories.lastIndex,
-                            modifier = subRowModifier(index, cat)
-                        ) {
-                            subRowContent(index, cat)
+                Text(category.name)
+                if (category.subCategories.isNotEmpty()) {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        if (expanded) Icon(
+                            imageVector = Icons.Sharp.ExpandLess,
+                            contentDescription = null
+                        )
+                        else Icon(imageVector = Icons.Sharp.ExpandMore, contentDescription = null)
+                    }
+                }
+                content()
+            }
+
+            if (category.subCategories.isNotEmpty()) {
+                AnimatedVisibility(
+                    visible = expanded,
+                    enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Column {
+                        category.subCategories.forEachIndexed { index, cat ->
+                            CategorySubRow(
+                                category = cat,
+                                indicatorColor = category.color.copy(alpha = 0.5f),
+                                last = index == category.subCategories.lastIndex,
+                                colorRowModifier = subRowModifier(index, cat)
+                            ) {
+                                subRowContent(index, cat)
+                            }
                         }
                     }
                 }

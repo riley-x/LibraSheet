@@ -5,7 +5,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -23,6 +22,7 @@ fun CategorySubRow(
     indicatorColor: Color,
     last: Boolean,
     modifier: Modifier = Modifier,
+    colorRowModifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit = { },
 ) {
     val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
@@ -38,24 +38,14 @@ fun CategorySubRow(
         ColorCodedRow(
             color = category.color,
             horizontalPadding = 0.dp,
-            modifier = Modifier
+            modifier = colorRowModifier
                 .padding(end = libraRowHorizontalPadding)
-                .drawBehind { // Can't use Divider because that adds a space between the ComponentIndicatorLines
-                    val strokeWidth = 1.dp.toPx()
-                    val y = strokeWidth / 2
-                    drawLine(
-                        color = dividerColor,
-                        start = Offset(0f, y),
-                        end = Offset(size.width, y),
-                        strokeWidth = strokeWidth
-                    )
-                }
+                .rowDivider(padding = 0.dp, color = dividerColor)
         ) {
             Text(category.name)
             content()
         }
     }
-
 }
 
 
@@ -65,8 +55,16 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             Column {
-                CategorySubRow(category = previewIncomeCategories[0], indicatorColor = Color.Green, last = false)
-                CategorySubRow(category = previewIncomeCategories[0], indicatorColor = Color.Green, last = true)
+                CategorySubRow(
+                    category = previewIncomeCategories[0],
+                    indicatorColor = Color.Green,
+                    last = false
+                )
+                CategorySubRow(
+                    category = previewIncomeCategories[0],
+                    indicatorColor = Color.Green,
+                    last = true
+                )
             }
         }
     }

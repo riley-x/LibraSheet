@@ -1,13 +1,18 @@
 package com.example.librasheet.ui.categories
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.*
@@ -49,15 +54,18 @@ fun CategoriesScreen(
 ) {
     val incomeDragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
     val expenseDragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
+    val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
     fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, dragScope: DragScope) {
         itemsIndexed(list) { index, category ->
-            if (index > 0) RowDivider()
-
+            val subDragScope = remember { DragScope() }
             CategoryRow(
                 category = category,
-                modifier = Modifier.dragToReorder(dragScope = dragScope, index = index),
-//                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
+                modifier = Modifier
+                    .dragToReorder(dragScope = dragScope, index = index)
+                    .rowDivider(enabled = index > 0 && index != dragScope.index, color = dividerColor)
+                ,
+                subRowModifier = { subIndex, _ -> Modifier.dragToReorder(dragScope = subDragScope, index = subIndex) },
                 subRowContent = { _, subCategory ->
                     Spacer(modifier = Modifier.weight(10f))
                     DropdownOptions(options = subCategoryOptions) {
