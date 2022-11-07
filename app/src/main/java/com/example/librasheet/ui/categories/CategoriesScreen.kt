@@ -1,34 +1,21 @@
 package com.example.librasheet.ui.categories
 
-import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
-import kotlin.math.roundToInt
 
 
 private enum class CategoryOptions(override val displayName: String): HasDisplayName {
@@ -47,9 +34,6 @@ private val categoryOptions = ImmutableList(CategoryOptions.values().toList())
 private val subCategoryOptions = ImmutableList(SubCategoryOptions.values().toList())
 
 
-
-
-
 @Composable
 fun CategoriesScreen(
     incomeCategories: SnapshotStateList<Category>,
@@ -63,16 +47,16 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
-    val incomeDragInfo = remember { DragInfo() } // Don't need state here since this is only passed into other composables.
-    val expenseDragInfo = remember { DragInfo() } // Don't need state here since this is only passed into other composables.
+    val incomeDragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
+    val expenseDragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
 
-    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, dragInfo: DragInfo) {
+    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, dragScope: DragScope) {
         itemsIndexed(list) { index, category ->
             if (index > 0) RowDivider()
 
             CategoryRow(
                 category = category,
-                modifier = Modifier.dragToReorder(dragInfo = dragInfo, index = index),
+                modifier = Modifier.dragToReorder(dragScope = dragScope, index = index),
 //                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
                 subRowContent = { _, subCategory ->
                     Spacer(modifier = Modifier.weight(10f))
@@ -106,11 +90,11 @@ fun CategoriesScreen(
             item("income_title") {
                 RowTitle(title = "Income")
             }
-            categoryItems(incomeCategories, incomeDragInfo)
+            categoryItems(incomeCategories, incomeDragScope)
             item("expense_title") {
                 RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
             }
-            categoryItems(expenseCategories, expenseDragInfo)
+            categoryItems(expenseCategories, expenseDragScope)
         }
     }
 }

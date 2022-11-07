@@ -1,10 +1,8 @@
 package com.example.librasheet.ui.components
 
-import android.util.Log
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
@@ -19,7 +17,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import kotlin.math.roundToInt
 
-class DragInfo {
+class DragScope {
     var index by mutableStateOf(-1)
     var height by mutableStateOf(0)
 
@@ -35,32 +33,32 @@ class DragInfo {
 }
 
 fun Modifier.dragToReorder(
-    dragInfo: DragInfo,
+    dragScope: DragScope,
     index: Int,
 ) = composed {
     val haptic = LocalHapticFeedback.current
 
-    val zIndex = if (index == dragInfo.index) 10f else 0f
+    val zIndex = if (index == dragScope.index) 10f else 0f
     var height by remember { mutableStateOf(0) }
     var originalY by remember { mutableStateOf(0f) }
 
     fun getOffset() =
-        if (index == dragInfo.index) dragInfo.offset.roundToInt()
-        else if (index > dragInfo.index) {
-            val targetY = originalY - dragInfo.height
-            val thresholdY = targetY + height - minOf(height, dragInfo.height) / 2f
-            if (dragInfo.currentY > thresholdY) -dragInfo.height
+        if (index == dragScope.index) dragScope.offset.roundToInt()
+        else if (index > dragScope.index) {
+            val targetY = originalY - dragScope.height
+            val thresholdY = targetY + height - minOf(height, dragScope.height) / 2f
+            if (dragScope.currentY > thresholdY) -dragScope.height
             else 0
         }
-        else if (index < dragInfo.index) {
-            val thresholdY = originalY + minOf(height, dragInfo.height) / 2f
-            if (dragInfo.currentY < thresholdY) dragInfo.height
+        else if (index < dragScope.index) {
+            val thresholdY = originalY + minOf(height, dragScope.height) / 2f
+            if (dragScope.currentY < thresholdY) dragScope.height
             else 0
         }
         else 0
 
     val offset =
-        if (index != dragInfo.index) {
+        if (index != dragScope.index) {
             val targetOffset by remember { derivedStateOf { getOffset() } }
             animateIntAsState(targetValue = targetOffset).value
         }
@@ -78,21 +76,21 @@ fun Modifier.dragToReorder(
             detectDragGesturesAfterLongPress(
                 onDragStart = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    dragInfo.index = index
-                    dragInfo.height = height
-                    dragInfo.offset = 0f
-                    dragInfo.currentY = originalY
+                    dragScope.index = index
+                    dragScope.height = height
+                    dragScope.offset = 0f
+                    dragScope.currentY = originalY
                 },
                 onDragEnd = {
-                    dragInfo.reset()
+                    dragScope.reset()
                 },
                 onDragCancel = {
-                    dragInfo.reset()
+                    dragScope.reset()
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
-                    dragInfo.offset += dragAmount.y
-                    dragInfo.currentY += dragAmount.y
+                    dragScope.offset += dragAmount.y
+                    dragScope.currentY += dragAmount.y
                 }
             )
         }
