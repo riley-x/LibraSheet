@@ -18,7 +18,10 @@ fun SettingsScreen(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onAddAccount: () -> Unit = { },
-    onEditAccount: (Account) -> Unit = { },
+    onClickAccount: (String) -> Unit = { },
+    onChangeAccountName: (String) -> Unit = { },
+    onChangeAccountColor: (String) -> Unit = { },
+    onDeleteAccount: (String) -> Unit = { },
     onSeeAllAccounts: () -> Unit = { },
     toEditCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
@@ -35,7 +38,10 @@ fun SettingsScreen(
                 AccountCard(
                     accounts = accounts,
                     onAddAccount = onAddAccount,
-                    onEditAccount = onEditAccount,
+                    onClickAccount = onClickAccount,
+                    onChangeName = onChangeAccountName,
+                    onChangeColor = onChangeAccountColor,
+                    onDelete = onDeleteAccount,
                     onSeeAllAccounts = onSeeAllAccounts,
                     modifier = Modifier.padding(10.dp)
                 )

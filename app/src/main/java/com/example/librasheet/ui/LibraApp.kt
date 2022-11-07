@@ -190,7 +190,10 @@ fun LibraApp(
                     SettingsScreen(
                         accounts = previewAccounts,
                         onAddAccount = ::onAddAccountClick,
-                        onEditAccount = ::onEditAccountClick,
+                        onClickAccount = { },
+                        onChangeAccountName = { },
+                        onChangeAccountColor = { },
+                        onDeleteAccount = { },
                         onSeeAllAccounts = { },
                         toEditCategories = { },
                         toCategoryRules = { },

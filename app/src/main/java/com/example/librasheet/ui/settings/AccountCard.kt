@@ -23,6 +23,7 @@ fun AccountCard(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onAddAccount: () -> Unit = { },
+    onClickAccount: (String) -> Unit = { },
     onChangeName: (String) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
     onDelete: (String) -> Unit = { },
@@ -49,15 +50,16 @@ fun AccountCard(
 
                 ColorCodedRow(
                     color = account.color,
-                    horizontalPadding = cardRowHorizontalPadding,
+                    horizontalPadding = 0.dp,
+                    modifier = Modifier
+                        .clickable { onClickAccount(account.name) }
+                        .padding(start = cardRowHorizontalPadding)
                 ) {
                     Text(account.name, modifier = Modifier.weight(10f))
 
                     var expanded by remember { mutableStateOf(false) }
 
-                    Box(modifier = Modifier
-                        .wrapContentSize(Alignment.TopStart)
-                    ) {
+                    Box {
                         IconButton(onClick = { expanded = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = null)
                         }
