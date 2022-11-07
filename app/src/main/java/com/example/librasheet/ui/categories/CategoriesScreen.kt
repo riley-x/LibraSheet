@@ -47,23 +47,7 @@ private val categoryOptions = ImmutableList(CategoryOptions.values().toList())
 private val subCategoryOptions = ImmutableList(SubCategoryOptions.values().toList())
 
 
-class DragInfo {
-    var index by mutableStateOf(-1)
-    var parentId by mutableStateOf(-1)
-    var height by mutableStateOf(0)
 
-    var offset by mutableStateOf(0f)
-    var currentY by mutableStateOf(0f)
-
-    fun reset() {
-        index = -1
-        parentId = -1
-        offset = 0f
-        height = 0
-        currentY = 0f
-    }
-}
-val LocalDragInfo = compositionLocalOf { DragInfo() }
 
 
 @Composable
@@ -79,93 +63,34 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
-    val haptic = LocalHapticFeedback.current
-    val dragInfo = LocalDragInfo.current
-
-    @Composable
-    fun Modifier.drag(index: Int, parentId: Int): Modifier {
-        val zIndex = if (parentId == dragInfo.parentId && index == dragInfo.index) 10f else 0f
-        var height by remember { mutableStateOf(0) }
-        var originalY by remember { mutableStateOf(0f) }
-        val offset by remember(dragInfo) { derivedStateOf {
-            if (parentId != dragInfo.parentId) 0
-            else if (index == dragInfo.index) dragInfo.offset.roundToInt()
-            else if (index > dragInfo.index) {
-                val targetY = originalY - dragInfo.height
-                val thresholdY = targetY + height / 2
-                if (dragInfo.currentY > thresholdY) -dragInfo.height
-                else 0
-            }
-            else if (index < dragInfo.index)  {
-                val thresholdY = originalY + height / 2
-                if (dragInfo.currentY < thresholdY) dragInfo.height
-                else 0
-            }
-            else 0
-        } }
-
-        return this
-            .onGloballyPositioned {
-                height = it.size.height
-                originalY = it.localToRoot(Offset.Zero).y
-            }
-            .offset { IntOffset(0, offset) }
-            .background(MaterialTheme.colors.surface)
-            .zIndex(zIndex)
-            .pointerInput(Unit) { detectDragGesturesAfterLongPress(
-                onDragStart = {
-                    Log.d("Libra", "Drag Start: $index $parentId")
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    dragInfo.index = index
-                    dragInfo.parentId = parentId
-                    dragInfo.height = height
-                    dragInfo.offset = 0f
-                    dragInfo.currentY = originalY
-                },
-                onDragEnd = {
-                    Log.d("Libra", "Drag End: $index $parentId")
-                    dragInfo.reset()
-                },
-                onDragCancel = {
-                    Log.d("Libra", "Drag Cancel: $index $parentId")
-                    dragInfo.reset()
-                },
-                onDrag = { change, dragAmount ->
-                    change.consume()
-                    dragInfo.offset += dragAmount.y
-                    dragInfo.currentY += dragAmount.y
-                }
-            )
-        }
-    }
-
     fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, id: Int) {
         itemsIndexed(list) { index, category ->
             if (index > 0) RowDivider()
 
-            CategoryRow(
-                category = category,
-                modifier = Modifier.drag(index, id),
+            DragToReorder(index = index, parentId = id) {
+                CategoryRow(
+                    category = category,
 //                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
-                subRowContent = { _, subCategory ->
-                    Spacer(modifier = Modifier.weight(10f))
-                    DropdownOptions(options = subCategoryOptions) {
-                        when (it) {
-                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
-                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
-                            SubCategoryOptions.DELETE -> onDelete(subCategory)
+                    subRowContent = { _, subCategory ->
+                        Spacer(modifier = Modifier.weight(10f))
+                        DropdownOptions(options = subCategoryOptions) {
+                            when (it) {
+                                SubCategoryOptions.RENAME -> onChangeName(subCategory)
+                                SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
+                                SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+                                SubCategoryOptions.DELETE -> onDelete(subCategory)
+                            }
                         }
-                    }
-                },
-            ) {
-                Spacer(modifier = Modifier.weight(10f))
-                DropdownOptions(options = categoryOptions) {
-                    when (it) {
-                        CategoryOptions.RENAME -> onChangeName(category)
-                        CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
-                        CategoryOptions.ADD -> onAddSubCategory(category)
-                        CategoryOptions.DELETE -> onDelete(category)
+                    },
+                ) {
+                    Spacer(modifier = Modifier.weight(10f))
+                    DropdownOptions(options = categoryOptions) {
+                        when (it) {
+                            CategoryOptions.RENAME -> onChangeName(category)
+                            CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
+                            CategoryOptions.ADD -> onAddSubCategory(category)
+                            CategoryOptions.DELETE -> onDelete(category)
+                        }
                     }
                 }
             }
