@@ -2,40 +2,33 @@ package com.example.librasheet.ui.categories
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Category
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
-import kotlin.math.abs
-import kotlin.math.exp
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 
 private enum class CategoryOptions(override val displayName: String): HasDisplayName {
@@ -54,6 +47,24 @@ private val categoryOptions = ImmutableList(CategoryOptions.values().toList())
 private val subCategoryOptions = ImmutableList(SubCategoryOptions.values().toList())
 
 
+class DragInfo {
+    var index by mutableStateOf(-1)
+    var parentId by mutableStateOf(-1)
+    var height by mutableStateOf(0)
+
+    var offset by mutableStateOf(0f)
+    var currentY by mutableStateOf(0f)
+
+    fun reset() {
+        index = -1
+        parentId = -1
+        offset = 0f
+        height = 0
+        currentY = 0f
+    }
+}
+val LocalDragInfo = compositionLocalOf { DragInfo() }
+
 
 @Composable
 fun CategoriesScreen(
@@ -68,52 +79,61 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
-    val rowHeight = with(LocalDensity.current) { (libraRowHeight + 1.dp).toPx().roundToInt() }
     val haptic = LocalHapticFeedback.current
-    var currentDragIndex by remember { mutableStateOf(-1) }
-    var currentParentId by remember { mutableStateOf(-3) } // use -1 for income, -2 for expense
-    var dragOffset by remember { mutableStateOf(0f) }
-    val currentHoverIndex by remember { derivedStateOf { currentDragIndex + (dragOffset / rowHeight).toInt() } }
+    val dragInfo = LocalDragInfo.current
 
     @Composable
     fun Modifier.drag(index: Int, parentId: Int): Modifier {
-        val zIndex = if (parentId == currentParentId && index == currentDragIndex) 10f else 0f
-        Log.d("Libra", "$parentId $index $zIndex")
+        val zIndex = if (parentId == dragInfo.parentId && index == dragInfo.index) 10f else 0f
+        var height by remember { mutableStateOf(0) }
+        var originalY by remember { mutableStateOf(0f) }
+        val offset by remember(dragInfo) { derivedStateOf {
+            if (parentId != dragInfo.parentId) 0
+            else if (index == dragInfo.index) dragInfo.offset.roundToInt()
+            else if (index > dragInfo.index) {
+                val targetY = originalY - dragInfo.height
+                val thresholdY = targetY + height / 2
+                if (dragInfo.currentY > thresholdY) -dragInfo.height
+                else 0
+            }
+            else if (index < dragInfo.index)  {
+                val thresholdY = originalY + height / 2
+                if (dragInfo.currentY < thresholdY) dragInfo.height
+                else 0
+            }
+            else 0
+        } }
 
         return this
-            .offset { IntOffset(0,
-                if (parentId != currentParentId) 0
-                else if (index == currentDragIndex) dragOffset.roundToInt()
-                else if (currentHoverIndex > currentDragIndex
-                    && index > currentDragIndex
-                    && index <= currentHoverIndex
-                ) -rowHeight
-                else if (currentHoverIndex < currentDragIndex
-                    && index < currentDragIndex
-                    && index >= currentHoverIndex
-                ) rowHeight
-                else 0
-            ) }
+            .onGloballyPositioned {
+                height = it.size.height
+                originalY = it.localToRoot(Offset.Zero).y
+            }
+            .offset { IntOffset(0, offset) }
             .background(MaterialTheme.colors.surface)
-            .zIndex(zIndex) // THIS NEEDS TO BE APPLIES TO THE COLUMN!!!!
+            .zIndex(zIndex)
             .pointerInput(Unit) { detectDragGesturesAfterLongPress(
                 onDragStart = {
+                    Log.d("Libra", "Drag Start: $index $parentId")
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    currentDragIndex = index
-                    currentParentId = parentId
-                    dragOffset = 0f
+                    dragInfo.index = index
+                    dragInfo.parentId = parentId
+                    dragInfo.height = height
+                    dragInfo.offset = 0f
+                    dragInfo.currentY = originalY
                 },
                 onDragEnd = {
-                    currentDragIndex = -1
-                    dragOffset = 0f
+                    Log.d("Libra", "Drag End: $index $parentId")
+                    dragInfo.reset()
                 },
                 onDragCancel = {
-                    currentDragIndex = -1
-                    dragOffset = 0f
+                    Log.d("Libra", "Drag Cancel: $index $parentId")
+                    dragInfo.reset()
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
-                    dragOffset += dragAmount.y
+                    dragInfo.offset += dragAmount.y
+                    dragInfo.currentY += dragAmount.y
                 }
             )
         }
@@ -126,7 +146,7 @@ fun CategoriesScreen(
             CategoryRow(
                 category = category,
                 modifier = Modifier.drag(index, id),
-                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
+//                subRowModifier = { subIndex, _ -> Modifier.drag(subIndex, category.id) },
                 subRowContent = { _, subCategory ->
                     Spacer(modifier = Modifier.weight(10f))
                     DropdownOptions(options = subCategoryOptions) {
@@ -159,11 +179,11 @@ fun CategoriesScreen(
             item("income_title") {
                 RowTitle(title = "Income")
             }
-            categoryItems(incomeCategories, -1)
+            categoryItems(incomeCategories, 0)
             item("expense_title") {
                 RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
             }
-            categoryItems(expenseCategories, -2)
+            categoryItems(expenseCategories, 1)
         }
     }
 }

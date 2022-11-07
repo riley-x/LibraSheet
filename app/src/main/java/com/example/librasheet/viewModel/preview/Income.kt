@@ -37,7 +37,7 @@ val previewIncomeCategories = mutableStateListOf(
         amount = 666_66_00,
     ),
     Category(
-        id = 7,
+        id = 8,
         name = "Interest",
         color = Color(0xFF03C416),
         subCategories = emptyList(),

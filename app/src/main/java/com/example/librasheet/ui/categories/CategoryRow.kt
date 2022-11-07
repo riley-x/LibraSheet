@@ -33,10 +33,9 @@ fun CategoryRow(
 ) {
     var expanded by rememberSaveable(category) { mutableStateOf(false) }
 
-    Column {
+    Column(modifier) {
         ColorCodedRow(
             color = category.color,
-            modifier = modifier,
         ) {
             Text(category.name)
             if (category.subCategories.isNotEmpty()) {
