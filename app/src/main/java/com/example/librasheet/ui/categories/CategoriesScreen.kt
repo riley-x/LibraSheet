@@ -52,57 +52,60 @@ fun CategoriesScreen(
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
 ) {
-    val incomeDragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
-    val expenseDragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
     val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
-    fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, dragScope: DragScope) {
-        itemsIndexed(list) { index, category ->
-            val subDragScope = remember { DragScope() }
-            CategoryRow(
-                category = category,
-                modifier = Modifier
-                    .dragToReorder(dragScope = dragScope, index = index)
-                    .rowDivider(enabled = index > 0 && index != dragScope.index, color = dividerColor)
-                ,
-                subRowModifier = { subIndex, _ -> Modifier.dragToReorder(dragScope = subDragScope, index = subIndex) },
-                subRowContent = { _, subCategory ->
-                    Spacer(modifier = Modifier.weight(10f))
-                    DropdownOptions(options = subCategoryOptions) {
-                        when (it) {
-                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
-                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
-                            SubCategoryOptions.DELETE -> onDelete(subCategory)
+    val dragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
+    CompositionLocalProvider(
+        LocalDragScope provides dragScope
+    ) {
+        fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, groupId: Int) {
+            itemsIndexed(list) { index, category ->
+                val subDragScope = remember { DragScope() }
+                DragToReorder(index = index, groupId = groupId) {
+                    CategoryRow(
+                        category = category,
+                        modifier = Modifier
+                            .rowDivider(enabled = index > 0 && !dragScope.isTarget(groupId, index), color = dividerColor)
+                        ,
+                        subRowContent = { _, subCategory ->
+                            Spacer(modifier = Modifier.weight(10f))
+                            DropdownOptions(options = subCategoryOptions) {
+                                when (it) {
+                                    SubCategoryOptions.RENAME -> onChangeName(subCategory)
+                                    SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
+                                    SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+                                    SubCategoryOptions.DELETE -> onDelete(subCategory)
+                                }
+                            }
+                        },
+                    ) {
+                        Spacer(modifier = Modifier.weight(10f))
+                        DropdownOptions(options = categoryOptions) {
+                            when (it) {
+                                CategoryOptions.RENAME -> onChangeName(category)
+                                CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
+                                CategoryOptions.ADD -> onAddSubCategory(category)
+                                CategoryOptions.DELETE -> onDelete(category)
+                            }
                         }
-                    }
-                },
-            ) {
-                Spacer(modifier = Modifier.weight(10f))
-                DropdownOptions(options = categoryOptions) {
-                    when (it) {
-                        CategoryOptions.RENAME -> onChangeName(category)
-                        CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
-                        CategoryOptions.ADD -> onAddSubCategory(category)
-                        CategoryOptions.DELETE -> onDelete(category)
                     }
                 }
             }
         }
-    }
 
-    Column(modifier) {
-        HeaderBar(title = "Categories", backArrow = true, onBack = onBack)
-        
-        LazyColumn(Modifier.fillMaxSize()) {
-            item("income_title") {
-                RowTitle(title = "Income")
+        Column(modifier) {
+            HeaderBar(title = "Categories", backArrow = true, onBack = onBack)
+
+            LazyColumn(Modifier.fillMaxSize()) {
+                item("income_title") {
+                    RowTitle(title = "Income")
+                }
+                categoryItems(incomeCategories, -10)
+                item("expense_title") {
+                    RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
+                }
+                categoryItems(expenseCategories, -20)
             }
-            categoryItems(incomeCategories, incomeDragScope)
-            item("expense_title") {
-                RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
-            }
-            categoryItems(expenseCategories, expenseDragScope)
         }
     }
 }
