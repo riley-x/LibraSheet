@@ -48,9 +48,9 @@ fun CategoriesScreen(
     expenseCategories: SnapshotStateList<Category>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
-    onCategoryClick: (Category) -> Unit = { },
+//    onCategoryClick: (Category) -> Unit = { },
     onChangeName: (Category) -> Unit = { },
-    onChangeColor: (Category) -> Unit = { },
+    onChangeColor: (String) -> Unit = { },
     onAddSubCategory: (Category) -> Unit = { },
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
@@ -67,20 +67,20 @@ fun CategoriesScreen(
                     DropdownOptions(options = subCategoryOptions) {
                         when (it) {
                             SubCategoryOptions.RENAME -> onChangeName(subCategory)
-                            SubCategoryOptions.COLOR -> onChangeColor(subCategory)
+                            SubCategoryOptions.COLOR -> onChangeColor("category_${subCategory.name}")
                             SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
                             SubCategoryOptions.DELETE -> onDelete(subCategory)
                         }
                     }
                 },
-                modifier = Modifier.clickable { onCategoryClick(category) },
-                subRowModifier = { Modifier.clickable { onCategoryClick(it) } }
+//                modifier = Modifier.clickable { onCategoryClick(category) },
+//                subRowModifier = { Modifier.clickable { onCategoryClick(it) } }
             ) {
                 Spacer(modifier = Modifier.weight(10f))
                 DropdownOptions(options = categoryOptions) {
                     when (it) {
                         CategoryOptions.RENAME -> onChangeName(category)
-                        CategoryOptions.COLOR -> onChangeColor(category)
+                        CategoryOptions.COLOR -> onChangeColor("category_${category.name}")
                         CategoryOptions.ADD -> onAddSubCategory(category)
                         CategoryOptions.DELETE -> onDelete(category)
                     }
@@ -117,7 +117,7 @@ private fun Preview() {
         Surface {
             CategoriesScreen(
                 incomeCategories = previewIncomeCategories,
-                expenseCategories = previewIncomeCategories,
+                expenseCategories = previewExpenseCategories,
             )
         }
     }

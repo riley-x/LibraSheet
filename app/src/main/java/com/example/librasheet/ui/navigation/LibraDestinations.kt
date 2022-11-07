@@ -77,6 +77,9 @@ val libraTabs = listOf(BalanceTab, IncomeTab, SpendingTab, SettingsTab)
 object AccountDestination {
     const val route = "account_details"
 }
+object CategoriesDestination {
+    const val route = "edit_categories"
+}
 
 object ColorDestination {
     const val routeBase = "color_selector"

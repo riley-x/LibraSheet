@@ -54,13 +54,16 @@ fun CategoryRow(
                 enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                category.subCategories.forEachIndexed { index, cat ->
-                    CategorySubRow(
-                        category = cat,
-                        last = index == category.subCategories.lastIndex,
-                        modifier = subRowModifier(cat)
-                    ) {
-                        subRowContent(cat)
+                Column {
+                    category.subCategories.forEachIndexed { index, cat ->
+                        CategorySubRow(
+                            category = cat,
+                            indicatorColor = category.color.copy(alpha = 0.5f),
+                            last = index == category.subCategories.lastIndex,
+                            modifier = subRowModifier(cat)
+                        ) {
+                            subRowContent(cat)
+                        }
                     }
                 }
             }

@@ -21,7 +21,49 @@ val previewIncomeCategories = mutableStateListOf(
         subCategories = emptyList(),
         amount = 2_750_00_00,
     ),
+    Category(
+        name = "Cash Back",
+        color = Color(0xFF48AD70),
+        subCategories = emptyList(),
+        amount = 50_69_00,
+    ),
 )
+
+
+val previewExpenseCategories = mutableStateListOf(
+    Category(
+        name = "Housing",
+        color = Color(0xFFCF814D),
+        amount = 2_000_00_00,
+        subCategories = listOf(
+            Category(
+                name = "Rent",
+                color = Color(0xFFE04A4A),
+                amount = 1_700_00_00,
+                subCategories = emptyList(),
+            ),
+            Category(
+                name = "Electricity",
+                color = Color(0xFFDDC318),
+                amount = 200_00_00,
+                subCategories = emptyList(),
+            ),
+            Category(
+                name = "Water",
+                color = Color(0xFF228FC2),
+                amount = 100_00_00,
+                subCategories = emptyList(),
+            ),
+        ),
+    ),
+    Category(
+        name = "Social",
+        color = Color(0xFF8C56B3),
+        subCategories = emptyList(),
+        amount = 600_00_00,
+    ),
+)
+
 
 val previewNetIncome = mutableStateListOf(
     1151.21f,

@@ -17,6 +17,7 @@ import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
+import com.example.librasheet.ui.categories.CategoriesScreen
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
@@ -57,6 +58,7 @@ fun LibraApp(
     }
     fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
+    fun toCategoriesScreen() = navController.navigate(CategoriesDestination.route)
     fun onSaveColor(spec: String, color: Color) {
         // TODO
         navController.popBackStack()
@@ -187,13 +189,26 @@ fun LibraApp(
                         onChangeAccountColor = ::toSettingsColorSelector,
                         onDeleteAccount = { },
                         onSeeAllAccounts = { },
-                        toEditCategories = { },
+                        toEditCategories = ::toCategoriesScreen,
                         toCategoryRules = { },
                         toAddTransaction = { },
                         toAddCSV = { },
                         toAllTransactions = { },
                         onBackupDatabase = { },
                         modifier = Modifier.padding(innerPadding),
+                    )
+                }
+                composable(route = CategoriesDestination.route) {
+                    CategoriesScreen(
+                        incomeCategories = previewIncomeCategories,
+                        expenseCategories = previewExpenseCategories,
+                        onBack = navController::popBackStack,
+//                        onCategoryClick = { },
+                        onChangeName = { },
+                        onChangeColor = ::toSettingsColorSelector,
+                        onAddSubCategory = { },
+                        onMoveSubCategory = { },
+                        onDelete = { },
                     )
                 }
                 colorSelector()
