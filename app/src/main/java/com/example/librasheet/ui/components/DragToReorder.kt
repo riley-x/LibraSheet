@@ -35,6 +35,9 @@ class DragScope {
 fun Modifier.dragToReorder(
     dragScope: DragScope,
     index: Int,
+    onDragStart: () -> Unit = { },
+    onDragEnd: () -> Unit = { },
+    onDragCancel: () -> Unit = { },
 ) = composed {
     val haptic = LocalHapticFeedback.current
 
@@ -79,12 +82,15 @@ fun Modifier.dragToReorder(
                     dragScope.height = height
                     dragScope.offset = 0f
                     dragScope.currentY = originalY
+                    onDragStart()
                 },
                 onDragEnd = {
                     dragScope.reset()
+                    onDragEnd()
                 },
                 onDragCancel = {
                     dragScope.reset()
+                    onDragCancel()
                 },
                 onDrag = { change, dragAmount ->
                     change.consume()
