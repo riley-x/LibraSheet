@@ -16,20 +16,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
-import com.example.librasheet.ui.components.HeaderBar
-import com.example.librasheet.ui.components.RowDivider
-import com.example.librasheet.ui.components.RowTitle
-import com.example.librasheet.ui.components.formatDollar
-import com.example.librasheet.ui.settings.CardTitle
+import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.dataClasses.HasDisplayName
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 import kotlin.math.exp
 
 
-private enum class CategoryOptions {
-
+private enum class CategoryOptions(override val displayName: String): HasDisplayName {
+    RENAME("Rename"),
+    COLOR("Change Color"),
+    ADD("Add Subcategory"),
+    DELETE("Delete"),
 }
+private enum class SubCategoryOptions(override val displayName: String): HasDisplayName {
+    RENAME("Rename"),
+    COLOR("Change Color"),
+    MOVE("Change Parent"),
+    DELETE("Delete"),
+}
+private val categoryOptions = ImmutableList(CategoryOptions.values().toList())
+private val subCategoryOptions = ImmutableList(SubCategoryOptions.values().toList())
 
 
 
@@ -40,6 +49,11 @@ fun CategoriesScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onCategoryClick: (Category) -> Unit = { },
+    onChangeName: (Category) -> Unit = { },
+    onChangeColor: (Category) -> Unit = { },
+    onAddSubCategory: (Category) -> Unit = { },
+    onMoveSubCategory: (Category) -> Unit = { },
+    onDelete: (Category) -> Unit = { },
 ) {
 
     fun LazyListScope.categoryItems(list: SnapshotStateList<Category>) {
@@ -48,15 +62,29 @@ fun CategoriesScreen(
 
             CategoryRow(
                 category = category,
-                subRowContent = {
+                subRowContent = { subCategory ->
                     Spacer(modifier = Modifier.weight(10f))
-                    Text(formatDollar(it.value))
+                    DropdownOptions(options = subCategoryOptions) {
+                        when (it) {
+                            SubCategoryOptions.RENAME -> onChangeName(subCategory)
+                            SubCategoryOptions.COLOR -> onChangeColor(subCategory)
+                            SubCategoryOptions.MOVE -> onMoveSubCategory(subCategory)
+                            SubCategoryOptions.DELETE -> onDelete(subCategory)
+                        }
+                    }
                 },
                 modifier = Modifier.clickable { onCategoryClick(category) },
                 subRowModifier = { Modifier.clickable { onCategoryClick(it) } }
             ) {
                 Spacer(modifier = Modifier.weight(10f))
-                Text(formatDollar(category.value))
+                DropdownOptions(options = categoryOptions) {
+                    when (it) {
+                        CategoryOptions.RENAME -> onChangeName(category)
+                        CategoryOptions.COLOR -> onChangeColor(category)
+                        CategoryOptions.ADD -> onAddSubCategory(category)
+                        CategoryOptions.DELETE -> onDelete(category)
+                    }
+                }
             }
         }
     }

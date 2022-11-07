@@ -67,7 +67,13 @@ fun AccountCard(
                         .padding(start = cardRowHorizontalPadding)
                 ) {
                     Text(account.name, modifier = Modifier.weight(10f))
-                    DropdownOptions(options = accountOptions)
+                    DropdownOptions(options = accountOptions) {
+                        when (it) {
+                            AccountOptions.RENAME -> onChangeName(account.name)
+                            AccountOptions.COLOR -> onChangeColor(account.name)
+                            AccountOptions.DELETE -> onDelete(account.name)
+                        }
+                    }
                 }
             }
 
