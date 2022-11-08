@@ -67,12 +67,12 @@ fun CategoriesScreen(
                         index = index,
                         groupId = groupId,
                         contentState = expanded,
-                    ) { scope, _ ->
+                    ) { dragScope, _ ->
                         CategoryRow(
                             category = category,
                             expanded = expanded,
                             onExpand = { expanded = !expanded },
-                            modifier = Modifier.rowDivider(enabled = index > 0 && !scope.isTarget(groupId, index), color = dividerColor),
+                            modifier = Modifier.rowDivider(enabled = index > 0 && !dragScope.isTarget(groupId, index), color = dividerColor),
                             content = { category ->
                                 Spacer(modifier = Modifier.weight(10f))
                                 DropdownOptions(options = categoryOptions) {
