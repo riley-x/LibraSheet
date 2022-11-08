@@ -2,14 +2,11 @@ package com.example.librasheet.data
 
 import androidx.compose.ui.graphics.toArgb
 import com.example.librasheet.data.database.CategoryEntity
-import com.example.librasheet.data.database.CategoryHierarchy
-import com.example.librasheet.data.database.CategoryWithChildren
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.dataClasses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.math.exp
 
 class CategoryData(private val scope: CoroutineScope) {
     val incomeEntities = mutableListOf<CategoryEntity>()
@@ -19,7 +16,27 @@ class CategoryData(private val scope: CoroutineScope) {
         // TODO. Make sure things are ordered correctly...
     }
 
+    fun find(category: String): Triple<CategoryEntity, MutableList<CategoryEntity>, Int>? {
+        val path = category.split(categoryPathSeparator)
+        if (path.size < 2) throw RuntimeException("CategoryData::find couldn't parse path of $category")
 
+        val list = when (path[0]) {
+            incomeName -> incomeEntities
+            expenseName -> expenseEntities
+            else -> throw RuntimeException("CategoryData::find can't find super of $category")
+        }
+
+        for ((indexP, parent) in list.withIndex()) {
+            if (path.size == 2) {
+                if (parent.name == path[1]) return Triple(parent, list, indexP)
+            } else {
+                for ((indexC, child) in parent.subCategories.withIndex()) {
+                    if (child.name == path[2]) return Triple(child, parent.subCategories, indexC)
+                }
+            }
+        }
+        return null
+    }
 
     fun add(parentCategory: String, newCategory: String): Boolean {
         val entity: CategoryEntity
@@ -37,7 +54,7 @@ class CategoryData(private val scope: CoroutineScope) {
                 list.add(entity)
             }
             else -> {
-                val parentName = getCategoryShortName(parentCategory)
+                val parentName = getCategoryName(parentCategory)
                 val parent = (incomeEntities + expenseEntities).find { it.name == parentName } ?: return false
                 if (parent.subCategories.any { it.name == newCategory }) return false
                 entity = CategoryEntity(
@@ -61,6 +78,13 @@ class CategoryData(private val scope: CoroutineScope) {
 
 
     fun rename(currentCategory: String, newName: String): Boolean {
-        return false
+        val (current, parentList, index) = find(currentCategory) ?: throw RuntimeException("CategoryData::rename couldn't find $currentCategory")
+        if (parentList.any { it.name == newName }) return false
+        val newCurrent = current.copy(name = newName)
+        parentList[index] = newCurrent
+        scope.launch(Dispatchers.IO) {
+            // TODO DAO update
+        }
+        return true
     }
 }

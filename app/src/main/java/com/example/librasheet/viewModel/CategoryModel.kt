@@ -1,17 +1,12 @@
 package com.example.librasheet.viewModel
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.database.CategoryEntity
-import com.example.librasheet.data.database.CategoryWithChildren
 import com.example.librasheet.viewModel.dataClasses.Category
-import com.example.librasheet.viewModel.dataClasses.pathSeparator
+import com.example.librasheet.viewModel.dataClasses.categoryPathSeparator
 import com.example.librasheet.viewModel.dataClasses.toCategory
-import com.example.librasheet.viewModel.preview.previewExpenseCategories
-import com.example.librasheet.viewModel.preview.previewIncomeCategories
-
 
 
 class CategoryModel(private val parent: LibraViewModel) {
@@ -38,7 +33,7 @@ class CategoryModel(private val parent: LibraViewModel) {
 
     @Callback
     fun add(parentCategory: String, newCategory: String): Boolean {
-        if (newCategory.contains(pathSeparator)) return false // TODO change error message
+        if (newCategory.contains(categoryPathSeparator)) return false // TODO change error message
         if (data.add(parentCategory, newCategory)) {
             loadUi()
             return true
@@ -47,8 +42,13 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     @Callback
-    fun rename(currentCategory: String, newName: String) {
-
+    fun rename(currentCategory: String, newName: String): Boolean {
+        if (newName.contains(categoryPathSeparator)) return false // TODO change error message
+        if (data.rename(currentCategory, newName)) {
+            loadUi()
+            return true
+        }
+        return false
     }
 }
 

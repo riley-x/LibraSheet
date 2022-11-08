@@ -11,28 +11,35 @@ import com.example.librasheet.ui.graphing.PieChartValue
 const val incomeName = "Income"
 const val expenseName = "Expense"
 
-internal const val pathSeparator = "_" // Note this needs to match what is used by the ColorScreen
+internal const val categoryPathSeparator = "_" // Note this needs to match what is used by the ColorScreen
 internal const val displaySeparator = " > "
 
 @Stable
-fun getCategoryPath(id: String) = id
-    .substringBeforeLast(pathSeparator)
-    .replace(pathSeparator, displaySeparator)
+fun getCategoryPath(id: String) = id.substringBeforeLast(categoryPathSeparator)
 
 @Stable
-fun getCategoryShortName(id: String) = id.substringAfterLast(pathSeparator)
+fun getCategoryName(id: String) = id.substringAfterLast(categoryPathSeparator)
 
 @Stable
-fun getCategoryFullDisplay(id: String) = id.replace(pathSeparator, displaySeparator)
+fun getCategoryFullDisplay(id: String) = id.replace(categoryPathSeparator, displaySeparator)
 
 @Stable
-fun joinCategoryPath(parent: String, child: String) = if (parent.isNotEmpty()) "$parent$pathSeparator$child" else child
+fun joinCategoryPath(parent: String, child: String) = if (parent.isNotEmpty()) "$parent$categoryPathSeparator$child" else child
 
 @Stable
-fun isSuperCategory(path: String) = !path.contains(pathSeparator)
+fun isSuperCategory(path: String) = !path.contains(categoryPathSeparator)
+@Stable
+fun isTopCategory(path: String) = path.split(categoryPathSeparator).size == 2
+
+@Stable
+fun getSuperCategory(path: String) = path.substringBefore(categoryPathSeparator)
+@Stable
+fun getCategorySuperlessPath(id: String) = id.substringAfter(categoryPathSeparator)
+
+
 
 /**
- * @param id This is a unique full path, i.e. Expense_Utilities_Rent / Mortgage
+ * @param id This is a unique full path, i.e. Expense_Utilities_Rent
  */
 @Immutable
 data class Category(
@@ -43,8 +50,8 @@ data class Category(
 ) : PieChartValue {
     override val value: Float
         get() = amount.toFloatDollar()
-    override val name = getCategoryShortName(id)
-    val fullName = getCategoryFullDisplay(id)
+    override val name = getCategoryName(id)
+    val fullDisplayName = getCategoryFullDisplay(id)
 }
 
 

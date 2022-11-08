@@ -88,7 +88,7 @@ fun LibraApp(
         if (newCategory.isNotBlank() && !viewModel.categories.add(
                 parentCategory = openAddCategoryDialog,
                 newCategory = newCategory
-            )) {
+        )) {
             dialogShowError = true
         } else {
             openAddCategoryDialog = ""
@@ -97,11 +97,15 @@ fun LibraApp(
     }
     fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.id }
     fun changeCategoryName(newName: String) {
-        if (newName.isNotBlank()) viewModel.categories.rename(
+        if (newName.isNotBlank() && !viewModel.categories.rename(
             currentCategory = changeCategoryNameOld,
             newName = newName
-        )
-        changeCategoryNameOld = ""
+        )) {
+            dialogShowError = true
+        } else {
+            changeCategoryNameOld = ""
+            dialogShowError = false
+        }
     }
 
     /** Main Layout Scaffold **/
@@ -235,6 +239,8 @@ fun LibraApp(
             TextFieldDialog(
                 title = "Add Account",
                 placeholder = "Account name",
+                error = dialogShowError,
+                errorMessage = "Error: account exists already",
                 onDismiss = ::addAccount
             )
         }
@@ -243,6 +249,8 @@ fun LibraApp(
                 title = "Rename $changeAccountNameOld",
                 initialText = changeAccountNameOld,
                 placeholder = "New name",
+                error = dialogShowError,
+                errorMessage = "Error: account exists already",
                 onDismiss = ::changeAccountName
             )
         }
@@ -258,7 +266,7 @@ fun LibraApp(
         if (changeCategoryNameOld.isNotEmpty()) {
             TextFieldDialog(
                 title = "Rename " + getCategoryFullDisplay(changeCategoryNameOld),
-                initialText = getCategoryShortName(changeCategoryNameOld),
+                initialText = getCategoryName(changeCategoryNameOld),
                 placeholder = "New name",
                 error = dialogShowError,
                 errorMessage = "Error: category exists already",
