@@ -75,22 +75,16 @@ fun CategoriesScreen(
                 val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
                 fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, groupId: Int) {
                     itemsIndexed(list) { index, category ->
-                        val statey = expanded.getOrDefault(Pair(groupId, index), false)
-                        if (index == 0 && groupId == -20) Log.d("Libra", "asdfas ${statey}")
                         DragToReorder(
                             index = index,
                             groupId = groupId,
-                            state = statey,
+                            contentState = expanded.getOrDefault(Pair(groupId, index), false),
                         ) { scope, state ->
-                            val expand = state as? Boolean ?: false
-                            if (index == 0 && groupId == -20) Log.d("Libra", "Hello ${expand}")
+                            val expandState = state as? Boolean ?: false
                             CategoryRow(
                                 category = category,
-                                expanded = expand,
-                                onExpand = {
-                                    expanded[Pair(groupId, index)] = !expand
-                                    Log.d("Libra", "${expanded[Pair(groupId, index)]}")
-                                           },
+                                expanded = expandState,
+                                onExpand = { expanded[Pair(groupId, index)] = !expandState },
                                 modifier = Modifier.rowDivider(enabled = index > 0 && !scope.isTarget(groupId, index), color = dividerColor),
                                 content = { category ->
                                     Spacer(modifier = Modifier.weight(10f))
@@ -146,9 +140,7 @@ fun CategoriesScreen(
                         )
                     }
                 ) {
-                    dragScope.PlaceContent(
-                        expanded.getOrDefault(Pair(dragScope.groupId, dragScope.index), false)
-                    )
+                    dragScope.PlaceContent()
                 }
             }
         }

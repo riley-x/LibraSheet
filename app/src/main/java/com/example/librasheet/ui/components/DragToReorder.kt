@@ -2,7 +2,6 @@ package com.example.librasheet.ui.components
 
 import android.util.Log
 import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
@@ -10,15 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 
 // See also https://blog.canopas.com/android-drag-and-drop-ui-element-in-jetpack-compose-14922073b3f1
 
@@ -38,14 +34,14 @@ class DragScope {
         index = -1
         content = null
         contentState = null
-        offset = 0f
         size = IntSize.Zero
         originalPos = Offset.Zero
+        offset = 0f
     }
     fun isTarget(groupId: Int, index: Int) = groupId == this.groupId && index == this.index
 
     @Composable
-    fun PlaceContent(state: Any? = null) {
+    fun PlaceContent() {
         content?.invoke(this, contentState)
     }
 }
@@ -57,12 +53,12 @@ fun DragToReorder(
     index: Int,
     groupId: Int,
     modifier: Modifier = Modifier,
-    state: Any? = null,
+    contentState: Any? = null,
     enabled: Boolean = true,
     content: @Composable (DragScope, Any?) -> Unit = { _, _ -> },
 ) {
     if (!enabled || index < 0) {
-        content(DragScope(), state)
+        content(DragScope(), contentState)
     } else {
         val haptic = LocalHapticFeedback.current
         val dragScope = LocalDragScope.current
@@ -102,7 +98,12 @@ fun DragToReorder(
                     this@drawWithContent.drawContent()
                 }
             }
-            .pointerInput(state) {
+            /** Pay attention to the key. This effectively launches a coroutine which runs the
+             * block. But this means the [contentState] parameter will keep it's value when the
+             * coroutine was launched. Setting the key to it makes sure the coroutine is cancelled
+             * and relaunched when the state changes.
+             **/
+            .pointerInput(contentState) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = {
                         if (dragScope.index == -1) {
@@ -113,7 +114,7 @@ fun DragToReorder(
                             dragScope.size = size
                             dragScope.originalPos = originalPos
                             dragScope.content = content
-                            dragScope.contentState = state
+                            dragScope.contentState = contentState
                             dragScope.offset = 0f
                         }
                     },
@@ -132,7 +133,7 @@ fun DragToReorder(
                 )
             }
         ) {
-            content(dragScope, state)
+            content(dragScope, contentState)
         }
     }
 }
