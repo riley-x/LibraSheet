@@ -14,13 +14,15 @@ internal const val pathSeparator = "_" // Note this needs to match what is used 
 internal const val displaySeparator = " > "
 
 @Stable
-fun getCategoryPath(fullName: String) = fullName
+fun getCategoryPath(id: String) = id
     .substringBeforeLast(pathSeparator)
     .replace(pathSeparator, displaySeparator)
 
 @Stable
-fun getCategoryShortName(fullName: String) = fullName.substringAfterLast(pathSeparator)
+fun getCategoryShortName(id: String) = id.substringAfterLast(pathSeparator)
 
+@Stable
+fun getCategoryFullDisplay(id: String) = id.replace(pathSeparator, displaySeparator)
 
 @Immutable
 data class Category(
@@ -32,6 +34,6 @@ data class Category(
     override val value: Float
         get() = amount.toFloatDollar()
     override val name = getCategoryShortName(id)
-    val fullName = getCategoryPath(id)
+    val fullName = getCategoryFullDisplay(id)
 }
 
