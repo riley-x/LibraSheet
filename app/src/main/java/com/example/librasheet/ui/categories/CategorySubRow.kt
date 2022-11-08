@@ -37,13 +37,13 @@ fun CategorySubRow(
                 .padding(start = libraRowHorizontalPadding + 1.dp)
                 .size(width = 22.dp, height = libraRowHeight)
         )
-        DragToReorder(index = dragIndex, groupId = dragGroup, enabled = dragIndex != -1) {
+        DragToReorder(index = dragIndex, groupId = dragGroup, enabled = dragIndex != -1) { dragScope, _  ->
             ColorCodedRow(
                 color = category.color,
                 horizontalPadding = 0.dp,
                 modifier = colorRowModifier
                     .padding(end = libraRowHorizontalPadding)
-                    .rowDivider(padding = 0.dp, color = dividerColor, enabled = !it.isTarget(dragGroup, dragIndex))
+                    .rowDivider(padding = 0.dp, color = dividerColor, enabled = !dragScope.isTarget(dragGroup, dragIndex))
             ) {
                 Text(category.name)
                 content()

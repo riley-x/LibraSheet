@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.categories
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -40,6 +41,10 @@ private enum class SubCategoryOptions(override val displayName: String) : HasDis
 private val categoryOptions = ImmutableList(CategoryOptions.values().toList())
 private val subCategoryOptions = ImmutableList(SubCategoryOptions.values().toList())
 
+/** Used for DragToReorder to know which group the selected element should be allowed to reorder in.
+ * MAKE SURE THESE DON'T CONFLICT WITH OTHER GROUP IDS (like Category.id) **/
+const val incomeGroupId = -10
+const val expenseGroupId = -20
 
 @Composable
 fun CategoriesScreen(
@@ -62,6 +67,7 @@ fun CategoriesScreen(
             modifier.onGloballyPositioned { startPos = it.localToRoot(Offset.Zero) }
         ) {
             val dragScope = remember { DragScope() } // Don't need state here since this is only passed into other composables.
+            val expanded = remember { mutableStateMapOf<Pair<Int, Int>, Boolean>() }
 
             CompositionLocalProvider(
                 LocalDragScope provides dragScope
@@ -69,10 +75,23 @@ fun CategoriesScreen(
                 val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
                 fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, groupId: Int) {
                     itemsIndexed(list) { index, category ->
-                        DragToReorder(index = index, groupId = groupId) {
+                        val statey = expanded.getOrDefault(Pair(groupId, index), false)
+                        if (index == 0 && groupId == -20) Log.d("Libra", "asdfas ${statey}")
+                        DragToReorder(
+                            index = index,
+                            groupId = groupId,
+                            state = statey,
+                        ) { scope, state ->
+                            val expand = state as? Boolean ?: false
+                            if (index == 0 && groupId == -20) Log.d("Libra", "Hello ${expand}")
                             CategoryRow(
                                 category = category,
-                                modifier = Modifier.rowDivider(enabled = index > 0, color = dividerColor),
+                                expanded = expand,
+                                onExpand = {
+                                    expanded[Pair(groupId, index)] = !expand
+                                    Log.d("Libra", "${expanded[Pair(groupId, index)]}")
+                                           },
+                                modifier = Modifier.rowDivider(enabled = index > 0 && !scope.isTarget(groupId, index), color = dividerColor),
                                 content = { category ->
                                     Spacer(modifier = Modifier.weight(10f))
                                     DropdownOptions(options = categoryOptions) {
@@ -111,11 +130,11 @@ fun CategoriesScreen(
                     item("income_title") {
                         RowTitle(title = "Income")
                     }
-                    categoryItems(incomeCategories, -10)
+                    categoryItems(incomeCategories, incomeGroupId)
                     item("expense_title") {
                         RowTitle(title = "Expense", modifier = Modifier.padding(top = 20.dp))
                     }
-                    categoryItems(expenseCategories, -20)
+                    categoryItems(expenseCategories, expenseGroupId)
                 }
 
                 Box(modifier = Modifier
@@ -127,7 +146,9 @@ fun CategoriesScreen(
                         )
                     }
                 ) {
-                    dragScope.PlaceContent()
+                    dragScope.PlaceContent(
+                        expanded.getOrDefault(Pair(dragScope.groupId, dragScope.index), false)
+                    )
                 }
             }
         }

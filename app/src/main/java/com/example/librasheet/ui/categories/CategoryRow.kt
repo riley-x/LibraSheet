@@ -11,11 +11,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ExpandLess
 import androidx.compose.material.icons.sharp.ExpandMore
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +25,8 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
+    expanded: Boolean = false,
+    onExpand: () -> Unit = {  },
     content: @Composable RowScope.(Category) -> Unit = { },
     subRow: @Composable ColumnScope.(Int, Category) -> Unit = { index, cat ->
         CategorySubRow(
@@ -39,8 +38,6 @@ fun CategoryRow(
         }
     },
 ) {
-    var expanded by rememberSaveable(category) { mutableStateOf(false) }
-
     Surface(modifier) {
         Column {
             ColorCodedRow(
@@ -48,7 +45,7 @@ fun CategoryRow(
             ) {
                 Text(category.name)
                 if (category.subCategories.isNotEmpty()) {
-                    IconButton(onClick = { expanded = !expanded }) {
+                    IconButton(onClick = onExpand) {
                         if (expanded) Icon(
                             imageVector = Icons.Sharp.ExpandLess,
                             contentDescription = null
