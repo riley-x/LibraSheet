@@ -6,8 +6,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +35,7 @@ fun CategorySubRow(
                 .padding(start = libraRowHorizontalPadding + 1.dp)
                 .size(width = 22.dp, height = libraRowHeight)
         )
-        DragToReorder(index = dragIndex, groupId = dragGroup, enabled = dragIndex != -1) { dragScope, _  ->
+        DragToReorderTarget(index = dragIndex, groupId = dragGroup, enabled = dragIndex != -1) { dragScope, _  ->
             ColorCodedRow(
                 color = category.color,
                 horizontalPadding = 0.dp,
