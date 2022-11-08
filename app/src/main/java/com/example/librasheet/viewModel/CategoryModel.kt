@@ -32,23 +32,23 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     @Callback
-    fun add(parentCategory: CategoryId, newCategory: String): Boolean {
-        if (newCategory.contains(categoryPathSeparator)) return false // TODO change error message
+    fun add(parentCategory: CategoryId, newCategory: String): String {
+        if (newCategory.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
         if (data.add(parentCategory, newCategory)) {
             loadUi()
-            return true
+            return ""
         }
-        return false
+        return "Error: account exists already"
     }
 
     @Callback
-    fun rename(currentCategory: CategoryId, newName: String): Boolean {
-        if (newName.contains(categoryPathSeparator)) return false // TODO change error message
+    fun rename(currentCategory: CategoryId, newName: String): String {
+        if (newName.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
         if (data.rename(currentCategory, newName)) {
             loadUi()
-            return true
+            return ""
         }
-        return false
+        return "Error: account exists already"
     }
 
     @Callback
@@ -63,12 +63,11 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     @Callback
-    fun move(currentCategory: CategoryId, newParent: CategoryId): Boolean {
-        if (data.move(currentCategory, newParent)) {
-            loadUi()
-            return true
-        }
-        return false
+    fun move(currentCategory: CategoryId, newParent: CategoryId): String {
+        val error = data.move(currentCategory, newParent)
+        if (error.isNotBlank()) return error
+        loadUi()
+        return ""
     }
 }
 

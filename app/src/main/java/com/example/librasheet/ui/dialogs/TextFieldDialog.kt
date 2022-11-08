@@ -19,7 +19,6 @@ fun TextFieldDialog(
     title: String = "",
     placeholder: String = "",
     errorMessage: String = "",
-    error: Boolean = false,
     cancelText: String = "Cancel",
     okText: String = "Ok",
     onDismiss: (String) -> Unit = { },
@@ -30,7 +29,6 @@ fun TextFieldDialog(
         title = title,
         okText = okText,
         cancelText = cancelText,
-        error = error,
         errorMessage = errorMessage,
         onCancel = { onDismiss("") },
         onOk = { onDismiss(text) },
@@ -73,7 +71,6 @@ private fun PreviewError() {
         TextFieldDialog(
             title = "Add Account",
             placeholder = "Account name",
-            error = true,
             errorMessage = "Error: account exists already"
         )
     }

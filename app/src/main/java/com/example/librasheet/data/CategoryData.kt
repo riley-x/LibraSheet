@@ -81,8 +81,11 @@ class CategoryData(private val scope: CoroutineScope) {
         return true
     }
 
-    fun move(currentCategory: CategoryId, newParent: CategoryId): Boolean {
+    fun move(currentCategory: CategoryId, newParent: CategoryId): String {
         val (current, oldParentList, index) = find(currentCategory) ?: throw RuntimeException("CategoryData::move couldn't find $currentCategory")
+        if (currentCategory.isTop && newParent.isTop && current.subCategories.isNotEmpty())
+            return "Error: can't move category with subcategories into another category"
+
         val newParentList = when(newParent.fullName) {
             incomeName -> incomeEntities
             expenseName -> expenseEntities
@@ -92,7 +95,8 @@ class CategoryData(private val scope: CoroutineScope) {
             }
         }
 
-        if (newParentList.any { it.name == currentCategory.name }) return false
+        if (newParentList.any { it.name == currentCategory.name }) return "Error: category exists in destination already"
+
 
         oldParentList.removeAt(index)
         val newEntity = current.copy(
@@ -104,6 +108,6 @@ class CategoryData(private val scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
             // TODO DAO update entity and xref (delete, readd)
         }
-        return true
+        return ""
     }
 }

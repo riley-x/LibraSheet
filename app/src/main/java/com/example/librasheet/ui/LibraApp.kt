@@ -65,7 +65,7 @@ fun LibraApp(
     }
 
     /** Dialogs **/
-    var dialogShowError by remember { mutableStateOf(false) } // this is reused across all dialogs
+    var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
@@ -85,49 +85,41 @@ fun LibraApp(
         changeAccountNameOld = ""
     }
 
-    var openAddCategoryDialog by remember { mutableStateOf(CategoryId()) }
-    fun onAddCategory(parent: CategoryId) { openAddCategoryDialog = parent }
-    fun addCategory(newCategory: String) {
-        if (newCategory.isNotBlank() && !viewModel.categories.add(
-                parentCategory = openAddCategoryDialog,
-                newCategory = newCategory
-        )) {
-            dialogShowError = true
-        } else {
-            openAddCategoryDialog = CategoryId()
-            dialogShowError = false
-        }
+
+    fun dialogCallback(key: MutableState<CategoryId>, result: String, function: (CategoryId) -> String) {
+        dialogErrorMessage = if (result.isNotBlank()) function(key.value) else ""
+        if (dialogErrorMessage.isEmpty()) key.value = CategoryId()
     }
 
-    var changeCategoryNameOld by remember { mutableStateOf(CategoryId()) }
-    fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.id }
-    fun changeCategoryName(newName: String) {
-        if (newName.isNotBlank() && !viewModel.categories.rename(
-            currentCategory = changeCategoryNameOld,
+
+    val openAddCategoryDialog = remember { mutableStateOf(CategoryId()) }
+    fun onAddCategory(parent: CategoryId) { openAddCategoryDialog.value = parent }
+    fun addCategory(newCategory: String) = dialogCallback(openAddCategoryDialog, newCategory) {
+        viewModel.categories.add(
+            parentCategory = it,
+            newCategory = newCategory
+        )
+    }
+
+    val changeCategoryNameOld = remember { mutableStateOf(CategoryId()) }
+    fun onChangeCategoryName(category: Category) { changeCategoryNameOld.value = category.id }
+    fun changeCategoryName(newName: String) = dialogCallback(changeCategoryNameOld, newName) {
+        viewModel.categories.rename(
+            currentCategory = it,
             newName = newName
-        )) {
-            dialogShowError = true
-        } else {
-            changeCategoryNameOld = CategoryId()
-            dialogShowError = false
-        }
+        )
     }
 
-    var moveCategoryName by remember { mutableStateOf(CategoryId()) }
+    val moveCategoryName = remember { mutableStateOf(CategoryId()) }
     fun onMoveCategory(category: Category) {
         viewModel.categories.setMoveOptions(category.id)
-        moveCategoryName = category.id
+        moveCategoryName.value = category.id
     }
-    fun moveCategory(newParent: String) {
-        if (newParent.isNotEmpty() && !viewModel.categories.move(
-                currentCategory = moveCategoryName,
-                newParent = newParent.toCategoryId()
-            )) {
-            dialogShowError = true
-        } else {
-            moveCategoryName = CategoryId()
-            dialogShowError = false
-        }
+    fun moveCategory(newParent: String) = dialogCallback(moveCategoryName, newParent) {
+        viewModel.categories.move(
+            currentCategory = it,
+            newParent = newParent.toCategoryId()
+        )
     }
 
     /** Main Layout Scaffold **/
@@ -261,8 +253,7 @@ fun LibraApp(
             TextFieldDialog(
                 title = "Add Account",
                 placeholder = "Account name",
-                error = dialogShowError,
-                errorMessage = "Error: account exists already",
+                errorMessage = dialogErrorMessage,
                 onDismiss = ::addAccount
             )
         }
@@ -271,37 +262,33 @@ fun LibraApp(
                 title = "Rename $changeAccountNameOld",
                 initialText = changeAccountNameOld,
                 placeholder = "New name",
-                error = dialogShowError,
-                errorMessage = "Error: account exists already",
+                errorMessage = dialogErrorMessage,
                 onDismiss = ::changeAccountName
             )
         }
-        if (openAddCategoryDialog.isValid) {
+        if (openAddCategoryDialog.value.isValid) {
             TextFieldDialog(
-                title = "Add to " + openAddCategoryDialog.fullDisplayName,
+                title = "Add to " + openAddCategoryDialog.value.fullDisplayName,
                 placeholder = "Category name",
-                error = dialogShowError,
-                errorMessage = "Error: category exists already",
+                errorMessage = dialogErrorMessage,
                 onDismiss = ::addCategory
             )
         }
-        if (changeCategoryNameOld.isValid) {
+        if (changeCategoryNameOld.value.isValid) {
             TextFieldDialog(
-                title = "Rename " + changeCategoryNameOld.fullDisplayName,
-                initialText = changeCategoryNameOld.name,
+                title = "Rename " + changeCategoryNameOld.value.fullDisplayName,
+                initialText = changeCategoryNameOld.value.name,
                 placeholder = "New name",
-                error = dialogShowError,
-                errorMessage = "Error: category exists already",
+                errorMessage = dialogErrorMessage,
                 onDismiss = ::changeCategoryName
             )
         }
-        if (moveCategoryName.isValid) {
+        if (moveCategoryName.value.isValid) {
             SelectorDialog(
                 options = viewModel.categories.moveTargets,
                 toString = ::getCategoryName,
-                title = "Move " + moveCategoryName.fullDisplayName,
-                error = dialogShowError,
-                errorMessage = "Error: category exists already",
+                title = "Move " + moveCategoryName.value.fullDisplayName,
+                errorMessage = dialogErrorMessage,
                 onDismiss = ::moveCategory
             )
         }

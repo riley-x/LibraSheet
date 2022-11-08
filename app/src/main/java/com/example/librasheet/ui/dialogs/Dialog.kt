@@ -17,7 +17,6 @@ fun Dialog(
     modifier: Modifier = Modifier,
     title: String = "",
     errorMessage: String = "",
-    error: Boolean = false,
     cancelText: String = "Cancel",
     okText: String = "Ok",
     onCancel: () -> Unit = { },
@@ -35,7 +34,7 @@ fun Dialog(
                 Column {
                     Text(text = title)
                     content()
-                    if (error) {
+                    if (errorMessage.isNotEmpty()) {
                         Text(
                             text = errorMessage,
                             color = MaterialTheme.colors.error,
@@ -73,7 +72,6 @@ private fun PreviewError() {
     LibraSheetTheme {
         Dialog(
             title = "I'm a simple dialog",
-            error = true,
             errorMessage = "Error: Oh no!"
         )
     }

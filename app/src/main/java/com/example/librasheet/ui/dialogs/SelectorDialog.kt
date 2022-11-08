@@ -18,7 +18,6 @@ fun SelectorDialog(
     initialSelection: String = "",
     title: String = "",
     errorMessage: String = "",
-    error: Boolean = false,
     cancelText: String = "Cancel",
     okText: String = "Ok",
     toString: (String) -> String = { it },
@@ -30,7 +29,6 @@ fun SelectorDialog(
         title = title,
         okText = okText,
         cancelText = cancelText,
-        error = error,
         errorMessage = errorMessage,
         onCancel = { onDismiss("") },
         onOk = { onDismiss(currentSelection) },
@@ -71,7 +69,6 @@ private fun PreviewError() {
         SelectorDialog(
             options = options,
             title = "Move To",
-            error = true,
             errorMessage = "Error: category exists in selection already"
         )
     }
