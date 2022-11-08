@@ -16,6 +16,9 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 class CategoryModel(private val parent: LibraViewModel) {
     internal val data = CategoryData(parent.viewModelScope)
 
+    /** This are displayed in the categories settings screen, but are also used to calculate the
+     * cash flow screen categories.
+     */
     val income = mutableStateListOf<Category>()
     val expense = mutableStateListOf<Category>()
 

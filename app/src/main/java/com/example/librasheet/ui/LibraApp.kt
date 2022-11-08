@@ -187,7 +187,7 @@ fun LibraApp(
                 composable(route = SpendingTab.route) {
                     CashFlowScreen(
                         title = "Spending",
-                        categories = previewIncomeCategories,
+                        categories = previewExpenseCategories,
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
@@ -217,8 +217,8 @@ fun LibraApp(
                 }
                 composable(route = CategoriesDestination.route) {
                     CategoriesScreen(
-                        incomeCategories = previewIncomeCategories,
-                        expenseCategories = previewExpenseCategories,
+                        incomeCategories = viewModel.categories.income,
+                        expenseCategories = viewModel.categories.expense,
                         onBack = navController::popBackStack,
                         onChangeName = ::onChangeCategoryName,
                         onChangeColor = ::toSettingsColorSelector,
@@ -250,6 +250,8 @@ fun LibraApp(
             TextFieldDialog(
                 title = "Add to " + getCategoryFullDisplay(openAddCategoryDialog),
                 placeholder = "Category name",
+                error = dialogShowError,
+                errorMessage = "Error: category exists already",
                 onDismiss = ::addCategory
             )
         }
@@ -258,6 +260,8 @@ fun LibraApp(
                 title = "Rename " + getCategoryFullDisplay(changeCategoryNameOld),
                 initialText = getCategoryShortName(changeCategoryNameOld),
                 placeholder = "New name",
+                error = dialogShowError,
+                errorMessage = "Error: category exists already",
                 onDismiss = ::changeCategoryName
             )
         }

@@ -18,6 +18,8 @@ fun TextFieldDialog(
     initialText: String = "",
     title: String = "",
     placeholder: String = "",
+    errorMessage: String = "",
+    error: Boolean = false,
     cancelText: String = "Cancel",
     okText: String = "Ok",
     onDismiss: (String) -> Unit = { },
@@ -32,7 +34,6 @@ fun TextFieldDialog(
                 Text(
                     text = title,
                     color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.padding(bottom = 6.dp),
                 )
                 OutlinedTextField(
                     value = text,
@@ -49,7 +50,11 @@ fun TextFieldDialog(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = MaterialTheme.colors.onSurface,
                     ),
-                    modifier = Modifier.height(60.dp)
+                    modifier = Modifier.height(60.dp).padding(vertical = 6.dp)
+                )
+                Text(
+                    text = if (error) errorMessage else "",
+                    color = MaterialTheme.colors.error,
                 )
             }
         },
@@ -67,11 +72,24 @@ fun TextFieldDialog(
 
 @Preview
 @Composable
-fun PreviewTextFieldDialog() {
+private fun Preview() {
     LibraSheetTheme {
         TextFieldDialog(
             title = "Add Account",
             placeholder = "Account name",
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewError() {
+    LibraSheetTheme {
+        TextFieldDialog(
+            title = "Add Account",
+            placeholder = "Account name",
+            error = true,
+            errorMessage = "Error: account exists already"
         )
     }
 }
