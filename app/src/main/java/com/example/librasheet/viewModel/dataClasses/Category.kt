@@ -23,31 +23,69 @@ const val displaySeparator = " > "
  */
 @Immutable
 data class Category(
-    val id: String = "",
+    val id: CategoryId = CategoryId(),
     override val color: Color = Color.White,
     val amount: Long = 0,
     val subCategories: List<Category> = emptyList(),
 ) : PieChartValue {
     override val value: Float
         get() = amount.toFloatDollar()
-    override val name = getCategoryName(id)
-    val fullDisplayName = getCategoryFullDisplay(id)
+    override val name: String
+        get() = id.name
 
     @Stable
-    fun isSet() = id.isNotEmpty()
+    fun isSet() = id.superName.isNotEmpty()
 }
 
 
 fun CategoryEntity.toCategory(parent: String = ""): Category {
     val fullName = joinCategoryPath(parent.ifEmpty { topCategory }, name)
     return Category(
-        id = fullName,
+        id = fullName.toCategoryId(),
         color = Color(color),
         amount = 0,
         subCategories = subCategories.map { it.toCategory(fullName) }
     )
 }
 
+@Immutable
+data class CategoryId(
+    val superName: String = "",
+    val topName: String = "",
+    val subName: String = "",
+) {
+    val name = subName.ifEmpty { topName }.ifEmpty { superName }
+    val fullName: String
+        get() = superName +
+                (if (topName.isNotEmpty()) "$categoryPathSeparator$topName" else "") +
+                (if (subName.isNotEmpty()) "$categoryPathSeparator$subName" else "")
+    val fullDisplayName: String
+        get() = superName +
+                (if (topName.isNotEmpty()) "$displaySeparator$topName" else "") +
+                (if (subName.isNotEmpty()) "$displaySeparator$subName" else "")
+
+    val isSuper: Boolean
+        get() = topName.isEmpty()
+    val isTop: Boolean
+        get() = topName.isNotEmpty() && subName.isEmpty()
+    val isSub: Boolean
+        get() = subName.isNotEmpty()
+
+    val isValid: Boolean
+        get() = superName.isNotEmpty()
+
+    val parentName: String
+        get() = if (isSub) topName else if (isTop) superName else ""
+}
+
+fun String.toCategoryId(): CategoryId {
+    val path = this.split(categoryPathSeparator)
+    return CategoryId(
+        path[0],
+        if (path.size > 1) path[1] else "",
+        if (path.size > 2) path[2] else "",
+    )
+}
 
 @Stable
 fun getCategoryPath(id: String) = id.substringBeforeLast(categoryPathSeparator)
@@ -65,6 +103,8 @@ fun joinCategoryPath(parent: String, child: String) = if (parent.isNotEmpty()) "
 fun isSuperCategory(path: String) = !path.contains(categoryPathSeparator)
 @Stable
 fun isTopCategory(path: String) = path.split(categoryPathSeparator).size == 2
+@Stable
+fun isSubCategory(path: String) = path.split(categoryPathSeparator).size == 3
 
 @Stable
 fun getSuperCategory(path: String) = path.substringBefore(categoryPathSeparator)

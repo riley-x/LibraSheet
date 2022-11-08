@@ -21,6 +21,7 @@ fun SelectorDialog(
     error: Boolean = false,
     cancelText: String = "Cancel",
     okText: String = "Ok",
+    toString: (String) -> String = { it },
     onDismiss: (String) -> Unit = { },
 ) {
     var currentSelection by remember { mutableStateOf(initialSelection) }
@@ -36,6 +37,7 @@ fun SelectorDialog(
         modifier = modifier,
     ) {
         DropdownSelector(
+            toString = toString,
             currentValue = currentSelection,
             allValues = options,
             onSelection = { currentSelection = it },

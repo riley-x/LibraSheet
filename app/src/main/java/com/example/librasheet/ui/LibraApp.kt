@@ -85,8 +85,8 @@ fun LibraApp(
         changeAccountNameOld = ""
     }
 
-    var openAddCategoryDialog by remember { mutableStateOf("") }
-    fun onAddCategory(parent: String) { openAddCategoryDialog = parent }
+    var openAddCategoryDialog by remember { mutableStateOf(CategoryId()) }
+    fun onAddCategory(parent: CategoryId) { openAddCategoryDialog = parent }
     fun addCategory(newCategory: String) {
         if (newCategory.isNotBlank() && !viewModel.categories.add(
                 parentCategory = openAddCategoryDialog,
@@ -94,12 +94,12 @@ fun LibraApp(
         )) {
             dialogShowError = true
         } else {
-            openAddCategoryDialog = ""
+            openAddCategoryDialog = CategoryId()
             dialogShowError = false
         }
     }
 
-    var changeCategoryNameOld by remember { mutableStateOf("") }
+    var changeCategoryNameOld by remember { mutableStateOf(CategoryId()) }
     fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.id }
     fun changeCategoryName(newName: String) {
         if (newName.isNotBlank() && !viewModel.categories.rename(
@@ -108,24 +108,24 @@ fun LibraApp(
         )) {
             dialogShowError = true
         } else {
-            changeCategoryNameOld = ""
+            changeCategoryNameOld = CategoryId()
             dialogShowError = false
         }
     }
 
-    var moveCategoryName by remember { mutableStateOf("") }
+    var moveCategoryName by remember { mutableStateOf(CategoryId()) }
     fun onMoveCategory(category: Category) {
         viewModel.categories.setMoveOptions(category.id)
         moveCategoryName = category.id
     }
     fun moveCategory(newParent: String) {
-        if (newParent.isNotBlank() && !viewModel.categories.move(
+        if (newParent.isNotEmpty() && !viewModel.categories.move(
                 currentCategory = moveCategoryName,
-                newParent = newParent
+                newParent = newParent.toCategoryId()
             )) {
             dialogShowError = true
         } else {
-            moveCategoryName = ""
+            moveCategoryName = CategoryId()
             dialogShowError = false
         }
     }
@@ -276,29 +276,30 @@ fun LibraApp(
                 onDismiss = ::changeAccountName
             )
         }
-        if (openAddCategoryDialog.isNotEmpty()) {
+        if (openAddCategoryDialog.isValid) {
             TextFieldDialog(
-                title = "Add to " + getCategoryFullDisplay(openAddCategoryDialog),
+                title = "Add to " + openAddCategoryDialog.fullDisplayName,
                 placeholder = "Category name",
                 error = dialogShowError,
                 errorMessage = "Error: category exists already",
                 onDismiss = ::addCategory
             )
         }
-        if (changeCategoryNameOld.isNotEmpty()) {
+        if (changeCategoryNameOld.isValid) {
             TextFieldDialog(
-                title = "Rename " + getCategoryFullDisplay(changeCategoryNameOld),
-                initialText = getCategoryName(changeCategoryNameOld),
+                title = "Rename " + changeCategoryNameOld.fullDisplayName,
+                initialText = changeCategoryNameOld.name,
                 placeholder = "New name",
                 error = dialogShowError,
                 errorMessage = "Error: category exists already",
                 onDismiss = ::changeCategoryName
             )
         }
-        if (moveCategoryName.isNotEmpty()) {
+        if (moveCategoryName.isValid) {
             SelectorDialog(
                 options = viewModel.categories.moveTargets,
-                title = "Move " + getCategoryFullDisplay(changeCategoryNameOld),
+                toString = ::getCategoryName,
+                title = "Move " + moveCategoryName.fullDisplayName,
                 error = dialogShowError,
                 errorMessage = "Error: category exists already",
                 onDismiss = ::moveCategory

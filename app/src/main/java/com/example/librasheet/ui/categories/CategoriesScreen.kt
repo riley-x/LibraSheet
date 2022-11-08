@@ -43,7 +43,7 @@ fun CategoriesScreen(
     onBack: () -> Unit = { },
     onChangeName: (Category) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
-    onAddCategory: (String) -> Unit = { },
+    onAddCategory: (CategoryId) -> Unit = { },
     onMoveCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
     onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
@@ -94,7 +94,7 @@ fun CategoriesScreen(
                                 indicatorColor = category.color.copy(alpha = 0.5f),
                                 last = subIndex == category.subCategories.lastIndex,
                                 dragIndex = subIndex,
-                                dragGroup = category.id,
+                                dragGroup = category.id.fullName,
                                 onDragEnd = onDragEnd,
                             ) {
                                 Spacer(modifier = Modifier.weight(10f))
@@ -109,7 +109,7 @@ fun CategoriesScreen(
             fun LazyListScope.categoryTitle(title: String) {
                 item(title) {
                     RowTitle(title = title) {
-                        IconButton(onClick = { onAddCategory(title) }) {
+                        IconButton(onClick = { onAddCategory(title.toCategoryId()) }) {
                             Icon(Icons.Sharp.Add, null)
                         }
                         Spacer(Modifier.width(libraRowHorizontalPadding))

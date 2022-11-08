@@ -14,7 +14,7 @@ import com.example.librasheet.viewModel.dataClasses.ImmutableList
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun <T> DropdownSelectorHelper(
+fun <T> DropdownSelector(
     toString: (T) -> String,
     currentValue: T,
     allValues: List<T>,
@@ -67,7 +67,7 @@ fun <T: HasDisplayName> DropdownSelector(
     label: String = "",
     onSelection: (T) -> Unit = { },
 ) {
-    DropdownSelectorHelper(
+    DropdownSelector(
         toString = { it.displayName },
         currentValue = currentValue,
         allValues = allValues.items,
@@ -85,7 +85,7 @@ fun DropdownSelector(
     label: String = "",
     onSelection: (String) -> Unit = { },
 ) {
-    DropdownSelectorHelper(
+    DropdownSelector(
         toString = { it },
         currentValue = currentValue,
         allValues = allValues,

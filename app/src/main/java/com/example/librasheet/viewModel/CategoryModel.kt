@@ -32,7 +32,7 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     @Callback
-    fun add(parentCategory: String, newCategory: String): Boolean {
+    fun add(parentCategory: CategoryId, newCategory: String): Boolean {
         if (newCategory.contains(categoryPathSeparator)) return false // TODO change error message
         if (data.add(parentCategory, newCategory)) {
             loadUi()
@@ -42,7 +42,7 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     @Callback
-    fun rename(currentCategory: String, newName: String): Boolean {
+    fun rename(currentCategory: CategoryId, newName: String): Boolean {
         if (newName.contains(categoryPathSeparator)) return false // TODO change error message
         if (data.rename(currentCategory, newName)) {
             loadUi()
@@ -52,19 +52,22 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     @Callback
-    fun setMoveOptions(currentCategory: String) {
-        val superName = getSuperCategory(currentCategory)
+    fun setMoveOptions(currentCategory: CategoryId) {
         moveTargets.clear()
-        moveTargets.add(superName)
-        when (superName) {
+        if (currentCategory.isSub) moveTargets.add(currentCategory.superName)
+        when (currentCategory.superName) {
             incomeName -> income
             expenseName -> expense
             else -> throw RuntimeException("CategoryModel::move bad category $currentCategory")
-        }.filter { it.id != currentCategory }.mapTo(moveTargets) { it.name }
+        }.filter { it.id.topName != currentCategory.topName }.mapTo(moveTargets) { it.id.fullName }
     }
 
     @Callback
-    fun move(currentCategory: String, newParent: String): Boolean {
+    fun move(currentCategory: CategoryId, newParent: CategoryId): Boolean {
+        if (data.move(currentCategory, newParent)) {
+            loadUi()
+            return true
+        }
         return false
     }
 }
