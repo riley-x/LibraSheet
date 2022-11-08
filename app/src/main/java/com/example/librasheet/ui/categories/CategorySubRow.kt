@@ -22,7 +22,7 @@ fun CategorySubRow(
     modifier: Modifier = Modifier,
     dragIndex: Int = -1,
     dragGroup: Int = 0,
-    divider: Boolean = true,
+    onDragEnd: (groupId: Int, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     dividerColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     colorRowModifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit = { },
@@ -35,7 +35,12 @@ fun CategorySubRow(
                 .padding(start = libraRowHorizontalPadding + 1.dp)
                 .size(width = 22.dp, height = libraRowHeight)
         )
-        DragToReorderTarget(index = dragIndex, groupId = dragGroup, enabled = dragIndex != -1) { dragScope, _  ->
+        DragToReorderTarget(
+            index = dragIndex,
+            groupId = dragGroup,
+            enabled = dragIndex != -1,
+            onDragEnd = onDragEnd,
+        ) { dragScope, _  ->
             ColorCodedRow(
                 color = category.color,
                 horizontalPadding = 0.dp,

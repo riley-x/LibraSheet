@@ -48,12 +48,12 @@ fun CategoriesScreen(
     expenseCategories: SnapshotStateList<Category>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
-//    onCategoryClick: (Category) -> Unit = { },
     onChangeName: (Category) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
     onAddSubCategory: (Category) -> Unit = { },
     onMoveSubCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
+    onDragEnd: (groupId: Int, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
     Column(modifier) {
         HeaderBar(title = "Categories", backArrow = true, onBack = onBack, modifier = Modifier.zIndex(10f))
@@ -67,6 +67,7 @@ fun CategoriesScreen(
                         index = index,
                         groupId = groupId,
                         contentState = expanded,
+                        onDragEnd = { _, _, _ -> },
                     ) { dragScope, _ ->
                         CategoryRow(
                             category = category,
@@ -91,6 +92,7 @@ fun CategoriesScreen(
                                 last = subIndex == category.subCategories.lastIndex,
                                 dragIndex = subIndex,
                                 dragGroup = category.id,
+                                onDragEnd = { _, _, _ -> },
                             ) {
                                 Spacer(modifier = Modifier.weight(10f))
                                 DropdownOptions(options = subCategoryOptions) {
