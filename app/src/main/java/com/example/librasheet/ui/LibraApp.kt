@@ -21,7 +21,7 @@ import com.example.librasheet.ui.categories.CategoriesScreen
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.dataClasses.Category
-import com.example.librasheet.viewModel.dataClasses.getCategoryParent
+import com.example.librasheet.viewModel.dataClasses.getCategoryPath
 import com.example.librasheet.viewModel.dataClasses.getCategoryShortName
 import com.example.librasheet.viewModel.preview.*
 
@@ -85,7 +85,7 @@ fun LibraApp(
         }
         changeAccountNameOld = ""
     }
-    fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.fullName }
+    fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.id }
     fun changeCategoryName(newName: String) {
         if (newName.isNotBlank()) {
             // TODO
@@ -237,7 +237,7 @@ fun LibraApp(
         }
         if (changeCategoryNameOld.isNotEmpty()) {
             TextFieldDialog(
-                title = getCategoryParent(changeCategoryNameOld),
+                title = getCategoryPath(changeCategoryNameOld),
                 initialText = getCategoryShortName(changeCategoryNameOld),
                 placeholder = "Category name",
                 onDismiss = ::changeCategoryName

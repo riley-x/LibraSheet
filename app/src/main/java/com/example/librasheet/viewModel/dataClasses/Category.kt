@@ -10,10 +10,13 @@ import com.example.librasheet.ui.graphing.PieChartValue
 const val incomeName = "Income"
 const val expenseName = "Expense"
 
-internal const val pathSeparator = " > "
+internal const val pathSeparator = "_" // Note this needs to match what is used by the ColorScreen
+internal const val displaySeparator = " > "
 
 @Stable
-fun getCategoryParent(fullName: String) = fullName.substringBeforeLast(pathSeparator)
+fun getCategoryPath(fullName: String) = fullName
+    .substringBeforeLast(pathSeparator)
+    .replace(pathSeparator, displaySeparator)
 
 @Stable
 fun getCategoryShortName(fullName: String) = fullName.substringAfterLast(pathSeparator)
@@ -21,13 +24,14 @@ fun getCategoryShortName(fullName: String) = fullName.substringAfterLast(pathSep
 
 @Immutable
 data class Category(
-    val fullName: String, // with full path; unique. i.e. Expense > Utilities > Rent / Mortgage
+    val id: String, // with full path; unique. i.e. Expense_Utilities_Rent / Mortgage
     override val color: Color,
     val amount: Long,
     val subCategories: List<Category>,
 ) : PieChartValue {
     override val value: Float
         get() = amount.toFloatDollar()
-    override val name = getCategoryShortName(fullName)
+    override val name = getCategoryShortName(id)
+    val fullName = getCategoryPath(id)
 }
 

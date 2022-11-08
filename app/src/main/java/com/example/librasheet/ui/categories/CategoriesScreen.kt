@@ -11,6 +11,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,8 +51,8 @@ fun CategoriesScreen(
     fun onOptionSelect(category: Category, categoryOption: CategoryOption) {
         when (categoryOption) {
             CategoryOption.RENAME -> onChangeName(category)
-            CategoryOption.COLOR -> onChangeColor("category_${category.fullName}")
-            CategoryOption.ADD -> onAddCategory(category.fullName)
+            CategoryOption.COLOR -> onChangeColor("category_${category.id}")
+            CategoryOption.ADD -> onAddCategory(category.id)
             CategoryOption.MOVE -> onMoveCategory(category)
             CategoryOption.DELETE -> onDelete(category)
         }
@@ -69,7 +70,7 @@ fun CategoriesScreen(
             val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
             fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, group: String) {
                 itemsIndexed(list) { index, category ->
-                    var expanded by remember { mutableStateOf(false) }
+                    var expanded by rememberSaveable { mutableStateOf(false) }
                     DragToReorderTarget(
                         index = index,
                         group = group,
@@ -93,7 +94,7 @@ fun CategoriesScreen(
                                 indicatorColor = category.color.copy(alpha = 0.5f),
                                 last = subIndex == category.subCategories.lastIndex,
                                 dragIndex = subIndex,
-                                dragGroup = category.fullName,
+                                dragGroup = category.id,
                                 onDragEnd = onDragEnd,
                             ) {
                                 Spacer(modifier = Modifier.weight(10f))
@@ -111,6 +112,7 @@ fun CategoriesScreen(
                         IconButton(onClick = { onAddCategory(title) }) {
                             Icon(Icons.Sharp.Add, null)
                         }
+                        Spacer(Modifier.width(libraRowHorizontalPadding))
                     }
                 }
             }

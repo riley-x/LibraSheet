@@ -28,8 +28,8 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import kotlin.math.*
 
 /**
- * @param spec Which color we're currently editing. This should have the format category_name. name
- * will be displayed as the title.
+ * @param spec Which color we're currently editing. This should have the format category_sub_name.
+ * name will be displayed as the title.
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -119,7 +119,7 @@ fun ColorSelectorScreen(
             .windowInsetsPadding(WindowInsets.ime)
             .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
     ) {
-        HeaderBar(title = spec.substringAfter("_"), backArrow = true, onBack = onCancel)
+        HeaderBar(title = spec.substringAfterLast("_"), backArrow = true, onBack = onCancel)
 
         ColorSelector(
             currentColor = currentColor,
