@@ -7,6 +7,7 @@ import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.database.CategoryEntity
 import com.example.librasheet.data.database.CategoryWithChildren
 import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.dataClasses.pathSeparator
 import com.example.librasheet.viewModel.dataClasses.toCategory
 import com.example.librasheet.viewModel.preview.previewExpenseCategories
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
@@ -27,13 +28,9 @@ class CategoryModel(private val parent: LibraViewModel) {
     }
 
     fun loadUi() {
-        fun loadList(list: MutableList<Category>, data: List<CategoryWithChildren>) {
+        fun loadList(list: MutableList<Category>, data: List<CategoryEntity>) {
             list.clear()
-            data.mapTo(list) {
-                it.parent.toCategory().copy(
-                    subCategories = it.children.map(CategoryEntity::toCategory)
-                )
-            }
+            data.mapTo(list) { it.toCategory() }
         }
         loadList(income, data.incomeEntities)
         loadList(expense, data.expenseEntities)
@@ -41,6 +38,7 @@ class CategoryModel(private val parent: LibraViewModel) {
 
     @Callback
     fun add(parentCategory: String, newCategory: String): Boolean {
+        if (newCategory.contains(pathSeparator)) return false // TODO change error message
         if (data.add(parentCategory, newCategory)) {
             loadUi()
             return true

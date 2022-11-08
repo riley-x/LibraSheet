@@ -50,7 +50,7 @@ fun TextFieldDialog(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         textColor = MaterialTheme.colors.onSurface,
                     ),
-                    modifier = Modifier.height(60.dp).padding(vertical = 6.dp)
+                    modifier = Modifier.padding(vertical = 6.dp).height(60.dp)
                 )
                 Text(
                     text = if (error) errorMessage else "",

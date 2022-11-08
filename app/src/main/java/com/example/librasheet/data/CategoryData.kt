@@ -5,63 +5,49 @@ import com.example.librasheet.data.database.CategoryEntity
 import com.example.librasheet.data.database.CategoryHierarchy
 import com.example.librasheet.data.database.CategoryWithChildren
 import com.example.librasheet.ui.theme.randomColor
-import com.example.librasheet.viewModel.dataClasses.expenseName
-import com.example.librasheet.viewModel.dataClasses.incomeName
-import com.example.librasheet.viewModel.dataClasses.isSuperCategory
-import com.example.librasheet.viewModel.dataClasses.joinCategoryPath
+import com.example.librasheet.viewModel.dataClasses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.exp
 
 class CategoryData(private val scope: CoroutineScope) {
-    val incomeEntities = mutableListOf<CategoryWithChildren>()
-    val expenseEntities = mutableListOf<CategoryWithChildren>()
+    val incomeEntities = mutableListOf<CategoryEntity>()
+    val expenseEntities = mutableListOf<CategoryEntity>()
 
     fun load() {
         // TODO. Make sure things are ordered correctly...
     }
 
+
+
     fun add(parentCategory: String, newCategory: String): Boolean {
-        val id = joinCategoryPath(parentCategory, newCategory)
-        if (incomeEntities.any { it.contains(id) }) return false
-        if (expenseEntities.any { it.contains(id) }) return false
-
         val entity: CategoryEntity
-
         when (parentCategory) {
-            incomeName -> {
+            incomeName, expenseName -> {
+                val list = if (parentCategory == incomeName) incomeEntities else expenseEntities
+                if (list.any { it.name == newCategory }) return false
                 entity = CategoryEntity(
-                    name = id,
+                    name = newCategory,
                     topCategory = parentCategory,
                     color = randomColor().toArgb(),
-                    listIndex = incomeEntities.size,
+                    listIndex = list.size,
+                    subCategories = mutableListOf(),
                 )
-                incomeEntities.add(CategoryWithChildren(
-                    parent = entity,
-                    children = mutableListOf(),
-                ))
-            }
-            expenseName -> {
-                entity = CategoryEntity(
-                    name = id,
-                    topCategory = parentCategory,
-                    color = randomColor().toArgb(),
-                    listIndex = expenseEntities.size,
-                )
-                expenseEntities.add(CategoryWithChildren(
-                    parent = entity,
-                    children = mutableListOf(),
-                ))
+                list.add(entity)
             }
             else -> {
-                val parent = (incomeEntities + expenseEntities).find { it.parent.name == parentCategory } ?: return false
+                val parentName = getCategoryShortName(parentCategory)
+                val parent = (incomeEntities + expenseEntities).find { it.name == parentName } ?: return false
+                if (parent.subCategories.any { it.name == newCategory }) return false
                 entity = CategoryEntity(
-                    name = id,
-                    topCategory = null,
+                    name = newCategory,
+                    topCategory = "",
                     color = randomColor().toArgb(),
-                    listIndex = parent.children.size,
+                    listIndex = parent.subCategories.size,
+                    subCategories = mutableListOf(),
                 )
-                parent.children.add(entity)
+                parent.subCategories.add(entity)
             }
         }
         scope.launch(Dispatchers.IO) {
@@ -71,5 +57,10 @@ class CategoryData(private val scope: CoroutineScope) {
             }
         }
         return true
+    }
+
+
+    fun rename(currentCategory: String, newName: String): Boolean {
+        return false
     }
 }

@@ -2,21 +2,28 @@ package com.example.librasheet.data.database
 
 import androidx.annotation.NonNull
 import androidx.room.*
+import com.example.librasheet.viewModel.dataClasses.Category
 
 const val category_table = "categories"
 
 /**
  * @param name is the full category path
- * @param topCategory Can be [incomeName] or [expenseName] for top-level categories, or null for
+ * @param topCategory Can be [incomeName] or [expenseName] for top-level categories, or "" for
  * sub-categories. This enables an easy search for top-level categories.
  */
 @Entity(tableName = category_table)
 data class CategoryEntity (
-    @PrimaryKey @NonNull val name: String,
-    val topCategory: String?,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @NonNull val name: String,
+    @NonNull val topCategory: String,
     val color: Int,
     val listIndex: Int,
-)
+    @Ignore val subCategories: MutableList<CategoryEntity>,
+) {
+    fun contains(id: Int): Boolean {
+        return id == id || subCategories.any { it.id == id }
+    }
+}
 
 @Entity(primaryKeys = ["parentId", "childId"])
 data class CategoryHierarchy(
@@ -33,7 +40,5 @@ data class CategoryWithChildren(
     )
     val children: MutableList<CategoryEntity>
 ) {
-    fun contains(id: String): Boolean {
-        return parent.name == id || children.any { it.name == id }
-    }
+    fun toNestedCategory() = parent.copy(subCategories = children)
 }

@@ -26,7 +26,7 @@ fun getCategoryShortName(id: String) = id.substringAfterLast(pathSeparator)
 fun getCategoryFullDisplay(id: String) = id.replace(pathSeparator, displaySeparator)
 
 @Stable
-fun joinCategoryPath(parent: String, child: String) = "$parent$pathSeparator$child"
+fun joinCategoryPath(parent: String, child: String) = if (parent.isNotEmpty()) "$parent$pathSeparator$child" else child
 
 @Stable
 fun isSuperCategory(path: String) = !path.contains(pathSeparator)
@@ -48,9 +48,12 @@ data class Category(
 }
 
 
-fun CategoryEntity.toCategory() = Category(
-    id = name,
-    color = Color(color),
-    amount = 0,
-    subCategories = emptyList(),
-)
+fun CategoryEntity.toCategory(parent: String = ""): Category {
+    val fullName = joinCategoryPath(parent.ifEmpty { topCategory }, name)
+    return Category(
+        id = fullName,
+        color = Color(color),
+        amount = 0,
+        subCategories = subCategories.map { it.toCategory(fullName) }
+    )
+}
