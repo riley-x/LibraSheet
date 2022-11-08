@@ -23,7 +23,6 @@ import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LibraApp(
     viewModel: LibraViewModel = viewModel(),
@@ -65,6 +64,7 @@ fun LibraApp(
     }
 
     /** Dialogs **/
+    var dialogShowError by remember { mutableStateOf(false) } // this is reused across all dialogs
     var openAddAccountDialog by remember { mutableStateOf(false) }
     var changeAccountNameOld by remember { mutableStateOf("") }
     var openAddCategoryDialog by remember { mutableStateOf("") }
@@ -85,16 +85,22 @@ fun LibraApp(
     }
     fun onAddCategory(parent: String) { openAddCategoryDialog = parent }
     fun addCategory(newCategory: String) {
-        openAddCategoryDialog = ""
-        if (newCategory.isNotBlank()) {
-            // TODO
+        if (newCategory.isNotBlank() && !viewModel.categories.add(
+                parentCategory = openAddCategoryDialog,
+                newCategory = newCategory
+            )) {
+            dialogShowError = true
+        } else {
+            openAddCategoryDialog = ""
+            dialogShowError = false
         }
     }
     fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.id }
     fun changeCategoryName(newName: String) {
-        if (newName.isNotBlank()) {
-            // TODO
-        }
+        if (newName.isNotBlank()) viewModel.categories.rename(
+            currentCategory = changeCategoryNameOld,
+            newName = newName
+        )
         changeCategoryNameOld = ""
     }
 

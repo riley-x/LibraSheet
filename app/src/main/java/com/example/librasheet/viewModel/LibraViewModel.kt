@@ -1,10 +1,17 @@
 package com.example.librasheet.viewModel
 
+import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.librasheet.LibraApplication
 
 class LibraViewModel(private val application: LibraApplication) : ViewModel() {
+    val categories = CategoryModel(this)
+
+    suspend fun startup() {
+
+    }
+
 }
 
 /**
@@ -21,3 +28,9 @@ class LibraViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+/**
+ * This method is a callback called from compose code
+ */
+@MainThread
+annotation class Callback
