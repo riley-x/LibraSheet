@@ -4,9 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.database.CategoryEntity
-import com.example.librasheet.viewModel.dataClasses.Category
-import com.example.librasheet.viewModel.dataClasses.categoryPathSeparator
-import com.example.librasheet.viewModel.dataClasses.toCategory
+import com.example.librasheet.viewModel.dataClasses.*
 
 
 class CategoryModel(private val parent: LibraViewModel) {
@@ -17,6 +15,8 @@ class CategoryModel(private val parent: LibraViewModel) {
      */
     val income = mutableStateListOf<Category>()
     val expense = mutableStateListOf<Category>()
+
+    val moveTargets = mutableStateListOf<String>()
 
     suspend fun loadData() {
         // TODO
@@ -49,6 +49,18 @@ class CategoryModel(private val parent: LibraViewModel) {
             return true
         }
         return false
+    }
+
+    @Callback
+    fun setMoveOptions(currentCategory: String) {
+        val superName = getSuperCategory(currentCategory)
+        moveTargets.clear()
+        moveTargets.add(superName)
+        when (superName) {
+            incomeName -> income
+            expenseName -> expense
+            else -> throw RuntimeException("CategoryModel::move bad category $currentCategory")
+        }.filter { it.id != currentCategory }.mapTo(moveTargets) { it.name }
     }
 
     @Callback

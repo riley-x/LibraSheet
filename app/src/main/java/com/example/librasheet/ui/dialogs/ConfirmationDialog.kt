@@ -14,23 +14,11 @@ fun ConfirmationDialog(
     modifier: Modifier = Modifier,
     onDismiss: (confirmed: Boolean) -> Unit = { },
 ) {
-    AlertDialog(
-        onDismissRequest = { onDismiss(false) },
-        // don't use the title argument, it really messes with the layouts
-        text = {
-            Text(
-                text = text,
-                color = MaterialTheme.colors.onSurface,
-                modifier = Modifier.padding(bottom = 6.dp)
-            )
-        },
-        buttons = {
-            ConfirmationButtons(
-                onCancel = { onDismiss(false) },
-                onOk = { onDismiss(true) },
-            )
-        },
+    Dialog(
+        title = text,
         modifier = modifier,
+        onOk = { onDismiss(true) },
+        onCancel = { onDismiss(false) },
     )
 }
 

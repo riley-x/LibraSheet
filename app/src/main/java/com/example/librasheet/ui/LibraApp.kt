@@ -18,6 +18,7 @@ import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.categories.CategoriesScreen
+import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
@@ -113,7 +114,10 @@ fun LibraApp(
     }
 
     var moveCategoryName by remember { mutableStateOf("") }
-    fun onMoveCategory(category: Category) { moveCategoryName = category.id }
+    fun onMoveCategory(category: Category) {
+        viewModel.categories.setMoveOptions(category.id)
+        moveCategoryName = category.id
+    }
     fun moveCategory(newParent: String) {
         if (newParent.isNotBlank() && !viewModel.categories.move(
                 currentCategory = moveCategoryName,
@@ -245,7 +249,7 @@ fun LibraApp(
                         onChangeName = ::onChangeCategoryName,
                         onChangeColor = ::toSettingsColorSelector,
                         onAddCategory = ::onAddCategory,
-                        onMoveCategory = { },
+                        onMoveCategory = ::onMoveCategory,
                         onDelete = { },
                     )
                 }
@@ -289,6 +293,15 @@ fun LibraApp(
                 error = dialogShowError,
                 errorMessage = "Error: category exists already",
                 onDismiss = ::changeCategoryName
+            )
+        }
+        if (moveCategoryName.isNotEmpty()) {
+            SelectorDialog(
+                options = viewModel.categories.moveTargets,
+                title = "Move " + getCategoryFullDisplay(changeCategoryNameOld),
+                error = dialogShowError,
+                errorMessage = "Error: category exists already",
+                onDismiss = ::moveCategory
             )
         }
     }

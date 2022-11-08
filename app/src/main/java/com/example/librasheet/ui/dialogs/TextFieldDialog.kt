@@ -26,48 +26,33 @@ fun TextFieldDialog(
 ) {
     var text by remember { mutableStateOf(initialText) }
 
-    AlertDialog(
-        onDismissRequest = { onDismiss("") },
-        // don't use the title argument, it really messes with the layouts
-        text = {
-            Column {
-                Text(
-                    text = title,
-                    color = MaterialTheme.colors.onSurface,
-                )
-                OutlinedTextField(
-                    value = text,
-                    textStyle = MaterialTheme.typography.h5,
-                    onValueChange = { text = it },
-                    placeholder = {
-                        Box(
-                            contentAlignment = Alignment.CenterStart,
-                            modifier = Modifier.fillMaxHeight()
-                        ) {
-                            Text(placeholder)
-                        }
-                    },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        textColor = MaterialTheme.colors.onSurface,
-                    ),
-                    modifier = Modifier.padding(vertical = 6.dp).height(60.dp)
-                )
-                Text(
-                    text = if (error) errorMessage else "",
-                    color = MaterialTheme.colors.error,
-                )
-            }
-        },
-        buttons = {
-            ConfirmationButtons(
-                cancelText = cancelText,
-                okText = okText,
-                onCancel = { onDismiss("") },
-                onOk = { onDismiss(text) },
-            )
-        },
+    Dialog(
+        title = title,
+        okText = okText,
+        cancelText = cancelText,
+        error = error,
+        errorMessage = errorMessage,
+        onCancel = { onDismiss("") },
+        onOk = { onDismiss(text) },
         modifier = modifier,
-    )
+    ) {
+        OutlinedTextField(
+            value = text,
+            textStyle = MaterialTheme.typography.h5,
+            onValueChange = { text = it },
+            placeholder = {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    Text(placeholder)
+                }
+            },
+            modifier = Modifier
+                .padding(vertical = 6.dp)
+                .height(60.dp)
+        )
+    }
 }
 
 @Preview

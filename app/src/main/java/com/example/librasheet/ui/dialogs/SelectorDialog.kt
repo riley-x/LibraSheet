@@ -15,7 +15,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 fun SelectorDialog(
     options: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
-    initialSelection: String = options[0],
+    initialSelection: String = "",
     title: String = "",
     errorMessage: String = "",
     error: Boolean = false,
@@ -25,37 +25,23 @@ fun SelectorDialog(
 ) {
     var currentSelection by remember { mutableStateOf(initialSelection) }
 
-    AlertDialog(
-        onDismissRequest = { onDismiss("") },
-        // don't use the title argument, it really messes with the layouts
-        text = {
-            Column {
-                Text(
-                    text = title,
-                    color = MaterialTheme.colors.onSurface,
-                )
-                DropdownSelector(
-                    currentValue = currentSelection,
-                    allValues = options,
-                    onSelection = { currentSelection = it },
-                    modifier = Modifier.padding(bottom = 6.dp)
-                )
-                Text(
-                    text = if (error) errorMessage else "",
-                    color = MaterialTheme.colors.error,
-                )
-            }
-        },
-        buttons = {
-            ConfirmationButtons(
-                cancelText = cancelText,
-                okText = okText,
-                onCancel = { onDismiss("") },
-                onOk = { onDismiss(currentSelection) },
-            )
-        },
+    Dialog(
+        title = title,
+        okText = okText,
+        cancelText = cancelText,
+        error = error,
+        errorMessage = errorMessage,
+        onCancel = { onDismiss("") },
+        onOk = { onDismiss(currentSelection) },
         modifier = modifier,
-    )
+    ) {
+        DropdownSelector(
+            currentValue = currentSelection,
+            allValues = options,
+            onSelection = { currentSelection = it },
+            modifier = Modifier.padding(bottom = 6.dp)
+        )
+    }
 }
 
 
