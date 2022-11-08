@@ -20,6 +20,9 @@ import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.categories.CategoriesScreen
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.viewModel.dataClasses.Account
+import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.dataClasses.getCategoryParent
+import com.example.librasheet.viewModel.dataClasses.getCategoryShortName
 import com.example.librasheet.viewModel.preview.*
 
 
@@ -67,24 +70,27 @@ fun LibraApp(
     /** Dialogs **/
     var openAddAccountDialog by remember { mutableStateOf(false) }
     var changeAccountNameOld by remember { mutableStateOf("") }
-    fun onAddAccountClick() {
-        openAddAccountDialog = true
-    }
-    fun onChangeAccountName(account: String) {
-        // TODO view model current edit
-        changeAccountNameOld = account
-    }
+    var changeCategoryNameOld by remember { mutableStateOf("") }
+    fun onAddAccountClick() { openAddAccountDialog = true }
     fun onAddAccount(account: String) {
         openAddAccountDialog = false
         if (account.isNotBlank()) {
             // TODO
         }
     }
+    fun onChangeAccountName(account: String) { changeAccountNameOld = account }
     fun changeAccountName(newName: String) {
         if (newName.isNotBlank()) {
             // TODO
         }
         changeAccountNameOld = ""
+    }
+    fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.fullName }
+    fun changeCategoryName(newName: String) {
+        if (newName.isNotBlank()) {
+            // TODO
+        }
+        changeCategoryNameOld = ""
     }
 
     /** Main Layout Scaffold **/
@@ -203,11 +209,10 @@ fun LibraApp(
                         incomeCategories = previewIncomeCategories,
                         expenseCategories = previewExpenseCategories,
                         onBack = navController::popBackStack,
-//                        onCategoryClick = { },
-                        onChangeName = { },
+                        onChangeName = ::onChangeCategoryName,
                         onChangeColor = ::toSettingsColorSelector,
-                        onAddSubCategory = { },
-                        onMoveSubCategory = { },
+                        onAddCategory = { },
+                        onMoveCategory = { },
                         onDelete = { },
                     )
                 }
@@ -228,6 +233,14 @@ fun LibraApp(
                 initialText = changeAccountNameOld,
                 placeholder = "Account name",
                 onDismiss = ::changeAccountName
+            )
+        }
+        if (changeCategoryNameOld.isNotEmpty()) {
+            TextFieldDialog(
+                title = getCategoryParent(changeCategoryNameOld),
+                initialText = getCategoryShortName(changeCategoryNameOld),
+                placeholder = "Category name",
+                onDismiss = ::changeCategoryName
             )
         }
     }

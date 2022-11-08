@@ -21,8 +21,8 @@ fun CategorySubRow(
     last: Boolean,
     modifier: Modifier = Modifier,
     dragIndex: Int = -1,
-    dragGroup: Int = 0,
-    onDragEnd: (groupId: Int, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
+    dragGroup: String = "",
+    onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     dividerColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     colorRowModifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit = { },
@@ -37,7 +37,7 @@ fun CategorySubRow(
         )
         DragToReorderTarget(
             index = dragIndex,
-            groupId = dragGroup,
+            group = dragGroup,
             enabled = dragIndex != -1,
             onDragEnd = onDragEnd,
         ) { dragScope, _  ->

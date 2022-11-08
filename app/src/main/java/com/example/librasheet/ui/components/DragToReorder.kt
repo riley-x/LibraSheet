@@ -57,7 +57,7 @@ import kotlin.math.roundToInt
  */
 class DragScope {
     /** Identifiers **/
-    var groupId by mutableStateOf(-1)
+    var groupId by mutableStateOf("")
     var index by mutableStateOf(-1)
     /** Composition **/
     var content by mutableStateOf<(@Composable (DragScope, Any?) -> Unit)?>(null)
@@ -70,7 +70,7 @@ class DragScope {
 
     fun reset() {
         /** Identifiers **/
-        groupId = -1
+        groupId = ""
         index = -1
         /** Composition **/
         content = null
@@ -82,7 +82,7 @@ class DragScope {
         affectedIndices.clear()
     }
 
-    fun isTarget(groupId: Int, index: Int) = groupId == this.groupId && index == this.index
+    fun isTarget(groupId: String, index: Int) = groupId == this.groupId && index == this.index
 
     @Composable
     fun PlaceContent() {
@@ -105,7 +105,7 @@ val LocalDragScope = compositionLocalOf { DragScope() }
  *
  * @param index Should uniquely identify the target in its group (usually the list index). It should
  * always be non-negative.
- * @param groupId Should uniquely identify the group this target belongs in. Targets can only be
+ * @param group Should uniquely identify the group this target belongs in. Targets can only be
  * reordered within the same group.
  * @param contentState Should include all state information necessary to reproduce [content].
  * [DragHost] will use this state when drawing the hovering dragged item.
@@ -115,11 +115,11 @@ val LocalDragScope = compositionLocalOf { DragScope() }
 @Composable
 fun DragToReorderTarget(
     index: Int,
-    groupId: Int,
+    group: String,
     modifier: Modifier = Modifier,
     contentState: Any? = null,
     enabled: Boolean = true,
-    onDragEnd: (groupId: Int, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
+    onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     content: @Composable (DragScope, Any?) -> Unit = { _, _ -> },
 ) {
     if (!enabled || index < 0) {
@@ -138,7 +138,7 @@ fun DragToReorderTarget(
          * be drawn by the [DragHost] at highest z-order.
          */
         fun getOffset() =
-            if (groupId != dragScope.groupId) 0
+            if (group != dragScope.groupId) 0
             else if (index > dragScope.index) {
                 val targetY = originalPos.y - dragScope.contentSize.height
                 val thresholdY = targetY + size.height - minOf(size.height, dragScope.contentSize.height) / 2f
@@ -155,7 +155,7 @@ fun DragToReorderTarget(
         val targetOffset by remember { derivedStateOf { getOffset() } }
         val offset = animateIntAsState(targetValue = targetOffset).value
 
-        if (groupId == dragScope.groupId) {
+        if (group == dragScope.groupId) {
             LaunchedEffect(targetOffset) {
                 if (targetOffset != 0) dragScope.affectedIndices.add(index)
                 else dragScope.affectedIndices.remove(index)
@@ -163,7 +163,7 @@ fun DragToReorderTarget(
         }
 
         val alpha by remember { derivedStateOf {
-            if (dragScope.isTarget(groupId, index)) 0f else 1f
+            if (dragScope.isTarget(group, index)) 0f else 1f
         } }
 
         Box(modifier = modifier
@@ -190,9 +190,9 @@ fun DragToReorderTarget(
                          * So need to check that we're in the right drag.
                          */
                         if (dragScope.index == -1) {
-                            Log.d("Libra/DragToReorder", "drag start: $groupId $index")
+                            Log.d("Libra/DragToReorder", "drag start: $group $index")
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            dragScope.groupId = groupId
+                            dragScope.groupId = group
                             dragScope.index = index
                             dragScope.contentSize = size
                             dragScope.originalPos = originalPos
@@ -205,13 +205,13 @@ fun DragToReorderTarget(
                         val endIndex = if (dragScope.affectedIndices.isEmpty()) index
                             else if (dragScope.affectedIndices.first() < index) dragScope.affectedIndices.min()
                             else dragScope.affectedIndices.max()
-                        Log.d("Libra/DragToReorder", "drag end: $groupId $index $endIndex")
+                        Log.d("Libra/DragToReorder", "drag end: $group $index $endIndex")
                         dragScope.reset()
-                        onDragEnd(groupId, index, endIndex)
+                        onDragEnd(group, index, endIndex)
                     },
                     onDragCancel = {
-                        Log.d("Libra/DragToReorder", "drag cancel: $groupId $index")
-                        if (dragScope.isTarget(groupId, index)) dragScope.reset()
+                        Log.d("Libra/DragToReorder", "drag cancel: $group $index")
+                        if (dragScope.isTarget(group, index)) dragScope.reset()
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
