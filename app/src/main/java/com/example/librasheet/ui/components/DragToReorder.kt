@@ -41,12 +41,8 @@ import kotlin.math.roundToInt
  * The [DragHost] is the parent that owns the drag, and provides its children with a local scope.
  * All composables that should go below (in the z direction) a current dragged item need to be
  * contained inside the host. When an element is dragged, the [DragHost] simply turns the original
- * to 0 alpha and draws a new copy on top.
- *
- * If the drawn element has state, the copy will need to have the same state. The state of each target
- * should be hoisted and passed to [DragToReorderTarget].
- *
- * Maybe not true: Note that in the emitted lambda you should use the passed parameter and not external state?
+ * to 0 alpha and draws a new copy on top. If the drawn element has state, the copy will need to
+ * have the same state. The state of each target should be hoisted and passed to [DragToReorderTarget].
  *
  * See also https://blog.canopas.com/android-drag-and-drop-ui-element-in-jetpack-compose-14922073b3f1
  */

@@ -58,21 +58,20 @@ fun CategoriesScreen(
     Column(modifier) {
         HeaderBar(title = "Categories", backArrow = true, onBack = onBack, modifier = Modifier.zIndex(10f))
 
-        val expanded = remember { mutableStateMapOf<Pair<Int, Int>, Boolean>() }
         DragHost {
             val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
             fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, groupId: Int) {
                 itemsIndexed(list) { index, category ->
+                    var expanded by remember { mutableStateOf(false) }
                     DragToReorderTarget(
                         index = index,
                         groupId = groupId,
-                        contentState = expanded.getOrDefault(Pair(groupId, index), false),
-                    ) { scope, state ->
-                        val expandState = state as? Boolean ?: false
+                        contentState = expanded,
+                    ) { scope, _ ->
                         CategoryRow(
                             category = category,
-                            expanded = expandState,
-                            onExpand = { expanded[Pair(groupId, index)] = !expandState },
+                            expanded = expanded,
+                            onExpand = { expanded = !expanded },
                             modifier = Modifier.rowDivider(enabled = index > 0 && !scope.isTarget(groupId, index), color = dividerColor),
                             content = { category ->
                                 Spacer(modifier = Modifier.weight(10f))
