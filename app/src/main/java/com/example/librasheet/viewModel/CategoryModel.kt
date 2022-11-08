@@ -50,5 +50,10 @@ class CategoryModel(private val parent: LibraViewModel) {
         }
         return false
     }
+
+    @Callback
+    fun move(currentCategory: String, newParent: String): Boolean {
+        return false
+    }
 }
 

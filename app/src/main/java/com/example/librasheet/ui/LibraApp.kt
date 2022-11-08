@@ -65,10 +65,8 @@ fun LibraApp(
 
     /** Dialogs **/
     var dialogShowError by remember { mutableStateOf(false) } // this is reused across all dialogs
+
     var openAddAccountDialog by remember { mutableStateOf(false) }
-    var changeAccountNameOld by remember { mutableStateOf("") }
-    var openAddCategoryDialog by remember { mutableStateOf("") }
-    var changeCategoryNameOld by remember { mutableStateOf("") }
     fun onAddAccount() { openAddAccountDialog = true }
     fun addAccount(account: String) {
         openAddAccountDialog = false
@@ -76,6 +74,8 @@ fun LibraApp(
             // TODO
         }
     }
+
+    var changeAccountNameOld by remember { mutableStateOf("") }
     fun onChangeAccountName(account: String) { changeAccountNameOld = account }
     fun changeAccountName(newName: String) {
         if (newName.isNotBlank()) {
@@ -83,6 +83,8 @@ fun LibraApp(
         }
         changeAccountNameOld = ""
     }
+
+    var openAddCategoryDialog by remember { mutableStateOf("") }
     fun onAddCategory(parent: String) { openAddCategoryDialog = parent }
     fun addCategory(newCategory: String) {
         if (newCategory.isNotBlank() && !viewModel.categories.add(
@@ -95,6 +97,8 @@ fun LibraApp(
             dialogShowError = false
         }
     }
+
+    var changeCategoryNameOld by remember { mutableStateOf("") }
     fun onChangeCategoryName(category: Category) { changeCategoryNameOld = category.id }
     fun changeCategoryName(newName: String) {
         if (newName.isNotBlank() && !viewModel.categories.rename(
@@ -104,6 +108,20 @@ fun LibraApp(
             dialogShowError = true
         } else {
             changeCategoryNameOld = ""
+            dialogShowError = false
+        }
+    }
+
+    var moveCategoryName by remember { mutableStateOf("") }
+    fun onMoveCategory(category: Category) { moveCategoryName = category.id }
+    fun moveCategory(newParent: String) {
+        if (newParent.isNotBlank() && !viewModel.categories.move(
+                currentCategory = moveCategoryName,
+                newParent = newParent
+            )) {
+            dialogShowError = true
+        } else {
+            moveCategoryName = ""
             dialogShowError = false
         }
     }
