@@ -40,7 +40,7 @@ fun CategorySubRow(
             group = dragGroup,
             enabled = dragIndex != -1,
             onDragEnd = onDragEnd,
-        ) { dragScope, _  ->
+        ) { dragScope ->
             ColorCodedRow(
                 color = category.color,
                 horizontalPadding = 0.dp,

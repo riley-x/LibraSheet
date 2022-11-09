@@ -77,9 +77,8 @@ fun CategoriesScreen(
                     DragToReorderTarget(
                         index = index,
                         group = group,
-                        contentState = false,
                         onDragEnd = onReorder,
-                    ) { dragScope, _ ->
+                    ) { dragScope ->
                         CategoryRow(
                             category = category,
                             expanded = expanded.getOrDefault(category.id.fullName, false),

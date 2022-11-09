@@ -60,8 +60,7 @@ class DragScope {
     var groupId by mutableStateOf("")
     var index by mutableStateOf(-1)
     /** Composition **/
-    var content by mutableStateOf<(@Composable (DragScope, Any?) -> Unit)?>(null)
-    var contentState by mutableStateOf<Any?>(null)
+    var content by mutableStateOf<(@Composable (DragScope) -> Unit)?>(null)
     var contentSize by mutableStateOf(IntSize.Zero)
     var originalPos by mutableStateOf(Offset.Zero)
     /** Drag **/
@@ -74,7 +73,6 @@ class DragScope {
         index = -1
         /** Composition **/
         content = null
-        contentState = null
         contentSize = IntSize.Zero
         originalPos = Offset.Zero
         /** Drag **/
@@ -87,7 +85,7 @@ class DragScope {
 
     @Composable
     fun PlaceContent() {
-        content?.invoke(this, contentState)
+        content?.invoke(this)
     }
 }
 
@@ -108,8 +106,6 @@ val LocalDragScope = compositionLocalOf { DragScope() }
  * always be non-negative.
  * @param group Should uniquely identify the group this target belongs in. Targets can only be
  * reordered within the same group.
- * @param contentState Should include all state information necessary to reproduce [content].
- * [DragHost] will use this state when drawing the hovering dragged item.
  * @param onDragEnd Returns the current dragged element id and the final index it was dropped at.
  * Note that this callback will only be triggered once, by the dragged element.
  */
@@ -118,13 +114,12 @@ fun DragToReorderTarget(
     index: Int,
     group: String,
     modifier: Modifier = Modifier,
-    contentState: Any? = null,
     enabled: Boolean = true,
     onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
-    content: @Composable (DragScope, Any?) -> Unit = { _, _ -> },
+    content: @Composable (DragScope) -> Unit = { },
 ) {
     if (!enabled || index < 0) {
-        content(DragScope(), contentState)
+        content(DragScope())
     } else {
         val haptic = LocalHapticFeedback.current
         val dragScope = LocalDragScope.current
@@ -179,11 +174,11 @@ fun DragToReorderTarget(
                 }
             }
             /** Pay attention to the key. This effectively launches a coroutine which runs the
-             * block. But this means the [contentState] parameter will keep it's value when the
+             * block. But this means the inputs parameter will keep it's value when the
              * coroutine was launched. Setting the key to it makes sure the coroutine is cancelled
              * and relaunched when the state changes.
              **/
-            .pointerInput(contentState) {
+            .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = {
                         /** When there are nested elements that can both be dragged, both will trigger
@@ -198,7 +193,6 @@ fun DragToReorderTarget(
                             dragScope.contentSize = size
                             dragScope.originalPos = originalPos
                             dragScope.content = content
-                            dragScope.contentState = contentState
                             dragScope.offset = 0f
                         }
                     },
@@ -221,7 +215,7 @@ fun DragToReorderTarget(
                 )
             }
         ) {
-            content(dragScope, contentState)
+            content(dragScope)
         }
     }
 }
@@ -231,8 +225,7 @@ fun DragToReorderTarget(
  * All composables that should go below (in the z direction) a current dragged item need to be
  * contained inside the host. When an element is dragged, the [DragToReorderTarget] simply turns the
  * original to 0 alpha. The [DragHost] then draws a new copy on top. If the drawn element has state,
- * the copy will need to have the same state. The state of each target should be hoisted and passed
- * to [DragToReorderTarget].
+ * the copy will need to have the same state, so the state of each target should be hoisted.
  */
 @Composable
 fun DragHost(
