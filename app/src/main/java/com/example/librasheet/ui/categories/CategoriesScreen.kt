@@ -69,6 +69,8 @@ fun CategoriesScreen(
         DragHost {
             val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
             fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, group: String) {
+                // TODO keying the lazy column like key = { _, it -> it.id.fullName } messes up the
+                //  index, which isn't reset since it's inside the composable
                 itemsIndexed(list) { index, category ->
                     var expanded by rememberSaveable { mutableStateOf(false) }
                     DragToReorderTarget(
