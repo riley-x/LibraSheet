@@ -110,7 +110,7 @@ class CategoryData(private val scope: CoroutineScope) {
     }
 
     fun delete(categoryId: CategoryId) {
-        val (_, parentList, index) = find(categoryId) ?: throw RuntimeException("CategoryData::delete couldn't find $categoryId")
+        val (category, parentList, index) = find(categoryId) ?: throw RuntimeException("CategoryData::delete couldn't find $categoryId")
         parentList.removeAt(index)
         val staleList = mutableListOf<CategoryEntity>()
         for (i in index..parentList.lastIndex) {
@@ -119,7 +119,8 @@ class CategoryData(private val scope: CoroutineScope) {
         }
         scope.launch(Dispatchers.IO) {
             // TODO delete transaction crossrefs
-            // TODO delete
+            // TODO delete category
+            // TODO delete subCategories
             // TODO update staleList
         }
     }
