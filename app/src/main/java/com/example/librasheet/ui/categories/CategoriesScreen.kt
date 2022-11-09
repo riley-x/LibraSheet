@@ -46,12 +46,12 @@ fun CategoriesScreen(
     onAddCategory: (CategoryId) -> Unit = { },
     onMoveCategory: (Category) -> Unit = { },
     onDelete: (Category) -> Unit = { },
-    onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
+    onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
     fun onOptionSelect(category: Category, categoryOption: CategoryOption) {
         when (categoryOption) {
             CategoryOption.RENAME -> onChangeName(category)
-            CategoryOption.COLOR -> onChangeColor("category_${category.id}")
+            CategoryOption.COLOR -> onChangeColor("category_" + category.id.fullName)
             CategoryOption.ADD -> onAddCategory(category.id)
             CategoryOption.MOVE -> onMoveCategory(category)
             CategoryOption.DELETE -> onDelete(category)
@@ -75,7 +75,7 @@ fun CategoriesScreen(
                         index = index,
                         group = group,
                         contentState = expanded,
-                        onDragEnd = onDragEnd,
+                        onDragEnd = onReorder,
                     ) { dragScope, _ ->
                         CategoryRow(
                             category = category,
@@ -95,7 +95,7 @@ fun CategoriesScreen(
                                 last = subIndex == category.subCategories.lastIndex,
                                 dragIndex = subIndex,
                                 dragGroup = category.id.fullName,
-                                onDragEnd = onDragEnd,
+                                onDragEnd = onReorder,
                             ) {
                                 Spacer(modifier = Modifier.weight(10f))
                                 DropdownOptions(options = subCategoryOptions) {

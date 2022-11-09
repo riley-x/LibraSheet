@@ -18,6 +18,7 @@ import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.categories.CategoriesScreen
+import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.viewModel.dataClasses.*
@@ -91,7 +92,6 @@ fun LibraApp(
         if (dialogErrorMessage.isEmpty()) key.value = CategoryId()
     }
 
-
     val openAddCategoryDialog = remember { mutableStateOf(CategoryId()) }
     fun onAddCategory(parent: CategoryId) { openAddCategoryDialog.value = parent }
     fun addCategory(newCategory: String) = dialogCallback(openAddCategoryDialog, newCategory) {
@@ -120,6 +120,13 @@ fun LibraApp(
             currentCategory = it,
             newParent = newParent.toCategoryId()
         )
+    }
+
+    var deleteCategoryId by remember { mutableStateOf(CategoryId()) }
+    fun onDeleteCategory(category: Category) { deleteCategoryId = category.id }
+    fun deleteCategory(confirm: Boolean) {
+        if (confirm) viewModel.categories.delete(categoryId = deleteCategoryId)
+        deleteCategoryId = CategoryId()
     }
 
     /** Main Layout Scaffold **/
@@ -242,7 +249,8 @@ fun LibraApp(
                         onChangeColor = ::toSettingsColorSelector,
                         onAddCategory = ::onAddCategory,
                         onMoveCategory = ::onMoveCategory,
-                        onDelete = { },
+                        onDelete = ::onDeleteCategory,
+                        onReorder = { _, _, _ -> },
                     )
                 }
                 colorSelector()
@@ -290,6 +298,12 @@ fun LibraApp(
                 title = "Move " + moveCategoryName.value.fullDisplayName,
                 errorMessage = dialogErrorMessage,
                 onDismiss = ::moveCategory
+            )
+        }
+        if (deleteCategoryId.isValid) {
+            ConfirmationDialog(
+                text = "Delete category " + deleteCategoryId.fullDisplayName + "?",
+                onDismiss = ::deleteCategory,
             )
         }
     }

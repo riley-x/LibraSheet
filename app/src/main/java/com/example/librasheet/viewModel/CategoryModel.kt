@@ -69,5 +69,12 @@ class CategoryModel(private val parent: LibraViewModel) {
         loadUi()
         return ""
     }
+
+    @Callback
+    fun delete(categoryId: CategoryId) {
+        // TODO delete transaction crossrefs
+        data.delete(categoryId)
+        loadUi()
+    }
 }
 
