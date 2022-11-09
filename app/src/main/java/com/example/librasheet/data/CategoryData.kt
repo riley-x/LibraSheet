@@ -16,7 +16,7 @@ class CategoryData(private val scope: CoroutineScope) {
         // TODO. Make sure things are ordered correctly...
     }
 
-    fun find(category: CategoryId): Triple<CategoryEntity, MutableList<CategoryEntity>, Int>? {
+    fun findNull(category: CategoryId): Triple<CategoryEntity, MutableList<CategoryEntity>, Int>? {
         val list = when (category.superName) {
             incomeName -> incomeEntities
             expenseName -> expenseEntities
@@ -35,6 +35,8 @@ class CategoryData(private val scope: CoroutineScope) {
         return null
     }
 
+    fun find(category: CategoryId) = findNull(category) ?: throw RuntimeException("CategoryData::find couldn't find $category")
+
     fun add(parentCategory: CategoryId, newCategory: String): Boolean {
         val entity: CategoryEntity
         if (parentCategory.isSuper) {
@@ -49,7 +51,7 @@ class CategoryData(private val scope: CoroutineScope) {
             )
             list.add(entity)
         } else {
-            val (parent, _) = find(parentCategory) ?: throw RuntimeException("CategoryData::add couldn't find $parentCategory")
+            val (parent, _) = find(parentCategory)
             if (parent.subCategories.any { it.name == newCategory }) return false
             entity = CategoryEntity(
                 name = newCategory,
@@ -71,7 +73,7 @@ class CategoryData(private val scope: CoroutineScope) {
 
 
     fun rename(currentCategory: CategoryId, newName: String): Boolean {
-        val (current, parentList, index) = find(currentCategory) ?: throw RuntimeException("CategoryData::rename couldn't find $currentCategory")
+        val (current, parentList, index) = find(currentCategory)
         if (parentList.any { it.name == newName }) return false
         val newCurrent = current.copy(name = newName)
         parentList[index] = newCurrent
@@ -82,7 +84,7 @@ class CategoryData(private val scope: CoroutineScope) {
     }
 
     fun move(currentCategory: CategoryId, newParent: CategoryId): String {
-        val (current, oldParentList, index) = find(currentCategory) ?: throw RuntimeException("CategoryData::move couldn't find $currentCategory")
+        val (current, oldParentList, index) = find(currentCategory)
         if (currentCategory.isTop && newParent.isTop && current.subCategories.isNotEmpty())
             return "Error: can't move category with subcategories into another category"
 
@@ -90,7 +92,7 @@ class CategoryData(private val scope: CoroutineScope) {
             incomeName -> incomeEntities
             expenseName -> expenseEntities
             else -> {
-                val (parent, _) = find(newParent) ?: throw RuntimeException("CategoryData::move couldn't find $newParent")
+                val (parent, _) = find(newParent)
                 parent.subCategories
             }
         }
@@ -110,7 +112,7 @@ class CategoryData(private val scope: CoroutineScope) {
     }
 
     fun delete(categoryId: CategoryId) {
-        val (category, parentList, index) = find(categoryId) ?: throw RuntimeException("CategoryData::delete couldn't find $categoryId")
+        val (category, parentList, index) = find(categoryId)
         parentList.removeAt(index)
         val staleList = mutableListOf<CategoryEntity>()
         for (i in index..parentList.lastIndex) {
@@ -121,6 +123,28 @@ class CategoryData(private val scope: CoroutineScope) {
             // TODO delete transaction crossrefs
             // TODO delete category
             // TODO delete subCategories
+            // TODO update staleList
+        }
+    }
+
+    fun reorder(parentId: CategoryId, startIndex: Int, endIndex: Int) {
+        val list = if (parentId.isSuper) {
+            if (parentId.name == incomeName) incomeEntities else expenseEntities
+        } else {
+            val (parent, _, _) = find(parentId)
+            parent.subCategories
+        }
+
+        val category = list.removeAt(startIndex)
+        list.add(endIndex, category)
+
+        val staleEntities = mutableListOf<CategoryEntity>()
+        for (i in rangeBetween(startIndex, endIndex)) {
+            list[i] = list[i].copy(listIndex = i)
+            staleEntities.add(list[i])
+        }
+
+        scope.launch(Dispatchers.IO) {
             // TODO update staleList
         }
     }

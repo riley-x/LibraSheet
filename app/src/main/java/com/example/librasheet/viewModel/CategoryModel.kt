@@ -76,5 +76,12 @@ class CategoryModel(private val parent: LibraViewModel) {
         data.delete(categoryId)
         loadUi()
     }
+
+    @Callback
+    fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
+        if (startIndex == endIndex) return
+        data.reorder(parentId.toCategoryId(), startIndex, endIndex)
+        loadUi()
+    }
 }
 

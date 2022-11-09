@@ -250,7 +250,7 @@ fun LibraApp(
                         onAddCategory = ::onAddCategory,
                         onMoveCategory = ::onMoveCategory,
                         onDelete = ::onDeleteCategory,
-                        onReorder = { _, _, _ -> },
+                        onReorder = viewModel.categories::reorder,
                     )
                 }
                 colorSelector()

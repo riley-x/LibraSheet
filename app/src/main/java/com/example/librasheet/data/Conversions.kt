@@ -14,3 +14,5 @@ fun Float.toLongDollar() : Long {
 fun Long.toFloatDollar() : Float {
     return (this / 10000f)
 }
+
+fun rangeBetween(a: Int, b: Int) = if (a < b) IntRange(a, b) else IntRange(b, a)

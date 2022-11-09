@@ -83,6 +83,7 @@ class DragScope {
     }
 
     fun isTarget(groupId: String, index: Int) = groupId == this.groupId && index == this.index
+    fun isActive() = index != -1
 
     @Composable
     fun PlaceContent() {
@@ -153,7 +154,7 @@ fun DragToReorderTarget(
             else 0
 
         val targetOffset by remember { derivedStateOf { getOffset() } }
-        val offset = animateIntAsState(targetValue = targetOffset).value
+        val offset = if (dragScope.isActive()) animateIntAsState(targetValue = targetOffset).value else targetOffset
 
         if (group == dragScope.groupId) {
             LaunchedEffect(targetOffset) {
@@ -206,8 +207,8 @@ fun DragToReorderTarget(
                             else if (dragScope.affectedIndices.first() < index) dragScope.affectedIndices.min()
                             else dragScope.affectedIndices.max()
                         Log.d("Libra/DragToReorder", "drag end: $group $index $endIndex")
-                        dragScope.reset()
                         onDragEnd(group, index, endIndex)
+                        dragScope.reset()
                     },
                     onDragCancel = {
                         Log.d("Libra/DragToReorder", "drag cancel: $group $index")
