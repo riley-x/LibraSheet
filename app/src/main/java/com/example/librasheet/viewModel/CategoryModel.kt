@@ -1,6 +1,7 @@
 package com.example.librasheet.viewModel
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.database.CategoryEntity
@@ -16,7 +17,13 @@ class CategoryModel(private val parent: LibraViewModel) {
     val income = mutableStateListOf<Category>()
     val expense = mutableStateListOf<Category>()
 
+    /** Options to display when moving a category **/
     val moveTargets = mutableStateListOf<String>()
+
+    /** Expanded state of each row in the edit category screen. This is needed here since lots of bugs
+     * occur if you try to put it inside the LazyColumn::items. Index with the full category name.
+     */
+    val editScreenIsExpanded = mutableStateMapOf<String, Boolean>()
 
     suspend fun loadData() {
         // TODO

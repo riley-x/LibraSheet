@@ -26,7 +26,7 @@ fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
     expanded: Boolean = false,
-    onExpand: () -> Unit = {  },
+    onExpand: (Boolean) -> Unit = {  },
     content: @Composable RowScope.(Category) -> Unit = { },
     subRow: @Composable ColumnScope.(Int, Category) -> Unit = { index, cat ->
         CategorySubRow(
@@ -45,7 +45,7 @@ fun CategoryRow(
             ) {
                 Text(category.name)
                 if (category.subCategories.isNotEmpty()) {
-                    IconButton(onClick = onExpand) {
+                    IconButton(onClick = { onExpand(!expanded) }) {
                         if (expanded) Icon(
                             imageVector = Icons.Sharp.ExpandLess,
                             contentDescription = null

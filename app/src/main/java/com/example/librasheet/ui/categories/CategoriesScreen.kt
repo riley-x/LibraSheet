@@ -13,6 +13,7 @@ import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ private val subCategoryOptions = ImmutableList(categoryOptions.items.filter { it
 fun CategoriesScreen(
     incomeCategories: SnapshotStateList<Category>,
     expenseCategories: SnapshotStateList<Category>,
+    expanded: SnapshotStateMap<String, Boolean>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onChangeName: (Category) -> Unit = { },
@@ -72,17 +74,16 @@ fun CategoriesScreen(
                 // TODO keying the lazy column like key = { _, it -> it.id.fullName } messes up the
                 //  index, which isn't reset since it's inside the composable
                 itemsIndexed(list) { index, category ->
-                    var expanded by rememberSaveable { mutableStateOf(false) }
                     DragToReorderTarget(
                         index = index,
                         group = group,
-                        contentState = expanded,
+                        contentState = false,
                         onDragEnd = onReorder,
                     ) { dragScope, _ ->
                         CategoryRow(
                             category = category,
-                            expanded = expanded,
-                            onExpand = { expanded = !expanded },
+                            expanded = expanded.getOrDefault(category.id.fullName, false),
+                            onExpand = { expanded[category.id.fullName] = it },
                             modifier = Modifier.rowDivider(enabled = index > 0 && !dragScope.isTarget(group, index), color = dividerColor),
                             content = { category ->
                                 Spacer(modifier = Modifier.weight(10f))
@@ -142,6 +143,7 @@ private fun Preview() {
             CategoriesScreen(
                 incomeCategories = previewIncomeCategories,
                 expenseCategories = previewExpenseCategories,
+                expanded = previewExpanded,
             )
         }
     }

@@ -55,8 +55,7 @@ data class CategoryId(
     val subName: String = "",
 ) {
     val name = subName.ifEmpty { topName }.ifEmpty { superName }
-    val fullName: String
-        get() = superName +
+    val fullName = superName +
                 (if (topName.isNotEmpty()) "$categoryPathSeparator$topName" else "") +
                 (if (subName.isNotEmpty()) "$categoryPathSeparator$subName" else "")
     val fullDisplayName: String

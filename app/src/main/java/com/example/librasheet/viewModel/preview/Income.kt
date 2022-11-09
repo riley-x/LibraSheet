@@ -1,6 +1,7 @@
 package com.example.librasheet.viewModel.preview
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.ui.graphing.AxesState
@@ -76,6 +77,12 @@ val previewExpenseCategories = mutableStateListOf(
         amount = 600_00_00,
     ),
 )
+
+
+val previewExpanded = mutableStateMapOf(
+    "Expense_Housing" to true
+)
+
 
 
 val previewNetIncome = mutableStateListOf(

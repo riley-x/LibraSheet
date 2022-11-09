@@ -244,6 +244,7 @@ fun LibraApp(
                     CategoriesScreen(
                         incomeCategories = viewModel.categories.income,
                         expenseCategories = viewModel.categories.expense,
+                        expanded = viewModel.categories.editScreenIsExpanded,
                         onBack = navController::popBackStack,
                         onChangeName = ::onChangeCategoryName,
                         onChangeColor = ::toSettingsColorSelector,
