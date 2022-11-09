@@ -38,6 +38,7 @@ fun TextFieldDialog(
             value = text,
             textStyle = MaterialTheme.typography.h5,
             onValueChange = { text = it },
+            singleLine = true,
             placeholder = {
                 Box(
                     contentAlignment = Alignment.CenterStart,
@@ -47,13 +48,16 @@ fun TextFieldDialog(
                 }
             },
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(vertical = 6.dp)
                 .height(60.dp)
         )
     }
 }
 
-@Preview
+@Preview(
+    widthDp = 360
+)
 @Composable
 private fun Preview() {
     LibraSheetTheme {
@@ -64,7 +68,9 @@ private fun Preview() {
     }
 }
 
-@Preview
+@Preview(
+    widthDp = 360
+)
 @Composable
 private fun PreviewError() {
     LibraSheetTheme {

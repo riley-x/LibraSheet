@@ -69,7 +69,7 @@ private fun PreviewError() {
         SelectorDialog(
             options = options,
             title = "Move To",
-            errorMessage = "Error: category exists in selection already"
+            errorMessage = "Error: category exists in selection already",
         )
     }
 }

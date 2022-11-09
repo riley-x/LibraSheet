@@ -94,9 +94,7 @@ class CategoryData(private val scope: CoroutineScope) {
                 parent.subCategories
             }
         }
-
         if (newParentList.any { it.name == currentCategory.name }) return "Error: category exists in destination already"
-
 
         oldParentList.removeAt(index)
         val newEntity = current.copy(

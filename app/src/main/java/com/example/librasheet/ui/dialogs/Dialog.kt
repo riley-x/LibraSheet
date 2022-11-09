@@ -3,15 +3,19 @@ package com.example.librasheet.ui.dialogs
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.example.librasheet.ui.components.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Dialog(
     modifier: Modifier = Modifier,
@@ -25,6 +29,11 @@ fun Dialog(
 ) {
     AlertDialog(
         onDismissRequest = onCancel,
+        /** This is needed to allow the dialog to resize if the content changes.
+         * This really messes up the previews though.
+         * See https://stackoverflow.com/questions/68469681/jetpack-compose-layout-changes-in-dialog-doesnt-update-the-size
+         */
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         // don't use the title argument, it really messes with the layouts
         text = {
             CompositionLocalProvider(
@@ -54,6 +63,7 @@ fun Dialog(
         modifier = modifier,
     )
 }
+
 
 
 @Preview
