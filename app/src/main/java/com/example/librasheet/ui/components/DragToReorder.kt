@@ -80,8 +80,8 @@ class DragScope {
         affectedIndices.clear()
     }
 
-    fun isTarget(groupId: String, index: Int) = groupId == this.groupId && index == this.index
     fun isActive() = index != -1
+    fun isTarget(groupId: String, index: Int) = isActive() && groupId == this.groupId && index == this.index
 
     @Composable
     fun PlaceContent() {

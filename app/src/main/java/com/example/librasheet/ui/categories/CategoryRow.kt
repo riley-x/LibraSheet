@@ -18,8 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.librasheet.ui.components.ColorCodedRow
+import com.example.librasheet.ui.components.RowDivider
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.preview.previewExpenseCategories
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
@@ -79,9 +81,17 @@ fun CategoryRow(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            CategoryRow(
-                category = previewIncomeCategories[0]
-            )
+            Column {
+                CategoryRow(
+                    category = previewIncomeCategories[0]
+                )
+                RowDivider()
+                CategoryRow(
+                    category = previewExpenseCategories[0],
+                    expanded = remember { MutableTransitionState(true) }
+                )
+            }
+
         }
     }
 }
