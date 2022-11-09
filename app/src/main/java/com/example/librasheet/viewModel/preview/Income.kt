@@ -1,5 +1,6 @@
 package com.example.librasheet.viewModel.preview
 
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -80,7 +81,7 @@ val previewExpenseCategories = mutableStateListOf(
 
 
 val previewExpanded = mutableStateMapOf(
-    "Expense_Housing" to true
+    "Expense_Housing" to MutableTransitionState(true)
 )
 
 

@@ -1,5 +1,6 @@
 package com.example.librasheet.viewModel
 
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.viewModelScope
@@ -23,7 +24,7 @@ class CategoryModel(private val parent: LibraViewModel) {
     /** Expanded state of each row in the edit category screen. This is needed here since lots of bugs
      * occur if you try to put it inside the LazyColumn::items. Index with the full category name.
      */
-    val editScreenIsExpanded = mutableStateMapOf<String, Boolean>()
+    val editScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
     suspend fun loadData() {
         // TODO

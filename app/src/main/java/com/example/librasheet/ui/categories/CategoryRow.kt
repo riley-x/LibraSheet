@@ -1,6 +1,7 @@
 package com.example.librasheet.ui.categories
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
@@ -25,8 +26,8 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: Category,
     modifier: Modifier = Modifier,
-    expanded: Boolean = false,
-    onExpand: (Boolean) -> Unit = {  },
+    expanded: MutableTransitionState<Boolean> = remember { MutableTransitionState(false) },
+    onExpand: (Boolean) -> Unit = { expanded.targetState = it },
     content: @Composable RowScope.(Category) -> Unit = { },
     subRow: @Composable ColumnScope.(Int, Category) -> Unit = { index, cat ->
         CategorySubRow(
@@ -45,8 +46,8 @@ fun CategoryRow(
             ) {
                 Text(category.name)
                 if (category.subCategories.isNotEmpty()) {
-                    IconButton(onClick = { onExpand(!expanded) }) {
-                        if (expanded) Icon(
+                    IconButton(onClick = { onExpand(!expanded.targetState) }) {
+                        if (expanded.targetState) Icon(
                             imageVector = Icons.Sharp.ExpandLess,
                             contentDescription = null
                         )
@@ -58,7 +59,7 @@ fun CategoryRow(
 
             if (category.subCategories.isNotEmpty()) {
                 AnimatedVisibility(
-                    visible = expanded,
+                    visibleState = expanded,
                     enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
                     exit = shrinkVertically() + fadeOut()
                 ) {

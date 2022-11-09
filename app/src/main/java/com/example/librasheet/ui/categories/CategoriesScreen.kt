@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.categories
 
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -40,7 +41,7 @@ private val subCategoryOptions = ImmutableList(categoryOptions.items.filter { it
 fun CategoriesScreen(
     incomeCategories: SnapshotStateList<Category>,
     expenseCategories: SnapshotStateList<Category>,
-    expanded: SnapshotStateMap<String, Boolean>,
+    expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onChangeName: (Category) -> Unit = { },
@@ -81,8 +82,8 @@ fun CategoriesScreen(
                     ) { dragScope ->
                         CategoryRow(
                             category = category,
-                            expanded = expanded.getOrDefault(category.id.fullName, false),
-                            onExpand = { expanded[category.id.fullName] = it },
+                            expanded = expanded.getOrPut(category.id.fullName) { MutableTransitionState(false) },
+//                            onExpand = { expanded[category.id.fullName] = it },
                             modifier = Modifier.rowDivider(enabled = index > 0 && !dragScope.isTarget(group, index), color = dividerColor),
                             content = { category ->
                                 Spacer(modifier = Modifier.weight(10f))
