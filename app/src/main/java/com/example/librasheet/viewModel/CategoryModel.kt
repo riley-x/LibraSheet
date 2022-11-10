@@ -44,14 +44,14 @@ class CategoryModel(
 
 
     @Callback
-    fun setMoveOptions(currentCategory: CategoryId) {
+    fun setMoveOptions(category: CategoryId) {
         moveTargets.clear()
-        if (currentCategory.isSub) moveTargets.add(currentCategory.superName)
-        when (currentCategory.superName) {
+        if (category.isSub) moveTargets.add(category.superName)
+        when (category.superName) {
             incomeName -> income
             expenseName -> expense
-            else -> throw RuntimeException("CategoryModel::move bad category $currentCategory")
-        }.filter { it.id.topName != currentCategory.topName }.mapTo(moveTargets) { it.id.fullName }
+            else -> throw RuntimeException("CategoryModel::move bad category $category")
+        }.filter { !category.isOrIsIn(it.id) }.mapTo(moveTargets) { it.id.fullName }
     }
 
     fun checkError(fn: () -> String): String {

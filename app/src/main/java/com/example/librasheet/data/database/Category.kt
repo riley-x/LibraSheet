@@ -69,49 +69,51 @@ data class CategoryWithChildren(
  */
 @Immutable
 data class CategoryId(
-    val superName: String = "",
-    val topName: String = "",
-    val subName: String = "",
+    val fullName: String = "",
+    val splitName: List<String> = fullName.split(categoryPathSeparator)
 ) {
-    val name = subName.ifEmpty { topName }.ifEmpty { superName }
-    val fullName = superName +
-                (if (topName.isNotEmpty()) "$categoryPathSeparator$topName" else "") +
-                (if (subName.isNotEmpty()) "$categoryPathSeparator$subName" else "")
+    constructor(splitName: List<String>) : this(
+        fullName = splitName.joinToString(categoryPathSeparator),
+        splitName = splitName,
+    )
+
+    val name = splitName.last()
+
     val fullDisplayName: String
-        get() = superName +
-                (if (topName.isNotEmpty()) "$displaySeparator$topName" else "") +
-                (if (subName.isNotEmpty()) "$displaySeparator$subName" else "")
+        get() = splitName.joinToString(displaySeparator)
+
+    val superName: String
+        get() = splitName.getOrElse(0) { "" }
+    val topName: String
+        get() = splitName.getOrElse(1) { "" }
+    val subName: String
+        get() = splitName.getOrElse(2) { "" }
 
     val isSuper: Boolean
-        get() = topName.isEmpty()
+        get() = splitName.size == 1
     val isTop: Boolean
-        get() = topName.isNotEmpty() && subName.isEmpty()
+        get() = splitName.size == 2
     val isSub: Boolean
-        get() = subName.isNotEmpty()
+        get() = splitName.size == 3
 
     val isValid: Boolean
-        get() = superName.isNotEmpty()
+        get() = splitName[0].isNotEmpty()
 
     val parent: CategoryId
-        get() = if (isSuper) CategoryId()
-            else if (isSub) CategoryId(superName, topName)
-            else CategoryId(superName)
+        get() = CategoryId(splitName = splitName.dropLast(1))
 
     fun isIn(other: CategoryId): Boolean {
-        if (other.superName != superName) return false
-        if (other.topName.isNotEmpty() && other.topName != topName) return false
-        return !other.isSub
+        if (splitName.size <= other.splitName.size) return false
+        for (i in 0..other.splitName.lastIndex) {
+            if (splitName[i] != other.splitName[i]) return false
+        }
+        return true
     }
+
+    fun isOrIsIn(other: CategoryId) = fullName == other.fullName || isIn(other)
 }
 
-fun String.toCategoryId(): CategoryId {
-    val path = this.split(categoryPathSeparator)
-    return CategoryId(
-        path[0],
-        if (path.size > 1) path[1] else "",
-        if (path.size > 2) path[2] else "",
-    )
-}
+fun String.toCategoryId() = CategoryId(this)
 
 
 @Stable
