@@ -39,6 +39,7 @@ fun CashFlowScreen(
     historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
+    onBack: () -> Unit = { },
     onCategoryClick: (CategoryUi) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
@@ -49,7 +50,7 @@ fun CashFlowScreen(
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = title, backArrow = headerBackArrow) {
+        HeaderBar(title = title, backArrow = headerBackArrow, onBack = onBack) {
             Spacer(Modifier.weight(10f))
             Text(hoverText, textAlign = TextAlign.End)
         }
@@ -105,18 +106,21 @@ fun CashFlowScreen(
                 }
             }
 
+            val firstIndex = categories.indexOfFirst { it.value > 0 }
             itemsIndexed(categories) { index, category ->
-                if (index > 0) RowDivider()
+                if (category.value > 0) {
+                    if (index > firstIndex) RowDivider()
 
-                CategoryRow(
-                    category = category,
-                    content = {
-                        Spacer(modifier = Modifier.weight(10f))
-                        Text(formatDollar(it.value))
-                    },
-                    modifier = Modifier
-                        .clickable { onCategoryClick(category) }
-                )
+                    CategoryRow(
+                        category = category,
+                        content = {
+                            Spacer(modifier = Modifier.weight(10f))
+                            Text(formatDollar(it.value))
+                        },
+                        modifier = Modifier
+                            .clickable { if (category.subCategories.isNotEmpty()) onCategoryClick(category) }
+                    )
+                }
             }
         }
     }

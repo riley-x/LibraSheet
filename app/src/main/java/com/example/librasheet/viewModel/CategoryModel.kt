@@ -3,10 +3,12 @@ package com.example.librasheet.viewModel
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.database.*
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.find
 import com.example.librasheet.viewModel.dataClasses.toUi
 
 
@@ -19,6 +21,10 @@ class CategoryModel(
      * screens **/
     val income = mutableStateListOf<CategoryUi>()
     val expense = mutableStateListOf<CategoryUi>()
+
+    /** These are displayed in the nested detail screens **/
+    val incomeDetail = mutableStateListOf<CategoryUi>()
+    val expenseDetail = mutableStateListOf<CategoryUi>()
 
     /** Options to display when moving a category **/
     val moveTargets = mutableStateListOf<String>()
@@ -41,6 +47,30 @@ class CategoryModel(
         income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
         expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
     }
+
+
+    fun loadDetail(list: SnapshotStateList<CategoryUi>, category: CategoryUi) {
+        list.clear()
+        list.addAll(category.subCategories)
+    }
+
+    @Callback
+    fun loadIncomeDetail(category: CategoryUi) {
+        loadDetail(incomeDetail, category)
+// TODO
+    }
+    @Callback
+    fun loadExpenseDetail(category: CategoryUi) {
+        loadDetail(expenseDetail, category)
+        // TODO
+    }
+
+
+    @Callback
+    fun find(category: CategoryId) =
+        income.find(category) ?:
+        expense.find(category) ?:
+        throw RuntimeException("CategoryModel couldn't find $category")
 
 
     @Callback

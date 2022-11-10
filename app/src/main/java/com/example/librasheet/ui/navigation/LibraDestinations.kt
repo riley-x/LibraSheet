@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.librasheet.R
@@ -81,20 +82,36 @@ object CategoriesDestination {
     const val route = "edit_categories"
 }
 
-object ColorDestination {
-    const val routeBase = "color_selector"
-    const val argSpec = "spec"
-    val arguments = listOf(
-        navArgument(argSpec) { type = NavType.StringType }
-    )
+
+abstract class DestinationStringArg {
+    abstract val routeBase: String
+    abstract val argName: String
+    abstract val arguments: List<NamedNavArgument>
 
     /** This is the route used to declare the destination target. Since the color selector can be
      * part of multiple graphs, the parent [graph] must be specified.
      */
-    fun route(graph: String) = "${routeBase}_${graph}/{$argSpec}"
+    fun route(graph: String) = "${routeBase}_${graph}/{${argName}}"
 
     /** This is the route used to navigate to a color destination. In addition to the [graph], the
-     * [spec] specifies which color is being edited. The [spec] format is "category_name".
+     * [arg] specifies which color is being edited. The [arg] format is "type_name".
      */
-    fun argRoute(graph: String, spec: String) = "${routeBase}_${graph}/${spec}"
+    fun argRoute(graph: String, arg: String) = "${routeBase}_${graph}/${arg}"
+}
+
+
+object ColorDestination: DestinationStringArg() {
+    override val routeBase = "color_selector"
+    override val argName = "spec"
+    override val arguments = listOf(
+        navArgument(argName) { type = NavType.StringType }
+    )
+}
+
+object CategoryDetailDestination: DestinationStringArg() {
+    override val routeBase = "category_details"
+    override val argName = "categoryId"
+    override val arguments = listOf(
+        navArgument(argName) { type = NavType.StringType }
+    )
 }

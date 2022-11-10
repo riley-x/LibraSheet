@@ -11,7 +11,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
-import com.example.librasheet.data.database.Category
 import com.example.librasheet.data.database.CategoryId
 import com.example.librasheet.data.database.getCategoryName
 import com.example.librasheet.data.database.toCategoryId
@@ -63,6 +62,14 @@ fun LibraApp(
     }
     fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
+    fun toIncomeCategoryDetailScreen(it: CategoryUi) {
+        viewModel.categories.loadIncomeDetail(it)
+        navController.navigate(CategoryDetailDestination.argRoute(IncomeTab.graph, it.id.fullName))
+    }
+    fun toExpenseCategoryDetailScreen(it: CategoryUi) {
+        viewModel.categories.loadExpenseDetail(it)
+        navController.navigate(CategoryDetailDestination.argRoute(SpendingTab.graph, it.id.fullName))
+    }
     fun toCategoriesScreen() = navController.navigate(CategoriesDestination.route)
     fun onSaveColor(spec: String, color: Color) {
         // TODO
@@ -152,13 +159,30 @@ fun LibraApp(
          */
         fun NavGraphBuilder.colorSelector() {
             composable(route = ColorDestination.route(route!!), arguments = ColorDestination.arguments) {
-                val spec = it.arguments?.getString(ColorDestination.argSpec) ?: ""
+                val spec = it.arguments?.getString(ColorDestination.argName) ?: ""
                 ColorSelectorScreen(
                     spec = spec,
-                    initialColor = Color.White,
+                    initialColor = Color.White, // TODO
                     onSave = ::onSaveColor,
                     onCancel = navController::popBackStack,
                     bottomPadding = innerPadding.calculateBottomPadding(),
+                )
+            }
+        }
+        fun NavGraphBuilder.categoryDetail() {
+            val isIncome = route == IncomeTab.graph
+            composable(route = CategoryDetailDestination.route(route!!), arguments = CategoryDetailDestination.arguments) {
+                val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
+                CashFlowScreen(
+                    title = category.name,
+                    headerBackArrow = true,
+                    categories = if (isIncome) viewModel.categories.incomeDetail else viewModel.categories.expenseDetail,
+                    history = previewStackedLineGraphState,
+                    historyDates = previewLineGraphDates,
+                    categoryTimeRange = previewIncomeCategoryTimeRange,
+                    historyTimeRange = previewIncomeHistoryTimeRange,
+                    onBack = navController::popBackStack,
+                    onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
                 )
             }
         }
@@ -209,9 +233,11 @@ fun LibraApp(
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
                         historyTimeRange = previewIncomeHistoryTimeRange,
+                        onCategoryClick = ::toIncomeCategoryDetailScreen,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
+                categoryDetail()
             }
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
@@ -223,9 +249,11 @@ fun LibraApp(
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
                         historyTimeRange = previewIncomeHistoryTimeRange,
+                        onCategoryClick = ::toExpenseCategoryDetailScreen,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
+                categoryDetail()
             }
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {

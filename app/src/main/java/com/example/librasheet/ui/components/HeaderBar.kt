@@ -25,7 +25,7 @@ fun HeaderBar(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.height(48.dp)
         ) {
             if (backArrow) {
                 IconButton(onClick = onBack) {
