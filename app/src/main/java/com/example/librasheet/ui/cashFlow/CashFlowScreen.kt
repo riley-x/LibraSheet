@@ -20,7 +20,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.categoryTimeRanges
-import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.historyTimeRanges
 import com.example.librasheet.viewModel.preview.*
@@ -32,14 +32,14 @@ private val tabs = ImmutableList(listOf("Categories", "History"))
 @Composable
 fun CashFlowScreen(
     title: String,
-    categories: SnapshotStateList<Category>,
+    categories: SnapshotStateList<CategoryUi>,
     history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
     categoryTimeRange: State<CategoryTimeRange>,
     historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
-    onCategoryClick: (Category) -> Unit = { },
+    onCategoryClick: (CategoryUi) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {

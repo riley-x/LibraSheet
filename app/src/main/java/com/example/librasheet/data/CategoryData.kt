@@ -1,110 +1,114 @@
 package com.example.librasheet.data
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.example.librasheet.data.database.CategoryEntity
+import com.example.librasheet.data.database.*
 import com.example.librasheet.ui.theme.randomColor
+import com.example.librasheet.viewModel.Callback
 import com.example.librasheet.viewModel.dataClasses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CategoryData(private val scope: CoroutineScope) {
-    val incomeEntities = mutableListOf<CategoryEntity>()
-    val expenseEntities = mutableListOf<CategoryEntity>()
+    val all = mutableListOf(
+        Category(
+            id = CategoryId(incomeName),
+            color = Color.Unspecified,
+            listIndex = 0,
+            subCategories = mutableListOf(),
+        ),
+        Category(
+            id = CategoryId(expenseName),
+            color = Color.Unspecified,
+            listIndex = 1,
+            subCategories = mutableListOf(),
+        )
+    )
 
     fun load() {
         // TODO. Make sure things are ordered correctly...
     }
 
-    fun findNull(category: CategoryId): Triple<CategoryEntity, MutableList<CategoryEntity>, Int>? {
-        val list = when (category.superName) {
-            incomeName -> incomeEntities
-            expenseName -> expenseEntities
-            else -> throw RuntimeException("CategoryData::find can't find super of $category")
-        }
+    fun find(category: CategoryId): Triple<Category, MutableList<Category>, Int> =
+        all.find(category) ?: throw RuntimeException("CategoryModel::find couldn't find $category")
 
-        for ((indexP, parent) in list.withIndex()) {
-            if (category.isTop) {
-                if (parent.name == category.topName) return Triple(parent, list, indexP)
-            } else {
-                for ((indexC, child) in parent.subCategories.withIndex()) {
-                    if (child.name == category.subName) return Triple(child, parent.subCategories, indexC)
-                }
-            }
-        }
-        return null
-    }
 
-    fun find(category: CategoryId) = findNull(category) ?: throw RuntimeException("CategoryData::find couldn't find $category")
+    @Callback
+    fun add(parentCategory: CategoryId, newCategory: String): String {
+        /** Find parent with error checks **/
+        if (newCategory.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
+        val (parent, _) = find(parentCategory)
+        if (parent.subCategories.any { it.id.name == newCategory }) return "Error: category exists already"
 
-    fun add(parentCategory: CategoryId, newCategory: String): Boolean {
-        val entity: CategoryEntity
-        if (parentCategory.isSuper) {
-            val list = if (parentCategory.name == incomeName) incomeEntities else expenseEntities
-            if (list.any { it.name == newCategory }) return false
-            entity = CategoryEntity(
-                name = newCategory,
-                topCategory = parentCategory.name,
-                color = randomColor().toArgb(),
-                listIndex = list.size,
-                subCategories = mutableListOf(),
-            )
-            list.add(entity)
-        } else {
-            val (parent, _) = find(parentCategory)
-            if (parent.subCategories.any { it.name == newCategory }) return false
-            entity = CategoryEntity(
-                name = newCategory,
-                topCategory = "",
-                color = randomColor().toArgb(),
-                listIndex = parent.subCategories.size,
-                subCategories = mutableListOf(),
-            )
-            parent.subCategories.add(entity)
-        }
+        /** Create and add the category **/
+        val category = Category(
+            id = joinCategoryPath(parentCategory, newCategory),
+            color = randomColor(),
+            listIndex = parent.subCategories.size,
+            subCategories = mutableListOf(),
+        )
+        parent.subCategories.add(category)
+
+        /** Update the database **/
         scope.launch(Dispatchers.IO) {
             // TODO DAO add
             if (!parentCategory.isSuper) {
                 // TODO DAO add crossref
             }
         }
-        return true
+        return ""
     }
 
+    fun rename(categoryId: CategoryId, newName: String): String {
+        /** Find category with error checks **/
+        if (newName.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
+        val (category, parentList, index) = find(categoryId)
+        if (parentList.any { it.id.name == newName }) return "Error: account exists already"
 
-    fun rename(currentCategory: CategoryId, newName: String): Boolean {
-        val (current, parentList, index) = find(currentCategory)
-        if (parentList.any { it.name == newName }) return false
-        val newCurrent = current.copy(name = newName)
-        parentList[index] = newCurrent
+        /** Update target **/
+        category.id = joinCategoryPath(category.id.parent, newName)
+
+        /** Update target's children. Note because we enforce that categories only have one level of
+         * nesting, at most we have to check the target's children, not nested ones. Similarly, it's
+         * children can never have an expanded state, so we don't have to update the map. **/
+        val staleList = mutableListOf(category)
+        for (child in category.subCategories) {
+            child.id = joinCategoryPath(category.id, child.id.name)
+            staleList.add(child)
+        }
+
+        /** Update database **/
         scope.launch(Dispatchers.IO) {
             // TODO DAO update
         }
-        return true
+        return ""
     }
 
-    fun move(currentCategory: CategoryId, newParent: CategoryId): String {
-        val (current, oldParentList, index) = find(currentCategory)
-        if (currentCategory.isTop && newParent.isTop && current.subCategories.isNotEmpty())
-            return "Error: can't move category with subcategories into another category"
+    fun move(categoryId: CategoryId, newParentId: CategoryId): String {
+        val (category, oldParentList, index) = find(categoryId)
+        if (category.subCategories.isNotEmpty())
+            return "Error: can't move category with subcategories"
 
-        val newParentList = when(newParent.fullName) {
-            incomeName -> incomeEntities
-            expenseName -> expenseEntities
-            else -> {
-                val (parent, _) = find(newParent)
-                parent.subCategories
-            }
+        val (newParent, _) = find(newParentId)
+        if (newParent.subCategories.any { it.id.name == categoryId.name }) return "Error: category exists in destination already"
+
+        /** Update add to new parent **/
+        category.apply {
+            id = joinCategoryPath(newParentId, categoryId.name)
+            listIndex = newParent.subCategories.size
         }
-        if (newParentList.any { it.name == currentCategory.name }) return "Error: category exists in destination already"
+        newParent.subCategories.add(category)
 
+        /** Update old parent's list and its children's indices **/
+        val staleList = mutableListOf(category)
         oldParentList.removeAt(index)
-        val newEntity = current.copy(
-            topCategory = if (newParent.isSuper) newParent.superName else "",
-            listIndex = newParentList.size
-        )
-        newParentList.add(newEntity)
+        for (i in index..oldParentList.lastIndex) {
+            oldParentList[i].listIndex = i
+            staleList.add(oldParentList[i])
+        }
 
+        /** Update database **/
         scope.launch(Dispatchers.IO) {
             // TODO DAO update entity and xref (delete, readd)
         }
@@ -114,11 +118,15 @@ class CategoryData(private val scope: CoroutineScope) {
     fun delete(categoryId: CategoryId) {
         val (category, parentList, index) = find(categoryId)
         parentList.removeAt(index)
-        val staleList = mutableListOf<CategoryEntity>()
+
+        /** Update parent's list and its children's indices **/
+        val staleList = mutableListOf<Category>()
         for (i in index..parentList.lastIndex) {
-            parentList[i] = parentList[i].copy(listIndex = parentList[i].listIndex - 1)
+            parentList[i].listIndex = i
             staleList.add(parentList[i])
         }
+
+        /** Update database **/
         scope.launch(Dispatchers.IO) {
             // TODO delete transaction crossrefs
             // TODO delete category
@@ -127,23 +135,20 @@ class CategoryData(private val scope: CoroutineScope) {
         }
     }
 
-    fun reorder(parentId: CategoryId, startIndex: Int, endIndex: Int) {
-        val list = if (parentId.isSuper) {
-            if (parentId.name == incomeName) incomeEntities else expenseEntities
-        } else {
-            val (parent, _, _) = find(parentId)
-            parent.subCategories
-        }
+    fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
+        if (startIndex == endIndex) return
 
-        val category = list.removeAt(startIndex)
-        list.add(endIndex, category)
+        val (parent, _) = find(parentId.toCategoryId())
+        parent.subCategories.add(endIndex, parent.subCategories.removeAt(startIndex))
 
-        val staleEntities = mutableListOf<CategoryEntity>()
+        /** Update parent's list and its children's indices **/
+        val staleEntities = mutableListOf<Category>()
         for (i in rangeBetween(startIndex, endIndex)) {
-            list[i] = list[i].copy(listIndex = i)
-            staleEntities.add(list[i])
+            parent.subCategories[i].listIndex = i
+            staleEntities.add(parent.subCategories[i])
         }
 
+        /** Update database **/
         scope.launch(Dispatchers.IO) {
             // TODO update staleList
         }

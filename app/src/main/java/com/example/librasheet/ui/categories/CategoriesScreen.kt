@@ -12,17 +12,18 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.librasheet.data.database.*
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
+import com.example.librasheet.viewModel.dataClasses.CategoryUi
 
 
 private enum class CategoryOption(override val displayName: String) : HasDisplayName {
@@ -39,19 +40,19 @@ private val subCategoryOptions = ImmutableList(categoryOptions.items.filter { it
 
 @Composable
 fun CategoriesScreen(
-    incomeCategories: SnapshotStateList<Category>,
-    expenseCategories: SnapshotStateList<Category>,
+    incomeCategories: SnapshotStateList<CategoryUi>,
+    expenseCategories: SnapshotStateList<CategoryUi>,
     expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
-    onChangeName: (Category) -> Unit = { },
+    onChangeName: (CategoryUi) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
     onAddCategory: (CategoryId) -> Unit = { },
-    onMoveCategory: (Category) -> Unit = { },
-    onDelete: (Category) -> Unit = { },
+    onMoveCategory: (CategoryUi) -> Unit = { },
+    onDelete: (CategoryUi) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
-    fun onOptionSelect(category: Category, categoryOption: CategoryOption) {
+    fun onOptionSelect(category: CategoryUi, categoryOption: CategoryOption) {
         when (categoryOption) {
             CategoryOption.RENAME -> onChangeName(category)
             CategoryOption.COLOR -> onChangeColor("category_" + category.id.fullName)
@@ -71,7 +72,7 @@ fun CategoriesScreen(
 
         DragHost {
             val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
-            fun LazyListScope.categoryItems(list: SnapshotStateList<Category>, group: String) {
+            fun LazyListScope.categoryItems(list: SnapshotStateList<CategoryUi>, group: String) {
                 // TODO keying the lazy column like key = { _, it -> it.id.fullName } messes up the
                 //  index, which isn't reset since it's inside the composable
                 itemsIndexed(list) { index, category ->
@@ -83,7 +84,6 @@ fun CategoriesScreen(
                         CategoryRow(
                             category = category,
                             expanded = expanded.getOrPut(category.id.fullName) { MutableTransitionState(false) },
-//                            onExpand = { expanded[category.id.fullName] = it },
                             modifier = Modifier.rowDivider(enabled = index > 0 && !dragScope.isTarget(group, index), color = dividerColor),
                             content = { category ->
                                 Spacer(modifier = Modifier.weight(10f))

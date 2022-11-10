@@ -11,6 +11,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
+import com.example.librasheet.data.database.Category
+import com.example.librasheet.data.database.CategoryId
+import com.example.librasheet.data.database.getCategoryName
+import com.example.librasheet.data.database.toCategoryId
 import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.dialogs.TextFieldDialog
@@ -102,28 +106,28 @@ fun LibraApp(
     }
 
     val changeCategoryNameOld = remember { mutableStateOf(CategoryId()) }
-    fun onChangeCategoryName(category: Category) { changeCategoryNameOld.value = category.id }
+    fun onChangeCategoryName(category: CategoryUi) { changeCategoryNameOld.value = category.id }
     fun changeCategoryName(newName: String) = dialogCallback(changeCategoryNameOld, newName) {
         viewModel.categories.rename(
-            currentCategory = it,
+            categoryId = it,
             newName = newName
         )
     }
 
     val moveCategoryName = remember { mutableStateOf(CategoryId()) }
-    fun onMoveCategory(category: Category) {
+    fun onMoveCategory(category: CategoryUi) {
         viewModel.categories.setMoveOptions(category.id)
         moveCategoryName.value = category.id
     }
     fun moveCategory(newParent: String) = dialogCallback(moveCategoryName, newParent) {
         viewModel.categories.move(
-            currentCategory = it,
-            newParent = newParent.toCategoryId()
+            categoryId = it,
+            newParentId = newParent.toCategoryId()
         )
     }
 
     var deleteCategoryId by remember { mutableStateOf(CategoryId()) }
-    fun onDeleteCategory(category: Category) { deleteCategoryId = category.id }
+    fun onDeleteCategory(category: CategoryUi) { deleteCategoryId = category.id }
     fun deleteCategory(confirm: Boolean) {
         if (confirm) viewModel.categories.delete(categoryId = deleteCategoryId)
         deleteCategoryId = CategoryId()

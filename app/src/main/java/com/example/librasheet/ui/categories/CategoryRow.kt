@@ -13,25 +13,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.ExpandLess
 import androidx.compose.material.icons.sharp.ExpandMore
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.librasheet.ui.components.ColorCodedRow
 import com.example.librasheet.ui.components.RowDivider
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.preview.previewExpenseCategories
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
 fun CategoryRow(
-    category: Category,
+    category: CategoryUi,
     modifier: Modifier = Modifier,
     expanded: MutableTransitionState<Boolean> = remember { MutableTransitionState(false) },
     onExpand: (Boolean) -> Unit = { expanded.targetState = it },
-    content: @Composable RowScope.(Category) -> Unit = { },
-    subRow: @Composable ColumnScope.(Int, Category) -> Unit = { index, cat ->
+    content: @Composable RowScope.(CategoryUi) -> Unit = { },
+    subRow: @Composable ColumnScope.(Int, CategoryUi) -> Unit = { index, cat ->
         CategorySubRow(
             category = cat,
             indicatorColor = category.color.copy(alpha = 0.5f),

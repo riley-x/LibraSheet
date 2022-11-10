@@ -5,18 +5,20 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
-import com.example.librasheet.data.database.CategoryEntity
-import com.example.librasheet.viewModel.dataClasses.*
+import com.example.librasheet.data.database.*
+import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.toUi
 
 
-class CategoryModel(private val parent: LibraViewModel) {
-    internal val data = CategoryData(parent.viewModelScope)
+class CategoryModel(
+    private val viewModel: LibraViewModel,
+) {
+    private val data = CategoryData(viewModel.viewModelScope)
 
-    /** This are displayed in the categories settings screen, but are also used to calculate the
-     * cash flow screen categories.
-     */
-    val income = mutableStateListOf<Category>()
-    val expense = mutableStateListOf<Category>()
+    /** This are displayed in both the categories settings screen and the respective cash flow
+     * screens **/
+    val income = mutableStateListOf<CategoryUi>()
+    val expense = mutableStateListOf<CategoryUi>()
 
     /** Options to display when moving a category **/
     val moveTargets = mutableStateListOf<String>()
@@ -26,38 +28,20 @@ class CategoryModel(private val parent: LibraViewModel) {
      */
     val editScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
-    suspend fun loadData() {
-        // TODO
+
+    suspend fun load() {
+        // TODO, ensure listIndex is correct
     }
 
     fun loadUi() {
-        fun loadList(list: MutableList<Category>, data: List<CategoryEntity>) {
-            list.clear()
-            data.mapTo(list) { it.toCategory() }
-        }
-        loadList(income, data.incomeEntities)
-        loadList(expense, data.expenseEntities)
+        income.clear()
+        expense.clear()
+        // TODO amounts
+        val amounts = emptyMap<CategoryId, Float>()
+        income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
+        expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
     }
 
-    @Callback
-    fun add(parentCategory: CategoryId, newCategory: String): String {
-        if (newCategory.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
-        if (data.add(parentCategory, newCategory)) {
-            loadUi()
-            return ""
-        }
-        return "Error: account exists already"
-    }
-
-    @Callback
-    fun rename(currentCategory: CategoryId, newName: String): String {
-        if (newName.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
-        if (data.rename(currentCategory, newName)) {
-            loadUi()
-            return ""
-        }
-        return "Error: account exists already"
-    }
 
     @Callback
     fun setMoveOptions(currentCategory: CategoryId) {
@@ -70,26 +54,44 @@ class CategoryModel(private val parent: LibraViewModel) {
         }.filter { it.id.topName != currentCategory.topName }.mapTo(moveTargets) { it.id.fullName }
     }
 
-    @Callback
-    fun move(currentCategory: CategoryId, newParent: CategoryId): String {
-        val error = data.move(currentCategory, newParent)
-        if (error.isNotBlank()) return error
-        loadUi()
-        return ""
+    fun checkError(fn: () -> String): String {
+        val error = fn()
+        if (error.isEmpty()) loadUi()
+        return error
     }
 
     @Callback
+    fun add(parentCategory: CategoryId, newCategory: String) = checkError {
+        data.add(parentCategory, newCategory)
+    }
+    @Callback
+    fun move(categoryId: CategoryId, newParentId: CategoryId) = checkError {
+        data.move(categoryId, newParentId)
+    }
+    @Callback
     fun delete(categoryId: CategoryId) {
-        // TODO delete transaction crossrefs
         data.delete(categoryId)
         loadUi()
     }
-
     @Callback
     fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
-        if (startIndex == endIndex) return
-        data.reorder(parentId.toCategoryId(), startIndex, endIndex)
+        data.reorder(parentId, startIndex, endIndex)
         loadUi()
+    }
+
+    @Callback
+    fun rename(categoryId: CategoryId, newName: String): String {
+        val error = data.rename(categoryId, newName)
+        if (error.isNotEmpty()) return error
+
+        /** Update expanded state map. Note that because we enforce that categories only have one
+         * level of nesting, the target category's children can never have an expanded state, so we
+         * don't have to check for them **/
+        editScreenIsExpanded.remove(categoryId.fullName)?.let {
+            editScreenIsExpanded[joinCategoryPath(categoryId.parent, newName).fullName] = it
+        }
+
+        return error
     }
 }
 

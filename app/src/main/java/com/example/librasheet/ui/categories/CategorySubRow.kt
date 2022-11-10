@@ -11,12 +11,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.Category
+import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
 fun CategorySubRow(
-    category: Category,
+    category: CategoryUi,
     indicatorColor: Color,
     last: Boolean,
     modifier: Modifier = Modifier,
