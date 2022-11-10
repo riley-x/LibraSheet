@@ -16,13 +16,11 @@ class CategoryData(private val scope: CoroutineScope) {
             id = CategoryId(incomeName),
             color = Color.Unspecified,
             listIndex = 0,
-            subCategories = mutableListOf(),
         ),
         Category(
             id = CategoryId(expenseName),
             color = Color.Unspecified,
             listIndex = 1,
-            subCategories = mutableListOf(),
         )
     )
 
@@ -46,7 +44,6 @@ class CategoryData(private val scope: CoroutineScope) {
             id = joinCategoryPath(parentCategory, newCategory),
             color = randomColor(),
             listIndex = parent.subCategories.size,
-            subCategories = mutableListOf(),
         )
         parent.subCategories.add(category)
 

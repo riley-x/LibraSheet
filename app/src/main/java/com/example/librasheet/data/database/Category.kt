@@ -30,8 +30,8 @@ class Category (
     @PrimaryKey @NonNull var id: CategoryId,
     val color: Color,
     var listIndex: Int,
-    @Ignore var subCategories: MutableList<Category> = mutableListOf(),
 ) {
+    @Ignore var subCategories: MutableList<Category> = mutableListOf()
     val isTop = id.isTop
 }
 

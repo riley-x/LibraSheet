@@ -17,9 +17,6 @@ data class CategoryUi(
 ) : PieChartValue {
     override val name: String
         get() = id.name
-
-    @Stable
-    fun isSet() = id.isValid
 }
 
 fun Category.toUi(values: Map<CategoryId, Float>): CategoryUi = CategoryUi(
