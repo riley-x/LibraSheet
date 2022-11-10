@@ -90,6 +90,7 @@ class CategoryModel(
         editScreenIsExpanded.remove(categoryId.fullName)?.let {
             editScreenIsExpanded[joinCategoryPath(categoryId.parent, newName).fullName] = it
         }
+        loadUi()
 
         return error
     }

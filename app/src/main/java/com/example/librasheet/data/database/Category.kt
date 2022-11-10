@@ -1,5 +1,6 @@
 package com.example.librasheet.data.database
 
+import android.util.Log
 import androidx.annotation.NonNull
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -22,7 +23,6 @@ const val displaySeparator = " > "
  * @param id This is the id used in the rest of the app, and passed to objects like dialogs or the
  * color selector to identify the current selection. See [CategoryId].
  * @param listIndex Index of this entry in its parent category list.
- *
  * @property isTop enables an easy search for top-level categories.
  */
 @Entity(tableName = category_table)
@@ -92,7 +92,16 @@ data class CategoryId(
     val isValid: Boolean
         get() = superName.isNotEmpty()
 
-    val parent = fullName.substringBeforeLast(categoryPathSeparator).toCategoryId()
+    val parent: CategoryId
+        get() = if (isSuper) CategoryId()
+            else if (isSub) CategoryId(superName, topName)
+            else CategoryId(superName)
+
+    fun isIn(other: CategoryId): Boolean {
+        if (other.superName != superName) return false
+        if (other.topName.isNotEmpty() && other.topName != topName) return false
+        return !other.isSub
+    }
 }
 
 fun String.toCategoryId(): CategoryId {
@@ -109,7 +118,7 @@ fun String.toCategoryId(): CategoryId {
 fun MutableList<Category>.find(target: CategoryId): Triple<Category, MutableList<Category>, Int>? {
     for ((index, current) in withIndex()) {
         if (current.id == target) return Triple(current, this, index)
-        else if (current.id == target.parent) return current.subCategories.find(target)
+        else if (target.isIn(current.id)) return current.subCategories.find(target)
     }
     return null
 }
