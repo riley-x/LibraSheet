@@ -190,6 +190,7 @@ fun LibraApp(
                         transactions = previewTransactions,
                         onBack = navController::popBackStack,
                         onClickColor = ::toBalanceColorSelector,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
                 colorSelector()
@@ -203,7 +204,8 @@ fun LibraApp(
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
-                        historyTimeRange = previewIncomeHistoryTimeRange
+                        historyTimeRange = previewIncomeHistoryTimeRange,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
             }
@@ -216,7 +218,8 @@ fun LibraApp(
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
-                        historyTimeRange = previewIncomeHistoryTimeRange
+                        historyTimeRange = previewIncomeHistoryTimeRange,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
             }
