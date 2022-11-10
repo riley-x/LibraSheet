@@ -70,13 +70,12 @@ data class CategoryWithChildren(
 @Immutable
 data class CategoryId(
     val fullName: String = "",
-    val splitName: List<String> = fullName.split(categoryPathSeparator)
 ) {
     constructor(splitName: List<String>) : this(
-        fullName = splitName.joinToString(categoryPathSeparator),
-        splitName = splitName,
+        splitName.joinToString(categoryPathSeparator),
     )
 
+    val splitName: List<String> = fullName.split(categoryPathSeparator)
     val name = splitName.last()
 
     val fullDisplayName: String
