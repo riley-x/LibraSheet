@@ -204,7 +204,7 @@ fun LibraApp(
                 composable(route = IncomeTab.route) {
                     CashFlowScreen(
                         title = "Income",
-                        categories = previewIncomeCategories,
+                        categories = viewModel.categories.income,
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,

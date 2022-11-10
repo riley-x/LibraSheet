@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -41,12 +42,10 @@ interface PieChartValue {
     val color: Color
 }
 
-/**
- */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T: PieChartValue> PieChart(
-    values: SnapshotStateList<T>,
+    values: List<T>,
     modifier: Modifier = Modifier,
     stroke: Dp = 30.dp,
 ) {
@@ -122,6 +121,29 @@ fun <T: PieChartValue> PieChart(
             style = MaterialTheme.typography.h2,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+
+
+@Composable
+fun <T: PieChartValue> PieChartFiltered(
+    values: SnapshotStateList<T>,
+    modifier: Modifier = Modifier,
+) {
+    val filteredValues = values.filter { it.value > 0 }
+    if (filteredValues.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+        ) {
+            Text("No Data",
+                style = MaterialTheme.typography.h2,
+                color = MaterialTheme.colors.error.copy(alpha = ContentAlpha.medium),
+            )
+        }
+    } else {
+        PieChart(filteredValues, modifier)
     }
 }
 

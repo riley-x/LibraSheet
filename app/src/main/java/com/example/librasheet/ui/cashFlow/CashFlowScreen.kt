@@ -62,14 +62,15 @@ fun CashFlowScreen(
                     onSelection = { selectedTab.value = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                ) {
-                    when (it) {
+                ) { targetState ->
+                    when (targetState) {
                         0 -> Column {
-                            PieChart(
+                            PieChartFiltered(
                                 values = categories,
                                 modifier = Modifier
                                     .height(300.dp)
                                     .padding(start = 30.dp, end = 30.dp)
+                                    .fillMaxWidth()
                             )
                             ButtonGroup(
                                 options = categoryTimeRanges,
