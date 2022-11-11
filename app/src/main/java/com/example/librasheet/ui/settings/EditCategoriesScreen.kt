@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.categories
+package com.example.librasheet.ui.settings
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.librasheet.data.database.*
+import com.example.librasheet.ui.categories.CategoryDragRow
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.*
@@ -39,7 +40,7 @@ private val subCategoryOptions = ImmutableList(categoryOptions.items.filter { it
 
 
 @Composable
-fun CategoriesScreen(
+fun EditCategoriesScreen(
     incomeCategories: SnapshotStateList<CategoryUi>,
     expenseCategories: SnapshotStateList<CategoryUi>,
     expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
@@ -133,7 +134,7 @@ fun CategoriesScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            CategoriesScreen(
+            EditCategoriesScreen(
                 incomeCategories = previewIncomeCategories,
                 expenseCategories = previewExpenseCategories,
                 expanded = previewExpanded,

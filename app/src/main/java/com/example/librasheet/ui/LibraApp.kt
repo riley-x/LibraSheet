@@ -18,11 +18,11 @@ import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
-import com.example.librasheet.ui.categories.CategoriesScreen
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.EditAccountsScreen
+import com.example.librasheet.ui.settings.EditCategoriesScreen
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
 
@@ -232,7 +232,7 @@ fun LibraApp(
                     CashFlowScreen(
                         parentCategory = incomeName.toCategoryId(),
                         categories = viewModel.categories.income,
-                        expanded = viewModel.categories.editScreenIsExpanded, // TODO
+                        expanded = viewModel.categories.incomeScreenIsExpanded,
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
@@ -249,7 +249,7 @@ fun LibraApp(
                     CashFlowScreen(
                         parentCategory = expenseName.toCategoryId(),
                         categories = previewExpenseCategories,
-                        expanded = viewModel.categories.editScreenIsExpanded, // TODO
+                        expanded = viewModel.categories.expenseScreenIsExpanded,
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
@@ -275,7 +275,7 @@ fun LibraApp(
                     )
                 }
                 composable(route = CategoriesDestination.route) {
-                    CategoriesScreen(
+                    EditCategoriesScreen(
                         incomeCategories = viewModel.categories.income,
                         expenseCategories = viewModel.categories.expense,
                         expanded = viewModel.categories.editScreenIsExpanded,

@@ -28,6 +28,7 @@ fun ColorCodedRow(
     color: Color,
     modifier: Modifier = Modifier,
     horizontalPadding: Dp = libraRowHorizontalPadding,
+    contentBefore: @Composable RowScope.() -> Unit = { },
     content: @Composable (RowScope.() -> Unit) = { },
 ) {
     Surface(modifier) {
@@ -38,6 +39,8 @@ fun ColorCodedRow(
                 .fillMaxWidth()
                 .padding(horizontal = horizontalPadding)
         ) {
+            contentBefore()
+            
             Spacer(
                 Modifier
                     .padding(vertical = 8.dp)
