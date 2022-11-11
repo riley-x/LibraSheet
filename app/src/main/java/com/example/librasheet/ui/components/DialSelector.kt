@@ -31,7 +31,8 @@ import kotlin.math.roundToInt
  * -1..[labels].size, and the edge cases are immediately looped to lastIndex or 0 respectively via
  * the LaunchedEffect below.
  *
- * TODO this bugs out when you try to scroll super fast, and gets stuck on -1 or size.
+ * TODO this bugs out when you try to scroll super fast, and gets stuck on -1 or size. Maybe a
+ * DisposableEffect would be better?
  *
  * @param swipeableState Should have an initial value of 0.
  * @param onSelection Is a callback triggered everytime the currentValue of [swipeableState] changes

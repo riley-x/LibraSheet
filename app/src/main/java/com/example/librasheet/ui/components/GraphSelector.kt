@@ -1,6 +1,9 @@
 package com.example.librasheet.ui.components
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -12,6 +15,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 
@@ -39,7 +43,12 @@ fun GraphSelector(
     // TODO do we need to hoist the selected tab state at all?
     val wasFromDialRight = remember { mutableStateOf(true) }
     val swipeableState = rememberSwipeableState(0,
-        animationSpec = tween(400)
+        animationSpec = spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = 5f,
+            // spring starts fast but ends slowly. This makes the animation short circuit a little
+            // at the end, which speeds up the transition of the graphic.
+        )
     )
 
     Column {
@@ -51,12 +60,19 @@ fun GraphSelector(
                     else AnimatedContentScope.SlideDirection.End
                 slideIntoContainer(
                     towards = towards,
-                    animationSpec = tween(400)
-                ) + fadeIn(animationSpec = tween(400)) with
+                    animationSpec = spring(
+                        stiffness = Spring.StiffnessMediumLow,
+                        visibilityThreshold = IntOffset.VisibilityThreshold,
+                    )
+                ) + fadeIn(animationSpec = spring(
+                    stiffness = Spring.StiffnessMediumLow,
+                )) with
                         slideOutOfContainer(
                             towards = towards,
-                            animationSpec = tween(200)
-                        ) + fadeOut(animationSpec = tween(200))
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessMediumLow,
+                                visibilityThreshold = IntOffset.VisibilityThreshold,
+                            )) + fadeOut()
             },
             content = { content(it.first) },
             modifier = modifier,
