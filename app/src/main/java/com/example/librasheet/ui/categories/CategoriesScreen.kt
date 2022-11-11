@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
@@ -73,28 +72,34 @@ fun CategoriesScreen(
 
         DragHost {
 
-            fun LazyListScope.categoryOptionsList(
+            fun LazyListScope.categoryItems(
                 list: SnapshotStateList<CategoryUi>,
                 group: String,
             ) {
-                categoryItems(
-                    list = list,
-                    group = group,
-                    expanded = expanded,
-                    onReorder = onReorder,
-                    content = { category ->
-                        Spacer(modifier = Modifier.weight(10f))
-                        DropdownOptions(options = categoryOptions) {
-                            onOptionSelect(category, it)
+                /** Warning the lazy column must be keyed with the index. Keying the lazy column like
+                 * `key = { _, it -> it.id.fullName }` messes up the passed index into DragToReorderTarget,
+                 * which won't be reset. **/
+                itemsIndexed(list) { index, category ->
+                    CategoryDragRow(
+                        category = category,
+                        group = group,
+                        index = index,
+                        expanded = expanded,
+                        onReorder = onReorder,
+                        content = { cat ->
+                            Spacer(modifier = Modifier.weight(10f))
+                            DropdownOptions(options = categoryOptions) {
+                                onOptionSelect(cat, it)
+                            }
+                        },
+                        subContent = { cat ->
+                            Spacer(modifier = Modifier.weight(10f))
+                            DropdownOptions(options = subCategoryOptions) {
+                                onOptionSelect(cat, it)
+                            }
                         }
-                    },
-                    subContent = { category ->
-                        Spacer(modifier = Modifier.weight(10f))
-                        DropdownOptions(options = subCategoryOptions) {
-                            onOptionSelect(category, it)
-                        }
-                    }
-                )
+                    )
+                }
             }
 
             fun LazyListScope.categoryTitle(title: String) {
@@ -110,10 +115,10 @@ fun CategoriesScreen(
 
             LazyColumn(Modifier.fillMaxSize()) {
                 categoryTitle(incomeName)
-                categoryOptionsList(incomeCategories, incomeName)
+                categoryItems(incomeCategories, incomeName)
                 item("spacer") { Spacer(Modifier.height(20.dp)) }
                 categoryTitle(expenseName)
-                categoryOptionsList(expenseCategories, expenseName)
+                categoryItems(expenseCategories, expenseName)
             }
         }
     }

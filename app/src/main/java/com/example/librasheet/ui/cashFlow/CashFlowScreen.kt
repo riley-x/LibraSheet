@@ -17,8 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import com.example.librasheet.data.database.CategoryId
 import com.example.librasheet.data.database.toCategoryId
-import com.example.librasheet.ui.categories.CategoryRow
-import com.example.librasheet.ui.categories.CategorySubRow
+import com.example.librasheet.ui.categories.*
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -85,43 +84,28 @@ fun CashFlowScreen(
                     )
                 }
 
-                val firstIndex = categories.indexOfFirst { it.value > 0 }
+                val startIndex = categories.indexOfFirst { it.value > 0 }
+                /** Warning the lazy column must be keyed with the index. Keying the lazy column like
+                 * `key = { _, it -> it.id.fullName }` messes up the passed index into DragToReorderTarget,
+                 * which won't be reset. **/
                 itemsIndexed(categories) { index, category ->
                     if (category.value > 0) {
-                        DragToReorderTarget(
-                            index = index,
+                        CategoryDragRow(
+                            category = category,
                             group = parentCategory.fullName,
-                            onDragEnd = onReorder,
-                        ) { dragScope ->
-                            CategoryRow(
-                                category = category,
-                                expanded = expanded.getOrPut(category.id.fullName) { MutableTransitionState(false) },
-                                content = {
-                                    Spacer(modifier = Modifier.weight(10f))
-                                    Text(formatDollar(it.value))
-                                },
-                                modifier = Modifier
-                                    .rowDivider(
-                                        enabled = index > firstIndex && !dragScope.isTarget(parentCategory.fullName, index),
-                                        color = dividerColor
-                                    )
-                                    .clickable {
-                                        if (category.subCategories.isNotEmpty()) onCategoryClick(category)
-                                    }
-                            ) { subIndex, subCategory ->
-                                CategorySubRow(
-                                    category = subCategory,
-                                    indicatorColor = category.color.copy(alpha = 0.5f),
-                                    last = subIndex == category.subCategories.lastIndex,
-                                    dragIndex = subIndex,
-                                    dragGroup = category.id.fullName,
-                                    onDragEnd = onReorder,
-                                ) {
-                                    Spacer(modifier = Modifier.weight(10f))
-                                    Text(formatDollar(subCategory.value))
-                                }
+                            index = index,
+                            startIndex = startIndex,
+                            expanded = expanded,
+                            onReorder = onReorder,
+                            content = { cat ->
+                                Spacer(modifier = Modifier.weight(10f))
+                                Text(formatDollar(cat.value))
+                            },
+                            subContent = { cat ->
+                                Spacer(modifier = Modifier.weight(10f))
+                                Text(formatDollar(cat.value))
                             }
-                        }
+                        )
                     }
                 }
             }
