@@ -15,13 +15,7 @@ import com.example.librasheet.viewModel.preview.previewAccounts
 
 @Composable
 fun SettingsScreen(
-    accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
-    onAddAccount: () -> Unit = { },
-    onClickAccount: (String) -> Unit = { },
-    onChangeAccountName: (String) -> Unit = { },
-    onChangeAccountColor: (String) -> Unit = { },
-    onDeleteAccount: (String) -> Unit = { },
     toEditAccounts: () -> Unit = { },
     toEditCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
@@ -79,7 +73,6 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             SettingsScreen(
-                accounts = previewAccounts,
             )
         }
     }

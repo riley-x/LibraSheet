@@ -1,14 +1,10 @@
 package com.example.librasheet.ui.settings.accounts
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.Composable
@@ -16,9 +12,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.ui.components.ColorCodedRow
-import com.example.librasheet.ui.components.DropdownOptions
-import com.example.librasheet.ui.components.HeaderBar
+import androidx.compose.ui.zIndex
+import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.settings.AccountCard
 import com.example.librasheet.ui.settings.CardRowDivider
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -45,27 +40,41 @@ fun EditAccountsScreen(
     onChangeName: (String) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
     onDelete: (String) -> Unit = { },
+    onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
 ) {
     Column(modifier) {
-        HeaderBar(title = "Accounts", backArrow = true, onBack = onBack) {
+        HeaderBar(
+            title = "Accounts",
+            backArrow = true,
+            onBack = onBack,
+            modifier = Modifier.zIndex(2f)
+        ) {
+            Spacer(Modifier.weight(10f))
             IconButton(onClick = onAddAccount) {
                 Icon(Icons.Sharp.Add, null)
             }
         }
 
-        LazyColumn {
-            itemsIndexed(accounts) { i, account ->
-                if (i > 0) CardRowDivider()
+        DragHost {
+            LazyColumn(Modifier.fillMaxSize()) {
+                itemsIndexed(accounts) { index, account ->
+                    if (index > 0) RowDivider(Modifier.zIndex(1f))
 
-                ColorCodedRow(
-                    color = account.color,
-                ) {
-                    Text(account.name, modifier = Modifier.weight(10f))
-                    DropdownOptions(options = accountOptions) {
-                        when (it) {
-                            AccountOptions.RENAME -> onChangeName(account.name)
-                            AccountOptions.COLOR -> onChangeColor(account.name)
-                            AccountOptions.DELETE -> onDelete(account.name)
+                    DragToReorderTarget(
+                        index = index,
+                        onDragEnd = { _, start, end -> onReorder(start, end) },
+                    ) {
+                        ColorCodedRow(
+                            color = account.color,
+                        ) {
+                            Text(account.name, modifier = Modifier.weight(10f))
+                            DropdownOptions(options = accountOptions) {
+                                when (it) {
+                                    AccountOptions.RENAME -> onChangeName(account.name)
+                                    AccountOptions.COLOR -> onChangeColor(account.name)
+                                    AccountOptions.DELETE -> onDelete(account.name)
+                                }
+                            }
                         }
                     }
                 }

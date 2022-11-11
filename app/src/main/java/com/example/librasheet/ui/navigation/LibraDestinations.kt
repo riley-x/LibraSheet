@@ -81,6 +81,9 @@ object AccountDestination {
 object CategoriesDestination {
     const val route = "edit_categories"
 }
+object EditAccountsDestination {
+    const val route = "edit_accounts"
+}
 
 
 abstract class DestinationStringArg {

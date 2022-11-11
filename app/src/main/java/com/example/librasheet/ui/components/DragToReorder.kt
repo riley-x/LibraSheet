@@ -112,8 +112,8 @@ val LocalDragScope = compositionLocalOf { DragScope() }
 @Composable
 fun DragToReorderTarget(
     index: Int,
-    group: String,
     modifier: Modifier = Modifier,
+    group: String = "",
     enabled: Boolean = true,
     onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     content: @Composable (DragScope) -> Unit = { },

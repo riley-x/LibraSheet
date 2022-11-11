@@ -24,6 +24,7 @@ import com.example.librasheet.ui.categories.CategoriesScreen
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
+import com.example.librasheet.ui.settings.accounts.EditAccountsScreen
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
 
@@ -62,7 +63,7 @@ fun LibraApp(
     }
     fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
-    fun toEditAccountsScreen() = navController.navigate()
+    fun toEditAccountsScreen() = navController.navigate(EditAccountsDestination.route)
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
         // WARNING! This only works because we have at most one level of nesting. Otherwise would have to catch back arrow, etc.
         viewModel.categories.loadIncomeDetail(it)
@@ -262,13 +263,7 @@ fun LibraApp(
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {
                     SettingsScreen(
-                        accounts = previewAccounts,
-                        onAddAccount = ::onAddAccount,
-                        onClickAccount = { },
-                        onChangeAccountName = ::onChangeAccountName,
-                        onChangeAccountColor = ::toSettingsColorSelector,
-                        onDeleteAccount = { },
-                        toEditAccounts = { },
+                        toEditAccounts = ::toEditAccountsScreen,
                         toEditCategories = ::toCategoriesScreen,
                         toCategoryRules = { },
                         toAddTransaction = { },
@@ -291,6 +286,15 @@ fun LibraApp(
                         onDelete = ::onDeleteCategory,
                         onReorder = viewModel.categories::reorder,
                         modifier = Modifier.padding(innerPadding),
+                    )
+                }
+                composable(route = EditAccountsDestination.route) {
+                    EditAccountsScreen(
+                        accounts = previewAccounts,
+                        onAddAccount = ::onAddAccount,
+                        onChangeName = ::onChangeAccountName,
+                        onChangeColor = ::toSettingsColorSelector,
+                        onDelete = { },
                     )
                 }
                 colorSelector()
