@@ -1,16 +1,12 @@
 package com.example.librasheet.data.database
 
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
-import com.example.librasheet.data.toFloatDollar
-import com.example.librasheet.ui.graphing.PieChartValue
-import com.example.librasheet.viewModel.dataClasses.*
 
-const val category_table = "categories"
+const val categoryTable = "categories"
 const val incomeName = "Income"
 const val expenseName = "Expense"
 const val categoryPathSeparator = "_" // Note this needs to match what is used by the ColorScreen
@@ -25,7 +21,7 @@ const val displaySeparator = " > "
  * @param listIndex Index of this entry in its parent category list.
  * @property isTop enables an easy search for top-level categories.
  */
-@Entity(tableName = category_table)
+@Entity(tableName = categoryTable)
 class Category (
     @PrimaryKey(autoGenerate = true) val key: Int = 0,
     @NonNull var id: CategoryId,
