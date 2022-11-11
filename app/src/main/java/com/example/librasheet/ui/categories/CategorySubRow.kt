@@ -11,12 +11,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
 
 @Composable
 fun CategorySubRow(
-    category: CategoryUi,
+    category: CategoryValue,
     indicatorColor: Color,
     last: Boolean,
     modifier: Modifier = Modifier,
@@ -25,7 +25,7 @@ fun CategorySubRow(
     onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     dividerColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     colorRowModifier: Modifier = Modifier,
-    content: @Composable RowScope.(CategoryUi) -> Unit = { },
+    content: @Composable RowScope.(CategoryValue) -> Unit = { },
 ) {
     Row(modifier) {
         ComponentIndicatorLine(

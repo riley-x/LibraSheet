@@ -62,12 +62,12 @@ fun LibraApp(
     fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
     fun toEditAccountsScreen() = navController.navigate(EditAccountsDestination.route)
-    fun toIncomeCategoryDetailScreen(it: CategoryUi) {
+    fun toIncomeCategoryDetailScreen(it: CategoryValue) {
         // WARNING! This only works because we have at most one level of nesting. Otherwise would have to catch back arrow, etc.
         viewModel.categories.loadIncomeDetail(it)
         navController.navigate(CategoryDetailDestination.argRoute(IncomeTab.graph, it.id.fullName))
     }
-    fun toExpenseCategoryDetailScreen(it: CategoryUi) {
+    fun toExpenseCategoryDetailScreen(it: CategoryValue) {
         viewModel.categories.loadExpenseDetail(it)
         navController.navigate(CategoryDetailDestination.argRoute(SpendingTab.graph, it.id.fullName))
     }
@@ -115,7 +115,7 @@ fun LibraApp(
     }
 
     val changeCategoryNameOld = remember { mutableStateOf(CategoryId()) }
-    fun onChangeCategoryName(category: CategoryUi) { changeCategoryNameOld.value = category.id }
+    fun onChangeCategoryName(category: CategoryValue) { changeCategoryNameOld.value = category.id }
     fun changeCategoryName(newName: String) = dialogCallback(changeCategoryNameOld, newName) {
         viewModel.categories.rename(
             categoryId = it,
@@ -124,7 +124,7 @@ fun LibraApp(
     }
 
     val moveCategoryName = remember { mutableStateOf(CategoryId()) }
-    fun onMoveCategory(category: CategoryUi) {
+    fun onMoveCategory(category: CategoryValue) {
         viewModel.categories.setMoveOptions(category.id)
         moveCategoryName.value = category.id
     }
@@ -136,7 +136,7 @@ fun LibraApp(
     }
 
     var deleteCategoryId by remember { mutableStateOf(CategoryId()) }
-    fun onDeleteCategory(category: CategoryUi) { deleteCategoryId = category.id }
+    fun onDeleteCategory(category: CategoryValue) { deleteCategoryId = category.id }
     fun deleteCategory(confirm: Boolean) {
         if (confirm) viewModel.categories.delete(categoryId = deleteCategoryId)
         deleteCategoryId = CategoryId()

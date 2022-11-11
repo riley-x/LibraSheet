@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -23,7 +22,7 @@ import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
@@ -34,7 +33,7 @@ private val tabs = ImmutableList(listOf("Categories", "History"))
 @Composable
 fun CashFlowScreen(
     parentCategory: CategoryId,
-    categories: SnapshotStateList<CategoryUi>,
+    categories: SnapshotStateList<CategoryValue>,
     expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
     history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
@@ -43,7 +42,7 @@ fun CashFlowScreen(
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
     onBack: () -> Unit = { },
-    onCategoryClick: (CategoryUi) -> Unit = { },
+    onCategoryClick: (CategoryValue) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },

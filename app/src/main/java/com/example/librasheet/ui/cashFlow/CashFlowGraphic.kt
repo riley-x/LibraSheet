@@ -21,7 +21,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.categoryTimeRanges
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.historyTimeRanges
 import com.example.librasheet.viewModel.preview.*
@@ -29,7 +29,7 @@ import com.example.librasheet.viewModel.preview.*
 @Composable
 fun CashFlowGraphic(
     tabs: ImmutableList<String>,
-    categories: SnapshotStateList<CategoryUi>,
+    categories: SnapshotStateList<CategoryValue>,
     history: StackedLineGraphState,
     historyDates: SnapshotStateList<String>,
     categoryTimeRange: State<CategoryTimeRange>,

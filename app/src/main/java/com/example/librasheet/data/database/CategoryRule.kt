@@ -1,9 +1,7 @@
 package com.example.librasheet.data.database
 
 import androidx.annotation.NonNull
-import androidx.compose.ui.graphics.Color
 import androidx.room.*
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
 
 private const val ruleTable = "rules"
 

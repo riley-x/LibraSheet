@@ -23,7 +23,7 @@ import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 
 
 private enum class CategoryOption(override val displayName: String) : HasDisplayName {
@@ -41,19 +41,19 @@ private val subCategoryOptions = ImmutableList(categoryOptions.items.filter { it
 
 @Composable
 fun EditCategoriesScreen(
-    incomeCategories: SnapshotStateList<CategoryUi>,
-    expenseCategories: SnapshotStateList<CategoryUi>,
+    incomeCategories: SnapshotStateList<CategoryValue>,
+    expenseCategories: SnapshotStateList<CategoryValue>,
     expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
-    onChangeName: (CategoryUi) -> Unit = { },
+    onChangeName: (CategoryValue) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
     onAddCategory: (CategoryId) -> Unit = { },
-    onMoveCategory: (CategoryUi) -> Unit = { },
-    onDelete: (CategoryUi) -> Unit = { },
+    onMoveCategory: (CategoryValue) -> Unit = { },
+    onDelete: (CategoryValue) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
-    fun onOptionSelect(category: CategoryUi, categoryOption: CategoryOption) {
+    fun onOptionSelect(category: CategoryValue, categoryOption: CategoryOption) {
         when (categoryOption) {
             CategoryOption.RENAME -> onChangeName(category)
             CategoryOption.COLOR -> onChangeColor("category_" + category.id.fullName)
@@ -74,7 +74,7 @@ fun EditCategoriesScreen(
         DragHost {
 
             fun LazyListScope.categoryItems(
-                list: SnapshotStateList<CategoryUi>,
+                list: SnapshotStateList<CategoryValue>,
                 group: String,
             ) {
                 /** Warning the lazy column must be keyed with the index. Keying the lazy column like

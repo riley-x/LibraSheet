@@ -7,9 +7,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.database.*
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import com.example.librasheet.viewModel.dataClasses.CategoryValue
 import com.example.librasheet.viewModel.dataClasses.find
-import com.example.librasheet.viewModel.dataClasses.toUi
+import com.example.librasheet.viewModel.dataClasses.withValue
 
 
 class CategoryModel(
@@ -19,12 +19,12 @@ class CategoryModel(
 
     /** This are displayed in both the categories settings screen and the respective cash flow
      * screens **/
-    val income = mutableStateListOf<CategoryUi>()
-    val expense = mutableStateListOf<CategoryUi>()
+    val income = mutableStateListOf<CategoryValue>()
+    val expense = mutableStateListOf<CategoryValue>()
 
     /** These are displayed in the nested detail screens **/
-    val incomeDetail = mutableStateListOf<CategoryUi>()
-    val expenseDetail = mutableStateListOf<CategoryUi>()
+    val incomeDetail = mutableStateListOf<CategoryValue>()
+    val expenseDetail = mutableStateListOf<CategoryValue>()
 
     /** Options to display when moving a category **/
     val moveTargets = mutableStateListOf<String>()
@@ -46,23 +46,23 @@ class CategoryModel(
         expense.clear()
         // TODO amounts
         val amounts = emptyMap<CategoryId, Float>()
-        income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
-        expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
+        income.addAll(data.all[0].subCategories.map { it.withValue(amounts) })
+        expense.addAll(data.all[1].subCategories.map { it.withValue(amounts) })
     }
 
 
-    fun loadDetail(list: SnapshotStateList<CategoryUi>, category: CategoryUi) {
+    fun loadDetail(list: SnapshotStateList<CategoryValue>, category: CategoryValue) {
         list.clear()
         list.addAll(category.subCategories)
     }
 
     @Callback
-    fun loadIncomeDetail(category: CategoryUi) {
+    fun loadIncomeDetail(category: CategoryValue) {
         loadDetail(incomeDetail, category)
         // TODO transactions, etc.
     }
     @Callback
-    fun loadExpenseDetail(category: CategoryUi) {
+    fun loadExpenseDetail(category: CategoryValue) {
         loadDetail(expenseDetail, category)
         // TODO
     }
