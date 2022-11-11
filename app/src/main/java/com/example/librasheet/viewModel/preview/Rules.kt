@@ -8,6 +8,12 @@ val previewRules = mutableStateListOf(
         pattern = "PYPAL",
         categoryKey = 0,
         listIndex = 0,
-        category = null,
-    )
+        category = previewIncomeCategories[0],
+    ),
+    CategoryRule(
+        pattern = "TGT",
+        categoryKey = 0,
+        listIndex = 0,
+        category = previewIncomeCategories[1],
+    ),
 )

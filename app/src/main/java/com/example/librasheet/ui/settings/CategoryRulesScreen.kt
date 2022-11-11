@@ -14,6 +14,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -38,7 +39,6 @@ private val ruleOptions = ImmutableList(RuleOptions.values().toList())
 
 @Composable
 fun CategoryRulesScreen(
-    categories: SnapshotStateList<CategoryUi>,
     rules: SnapshotStateList<CategoryRule>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
@@ -76,7 +76,12 @@ fun CategoryRulesScreen(
                             Text(rule.pattern, modifier = Modifier.weight(10f))
                             Spacer(Modifier.width(12.dp))
                             ColorIndicator(rule.category?.color ?: Color.Unspecified)
-                            Text(rule.category?.id?.name ?: "None", modifier = Modifier.weight(6f))
+                            Text(
+                                text = rule.category?.id?.name ?: "None",
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                modifier = Modifier.weight(8f)
+                            )
                             DropdownOptions(options = ruleOptions) {
                                 when (it) {
                                     RuleOptions.EDIT -> onEdit(rule)
@@ -98,7 +103,6 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             CategoryRulesScreen(
-                categories = previewIncomeCategories,
                 rules = previewRules,
             )
         }

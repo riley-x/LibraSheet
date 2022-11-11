@@ -40,9 +40,6 @@ fun LibraApp(
     }
     val currentTab = libraTabs.find { it.isActive() == true } ?: libraTabs[0]
 
-    Log.d("Libra", "Current destination: ${currentDestination?.route}")
-    Log.d("Libra", "Current tab: ${currentTab.graph}")
-
     fun onTabSelected(tab: LibraTab) {
         if (tab.route != currentDestination?.route) {
             if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
@@ -140,6 +137,14 @@ fun LibraApp(
     fun deleteCategory(confirm: Boolean) {
         if (confirm) viewModel.categories.delete(categoryId = deleteCategoryId)
         deleteCategoryId = CategoryId()
+    }
+
+    var editCategoryRuleIndex by remember { mutableStateOf(-1) }
+    fun onEditRule(index: Int) { editCategoryRuleIndex = index }
+    fun editRule(cancel: Boolean, pattern: String, categoryId: CategoryId) {
+        editCategoryRuleIndex = -1
+        if (cancel) return
+        // TODO
     }
 
     /** Main Layout Scaffold **/
@@ -348,6 +353,12 @@ fun LibraApp(
             )
         }
         if (deleteCategoryId.isValid) {
+            ConfirmationDialog(
+                text = "Delete category " + deleteCategoryId.fullDisplayName + "?\n\nWarning! This will delete any subcategories as well.",
+                onDismiss = ::deleteCategory,
+            )
+        }
+        if (editCategoryRuleIndex >= 0) {
             ConfirmationDialog(
                 text = "Delete category " + deleteCategoryId.fullDisplayName + "?\n\nWarning! This will delete any subcategories as well.",
                 onDismiss = ::deleteCategory,
