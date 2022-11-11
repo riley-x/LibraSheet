@@ -34,6 +34,20 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 
+/**
+ * This class implements the swipe to dispose/reveal by just always drawing the neighboring text
+ * labels offset from the center. The looping at boundaries is implemented by allowing states in
+ * -1..[labels].size, and the edge cases are immediately looped to lastIndex or 0 respectively via
+ * the LaunchedEffect below.
+ *
+ * TODO this bugs out when you try to scroll super fast, and gets stuck on -1 or size.
+ *
+ * @param swipeableState Should have an initial value of 0.
+ * @param onSelection Is a callback triggered everytime the currentValue of [swipeableState] changes
+ * (i.e. after the animation is completed), and also everytime the left/right buttons are pressed.
+ * Also, when loop = true, the LaunchedEffect will call onSelection again with loop = false, so users
+ * should case on when the index actually changes.
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialSelector(
@@ -47,7 +61,8 @@ fun DialSelector(
     @Stable
     fun get(stateValue: Int) = labels.items[index(stateValue)]
 
-    val scope = rememberCoroutineScope()
+    /** This needs to be a big value so that when loading the first time the neighboring labels don't
+     * appear. **/
     var swipeWidth by rememberSaveable { mutableStateOf(1000f) }
 
     /** I think it's necessary that the initial state has anchor 0f, or else an animation will trigger
@@ -57,9 +72,7 @@ fun DialSelector(
         (-1..labels.items.size).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
     }
 
-    Log.d("Libra", "composable ${swipeableState.currentValue}")
     LaunchedEffect(swipeableState.currentValue) {
-        Log.d("Libra", "enter ${swipeableState.currentValue}")
         val loop: Boolean
         val index: Int
         if (swipeableState.currentValue == -1) {
@@ -75,11 +88,10 @@ fun DialSelector(
             loop = false
             index = swipeableState.currentValue
         }
-        Log.d("Libra", "exit ${swipeableState.currentValue} $index")
         onSelection(index, loop)
     }
 
-
+    val scope = rememberCoroutineScope()
     fun back() {
         scope.launch {
             if (swipeableState.currentValue == -1) // Does this ever happen?
