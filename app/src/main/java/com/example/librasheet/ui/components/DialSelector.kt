@@ -2,6 +2,7 @@ package com.example.librasheet.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -20,9 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewGraphLabels
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 
@@ -34,7 +38,8 @@ fun DialSelector(
     modifier: Modifier = Modifier,
     onSelection: (Int, wasFromDialRight: Boolean) -> Unit = { _, _ -> },
 ) {
-    var swipeWidth by remember { mutableStateOf(100f) }
+    val scope = rememberCoroutineScope()
+    var swipeWidth by remember { mutableStateOf(500f) }
     val swipeableState = rememberSwipeableState(1)
     val anchors = remember(swipeWidth) {
         (0..labels.items.size + 1).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
@@ -42,68 +47,92 @@ fun DialSelector(
     Log.d("Libra", "${swipeableState.currentValue}")
 
     LaunchedEffect(swipeableState.currentValue) {
+        Log.d("Libra", "enter ${swipeableState.currentValue}")
         if (swipeableState.currentValue == 0) swipeableState.snapTo(labels.items.size)
         else if (swipeableState.currentValue == labels.items.size + 1) swipeableState.snapTo(1)
+        Log.d("Libra", "exit ${swipeableState.currentValue}")
+    }
+
+    @Stable
+    fun get(stateValue: Int): String {
+        val index = (stateValue - 1 + labels.items.size) % labels.items.size
+        return labels.items[index]
+    }
+
+    fun back() {
+        scope.launch {
+            if (swipeableState.currentValue == 0)
+                swipeableState.snapTo(labels.items.size + 1)
+            swipeableState.animateTo(swipeableState.currentValue - 1)
+        }
+    }
+    fun next() {
+        scope.launch {
+            if (swipeableState.currentValue == labels.items.size + 1)
+                swipeableState.snapTo(0)
+            swipeableState.animateTo(swipeableState.currentValue + 1)
+        }
     }
 
 
-    fun back() =
-        if (selected.value == 0) labels.items.lastIndex
-        else selected.value - 1
-
-    fun next() =
-        if (selected.value == labels.items.lastIndex) 0
-        else selected.value + 1
-
-    CompositionLocalProvider(
-        LocalMinimumTouchTargetEnforcement provides false,
-    ) {
+    Surface(modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
         ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+
             ) {
-                IconButton(onClick = { onSelection(back(), false) }) {
-                    Icon(imageVector = Icons.Sharp.ArrowBackIos, contentDescription = null)
-                }
-
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .weight(10f)
-                        .onGloballyPositioned { swipeWidth = it.size.width.toFloat() }
-                        .swipeable(
-                            state = swipeableState,
-                            anchors = anchors,
-                            orientation = Orientation.Horizontal,
-                            reverseDirection = true, // "natural" scrolling
-                        )
+                CompositionLocalProvider(
+                    LocalMinimumTouchTargetEnforcement provides false,
                 ) {
-                    val offset = swipeableState.currentValue * swipeWidth - swipeableState.offset.value
-                    Text(
-                        text = labels.items.getOrElse(swipeableState.currentValue - 2) { labels.items.last() },
-                        style = MaterialTheme.typography.h2,
-                        color = Color.Red,
-                        modifier = Modifier.offset { IntOffset((offset - swipeWidth).roundToInt(), 0) }
-                    )
-                    Text(
-                        text = labels.items.getOrElse(swipeableState.currentValue - 1) { "" },
-                        style = MaterialTheme.typography.h2,
-                        modifier = Modifier.offset { IntOffset(offset.roundToInt(), 0) }
-                    )
-                    Text(
-                        text = labels.items.getOrElse(swipeableState.currentValue) { labels.items.first() },
-                        style = MaterialTheme.typography.h2,
-                        color = Color.Blue,
-                        modifier = Modifier.offset { IntOffset((offset + swipeWidth).roundToInt(), 0) }
-                    )
-                }
+                    IconButton(
+                        onClick = ::back,
+                        modifier = Modifier
+                            .background(MaterialTheme.colors.background)
+                            .zIndex(1f)
+                    ) {
+                        Icon(imageVector = Icons.Sharp.ArrowBackIos, contentDescription = null)
+                    }
 
-                IconButton(onClick = { onSelection(next(), true) }) {
-                    Icon(imageVector = Icons.Sharp.ArrowForwardIos, contentDescription = null)
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .weight(10f)
+                            .onGloballyPositioned { swipeWidth = it.size.width.toFloat() }
+                            .swipeable(
+                                state = swipeableState,
+                                anchors = anchors,
+                                orientation = Orientation.Horizontal,
+                                reverseDirection = true, // "natural" scrolling
+                            )
+                    ) {
+                        val offset = swipeableState.currentValue * swipeWidth - swipeableState.offset.value
+                        Text(
+                            text = get(swipeableState.currentValue - 1),
+                            style = MaterialTheme.typography.h2,
+                            modifier = Modifier.offset { IntOffset((offset - swipeWidth).roundToInt(), 0) }
+                        )
+                        Text(
+                            text = get(swipeableState.currentValue),
+                            style = MaterialTheme.typography.h2,
+                            modifier = Modifier.offset { IntOffset(offset.roundToInt(), 0) }
+                        )
+                        Text(
+                            text = get(swipeableState.currentValue + 1),
+                            style = MaterialTheme.typography.h2,
+                            modifier = Modifier.offset { IntOffset((offset + swipeWidth).roundToInt(), 0) }
+                        )
+                    }
+
+                    IconButton(
+                        onClick = ::next,
+                        modifier = Modifier.background(MaterialTheme.colors.background)
+                    ) {
+                        Icon(imageVector = Icons.Sharp.ArrowForwardIos, contentDescription = null)
+                    }
                 }
             }
 
