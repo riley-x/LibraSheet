@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeableState
 import androidx.compose.material.rememberSwipeableState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -32,15 +30,14 @@ import com.example.librasheet.viewModel.dataClasses.ImmutableList
 @Composable
 fun GraphSelector(
     tabs: ImmutableList<String>,
-    selectedTab: State<Int>,
     modifier: Modifier = Modifier,
-    onSelection: (Int) -> Unit = { },
+    selectedTab: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+    onSelection: (Int) -> Unit = { selectedTab.value = it },
     content: @Composable AnimatedVisibilityScope.(Int) -> Unit = { },
 ) {
     /** This needs to be passed into AnimatedContent as part of the state so the animation knows
      * which direction to move (which CAN'T be figured out with just the indices when there are exactly
      * two tabs). However, the hoisted states don't need to care about it. **/
-    // TODO do we need to hoist the selected tab state at all?
     val wasFromDialRight = remember { mutableStateOf(true) }
     val swipeableState = rememberSwipeableState(0,
         animationSpec = spring(

@@ -71,7 +71,11 @@ fun CategoriesScreen(
         )
 
         DragHost {
+            /** Note you have to draw the dividers with the composables, because the size of each
+             * category row can be different if they're expanded. So it doesn't make sense to have
+             * fixed dividers like in the EditAccountScreen. **/
             val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
+
             fun LazyListScope.categoryItems(list: SnapshotStateList<CategoryUi>, group: String) {
                 // TODO keying the lazy column like key = { _, it -> it.id.fullName } messes up the
                 //  index, which isn't reset since it's inside the composable

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.librasheet.ui.categories.CategoryRow
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
@@ -44,82 +46,57 @@ fun CashFlowScreen(
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
-    val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = title, backArrow = headerBackArrow, onBack = onBack) {
+        HeaderBar(
+            title = title,
+            backArrow = headerBackArrow,
+            onBack = onBack,
+            modifier = Modifier.zIndex(1f),
+        ) {
             Spacer(Modifier.weight(10f))
             Text(hoverText, textAlign = TextAlign.End)
         }
 
-        LazyColumn {
-            item("graphic") {
-                GraphSelector(
-                    tabs = tabs,
-                    selectedTab = selectedTab,
-                    onSelection = { selectedTab.value = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) { targetState ->
-                    when (targetState) {
-                        0 -> Column {
-                            PieChartFiltered(
-                                values = categories,
-                                modifier = Modifier
-                                    .height(300.dp)
-                                    .padding(start = 30.dp, end = 30.dp)
-                                    .fillMaxWidth()
-                            )
-                            ButtonGroup(
-                                options = categoryTimeRanges,
-                                currentSelection = categoryTimeRange,
-                                onSelection = onCategoryTimeRange,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 30.dp, vertical = 5.dp)
-                            )
-                        }
-                        else -> Column {
-                            StackedLineGraph(
-                                state = history,
-                                modifier = Modifier
-                                    .height(300.dp)
-                                    .fillMaxWidth()
-                            ) { isHover, loc ->
-                                hoverText = if (isHover)
-                                    formatDollar(history.values.first().second[loc]) + "\n" + historyDates[loc]
-                                else ""
-                            }
-                            ButtonGroup(
-                                options = historyTimeRanges,
-                                currentSelection = historyTimeRange,
-                                onSelection = onHistoryTimeRange,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 30.dp, vertical = 5.dp)
-                            )
-                        }
-                    }
-                }
-            }
+        DragHost {
+            /** Note you have to draw the dividers with the composables, because the size of each
+             * category row can be different if they're expanded. So it doesn't make sense to have
+             * fixed dividers like in the EditAccountScreen. **/
+            val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
-            val firstIndex = categories.indexOfFirst { it.value > 0 }
-            itemsIndexed(categories) { index, category ->
-                if (category.value > 0) {
-                    if (index > firstIndex) RowDivider()
-
-                    CategoryRow(
-                        category = category,
-                        content = {
-                            Spacer(modifier = Modifier.weight(10f))
-                            Text(formatDollar(it.value))
-                        },
-                        modifier = Modifier
-                            .clickable { if (category.subCategories.isNotEmpty()) onCategoryClick(category) }
+            LazyColumn {
+                item("graphic") {
+                    CashFlowGraphic(
+                        tabs = tabs,
+                        categories = categories,
+                        history = history,
+                        historyDates = historyDates,
+                        categoryTimeRange = categoryTimeRange,
+                        historyTimeRange = historyTimeRange,
+                        updateHoverText = { hoverText = it },
+                        onCategoryTimeRange = onCategoryTimeRange,
+                        onHistoryTimeRange = onHistoryTimeRange,
                     )
+                }
+
+                val firstIndex = categories.indexOfFirst { it.value > 0 }
+                itemsIndexed(categories) { index, category ->
+                    if (category.value > 0) {
+                        if (index > firstIndex) RowDivider()
+
+                        CategoryRow(
+                            category = category,
+                            content = {
+                                Spacer(modifier = Modifier.weight(10f))
+                                Text(formatDollar(it.value))
+                            },
+                            modifier = Modifier
+                                .clickable { if (category.subCategories.isNotEmpty()) onCategoryClick(category) }
+                        )
+                    }
                 }
             }
         }

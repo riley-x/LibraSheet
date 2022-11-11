@@ -72,11 +72,18 @@ val previewExpenseCategories = mutableStateListOf(
         ),
     ),
     CategoryUi(
+        id = "Expense_Zero".toCategoryId(),
+        color = Color(0xFF03C416),
+        subCategories = emptyList(),
+        value = 0f,
+    ),
+    CategoryUi(
         id = "Expense_Social".toCategoryId(),
         color = Color(0xFF8C56B3),
         subCategories = emptyList(),
         value = 600f,
     ),
+
 )
 
 
