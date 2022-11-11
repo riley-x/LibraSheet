@@ -68,7 +68,7 @@ fun LibraApp(
     }
     fun toCategoriesScreen() = navController.navigate(CategoriesDestination.route)
     fun toRulesScreen(income: Boolean) {
-//        viewModel.categories.setRules(income) TODO
+        viewModel.rules.setFilter(income)
         navController.navigate(RulesDestination.route)
     }
     fun onSaveColor(spec: String, color: Color) {
@@ -141,12 +141,18 @@ fun LibraApp(
         deleteCategoryId = CategoryId()
     }
 
-    var editCategoryRuleIndex by remember { mutableStateOf(-1) }
+    var editCategoryRuleIndex by remember { mutableStateOf(-2) }
+    fun onAddRule() { editCategoryRuleIndex = -1 }
     fun onEditRule(index: Int) { editCategoryRuleIndex = index }
-    fun editRule(cancel: Boolean, pattern: String, category: CategoryUi) {
-        if (!cancel) viewModel.rules.updateRule(editCategoryRuleIndex, pattern, category)
-        editCategoryRuleIndex = -1
+    fun addRule(cancel: Boolean, pattern: String, category: Category) {
+        if (!cancel) viewModel.rules.addRule(pattern, category)
+        editCategoryRuleIndex = -2
     }
+    fun editRule(cancel: Boolean, pattern: String, category: Category) {
+        if (!cancel) viewModel.rules.updateRule(editCategoryRuleIndex, pattern, category)
+        editCategoryRuleIndex = -2
+    }
+
 
     /** Main Layout Scaffold **/
     Scaffold(
@@ -310,7 +316,7 @@ fun LibraApp(
                     CategoryRulesScreen(
                         rules = viewModel.rules.displayList,
                         onBack = navController::popBackStack,
-                        onAdd = { },
+                        onAdd = ::onAddRule,
                         onEdit = ::onEditRule,
                         onDelete = { },
                         onReorder = { _, _ -> },
@@ -369,12 +375,20 @@ fun LibraApp(
                 onDismiss = ::deleteCategory,
             )
         }
-        if (editCategoryRuleIndex >= 0) {
+        if (editCategoryRuleIndex == -1) {
+            CategoryRuleDialog(
+                currentPattern = "",
+                currentCategory = Category.None,
+                categories = viewModel.rules.filterCategory.subCategories,
+                onClose = ::addRule,
+            )
+        }
+        else if (editCategoryRuleIndex >= 0) {
             val current = viewModel.rules.displayList[editCategoryRuleIndex]
             CategoryRuleDialog(
                 currentPattern = current.pattern,
-                currentCategory = current.category ?: CategoryUi(),
-                categories = previewIncomeCategories,
+                currentCategory = current.category ?: Category.None,
+                categories = viewModel.rules.filterCategory.subCategories,
                 onClose = ::editRule,
             )
         }

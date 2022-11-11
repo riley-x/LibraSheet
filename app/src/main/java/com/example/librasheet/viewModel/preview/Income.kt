@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import com.example.librasheet.data.database.Category
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.DiscreteGraphState
@@ -15,6 +16,30 @@ import com.example.librasheet.data.database.toCategoryId
 
 val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
+
+val previewIncomeCategories2 = mutableStateListOf(
+    Category(
+        id = "Income_Compensation".toCategoryId(),
+        color = Color(0xFF00BFA5),
+        listIndex = 0,
+    ),
+    Category(
+        id = "Income_Cash Back".toCategoryId(),
+        color = Color(0xFF6FAD48),
+        listIndex = 1,
+    ),
+    Category(
+        id = "Income_Tax Return".toCategoryId(),
+        color = Color(0xFF4899AD),
+        listIndex = 2,
+    ),
+    Category(
+        id = "Income_Interest".toCategoryId(),
+        color = Color(0xFF03C416),
+        listIndex = 3,
+    ),
+)
+
 
 
 val previewIncomeCategories = mutableStateListOf(

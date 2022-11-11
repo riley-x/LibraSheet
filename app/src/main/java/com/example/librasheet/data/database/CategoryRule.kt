@@ -18,6 +18,6 @@ data class CategoryRule (
     @NonNull val pattern: String,
     val categoryKey: Int,
     val listIndex: Int,
-    @Ignore val category: CategoryUi? = null
+    @Ignore val category: Category? = null
 )
 

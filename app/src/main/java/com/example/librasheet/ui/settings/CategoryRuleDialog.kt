@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.data.database.Category
 import com.example.librasheet.data.database.CategoryId
 import com.example.librasheet.data.database.toCategoryId
 import com.example.librasheet.ui.components.DropdownSelector
@@ -18,13 +19,14 @@ import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.preview.previewIncomeCategories
+import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
 @Composable
 fun CategoryRuleDialog(
     currentPattern: String,
-    currentCategory: CategoryUi,
-    categories: SnapshotStateList<CategoryUi>,
-    onClose: (cancelled: Boolean, String, CategoryUi) -> Unit = { _, _, _ -> },
+    currentCategory: Category,
+    categories: List<Category>,
+    onClose: (cancelled: Boolean, String, Category) -> Unit = { _, _, _ -> },
 ) {
     var pattern by remember { mutableStateOf(currentPattern) }
     var category by remember { mutableStateOf(currentCategory) }
@@ -70,8 +72,8 @@ private fun Preview() {
     LibraSheetTheme {
         CategoryRuleDialog(
             currentPattern = "PYPAL",
-            currentCategory = previewIncomeCategories[0],
-            categories = previewIncomeCategories,
+            currentCategory = previewIncomeCategories2[0],
+            categories = previewIncomeCategories2,
         )
     }
 }

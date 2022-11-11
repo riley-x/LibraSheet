@@ -32,6 +32,14 @@ data class Category (
 ) {
     @Ignore val subCategories: SnapshotStateList<Category> = mutableStateListOf()
     val isTop = id.isTop
+
+    companion object {
+        val None = Category(
+            id = CategoryId(),
+            color = Color.Unspecified,
+            listIndex = -1,
+        )
+    }
 }
 
 
