@@ -291,10 +291,12 @@ fun LibraApp(
                 composable(route = EditAccountsDestination.route) {
                     EditAccountsScreen(
                         accounts = previewAccounts,
+                        onBack = navController::popBackStack,
                         onAddAccount = ::onAddAccount,
                         onChangeName = ::onChangeAccountName,
                         onChangeColor = ::toSettingsColorSelector,
                         onDelete = { },
+                        onReorder = { _,_ -> },
                     )
                 }
                 colorSelector()

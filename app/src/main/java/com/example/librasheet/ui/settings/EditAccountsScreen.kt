@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.settings.accounts
+package com.example.librasheet.ui.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
