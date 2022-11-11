@@ -1,6 +1,8 @@
 package com.example.librasheet.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -9,13 +11,19 @@ import androidx.compose.material.icons.sharp.ArrowForwardIos
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewGraphLabels
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -26,6 +34,19 @@ fun DialSelector(
     modifier: Modifier = Modifier,
     onSelection: (Int, wasFromDialRight: Boolean) -> Unit = { _, _ -> },
 ) {
+    var swipeWidth by remember { mutableStateOf(100f) }
+    val swipeableState = rememberSwipeableState(1)
+    val anchors = remember(swipeWidth) {
+        (0..labels.items.size + 1).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
+    }
+    Log.d("Libra", "${swipeableState.currentValue}")
+
+    LaunchedEffect(swipeableState.currentValue) {
+        if (swipeableState.currentValue == 0) swipeableState.snapTo(labels.items.size)
+        else if (swipeableState.currentValue == labels.items.size + 1) swipeableState.snapTo(1)
+    }
+
+
     fun back() =
         if (selected.value == 0) labels.items.lastIndex
         else selected.value - 1
@@ -49,14 +70,37 @@ fun DialSelector(
                     Icon(imageVector = Icons.Sharp.ArrowBackIos, contentDescription = null)
                 }
 
-                Spacer(modifier = Modifier.weight(10f))
-
-                Text(
-                    text = labels.items[selected.value],
-                    style = MaterialTheme.typography.h2,
-                )
-
-                Spacer(modifier = Modifier.weight(10f))
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .weight(10f)
+                        .onGloballyPositioned { swipeWidth = it.size.width.toFloat() }
+                        .swipeable(
+                            state = swipeableState,
+                            anchors = anchors,
+                            orientation = Orientation.Horizontal,
+                            reverseDirection = true, // "natural" scrolling
+                        )
+                ) {
+                    val offset = swipeableState.currentValue * swipeWidth - swipeableState.offset.value
+                    Text(
+                        text = labels.items.getOrElse(swipeableState.currentValue - 2) { labels.items.last() },
+                        style = MaterialTheme.typography.h2,
+                        color = Color.Red,
+                        modifier = Modifier.offset { IntOffset((offset - swipeWidth).roundToInt(), 0) }
+                    )
+                    Text(
+                        text = labels.items.getOrElse(swipeableState.currentValue - 1) { "" },
+                        style = MaterialTheme.typography.h2,
+                        modifier = Modifier.offset { IntOffset(offset.roundToInt(), 0) }
+                    )
+                    Text(
+                        text = labels.items.getOrElse(swipeableState.currentValue) { labels.items.first() },
+                        style = MaterialTheme.typography.h2,
+                        color = Color.Blue,
+                        modifier = Modifier.offset { IntOffset((offset + swipeWidth).roundToInt(), 0) }
+                    )
+                }
 
                 IconButton(onClick = { onSelection(next(), true) }) {
                     Icon(imageVector = Icons.Sharp.ArrowForwardIos, contentDescription = null)
