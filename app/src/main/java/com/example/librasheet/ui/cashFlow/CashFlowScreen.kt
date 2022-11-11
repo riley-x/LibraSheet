@@ -64,11 +64,6 @@ fun CashFlowScreen(
         }
 
         DragHost {
-            /** Note you have to draw the dividers with the composables, because the size of each
-             * category row can be different if they're expanded. So it doesn't make sense to have
-             * fixed dividers like in the EditAccountScreen. **/
-            val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
-
             LazyColumn {
                 item("graphic") {
                     CashFlowGraphic(
@@ -104,6 +99,9 @@ fun CashFlowScreen(
                             subContent = { cat ->
                                 Spacer(modifier = Modifier.weight(10f))
                                 Text(formatDollar(cat.value))
+                            },
+                            modifier = Modifier.clickable {
+                                if (category.subCategories.isNotEmpty()) onCategoryClick(category)
                             }
                         )
                     }
