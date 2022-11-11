@@ -37,32 +37,48 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialSelector(
-    selected: State<Int>,
     labels: ImmutableList<String>,
     modifier: Modifier = Modifier,
-    onSelection: (Int, wasFromDialRight: Boolean) -> Unit = { _, _ -> },
+    swipeableState: SwipeableState<Int> = rememberSwipeableState(0),
+    onSelection: (Int, looped: Boolean) -> Unit = { _, _ -> },
 ) {
-    val scope = rememberCoroutineScope()
-    var swipeWidth by rememberSaveable { mutableStateOf(1000f) }
-    val swipeableState = rememberSwipeableState(0)
-
-    /** I think it's necessary that the initial state has anchor 0f, or else an animation will trigger
-     * when the composable is first loaded. Also important to save the swipeWidth above, and set it
-     * to something big so the side text doesn't display.
-     */
-    val anchors = remember(swipeWidth) {
-        (-1..labels.items.size).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
-    }
-
-    LaunchedEffect(swipeableState.currentValue) {
-        if (swipeableState.currentValue == -1) swipeableState.snapTo(labels.items.lastIndex)
-        else if (swipeableState.currentValue == labels.items.size) swipeableState.snapTo(0)
-    }
-
     @Stable
     fun index(stateValue: Int) = (stateValue + labels.items.size) % labels.items.size
     @Stable
     fun get(stateValue: Int) = labels.items[index(stateValue)]
+
+    val scope = rememberCoroutineScope()
+    var swipeWidth by rememberSaveable { mutableStateOf(1000f) }
+
+    /** I think it's necessary that the initial state has anchor 0f, or else an animation will trigger
+     * when the composable is first loaded. Also important to save the swipeWidth above, and set it
+     * to something big so the side text doesn't display. **/
+    val anchors = remember(swipeWidth) {
+        (-1..labels.items.size).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
+    }
+
+    Log.d("Libra", "composable ${swipeableState.currentValue}")
+    LaunchedEffect(swipeableState.currentValue) {
+        Log.d("Libra", "enter ${swipeableState.currentValue}")
+        val loop: Boolean
+        val index: Int
+        if (swipeableState.currentValue == -1) {
+            loop = true
+            index = labels.items.lastIndex
+            swipeableState.snapTo(index)
+        }
+        else if (swipeableState.currentValue == labels.items.size) {
+            loop = true
+            index = 0
+            swipeableState.snapTo(index)
+        } else {
+            loop = false
+            index = swipeableState.currentValue
+        }
+        Log.d("Libra", "exit ${swipeableState.currentValue} $index")
+        onSelection(index, loop)
+    }
+
 
     fun back() {
         scope.launch {
@@ -151,13 +167,14 @@ fun DialSelector(
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun Preview() {
     val selected = remember { mutableStateOf(0) }
     LibraSheetTheme {
         Surface {
-            DialSelector(selected = selected, labels = previewGraphLabels)
+            DialSelector(labels = previewGraphLabels)
         }
     }
 }

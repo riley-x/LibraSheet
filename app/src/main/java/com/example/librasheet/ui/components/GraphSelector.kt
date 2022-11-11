@@ -4,6 +4,9 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SwipeableState
+import androidx.compose.material.rememberSwipeableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +24,7 @@ import com.example.librasheet.viewModel.dataClasses.ImmutableList
  * @param modifier Note this is passed to the AnimatedContent, and doesn't affect the dial selector
  * or the containing column.
  */
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun GraphSelector(
     tabs: ImmutableList<String>,
@@ -57,10 +60,11 @@ fun GraphSelector(
         )
 
         DialSelector(
-            selected = selectedTab,
             labels = tabs,
-            onSelection = { index, dialRight ->
-                wasFromDialRight.value = dialRight
+            onSelection = { index, loop ->
+                if (index == selectedTab.value) return@DialSelector
+                val greater = index > selectedTab.value
+                wasFromDialRight.value = if (loop) !greater else greater
                 onSelection(index)
             },
             modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp)
