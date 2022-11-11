@@ -82,10 +82,11 @@ fun DialSelector(
 
     fun back() {
         scope.launch {
-            if (swipeableState.currentValue == -1)
+            if (swipeableState.currentValue == -1) // Does this ever happen?
                 swipeableState.snapTo(labels.items.size)
             swipeableState.animateTo(swipeableState.currentValue - 1)
         }
+        onSelection(index(swipeableState.currentValue - 1), swipeableState.currentValue == 0)
     }
     fun next() {
         scope.launch {
@@ -93,6 +94,7 @@ fun DialSelector(
                 swipeableState.snapTo(-1)
             swipeableState.animateTo(swipeableState.currentValue + 1)
         }
+        onSelection(index(swipeableState.currentValue + 1), swipeableState.currentValue == labels.items.lastIndex)
     }
 
     Column(
