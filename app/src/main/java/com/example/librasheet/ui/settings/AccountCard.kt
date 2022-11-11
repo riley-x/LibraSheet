@@ -22,73 +22,20 @@ import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewAccounts
 
 
-private enum class AccountOptions(override val displayName: String): HasDisplayName {
-    RENAME("Rename"),
-    COLOR("Change Color"),
-    DELETE("Delete"),
-}
-private val accountOptions = ImmutableList(AccountOptions.values().toList())
 
 @Composable
 fun AccountCard(
-    accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
-    onAddAccount: () -> Unit = { },
-    onClickAccount: (String) -> Unit = { },
-    onChangeName: (String) -> Unit = { },
-    onChangeColor: (String) -> Unit = { },
-    onDelete: (String) -> Unit = { },
-    onSeeAllAccounts: () -> Unit = { },
+    toEditAccounts: () -> Unit = { },
 ) {
     Card(
         elevation = 1.dp,
         modifier = modifier,
     ) {
         Column {
-            CardTitle(title = "Accounts") {
-                IconButton(onClick = onAddAccount) {
-                    Icon(
-                        imageVector = Icons.Sharp.Add,
-                        contentDescription = null,
-                    )
-                }
-            }
-
+            CardTitle(title = "Accounts")
             CardRowDivider(color = MaterialTheme.colors.primary)
-
-            accounts.asReversed().take(if (accounts.size > 4) 3 else 4).forEachIndexed { i, account ->
-                if (i > 0) CardRowDivider()
-
-                ColorCodedRow(
-                    color = account.color,
-                    horizontalPadding = 0.dp,
-                    modifier = Modifier
-                        .clickable { onClickAccount(account.name) }
-                        .padding(start = cardRowHorizontalPadding)
-                ) {
-                    Text(account.name, modifier = Modifier.weight(10f))
-                    DropdownOptions(options = accountOptions) {
-                        when (it) {
-                            AccountOptions.RENAME -> onChangeName(account.name)
-                            AccountOptions.COLOR -> onChangeColor(account.name)
-                            AccountOptions.DELETE -> onDelete(account.name)
-                        }
-                    }
-                }
-            }
-
-            if (accounts.size > 4) {
-                CardRowDivider()
-                TextButton(
-                    onClick = onSeeAllAccounts,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 4.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text("SEE ALL")
-                }
-            }
+            ClickableRow("Edit", toEditAccounts)
         }
     }
 }
@@ -98,7 +45,7 @@ fun AccountCard(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            AccountCard(accounts = previewAccounts)
+            AccountCard()
         }
     }
 }

@@ -22,7 +22,7 @@ fun SettingsScreen(
     onChangeAccountName: (String) -> Unit = { },
     onChangeAccountColor: (String) -> Unit = { },
     onDeleteAccount: (String) -> Unit = { },
-    onSeeAllAccounts: () -> Unit = { },
+    toEditAccounts: () -> Unit = { },
     toEditCategories: () -> Unit = { },
     toCategoryRules: () -> Unit = { },
     toAddTransaction: () -> Unit = { },
@@ -36,13 +36,7 @@ fun SettingsScreen(
         LazyColumn {
             item(key = "accounts") {
                 AccountCard(
-                    accounts = accounts,
-                    onAddAccount = onAddAccount,
-                    onClickAccount = onClickAccount,
-                    onChangeName = onChangeAccountName,
-                    onChangeColor = onChangeAccountColor,
-                    onDelete = onDeleteAccount,
-                    onSeeAllAccounts = onSeeAllAccounts,
+                    toEditAccounts = toEditAccounts,
                     modifier = Modifier.padding(10.dp)
                 )
             }

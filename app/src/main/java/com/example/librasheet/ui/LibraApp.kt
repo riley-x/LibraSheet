@@ -62,7 +62,9 @@ fun LibraApp(
     }
     fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
+    fun toEditAccountsScreen() = navController.navigate()
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
+        // WARNING! This only works because we have at most one level of nesting. Otherwise would have to catch back arrow, etc.
         viewModel.categories.loadIncomeDetail(it)
         navController.navigate(CategoryDetailDestination.argRoute(IncomeTab.graph, it.id.fullName))
     }
@@ -75,6 +77,7 @@ fun LibraApp(
         // TODO
         navController.popBackStack()
     }
+
 
     /** Dialogs **/
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
@@ -265,7 +268,7 @@ fun LibraApp(
                         onChangeAccountName = ::onChangeAccountName,
                         onChangeAccountColor = ::toSettingsColorSelector,
                         onDeleteAccount = { },
-                        onSeeAllAccounts = { },
+                        toEditAccounts = { },
                         toEditCategories = ::toCategoriesScreen,
                         toCategoryRules = { },
                         toAddTransaction = { },

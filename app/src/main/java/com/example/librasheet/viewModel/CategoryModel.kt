@@ -57,7 +57,7 @@ class CategoryModel(
     @Callback
     fun loadIncomeDetail(category: CategoryUi) {
         loadDetail(incomeDetail, category)
-// TODO
+        // TODO transactions, etc.
     }
     @Callback
     fun loadExpenseDetail(category: CategoryUi) {
