@@ -19,7 +19,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     toEditAccounts: () -> Unit = { },
     toEditCategories: () -> Unit = { },
-    toCategoryRules: () -> Unit = { },
+    toCategoryRules: (income: Boolean) -> Unit = { },
     toAddTransaction: () -> Unit = { },
     toAddCSV: () -> Unit = { },
     toAllTransactions: () -> Unit = { },

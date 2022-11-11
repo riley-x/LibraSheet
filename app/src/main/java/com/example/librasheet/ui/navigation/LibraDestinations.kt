@@ -81,6 +81,9 @@ object AccountDestination {
 object CategoriesDestination {
     const val route = "edit_categories"
 }
+object RulesDestination {
+    const val route = "rules"
+}
 object EditAccountsDestination {
     const val route = "edit_accounts"
 }

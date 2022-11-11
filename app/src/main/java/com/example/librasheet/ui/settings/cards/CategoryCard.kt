@@ -16,7 +16,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 fun CategoryCard(
     modifier: Modifier = Modifier,
     toEditCategories: () -> Unit = { },
-    toCategoryRules: () -> Unit = { },
+    toCategoryRules: (income: Boolean) -> Unit = { },
 ) {
     Card(
         elevation = 1.dp,
@@ -27,7 +27,9 @@ fun CategoryCard(
             CardRowDivider(color = MaterialTheme.colors.primary)
             ClickableRow("Edit", toEditCategories)
             CardRowDivider()
-            ClickableRow("Rules", toCategoryRules)
+            ClickableRow("Income Rules") { toCategoryRules(true) }
+            CardRowDivider()
+            ClickableRow("Expense Rules") { toCategoryRules(false) }
         }
     }
 }

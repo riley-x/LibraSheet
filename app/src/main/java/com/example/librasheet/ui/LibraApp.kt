@@ -16,13 +16,11 @@ import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
-import com.example.librasheet.ui.settings.SettingsScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
-import com.example.librasheet.ui.settings.EditAccountsScreen
-import com.example.librasheet.ui.settings.EditCategoriesScreen
+import com.example.librasheet.ui.settings.*
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
 
@@ -69,6 +67,10 @@ fun LibraApp(
         navController.navigate(CategoryDetailDestination.argRoute(SpendingTab.graph, it.id.fullName))
     }
     fun toCategoriesScreen() = navController.navigate(CategoriesDestination.route)
+    fun toRulesScreen(income: Boolean) {
+//        viewModel.categories.setRules(income) TODO
+        navController.navigate(RulesDestination.route)
+    }
     fun onSaveColor(spec: String, color: Color) {
         // TODO
         navController.popBackStack()
@@ -271,7 +273,7 @@ fun LibraApp(
                     SettingsScreen(
                         toEditAccounts = ::toEditAccountsScreen,
                         toEditCategories = ::toCategoriesScreen,
-                        toCategoryRules = { },
+                        toCategoryRules = ::toRulesScreen,
                         toAddTransaction = { },
                         toAddCSV = { },
                         toAllTransactions = { },
@@ -303,6 +305,16 @@ fun LibraApp(
                         onChangeColor = ::toSettingsColorSelector,
                         onDelete = { },
                         onReorder = { _,_ -> },
+                    )
+                }
+                composable(route = RulesDestination.route) {
+                    CategoryRulesScreen(
+                        rules = previewRules,
+                        onBack = navController::popBackStack,
+                        onAdd = { },
+                        onEdit = ::onEditRule,
+                        onDelete = { },
+                        onReorder = { _, _ -> },
                     )
                 }
                 colorSelector()
@@ -359,9 +371,11 @@ fun LibraApp(
             )
         }
         if (editCategoryRuleIndex >= 0) {
-            ConfirmationDialog(
-                text = "Delete category " + deleteCategoryId.fullDisplayName + "?\n\nWarning! This will delete any subcategories as well.",
-                onDismiss = ::deleteCategory,
+            CategoryRuleDialog(
+                currentPattern = "",
+                currentCategory = CategoryId(),
+                categories = previewIncomeCategories,
+                onClose = ::editRule,
             )
         }
     }
