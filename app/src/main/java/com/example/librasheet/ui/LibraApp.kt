@@ -24,7 +24,7 @@ import com.example.librasheet.ui.categories.CategoriesScreen
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
-import com.example.librasheet.ui.settings.accounts.EditAccountsScreen
+import com.example.librasheet.ui.settings.EditAccountsScreen
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
 

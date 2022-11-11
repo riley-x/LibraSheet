@@ -1,26 +1,12 @@
-package com.example.librasheet.ui.settings
+package com.example.librasheet.ui.settings.cards
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.ui.components.ColorCodedRow
-import com.example.librasheet.ui.components.DropdownOptions
-import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.Account
-import com.example.librasheet.viewModel.dataClasses.HasDisplayName
-import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.preview.previewAccounts
-
 
 
 @Composable

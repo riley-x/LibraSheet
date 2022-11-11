@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.settings
+package com.example.librasheet.ui.settings.cards
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope

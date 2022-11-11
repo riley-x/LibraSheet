@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.settings
+package com.example.librasheet.ui.settings.cards
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
