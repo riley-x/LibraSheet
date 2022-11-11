@@ -1,5 +1,7 @@
 package com.example.librasheet.data
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.example.librasheet.data.database.*
@@ -11,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CategoryData(private val scope: CoroutineScope) {
-    val all = mutableListOf(
+    val all = mutableStateListOf(
         Category(
             id = CategoryId(incomeName),
             color = Color.Unspecified,
@@ -28,7 +30,7 @@ class CategoryData(private val scope: CoroutineScope) {
         // TODO. Make sure things are ordered correctly...
     }
 
-    fun find(category: CategoryId): Triple<Category, MutableList<Category>, Int> =
+    fun find(category: CategoryId): Triple<Category, SnapshotStateList<Category>, Int> =
         all.find(category) ?: throw RuntimeException("CategoryModel::find couldn't find $category")
 
 
@@ -64,15 +66,20 @@ class CategoryData(private val scope: CoroutineScope) {
         if (parentList.any { it.id.name == newName }) return "Error: account exists already"
 
         /** Update target **/
-        category.id = joinCategoryPath(category.id.parent, newName)
+        val newCategory = category.copy(
+            id = joinCategoryPath(category.id.parent, newName)
+        )
+        parentList.replace(index) { newCategory }
 
         /** Update target's children. Note because we enforce that categories only have one level of
          * nesting, at most we have to check the target's children, not nested ones. Similarly, it's
          * children can never have an expanded state, so we don't have to update the map. **/
-        val staleList = mutableListOf(category)
-        for (child in category.subCategories) {
-            child.id = joinCategoryPath(category.id, child.id.name)
-            staleList.add(child)
+        val staleList = mutableListOf(newCategory)
+        for (i in newCategory.subCategories.indices) {
+            newCategory.subCategories.replace(i) {
+                it.copy(id = joinCategoryPath(category.id, it.id.name))
+            }
+            staleList.add(newCategory.subCategories[i])
         }
 
         /** Update database **/
@@ -91,14 +98,14 @@ class CategoryData(private val scope: CoroutineScope) {
         if (newParent.subCategories.any { it.id.name == categoryId.name }) return "Error: category exists in destination already"
 
         /** Update add to new parent **/
-        category.apply {
-            id = joinCategoryPath(newParentId, categoryId.name)
+        val newCategory = category.copy(
+            id = joinCategoryPath(newParentId, categoryId.name),
             listIndex = newParent.subCategories.size
-        }
-        newParent.subCategories.add(category)
+        )
+        newParent.subCategories.add(newCategory)
 
         /** Update old parent's list and its children's indices **/
-        val staleList = mutableListOf(category)
+        val staleList = mutableListOf(newCategory)
         oldParentList.removeAt(index)
         for (i in index..oldParentList.lastIndex) {
             oldParentList[i].listIndex = i
