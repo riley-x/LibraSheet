@@ -20,6 +20,25 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 val libraRowHorizontalPadding = 20.dp
 val libraRowHeight = 50.dp
 
+fun Modifier.libraRow(
+    height: Dp = libraRowHeight,
+    horizontalPadding: Dp = libraRowHorizontalPadding,
+) = height(height)
+    .fillMaxWidth()
+    .padding(horizontal = horizontalPadding)
+
+@Composable
+fun ColorIndicator(
+    color: Color = Color.Unspecified,
+) {
+    Spacer(Modifier.padding(end = 12.dp)
+        .padding(vertical = 8.dp)
+        .width(4.dp)
+        .fillMaxHeight()
+        .background(color = color)
+    )
+}
+
 /**
  * Base row composable for various lists, like accounts, income, or expenses.
  */
@@ -34,22 +53,10 @@ fun ColorCodedRow(
     Surface(modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(libraRowHeight)
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding)
+            modifier = Modifier.libraRow(horizontalPadding = horizontalPadding)
         ) {
             contentBefore()
-            
-            Spacer(
-                Modifier
-                    .padding(vertical = 8.dp)
-                    .width(4.dp)
-                    .fillMaxHeight()
-                    .background(color = color)
-            )
-            Spacer(Modifier.width(12.dp))
-
+            ColorIndicator(color)
             content()
         }
     }
