@@ -38,6 +38,9 @@ fun GraphSelector(
      * two tabs). However, the hoisted states don't need to care about it. **/
     // TODO do we need to hoist the selected tab state at all?
     val wasFromDialRight = remember { mutableStateOf(true) }
+    val swipeableState = rememberSwipeableState(0,
+        animationSpec = tween(400)
+    )
 
     Column {
         AnimatedContent(
@@ -48,7 +51,7 @@ fun GraphSelector(
                     else AnimatedContentScope.SlideDirection.End
                 slideIntoContainer(
                     towards = towards,
-                    animationSpec = tween(400 )
+                    animationSpec = tween(400)
                 ) + fadeIn(animationSpec = tween(400)) with
                         slideOutOfContainer(
                             towards = towards,
@@ -61,8 +64,12 @@ fun GraphSelector(
 
         DialSelector(
             labels = tabs,
+            swipeableState = swipeableState,
             onSelection = { index, loop ->
+                // This if check is important because when loop is true, the launched effect in the
+                // dial selector will call onSelection again with loop = false
                 if (index == selectedTab.value) return@DialSelector
+
                 val greater = index > selectedTab.value
                 wasFromDialRight.value = if (loop) !greater else greater
                 onSelection(index)
