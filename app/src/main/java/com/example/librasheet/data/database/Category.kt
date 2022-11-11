@@ -3,6 +3,8 @@ package com.example.librasheet.data.database
 import androidx.annotation.NonNull
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
 
@@ -22,13 +24,13 @@ const val displaySeparator = " > "
  * @property isTop enables an easy search for top-level categories.
  */
 @Entity(tableName = categoryTable)
-class Category (
+data class Category (
     @PrimaryKey(autoGenerate = true) val key: Int = 0,
-    @NonNull var id: CategoryId,
+    @NonNull val id: CategoryId,
     val color: Color,
-    var listIndex: Int,
+    var listIndex: Int, // This is not used by compose, and can be a var
 ) {
-    @Ignore var subCategories: MutableList<Category> = mutableListOf()
+    @Ignore val subCategories: SnapshotStateList<Category> = mutableStateListOf()
     val isTop = id.isTop
 }
 
@@ -51,7 +53,7 @@ data class CategoryWithChildren(
     /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
      * to worry about nested subCategories since we enforce only two levels of categories **/
     fun toNestedCategory(): Category {
-        current.subCategories = subCategories
+        current.subCategories.addAll(subCategories)
         return current
     }
 }
@@ -113,12 +115,15 @@ fun String.toCategoryId() = CategoryId(this)
 
 
 @Stable
-fun MutableList<Category>.find(target: CategoryId): Triple<Category, MutableList<Category>, Int>? {
+fun SnapshotStateList<Category>.find(target: CategoryId): Triple<Category, SnapshotStateList<Category>, Int>? {
     for ((index, current) in withIndex()) {
         if (current.id == target) return Triple(current, this, index)
         else if (target.isIn(current.id)) return current.subCategories.find(target)
     }
     return null
+}
+fun SnapshotStateList<Category>.replace(index: Int, new: (Category) -> Category) {
+    this[index] = new(this[index])
 }
 
 
