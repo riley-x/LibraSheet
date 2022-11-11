@@ -12,6 +12,7 @@ import com.example.librasheet.ui.graphing.PieChartValue
 
 @Immutable
 data class CategoryUi(
+    val key: Int = 0,
     val id: CategoryId = CategoryId(),
     override val color: Color = Color.White,
     override val value: Float = 0f,
@@ -22,12 +23,12 @@ data class CategoryUi(
 }
 
 fun Category.toUi(values: Map<CategoryId, Float>): CategoryUi = CategoryUi(
+    key = key,
     id = id,
     color = color,
     value = values.getOrDefault(id, 0f),
     subCategories = subCategories.map { it.toUi(values) }
 )
-
 
 @Stable
 fun List<CategoryUi>.find(target: CategoryId): CategoryUi? {

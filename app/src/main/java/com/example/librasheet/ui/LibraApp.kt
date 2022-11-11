@@ -143,10 +143,9 @@ fun LibraApp(
 
     var editCategoryRuleIndex by remember { mutableStateOf(-1) }
     fun onEditRule(index: Int) { editCategoryRuleIndex = index }
-    fun editRule(cancel: Boolean, pattern: String, categoryId: CategoryId) {
+    fun editRule(cancel: Boolean, pattern: String, category: CategoryUi) {
+        if (!cancel) viewModel.rules.updateRule(editCategoryRuleIndex, pattern, category)
         editCategoryRuleIndex = -1
-        if (cancel) return
-        // TODO
     }
 
     /** Main Layout Scaffold **/
@@ -309,7 +308,7 @@ fun LibraApp(
                 }
                 composable(route = RulesDestination.route) {
                     CategoryRulesScreen(
-                        rules = previewRules,
+                        rules = viewModel.rules.displayList,
                         onBack = navController::popBackStack,
                         onAdd = { },
                         onEdit = ::onEditRule,
@@ -371,9 +370,10 @@ fun LibraApp(
             )
         }
         if (editCategoryRuleIndex >= 0) {
+            val current = viewModel.rules.displayList[editCategoryRuleIndex]
             CategoryRuleDialog(
-                currentPattern = "",
-                currentCategory = CategoryId(),
+                currentPattern = current.pattern,
+                currentCategory = current.category ?: CategoryUi(),
                 categories = previewIncomeCategories,
                 onClose = ::editRule,
             )

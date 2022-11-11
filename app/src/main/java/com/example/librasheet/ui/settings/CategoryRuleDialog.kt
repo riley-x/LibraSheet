@@ -22,9 +22,9 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 @Composable
 fun CategoryRuleDialog(
     currentPattern: String,
-    currentCategory: CategoryId,
+    currentCategory: CategoryUi,
     categories: SnapshotStateList<CategoryUi>,
-    onClose: (cancelled: Boolean, String, CategoryId) -> Unit = { _, _, _ -> },
+    onClose: (cancelled: Boolean, String, CategoryUi) -> Unit = { _, _, _ -> },
 ) {
     var pattern by remember { mutableStateOf(currentPattern) }
     var category by remember { mutableStateOf(currentCategory) }
@@ -54,9 +54,9 @@ fun CategoryRuleDialog(
 
         DropdownSelector(
             label = "Category",
-            toString = { it.name },
+            toString = { it.id.name },
             currentValue = category,
-            allValues = categories.map { it.id },
+            allValues = categories,
             onSelection = { category = it },
             modifier = Modifier.padding(bottom = 6.dp)
         )
@@ -70,7 +70,7 @@ private fun Preview() {
     LibraSheetTheme {
         CategoryRuleDialog(
             currentPattern = "PYPAL",
-            currentCategory = "Income".toCategoryId(),
+            currentCategory = previewIncomeCategories[0],
             categories = previewIncomeCategories,
         )
     }
