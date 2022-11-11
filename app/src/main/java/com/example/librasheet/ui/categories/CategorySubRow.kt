@@ -25,7 +25,7 @@ fun CategorySubRow(
     onDragEnd: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     dividerColor: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
     colorRowModifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit = { },
+    content: @Composable RowScope.(CategoryUi) -> Unit = { },
 ) {
     Row(modifier) {
         ComponentIndicatorLine(
@@ -49,7 +49,7 @@ fun CategorySubRow(
                     .rowDivider(padding = 0.dp, color = dividerColor, enabled = !dragScope.isTarget(dragGroup, dragIndex))
             ) {
                 Text(category.name)
-                content()
+                content(category)
             }
         }
     }

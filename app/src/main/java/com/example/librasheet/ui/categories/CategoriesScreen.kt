@@ -38,6 +38,7 @@ private val categoryOptions = ImmutableList(CategoryOption.values().toList())
 private val subCategoryOptions = ImmutableList(categoryOptions.items.filter { it != CategoryOption.ADD })
 
 
+
 @Composable
 fun CategoriesScreen(
     incomeCategories: SnapshotStateList<CategoryUi>,
@@ -71,48 +72,31 @@ fun CategoriesScreen(
         )
 
         DragHost {
-            /** Note you have to draw the dividers with the composables, because the size of each
-             * category row can be different if they're expanded. So it doesn't make sense to have
-             * fixed dividers like in the EditAccountScreen. **/
-            val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
-            fun LazyListScope.categoryItems(list: SnapshotStateList<CategoryUi>, group: String) {
-                // TODO keying the lazy column like key = { _, it -> it.id.fullName } messes up the
-                //  index, which isn't reset since it's inside the composable
-                itemsIndexed(list) { index, category ->
-                    DragToReorderTarget(
-                        index = index,
-                        group = group,
-                        onDragEnd = onReorder,
-                    ) { dragScope ->
-                        CategoryRow(
-                            category = category,
-                            expanded = expanded.getOrPut(category.id.fullName) { MutableTransitionState(false) },
-                            modifier = Modifier.rowDivider(enabled = index > 0 && !dragScope.isTarget(group, index), color = dividerColor),
-                            content = { category ->
-                                Spacer(modifier = Modifier.weight(10f))
-                                DropdownOptions(options = categoryOptions) {
-                                    onOptionSelect(category, it)
-                                }
-                            },
-                        ) { subIndex, subCategory ->
-                            CategorySubRow(
-                                category = subCategory,
-                                indicatorColor = category.color.copy(alpha = 0.5f),
-                                last = subIndex == category.subCategories.lastIndex,
-                                dragIndex = subIndex,
-                                dragGroup = category.id.fullName,
-                                onDragEnd = onReorder,
-                            ) {
-                                Spacer(modifier = Modifier.weight(10f))
-                                DropdownOptions(options = subCategoryOptions) {
-                                    onOptionSelect(subCategory, it)
-                                }
-                            }
+            fun LazyListScope.categoryOptionsList(
+                list: SnapshotStateList<CategoryUi>,
+                group: String,
+            ) {
+                categoryItems(
+                    list = list,
+                    group = group,
+                    expanded = expanded,
+                    onReorder = onReorder,
+                    content = { category ->
+                        Spacer(modifier = Modifier.weight(10f))
+                        DropdownOptions(options = categoryOptions) {
+                            onOptionSelect(category, it)
+                        }
+                    },
+                    subContent = { category ->
+                        Spacer(modifier = Modifier.weight(10f))
+                        DropdownOptions(options = subCategoryOptions) {
+                            onOptionSelect(category, it)
                         }
                     }
-                }
+                )
             }
+
             fun LazyListScope.categoryTitle(title: String) {
                 item(title) {
                     RowTitle(title = title) {
@@ -126,10 +110,10 @@ fun CategoriesScreen(
 
             LazyColumn(Modifier.fillMaxSize()) {
                 categoryTitle(incomeName)
-                categoryItems(incomeCategories, incomeName)
+                categoryOptionsList(incomeCategories, incomeName)
                 item("spacer") { Spacer(Modifier.height(20.dp)) }
                 categoryTitle(expenseName)
-                categoryItems(expenseCategories, expenseName)
+                categoryOptionsList(expenseCategories, expenseName)
             }
         }
     }

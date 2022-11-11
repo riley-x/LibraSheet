@@ -11,9 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
-import com.example.librasheet.data.database.CategoryId
-import com.example.librasheet.data.database.getCategoryName
-import com.example.librasheet.data.database.toCategoryId
+import com.example.librasheet.data.database.*
 import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.dialogs.TextFieldDialog
@@ -178,9 +176,10 @@ fun LibraApp(
             composable(route = CategoryDetailDestination.route(route!!), arguments = CategoryDetailDestination.arguments) {
                 val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 CashFlowScreen(
-                    title = category.name,
+                    parentCategory = category,
                     headerBackArrow = true,
                     categories = if (isIncome) viewModel.categories.incomeDetail else viewModel.categories.expenseDetail,
+                    expanded = viewModel.categories.editScreenIsExpanded, // TODO
                     history = previewStackedLineGraphState,
                     historyDates = previewLineGraphDates,
                     categoryTimeRange = previewIncomeCategoryTimeRange,
@@ -231,8 +230,9 @@ fun LibraApp(
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
                     CashFlowScreen(
-                        title = "Income",
+                        parentCategory = incomeName.toCategoryId(),
                         categories = viewModel.categories.income,
+                        expanded = viewModel.categories.editScreenIsExpanded, // TODO
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
@@ -247,8 +247,9 @@ fun LibraApp(
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
                     CashFlowScreen(
-                        title = "Spending",
+                        parentCategory = expenseName.toCategoryId(),
                         categories = previewExpenseCategories,
+                        expanded = viewModel.categories.editScreenIsExpanded, // TODO
                         history = previewStackedLineGraphState,
                         historyDates = previewLineGraphDates,
                         categoryTimeRange = previewIncomeCategoryTimeRange,
