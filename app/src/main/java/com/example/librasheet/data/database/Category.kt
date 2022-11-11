@@ -27,7 +27,8 @@ const val displaySeparator = " > "
  */
 @Entity(tableName = category_table)
 class Category (
-    @PrimaryKey @NonNull var id: CategoryId,
+    @PrimaryKey(autoGenerate = true) val key: Int = 0,
+    @NonNull var id: CategoryId,
     val color: Color,
     var listIndex: Int,
 ) {
@@ -36,17 +37,17 @@ class Category (
 }
 
 
-@Entity(primaryKeys = ["parentId", "childId"])
+@Entity(primaryKeys = ["parentKey", "childKey"])
 data class CategoryHierarchy(
-    val parentId: String,
-    val childId: String
+    val parentKey: Int,
+    val childKey: Int
 )
 
 data class CategoryWithChildren(
     @Embedded val current: Category,
     @Relation(
-        parentColumn = "parentId",
-        entityColumn = "childId",
+        parentColumn = "parentKey",
+        entityColumn = "childKey",
         associateBy = Junction(CategoryHierarchy::class)
     )
     val subCategories: MutableList<Category>
