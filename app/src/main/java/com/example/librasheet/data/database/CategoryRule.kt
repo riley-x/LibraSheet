@@ -29,10 +29,9 @@ data class CategoryRule (
  * https://stackoverflow.com/questions/45789325/update-some-specific-field-of-an-entity-in-android-room/59834309#59834309
  */
 @Entity
-data class CategoryRuleWithoutIndex (
-    @PrimaryKey(autoGenerate = true) val key: Int = 0,
+data class RulePartialUpdate (
+    val key: Long,
     @NonNull val pattern: String,
-    val categoryKey: Int,
-    @Ignore val category: Category? = null
+    val categoryKey: Long,
 )
 
