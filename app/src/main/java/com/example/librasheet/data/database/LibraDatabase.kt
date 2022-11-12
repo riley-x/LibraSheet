@@ -11,8 +11,9 @@ import java.io.File
 @Database(
     entities = [
         Category::class,
+        CategoryRuleEntity::class,
     ],
-    version = 2,
+    version = 3,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
@@ -20,6 +21,7 @@ import java.io.File
 @TypeConverters(Converters::class)
 abstract class LibraDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
+    abstract fun ruleDao(): RuleDao
 
     companion object {
         @Volatile

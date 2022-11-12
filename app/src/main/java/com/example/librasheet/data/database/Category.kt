@@ -32,8 +32,12 @@ internal const val expenseKey = -2L
  * https://stackoverflow.com/questions/58203953/room-database-with-kotlin-inline-class-as-an-entity-field
  * So must specify a Long as the type and convert (which should be heap-free).
  * @param listIndex Index of this entry in its parent category list. Only used when loading from the
- * database, not inside compose
- * @param parentKey can be [incomeKey] for income, or [expenseKey] for expense
+ * database, not inside compose.
+ * @param parentKey can be [incomeKey] for income, or [expenseKey] for expense. Otherwise points to
+ * the [key] of the parent category. This is not accessed by compose UI so it can be modified without
+ * becoming stale.
+ *
+ * TODO id and color should be States? 
  */
 @Entity(tableName = categoryTable)
 data class Category (
