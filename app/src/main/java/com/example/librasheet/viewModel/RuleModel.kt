@@ -8,11 +8,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.database.Category
 import com.example.librasheet.data.database.CategoryRule
+import com.example.librasheet.data.database.matchCategories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
+/** This class only stores a filtered set of rules at any given time. When we reorder rules,
+ * we don't know what intermediate rules there may be. These have to be handled by the dao. Note
+ * we don't need a startup function because all the loading is deferred to [setScreen].
+ */
 class RuleModel(
     private val viewModel: LibraViewModel,
 ) {
@@ -24,13 +29,6 @@ class RuleModel(
     var filterCategories = mutableStateListOf<Category>()
     var currentFilter by mutableStateOf(Category.None)
     private var currentScreenIsIncome = false
-
-
-    /** This class only stores a filtered set of rules at any given time. When we reorder rules,
-     * we don't know what intermediate rules there may be. These have to be handled by the dao. Note
-     * we don't need a load/startup function because all the loading is deferred to [setScreen].
-     */
-
 
 
     @Callback
@@ -107,7 +105,7 @@ class RuleModel(
         viewModel.viewModelScope.launch {
             // TODO loading indicator
             val rules = withContext(Dispatchers.IO) {
-                if (currentScreenIsIncome) {
+                val rules = if (currentScreenIsIncome) {
                     if (category.id.isSuper) dao.getIncomeRules()
                     else dao.getIncomeRules(category.key)
                 }
@@ -115,6 +113,8 @@ class RuleModel(
                     if (category.id.isSuper) dao.getExpenseRules()
                     else dao.getExpenseRules(category.key)
                 }
+                // TODO is reading category safe here?
+                rules.matchCategories(category)
             }
             displayList.clear()
             displayList.addAll(rules)

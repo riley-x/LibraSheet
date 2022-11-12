@@ -4,17 +4,6 @@ import androidx.room.*
 
 @Dao
 interface RuleDao {
-    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 1 ORDER BY listIndex")
-    fun getIncomeRules(): List<CategoryRule>
-
-    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 0 ORDER BY listIndex")
-    fun getExpenseRules(): List<CategoryRule>
-
-    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 1 AND categoryKey = :categoryKey ORDER BY listIndex")
-    fun getIncomeRules(categoryKey: Long): List<CategoryRule>
-
-    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 0 AND categoryKey = :categoryKey ORDER BY listIndex")
-    fun getExpenseRules(categoryKey: Long): List<CategoryRule>
 
     @Query("SELECT listIndex FROM $ruleTable WHERE `key` = :key")
     fun getIndex(key: Long): Int
@@ -43,6 +32,25 @@ interface RuleDao {
 
     @Query("DELETE FROM $ruleTable WHERE `key` = :key")
     fun delete(key: Long)
+
+
+    /** GET FUNCTIONS **/
+
+    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 1 ORDER BY listIndex")
+    fun getIncomeRules(): List<CategoryRule>
+
+    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 0 ORDER BY listIndex")
+    fun getExpenseRules(): List<CategoryRule>
+
+    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 1 AND categoryKey = :categoryKey ORDER BY listIndex")
+    fun getIncomeRules(categoryKey: Long): List<CategoryRule>
+
+    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 0 AND categoryKey = :categoryKey ORDER BY listIndex")
+    fun getExpenseRules(categoryKey: Long): List<CategoryRule>
+
+
+
+    /** REORDER FUNCTIONS **/
 
     @Query("UPDATE $ruleTable SET listIndex = listIndex - 1 WHERE listIndex >= :startIndex AND listIndex <= :endIndex")
     fun decrementIndices(startIndex: Int, endIndex: Int)

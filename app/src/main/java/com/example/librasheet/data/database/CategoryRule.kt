@@ -64,3 +64,12 @@ data class CategoryRule (
     )
 }
 
+
+fun List<CategoryRule>.matchCategories(parentCategory: Category): List<CategoryRule> {
+    val keyMap = mutableMapOf<Long, Category?>()
+    return map {
+        it.copy(
+            category = keyMap.getOrPut(it.categoryKey) { parentCategory.find(it.categoryKey) }
+        )
+    }
+}

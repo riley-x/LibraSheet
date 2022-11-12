@@ -37,7 +37,7 @@ internal const val expenseKey = -2L
  * the [key] of the parent category. This is not accessed by compose UI so it can be modified without
  * becoming stale.
  *
- * TODO id and color should be States? 
+ * TODO id and color should be States?
  */
 @Entity(tableName = categoryTable)
 data class Category (
@@ -98,6 +98,15 @@ data class Category (
         if (inclusive) out.add(this)
         subCategories.forEach { out.addAll(it.getAllFlattened()) }
         return out
+    }
+
+    fun find(targetKey: Long) : Category? {
+        if (key == targetKey) return this
+        subCategories.forEach {
+            val res = it.find(targetKey)
+            if (res != null) return res
+        }
+        return null
     }
 }
 
