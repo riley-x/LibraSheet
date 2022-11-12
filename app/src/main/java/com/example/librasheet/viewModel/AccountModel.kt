@@ -1,38 +1,50 @@
 package com.example.librasheet.viewModel
 
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.viewModelScope
+import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.theme.randomColor
-import com.example.librasheet.viewModel.dataClasses.Account
-import com.example.librasheet.viewModel.preview.previewAccounts
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AccountModel(
     private val viewModel: LibraViewModel,
 ) {
-    //val current = mutableStateListOf<Account>()
-    val current = previewAccounts.toMutableStateList()
+    private val dao = viewModel.application.database.accountDao()
+
+    val all = mutableStateListOf<Account>()
+//    val current = previewAccounts.toMutableStateList()
 
     @Callback
     fun rename(index: Int, name: String) {
-        if (name == current[index].name) return
-        current[index] = current[index].copy(name = name)
-        // TODO Room update. Only do a partial update since we don't keep track listIndex
+        if (name == all[index].name) return
+        all[index] = all[index].copy(name = name)
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            dao.update(all[index])
+        }
     }
 
     @Callback
     fun add(name: String) {
-        val account = Account(
+        val accountWithoutKey = Account(
             name = name,
             color = randomColor(),
-            balance = 0,
+            listIndex = all.size,
+            // TODO institute
         )
-        current.add(account)
-        // TODO Room update. Need wrapper insert function that finds the current last Index.
+        viewModel.viewModelScope.launch {
+            // TODO loading indicator
+            all.add(accountWithoutKey.copy(
+                key = withContext(Dispatchers.IO) { dao.add(accountWithoutKey) }
+            ))
+        }
     }
 
     @Callback
     fun reorder(startIndex: Int, endIndex: Int) {
         if (startIndex == endIndex) return
-        current.add(endIndex, current.removeAt(startIndex))
+        all.add(endIndex, all.removeAt(startIndex))
         // TODO delete and update all affected indices (via a SQL command)
     }
 }

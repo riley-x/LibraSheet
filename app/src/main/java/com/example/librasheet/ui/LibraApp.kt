@@ -21,7 +21,6 @@ import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
 import com.example.librasheet.viewModel.dataClasses.*
-import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
 
 
@@ -227,7 +226,7 @@ fun LibraApp(
             navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
                 composable(route = BalanceTab.route) {
                     BalanceScreen(
-                        accounts = viewModel.accounts.current,
+                        accounts = viewModel.accounts.all,
                         history = previewStackedLineGraphState,
                         dates = previewLineGraphDates,
                         netIncome = previewNetIncomeState,
@@ -317,7 +316,7 @@ fun LibraApp(
                 }
                 composable(route = EditAccountsDestination.route) {
                     EditAccountsScreen(
-                        accounts = viewModel.accounts.current,
+                        accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
                         onAddAccount = ::onAddAccount,
                         onChangeName = ::onChangeAccountName,
@@ -349,7 +348,7 @@ fun LibraApp(
             )
         }
         if (changeAccountNameIndex >= 0) {
-            val currentName = viewModel.accounts.current[changeAccountNameIndex].name
+            val currentName = viewModel.accounts.all[changeAccountNameIndex].name
             TextFieldDialog(
                 title = "Rename $currentName",
                 initialText = currentName,

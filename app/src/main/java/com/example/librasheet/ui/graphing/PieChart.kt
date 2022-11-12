@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.components.formatPercent
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.previewAccounts
 import java.lang.Math.toDegrees
 
