@@ -13,6 +13,7 @@ data class CategoryWithChildren(
     /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
      * to worry about nested subCategories since we enforce only two levels of categories **/
     fun toNestedCategory(): Category {
+        subCategories.sortBy { it.listIndex }
         current.subCategories.addAll(subCategories)
         return current
     }
@@ -21,9 +22,12 @@ data class CategoryWithChildren(
 
 @Dao
 interface CategoryDao {
-    @Query("SELECT * FROM $categoryTable WHERE parentKey = $incomeKey")
+    @Transaction
+    @Query("SELECT * FROM $categoryTable WHERE parentKey = $incomeKey ORDER BY listIndex")
     fun getIncome(): List<CategoryWithChildren>
-    @Query("SELECT * FROM $categoryTable WHERE parentKey = $expenseKey")
+
+    @Transaction
+    @Query("SELECT * FROM $categoryTable WHERE parentKey = $expenseKey ORDER BY listIndex")
     fun getExpense(): List<CategoryWithChildren>
 
     @Insert fun add(category: Category): Long

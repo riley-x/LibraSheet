@@ -37,9 +37,7 @@ class CategoryModel(
     val expenseScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
 
-    suspend fun load() {
-        // TODO, ensure listIndex is correct
-    }
+    fun loadData() = data.load()
 
     fun loadUi() {
         income.clear()

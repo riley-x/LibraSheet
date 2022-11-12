@@ -11,6 +11,7 @@ import com.example.librasheet.viewModel.Callback
 import com.example.librasheet.viewModel.dataClasses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.exp
 
@@ -34,8 +35,11 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
     )
 
 
-    fun load() {
-        // TODO. Make sure things are ordered correctly...
+    fun load(): Job {
+        return scope.launch(Dispatchers.IO) {
+            dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
+            dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
+        }
     }
 
     fun find(category: CategoryId): Triple<Category, SnapshotStateList<Category>, Int> =

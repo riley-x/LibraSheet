@@ -1,5 +1,6 @@
 package com.example.librasheet.viewModel
 
+import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,9 +12,10 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val accounts = AccountModel(this)
 
     suspend fun startup() {
-
+        Log.d("Libra/LibraViewModel/startup", "Startup")
+        categories.loadData().join()
+        categories.loadUi()
     }
-
 }
 
 /**
