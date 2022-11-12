@@ -94,6 +94,7 @@ data class CategoryId(
 
     val fullDisplayName: String
         get() = splitName.joinToString(displaySeparator)
+    fun indentedName(offset: Int = 0): String = "—".repeat(maxOf(0,splitName.size - 1 - offset)) + name
 
     val superName: String
         get() = splitName.getOrElse(0) { "" }

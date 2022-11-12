@@ -16,7 +16,9 @@ class RuleModel(
 ) {
     /** Used by the CategoryRulesScreen **/
     val displayList = mutableStateListOf<CategoryRule>()
-    var targetCategories  = mutableStateListOf<Category>()
+    var targetCategories = mutableStateListOf<Category>()
+    var filterCategories = mutableStateListOf<Category>()
+    var currentFilter by mutableStateOf(Category.None)
 
     @Callback
     fun update(index: Int, pattern: String, category: Category) {
@@ -56,18 +58,21 @@ class RuleModel(
         // TODO delete and update all affected indices (via a SQL command)
     }
 
+    /** Called from navigating to the income or expense rules from the settings screen. **/
     @Callback
-    fun setFilter(income: Boolean) {
+    fun setScreen(income: Boolean) {
         val category = viewModel.categories.data.all[if (income) 0 else 1]
         targetCategories.clear()
-        targetCategories.addAll(category.getAllFlattened(false))
-        // TODO reset displayList via room query
+        targetCategories.addAll(category.getAllFlattened(!category.id.isSuper))
+        filterCategories.clear()
+        filterCategories.add(category)
+        filterCategories.addAll(targetCategories)
+        setFilter(category)
     }
 
     @Callback
     fun setFilter(category: Category) {
-        targetCategories.clear()
-        targetCategories.addAll(category.getAllFlattened())
+        currentFilter = category
         // TODO reset displayList via room query
     }
 }

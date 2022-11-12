@@ -9,6 +9,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
+import androidx.compose.material.icons.sharp.FilterAlt
+import androidx.compose.material.icons.sharp.FilterList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -43,6 +45,7 @@ fun CategoryRulesScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onAdd: () -> Unit = { },
+    onFilter: () -> Unit = { },
     onEdit: (Int) -> Unit = { },
     onDelete: (Int) -> Unit = { },
     onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
@@ -55,6 +58,10 @@ fun CategoryRulesScreen(
             modifier = Modifier.zIndex(2f)
         ) {
             Spacer(Modifier.weight(10f))
+            IconButton(onClick = onFilter) {
+                Icon(Icons.Sharp.FilterAlt, null)
+            }
+            Spacer(Modifier.width(5.dp))
             IconButton(onClick = onAdd) {
                 Icon(Icons.Sharp.Add, null)
             }

@@ -56,7 +56,7 @@ fun CategoryRuleDialog(
 
         DropdownSelector(
             label = "Category",
-            toString = { it.id.name },
+            toString = { it.id.indentedName(1) },
             currentValue = category,
             allValues = categories,
             onSelection = { category = it },

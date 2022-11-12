@@ -12,16 +12,16 @@ import com.example.librasheet.ui.components.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
 @Composable
-fun SelectorDialog(
-    options: SnapshotStateList<String>,
+fun <T> SelectorDialog(
+    options: SnapshotStateList<T>,
+    initialSelection: T,
+    toString: (T) -> String,
     modifier: Modifier = Modifier,
-    initialSelection: String = "",
     title: String = "",
     errorMessage: String = "",
     cancelText: String = "Cancel",
     okText: String = "Ok",
-    toString: (String) -> String = { it },
-    onDismiss: (String) -> Unit = { },
+    onDismiss: (cancelled: Boolean, T) -> Unit = { _, _ -> },
 ) {
     var currentSelection by remember { mutableStateOf(initialSelection) }
 
@@ -30,8 +30,8 @@ fun SelectorDialog(
         okText = okText,
         cancelText = cancelText,
         errorMessage = errorMessage,
-        onCancel = { onDismiss("") },
-        onOk = { onDismiss(currentSelection) },
+        onCancel = { onDismiss(true, currentSelection) },
+        onOk = { onDismiss(false, currentSelection) },
         modifier = modifier,
     ) {
         DropdownSelector(
@@ -44,6 +44,29 @@ fun SelectorDialog(
     }
 }
 
+
+@Composable
+fun SelectorDialog(
+    options: SnapshotStateList<String>,
+    modifier: Modifier = Modifier,
+    initialSelection: String = "",
+    title: String = "",
+    errorMessage: String = "",
+    cancelText: String = "Cancel",
+    okText: String = "Ok",
+    toString: (String) -> String = { it },
+    onDismiss: (String) -> Unit = { },
+) = SelectorDialog(
+    options = options,
+    modifier = modifier,
+    initialSelection = initialSelection,
+    title = title,
+    errorMessage = errorMessage,
+    cancelText = cancelText,
+    okText = okText,
+    toString = toString,
+    onDismiss = { cancelled, text -> if (cancelled) onDismiss("") else onDismiss(text) },
+)
 
 @Preview
 @Composable

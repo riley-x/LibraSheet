@@ -67,7 +67,7 @@ fun LibraApp(
     }
     fun toCategoriesScreen() = navController.navigate(CategoriesDestination.route)
     fun toRulesScreen(income: Boolean) {
-        viewModel.rules.setFilter(income)
+        viewModel.rules.setScreen(income)
         navController.navigate(RulesDestination.route)
     }
     fun onSaveColor(spec: String, color: Color) {
@@ -150,6 +150,13 @@ fun LibraApp(
     fun editRule(cancel: Boolean, pattern: String, category: Category) {
         if (!cancel) viewModel.rules.update(editCategoryRuleIndex, pattern, category)
         editCategoryRuleIndex = -2
+    }
+
+    var showFilterRules by remember { mutableStateOf(false) }
+    fun onFilterRules() { showFilterRules = true }
+    fun filterRules(cancelled: Boolean, filter: Category) {
+        if (!cancelled) viewModel.rules.setFilter(filter)
+        showFilterRules = false
     }
 
     var deleteRuleIndex by remember { mutableStateOf(-1) }
@@ -322,6 +329,7 @@ fun LibraApp(
                         rules = viewModel.rules.displayList,
                         onBack = navController::popBackStack,
                         onAdd = ::onAddRule,
+                        onFilter = ::onFilterRules,
                         onEdit = ::onEditRule,
                         onDelete = ::onDeleteRule,
                         onReorder = viewModel.rules::reorder,
@@ -401,6 +409,14 @@ fun LibraApp(
             ConfirmationDialog(
                 text = "Delete rule ${viewModel.rules.displayList[deleteRuleIndex].pattern}?",
                 onDismiss = ::deleteRule,
+            )
+        }
+        if (showFilterRules) {
+            SelectorDialog(
+                options = viewModel.rules.filterCategories,
+                initialSelection = viewModel.rules.currentFilter,
+                toString = { it.id.indentedName() },
+                onDismiss = ::filterRules,
             )
         }
     }
