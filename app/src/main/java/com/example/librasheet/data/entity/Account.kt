@@ -13,7 +13,7 @@ const val accountHistoryTable = "account_history"
     tableName = accountTable
 )
 data class Account(
-    @PrimaryKey(autoGenerate = true) val key: Int = 0,
+    @PrimaryKey(autoGenerate = true) val key: Long = 0,
     @NonNull val name: String,
     val institution: Institution,
     val colorLong: Long,
@@ -26,10 +26,10 @@ data class Account(
 
 @Entity(
     tableName = accountHistoryTable,
-    primaryKeys = ["account", "date"],
+    primaryKeys = ["accountKey", "date"],
 )
 data class AccountHistory(
-    val account: Long,
+    val accountKey: Long,
     val date: Int,
     val balance: Long,
 )

@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.librasheet.data.dao.AccountDao
 import com.example.librasheet.data.dao.CategoryDao
 import com.example.librasheet.data.dao.RuleDao
 import com.example.librasheet.data.entity.*
@@ -16,7 +17,7 @@ import com.example.librasheet.data.entity.*
         Account::class,
         AccountHistory::class,
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
@@ -25,6 +26,7 @@ import com.example.librasheet.data.entity.*
 abstract class LibraDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun ruleDao(): RuleDao
+    abstract fun accountDao(): AccountDao
 
     companion object {
         @Volatile
