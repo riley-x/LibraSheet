@@ -39,6 +39,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         return scope.launch(Dispatchers.IO) {
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
             dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
+            lastRowId = dao.getMaxKey()
         }
     }
 
