@@ -77,7 +77,7 @@ class CategoryData(private val scope: CoroutineScope) {
         val staleList = mutableListOf(newCategory)
         for (i in newCategory.subCategories.indices) {
             newCategory.subCategories.replace(i) {
-                it.copy(id = joinCategoryPath(category.id, it.id.name))
+                it.copy(id = joinCategoryPath(newCategory.id, it.id.name))
             }
             staleList.add(newCategory.subCategories[i])
         }

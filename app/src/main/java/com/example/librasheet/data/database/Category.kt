@@ -29,8 +29,8 @@ data class Category (
     @NonNull val id: CategoryId,
     val color: Color,
     var listIndex: Int, // This is not used by compose, and can be a var
-) {
     @Ignore val subCategories: SnapshotStateList<Category> = mutableStateListOf()
+) {
     val isTop = id.isTop
 
     companion object {
