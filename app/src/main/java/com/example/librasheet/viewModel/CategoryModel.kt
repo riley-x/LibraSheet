@@ -111,6 +111,7 @@ class CategoryModel(
         loadUi()
     }
 
+    /** Todo this will leave the rules stale. Check branch RulesStoreCategoryState **/
     @Callback
     fun rename(categoryId: CategoryId, newName: String): String {
         val error = data.rename(categoryId, newName)

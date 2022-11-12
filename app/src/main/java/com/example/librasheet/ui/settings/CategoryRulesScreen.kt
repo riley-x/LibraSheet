@@ -44,7 +44,7 @@ fun CategoryRulesScreen(
     onBack: () -> Unit = { },
     onAdd: () -> Unit = { },
     onEdit: (Int) -> Unit = { },
-    onDelete: (CategoryRule) -> Unit = { },
+    onDelete: (Int) -> Unit = { },
     onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
 ) {
     Column(modifier) {
@@ -85,7 +85,7 @@ fun CategoryRulesScreen(
                             DropdownOptions(options = ruleOptions) {
                                 when (it) {
                                     RuleOptions.EDIT -> onEdit(index)
-                                    RuleOptions.DELETE -> onDelete(rule)
+                                    RuleOptions.DELETE -> onDelete(index)
                                 }
                             }
                         }

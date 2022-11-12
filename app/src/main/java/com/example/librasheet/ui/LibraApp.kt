@@ -1,6 +1,5 @@
 package com.example.librasheet.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
@@ -145,14 +144,20 @@ fun LibraApp(
     fun onAddRule() { editCategoryRuleIndex = -1 }
     fun onEditRule(index: Int) { editCategoryRuleIndex = index }
     fun addRule(cancel: Boolean, pattern: String, category: Category) {
-        if (!cancel) viewModel.rules.addRule(pattern, category)
+        if (!cancel) viewModel.rules.add(pattern, category)
         editCategoryRuleIndex = -2
     }
     fun editRule(cancel: Boolean, pattern: String, category: Category) {
-        if (!cancel) viewModel.rules.updateRule(editCategoryRuleIndex, pattern, category)
+        if (!cancel) viewModel.rules.update(editCategoryRuleIndex, pattern, category)
         editCategoryRuleIndex = -2
     }
 
+    var deleteRuleIndex by remember { mutableStateOf(-1) }
+    fun onDeleteRule(index: Int) { deleteRuleIndex = index }
+    fun deleteRule(confirmed: Boolean) {
+        if (confirmed) viewModel.rules.delete(deleteRuleIndex)
+        deleteRuleIndex = -1
+    }
 
     /** Main Layout Scaffold **/
     Scaffold(
@@ -318,8 +323,8 @@ fun LibraApp(
                         onBack = navController::popBackStack,
                         onAdd = ::onAddRule,
                         onEdit = ::onEditRule,
-                        onDelete = { },
-                        onReorder = { _, _ -> },
+                        onDelete = ::onDeleteRule,
+                        onReorder = viewModel.rules::reorder,
                     )
                 }
                 colorSelector()
@@ -390,6 +395,12 @@ fun LibraApp(
                 currentCategory = current.category ?: Category.None,
                 categories = viewModel.rules.filterCategory.subCategories,
                 onClose = ::editRule,
+            )
+        }
+        if (deleteRuleIndex >= 0) {
+            ConfirmationDialog(
+                text = "Delete rule ${viewModel.rules.displayList[deleteRuleIndex].pattern}?",
+                onDismiss = ::deleteRule,
             )
         }
     }

@@ -17,7 +17,21 @@ data class CategoryRule (
     @PrimaryKey(autoGenerate = true) val key: Int = 0,
     @NonNull val pattern: String,
     val categoryKey: Int,
-    val listIndex: Int,
+    val listIndex: Int = -1, // this is not used by composables, so it can safely be a var
+    @Ignore val category: Category? = null
+)
+
+/**
+ * Used for partial updates.
+ *
+ * https://stackoverflow.com/questions/55805587/is-it-possible-in-room-to-ignore-a-field-on-a-basic-update
+ * https://stackoverflow.com/questions/45789325/update-some-specific-field-of-an-entity-in-android-room/59834309#59834309
+ */
+@Entity
+data class CategoryRuleWithoutIndex (
+    @PrimaryKey(autoGenerate = true) val key: Int = 0,
+    @NonNull val pattern: String,
+    val categoryKey: Int,
     @Ignore val category: Category? = null
 )
 
