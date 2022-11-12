@@ -40,6 +40,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
             dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
             lastRowId = dao.getMaxKey()
+            Log.d("Libra/CategoryData/load", "key=$lastRowId income=${all[0].subCategories.size} expense=${all[1].subCategories.size}")
         }
     }
 
