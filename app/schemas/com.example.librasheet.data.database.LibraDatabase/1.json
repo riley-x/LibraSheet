@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3c9eb9b1dda1781672e508b453fa5db9",
+    "identityHash": "75321547ed950d7d1501e323b1c25b80",
     "entities": [
       {
         "tableName": "categories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` TEXT NOT NULL, `colorLong` INTEGER NOT NULL, `listIndex` INTEGER NOT NULL, `isTop` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id` TEXT NOT NULL, `colorLong` INTEGER NOT NULL, `parentKey` INTEGER NOT NULL, `listIndex` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "key",
@@ -27,14 +27,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "listIndex",
-            "columnName": "listIndex",
+            "fieldPath": "parentKey",
+            "columnName": "parentKey",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "isTop",
-            "columnName": "isTop",
+            "fieldPath": "listIndex",
+            "columnName": "listIndex",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -47,39 +47,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "category_hierarchy",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parentKey` INTEGER NOT NULL, `childKey` INTEGER NOT NULL, PRIMARY KEY(`parentKey`, `childKey`))",
-        "fields": [
-          {
-            "fieldPath": "parentKey",
-            "columnName": "parentKey",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "childKey",
-            "columnName": "childKey",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "parentKey",
-            "childKey"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3c9eb9b1dda1781672e508b453fa5db9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '75321547ed950d7d1501e323b1c25b80')"
     ]
   }
 }

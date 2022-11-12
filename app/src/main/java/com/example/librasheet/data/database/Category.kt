@@ -19,6 +19,10 @@ const val categoryPathSeparator = "_" // Note this needs to match what is used b
 const val displaySeparator = " > "
 
 
+internal const val incomeKey = -1L
+internal const val expenseKey = -2L
+
+
 /**
  * We enforce that categories only have two levels of hierarchy.
  *
@@ -30,15 +34,15 @@ const val displaySeparator = " > "
  * https://stackoverflow.com/questions/58203953/room-database-with-kotlin-inline-class-as-an-entity-field
  * So must specify a Long as the type and convert (which should be heap-free).
  * @param listIndex Index of this entry in its parent category list.
- * @property isTop enables an easy search for top-level categories.
+ * @param parentKey can be [incomeKey] for income, or [expenseKey] for expense
  */
 @Entity(tableName = categoryTable)
 data class Category (
     @PrimaryKey(autoGenerate = true) var key: Long, // This should only ever be modified on initialization
     @NonNull val id: CategoryId,
     val colorLong: Long,
+    var parentKey: Long,
     var listIndex: Int, // This is not used by compose, and can be a var
-    val isTop: Boolean = id.isTop,
     @Ignore val subCategories: SnapshotStateList<Category>,
 ) {
     val color: Color
@@ -48,15 +52,15 @@ data class Category (
     constructor(
         key: Long,
         id: CategoryId,
+        parentKey: Long,
         colorLong: Long,
         listIndex: Int,
-        isTop: Boolean,
     ) : this(
         key = key,
         id = id,
         colorLong = colorLong,
+        parentKey = parentKey,
         listIndex = listIndex,
-        isTop = isTop,
         subCategories = mutableStateListOf(),
     )
 
@@ -65,14 +69,15 @@ data class Category (
         id: CategoryId,
         color: Color,
         key: Long = 0,
+        parentKey: Long = 0,
         listIndex: Int = -1,
         subCategories: SnapshotStateList<Category> = mutableStateListOf(),
     ) : this(
         key = key,
         id = id,
         colorLong = color.value.data,
+        parentKey = parentKey,
         listIndex = listIndex,
-        isTop = false,
         subCategories = subCategories,
     )
 

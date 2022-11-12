@@ -12,6 +12,7 @@ import com.example.librasheet.viewModel.dataClasses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.exp
 
 class CategoryData(private val scope: CoroutineScope, private val dao: CategoryDao) {
 
@@ -19,17 +20,18 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
     val all = mutableStateListOf(
         Category(
+            key = incomeKey,
             id = CategoryId(incomeName),
             color = Color.Unspecified,
             listIndex = 0,
         ),
         Category(
+            key = expenseKey,
             id = CategoryId(expenseName),
             color = Color.Unspecified,
             listIndex = 1,
         )
     )
-
 
 
     fun load() {
@@ -53,6 +55,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
             key = lastRowId,
             id = joinCategoryPath(parentCategory, newCategory),
             color = randomColor(),
+            parentKey = parent.key,
             listIndex = parent.subCategories.size,
         )
         parent.subCategories.add(category)
@@ -60,8 +63,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         /** Update the database **/
         scope.launch(Dispatchers.IO) {
             Log.d("Libra/CategoryData/add", "$category")
-            if (parentCategory.isSuper) dao.add(category)
-            else dao.addWithParent(category, parent)
+            dao.add(category)
         }
         return ""
     }
@@ -110,6 +112,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         /** Update add to new parent **/
         val newCategory = category.copy(
             id = joinCategoryPath(newParentId, categoryId.name),
+            parentKey = newParent.key,
             listIndex = newParent.subCategories.size
         )
         newParent.subCategories.add(newCategory)
@@ -119,7 +122,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
          * can't be in a dispatched thread though since it reads a list that could be modified
          * concurrently (would have to copy parentList). **/
         oldParentList.removeAt(index)
-        val staleList = mutableListOf<Category>()
+        val staleList = mutableListOf(newCategory)
         for (i in index..oldParentList.lastIndex) {
             oldParentList[i].listIndex = i
             staleList.add(oldParentList[i])
@@ -127,7 +130,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            dao.moveUpdate(newCategory, newParent, staleList)
+            dao.update(staleList)
         }
         return ""
     }
