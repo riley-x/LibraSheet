@@ -84,17 +84,17 @@ fun LibraApp(
     fun addAccount(account: String) {
         openAddAccountDialog = false
         if (account.isNotBlank()) {
-            // TODO
+            viewModel.accounts.add(account)
         }
     }
 
-    var changeAccountNameOld by remember { mutableStateOf("") }
-    fun onChangeAccountName(account: String) { changeAccountNameOld = account }
+    var changeAccountNameIndex by remember { mutableStateOf(-1) }
+    fun onChangeAccountName(index: Int) { changeAccountNameIndex = index }
     fun changeAccountName(newName: String) {
         if (newName.isNotBlank()) {
-            // TODO
+            viewModel.accounts.rename(changeAccountNameIndex, newName)
         }
-        changeAccountNameOld = ""
+        changeAccountNameIndex = -1
     }
 
 
@@ -226,7 +226,7 @@ fun LibraApp(
             navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
                 composable(route = BalanceTab.route) {
                     BalanceScreen(
-                        accounts = previewAccounts,
+                        accounts = viewModel.accounts.current,
                         history = previewStackedLineGraphState,
                         dates = previewLineGraphDates,
                         netIncome = previewNetIncomeState,
@@ -315,13 +315,12 @@ fun LibraApp(
                 }
                 composable(route = EditAccountsDestination.route) {
                     EditAccountsScreen(
-                        accounts = previewAccounts,
+                        accounts = viewModel.accounts.current,
                         onBack = navController::popBackStack,
                         onAddAccount = ::onAddAccount,
                         onChangeName = ::onChangeAccountName,
                         onChangeColor = ::toSettingsColorSelector,
-                        onDelete = { },
-                        onReorder = { _,_ -> },
+                        onReorder = viewModel.accounts::reorder,
                     )
                 }
                 composable(route = RulesDestination.route) {
@@ -347,10 +346,11 @@ fun LibraApp(
                 onDismiss = ::addAccount
             )
         }
-        if (changeAccountNameOld.isNotEmpty()) {
+        if (changeAccountNameIndex >= 0) {
+            val currentName = viewModel.accounts.current[changeAccountNameIndex].name
             TextFieldDialog(
-                title = "Rename $changeAccountNameOld",
-                initialText = changeAccountNameOld,
+                title = "Rename $currentName",
+                initialText = currentName,
                 placeholder = "New name",
                 errorMessage = dialogErrorMessage,
                 onDismiss = ::changeAccountName

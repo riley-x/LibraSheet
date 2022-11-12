@@ -21,7 +21,7 @@ import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
 
-private val tabs = ImmutableList(listOf("Pie Chart", "History", "Net Income"))
+private val tabs = ImmutableList(listOf("Current", "History", "Net Income"))
 
 
 @Composable

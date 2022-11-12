@@ -33,9 +33,9 @@ fun EditAccountsScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onAddAccount: () -> Unit = { },
-    onChangeName: (String) -> Unit = { },
+    onChangeName: (Int) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
-    onDelete: (String) -> Unit = { },
+    onDelete: (Int) -> Unit = { },
     onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
 ) {
     Column(modifier) {
@@ -66,9 +66,9 @@ fun EditAccountsScreen(
                             Text(account.name, modifier = Modifier.weight(10f))
                             DropdownOptions(options = accountOptions) {
                                 when (it) {
-                                    AccountOptions.RENAME -> onChangeName(account.name)
-                                    AccountOptions.COLOR -> onChangeColor(account.name)
-                                    AccountOptions.DELETE -> onDelete(account.name)
+                                    AccountOptions.RENAME -> onChangeName(index)
+                                    AccountOptions.COLOR -> onChangeColor("account_" + account.name)
+                                    AccountOptions.DELETE -> onDelete(index)
                                 }
                             }
                         }

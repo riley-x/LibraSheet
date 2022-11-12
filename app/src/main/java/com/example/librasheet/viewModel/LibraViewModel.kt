@@ -8,6 +8,7 @@ import com.example.librasheet.LibraApplication
 class LibraViewModel(private val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
     val rules = RuleModel(this)
+    val accounts = AccountModel(this)
 
     suspend fun startup() {
 
