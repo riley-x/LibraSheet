@@ -5,6 +5,8 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.librasheet.LibraApplication
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
@@ -13,8 +15,11 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
     suspend fun startup() {
         Log.d("Libra/LibraViewModel/startup", "Startup")
+        val jobs = mutableListOf<Job>()
+        jobs.add(accounts.load())
         categories.loadData().join()
         categories.loadUi()
+        jobs.joinAll()
     }
 }
 

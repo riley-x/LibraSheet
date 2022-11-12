@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.entity.AccountHistory
+import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.DiscreteGraphState
@@ -58,6 +60,16 @@ val previewStackedLineGraph = mutableStateListOf(
         listOf(35032.96,32572.96,36532.96,36448.93,36360.9,43074.89,44020.68,40330.68,40330.68).map { it.toFloat() }
     ),
 )
+
+
+val testAccountHistory = previewStackedLineGraph.map {
+    it.second.mapIndexed {index, value ->
+        AccountHistory(
+            date = 20221101 + index,
+            balance = value.toLongDollar()
+        )
+    }.toMutableList()
+}
 
 val previewLineGraph = previewStackedLineGraph[0].second.toMutableStateList()
 

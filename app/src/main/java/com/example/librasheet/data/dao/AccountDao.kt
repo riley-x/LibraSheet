@@ -19,4 +19,13 @@ interface AccountDao {
     @Query("SELECT date, balance FROM $accountHistoryTable WHERE accountKey = :accountKey ORDER BY date")
     fun getHistory(accountKey: Long): List<AccountHistory>
     fun getHistory(account: Account) = getHistory(account.key)
+
+    @Transaction
+    fun load(): Pair<List<Account>, List<MutableList<AccountHistory>>> {
+        val accounts = getAccounts()
+        val history = accounts.map {
+            getHistory(it.key).toMutableList()
+        }
+        return Pair(accounts, history)
+    }
 }
