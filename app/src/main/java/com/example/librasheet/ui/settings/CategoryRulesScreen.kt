@@ -3,10 +3,7 @@ package com.example.librasheet.ui.settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.FilterAlt
@@ -15,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,9 +87,12 @@ fun CategoryRulesScreen(
                                 ColorIndicator(rule.category?.color ?: Color.Unspecified)
                                 Text(
                                     text = rule.category?.id?.name ?: "None",
+                                    fontStyle = if (rule.category == null) FontStyle.Italic else FontStyle.Normal,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
-                                    modifier = Modifier.weight(8f)
+                                    modifier = Modifier
+                                        .weight(8f)
+                                        .alpha(if (rule.category == null) ContentAlpha.disabled else ContentAlpha.high)
                                 )
                                 DropdownOptions(options = ruleOptions) {
                                     when (it) {

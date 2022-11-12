@@ -33,12 +33,12 @@ interface RuleDao {
     fun update(rule: CategoryRuleEntity)
 
     @Insert
-    fun add(rule: CategoryRuleEntity)
+    fun add(rule: CategoryRuleEntity) : Long
 
     @Transaction
-    fun add(rule: CategoryRule) {
+    fun add(rule: CategoryRule) : Long {
         val index = getMaxIndex()
-        add(rule.withIndex(index + 1))
+        return add(rule.withIndex(index + 1))
     }
 
     @Query("DELETE FROM $ruleTable WHERE `key` = :key")

@@ -7,12 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.database.Category
-import com.example.librasheet.data.database.CategoryId
 import com.example.librasheet.data.database.CategoryRule
-import com.example.librasheet.data.rangeBetween
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class RuleModel(
@@ -29,8 +27,11 @@ class RuleModel(
 
 
     /** This class only stores a filtered set of rules at any given time. When we reorder rules,
-     * we don't know what intermediate rules there may be. These have to be handled by the dao.
+     * we don't know what intermediate rules there may be. These have to be handled by the dao. Note
+     * we don't need a load/startup function because all the loading is deferred to [setScreen].
      */
+
+
 
     @Callback
     fun update(index: Int, pattern: String, category: Category) {
@@ -50,15 +51,17 @@ class RuleModel(
 
     @Callback
     fun add(pattern: String, category: Category) {
-        val rule = CategoryRule(
+        val ruleWithoutKey = CategoryRule(
             pattern = pattern,
             categoryKey = category.key,
             category = category,
             isIncome = currentScreenIsIncome,
         )
-        displayList.add(rule)
-        viewModel.viewModelScope.launch(Dispatchers.IO) {
-            dao.add(rule)
+        viewModel.viewModelScope.launch {
+            // TODO loading indicator
+            displayList.add(ruleWithoutKey.copy(
+                key = withContext(Dispatchers.IO) { dao.add(ruleWithoutKey) }
+            ))
         }
     }
 
@@ -101,6 +104,20 @@ class RuleModel(
     @Callback
     fun setFilter(category: Category) {
         currentFilter = category
-        // TODO reset displayList via room query
+        viewModel.viewModelScope.launch {
+            // TODO loading indicator
+            val rules = withContext(Dispatchers.IO) {
+                if (currentScreenIsIncome) {
+                    if (category.id.isSuper) dao.getIncomeRules()
+                    else dao.getIncomeRules(category.key)
+                }
+                else {
+                    if (category.id.isSuper) dao.getExpenseRules()
+                    else dao.getExpenseRules(category.key)
+                }
+            }
+            displayList.clear()
+            displayList.addAll(rules)
+        }
     }
 }
