@@ -13,13 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import com.example.librasheet.data.database.LibraDatabase
 import com.example.librasheet.ui.LibraApp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.LibraViewModelFactory
 
 class LibraApplication : Application() {
-//    val database: LibraDatabase by lazy { LibraDatabase.getDatabase(this) }
+    val database: LibraDatabase by lazy { LibraDatabase.getDatabase(this) }
 }
 
 

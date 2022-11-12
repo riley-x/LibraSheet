@@ -1,3 +1,6 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+// So that we can access the inlined value class Color -> ULong -> Long
+
 package com.example.librasheet.data.database
 
 import androidx.annotation.NonNull
@@ -7,6 +10,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
+import androidx.room.ColumnInfo.INTEGER
 
 const val categoryTable = "categories"
 const val incomeName = "Income"
@@ -25,53 +29,85 @@ const val displaySeparator = " > "
  */
 @Entity(tableName = categoryTable)
 data class Category (
-    @PrimaryKey(autoGenerate = true) val key: Int = 0,
+    @PrimaryKey(autoGenerate = true) val key: Int,
     @NonNull val id: CategoryId,
-    val color: Color,
+    val colorLong: Long,
     var listIndex: Int, // This is not used by compose, and can be a var
-    @Ignore val subCategories: SnapshotStateList<Category> = mutableStateListOf()
+    val isTop: Boolean = id.isTop,
+    @Ignore val subCategories: SnapshotStateList<Category>,
 ) {
-    val isTop = id.isTop
+    val color: Color
+        get() = Color(value = colorLong.toULong())
 
-    companion object {
-        val None = Category(
-            id = CategoryId(),
-            color = Color.Unspecified,
-            listIndex = -1,
-        )
-    }
-
-    fun getAllFlattened(inclusive: Boolean = true) : List<Category> {
-        val out = mutableListOf<Category>()
-        if (inclusive) out.add(this)
-        subCategories.forEach { out.addAll(it.getAllFlattened()) }
-        return out
-    }
-}
-
-
-@Entity(primaryKeys = ["parentKey", "childKey"])
-data class CategoryHierarchy(
-    val parentKey: Int,
-    val childKey: Int
-)
-
-data class CategoryWithChildren(
-    @Embedded val current: Category,
-    @Relation(
-        parentColumn = "parentKey",
-        entityColumn = "childKey",
-        associateBy = Junction(CategoryHierarchy::class)
+    constructor(
+        key: Int,
+        id: CategoryId,
+        colorLong: Long,
+        listIndex: Int,
+        isTop: Boolean,
+    ) : this(
+        key = key,
+        id = id,
+        colorLong = colorLong,
+        listIndex = listIndex,
+        isTop = isTop,
+        subCategories = mutableStateListOf(),
     )
-    val subCategories: MutableList<Category>
-) {
-    /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
-     * to worry about nested subCategories since we enforce only two levels of categories **/
-    fun toNestedCategory(): Category {
-        current.subCategories.addAll(subCategories)
-        return current
-    }
+
+    constructor(
+        id: CategoryId,
+        color: Color,
+        listIndex: Int = -1,
+        subCategories: SnapshotStateList<Category> = mutableStateListOf(),
+    ) : this(
+        key = 0,
+        id = id,
+        colorLong = color.value.data,
+        listIndex = listIndex,
+        isTop = false,
+        subCategories = subCategories,
+    )
+
+//    companion object {
+//        @Ignore
+//        val None = Category(
+//            id = CategoryId(),
+//            color = Color.Unspecified,
+//            listIndex = -1,
+//        )
+//    }
+//
+//    fun getAllFlattened(inclusive: Boolean = true) : List<Category> {
+//        val out = mutableListOf<Category>()
+//        if (inclusive) out.add(this)
+//        subCategories.forEach { out.addAll(it.getAllFlattened()) }
+//        return out
+//    }
 }
+
+
+//@Entity(primaryKeys = ["parentKey", "childKey"])
+//data class CategoryHierarchy(
+//    val parentKey: Int,
+//    val childKey: Int
+//)
+
+//data class CategoryWithChildren(
+//    @Embedded val current: Category,
+//    @Relation(
+//        parentColumn = "parentKey",
+//        entityColumn = "childKey",
+//        associateBy = Junction(CategoryHierarchy::class)
+//    )
+//    val subCategories: MutableList<Category>
+//) {
+//    /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
+//     * to worry about nested subCategories since we enforce only two levels of categories **/
+//    fun toNestedCategory(): Category {
+//        current.subCategories.addAll(subCategories)
+//        return current
+//    }
+//}
 
 /** This is a unique string identifier for all categories. This is what is passed throughout the rest
  * of the app, to elements like the color selector or dialog callbacks. The string is composed of a
