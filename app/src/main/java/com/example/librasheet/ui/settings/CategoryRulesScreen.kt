@@ -69,23 +69,27 @@ fun CategoryRulesScreen(
                         index = index,
                         onDragEnd = { _, start, end -> onReorder(start, end) },
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.libraRow()
-                        ) {
-                            Text(rule.pattern, modifier = Modifier.weight(10f))
-                            Spacer(Modifier.width(12.dp))
-                            ColorIndicator(rule.category?.color ?: Color.Unspecified)
-                            Text(
-                                text = rule.category?.id?.name ?: "None",
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.weight(8f)
-                            )
-                            DropdownOptions(options = ruleOptions) {
-                                when (it) {
-                                    RuleOptions.EDIT -> onEdit(index)
-                                    RuleOptions.DELETE -> onDelete(index)
+                        Surface {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .libraRow(horizontalPadding = 0.dp)
+                                    .padding(start = libraRowHorizontalPadding)
+                            ) {
+                                Text(rule.pattern, modifier = Modifier.weight(10f))
+                                Spacer(Modifier.width(12.dp))
+                                ColorIndicator(rule.category?.color ?: Color.Unspecified)
+                                Text(
+                                    text = rule.category?.id?.name ?: "None",
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 1,
+                                    modifier = Modifier.weight(8f)
+                                )
+                                DropdownOptions(options = ruleOptions) {
+                                    when (it) {
+                                        RuleOptions.EDIT -> onEdit(index)
+                                        RuleOptions.DELETE -> onDelete(index)
+                                    }
                                 }
                             }
                         }
