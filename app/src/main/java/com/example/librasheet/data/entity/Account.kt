@@ -26,10 +26,12 @@ data class Account(
     val institution: Institution,
     val colorLong: Long,
     var listIndex: Int, // this is not used by compose, so safe to be a var
-    @Ignore override val value: Float,
+    val balance: Long,
 ): PieChartValue {
     override val color: Color
         get() = Color(value = colorLong.toULong())
+    override val value: Float
+        get() = balance.toFloatDollar()
 
     /** Room constructor **/
     constructor(
@@ -44,7 +46,7 @@ data class Account(
         institution = institution,
         colorLong = colorLong,
         listIndex = listIndex,
-        value = 0f,
+        balance = 0,
     )
 
     /** Normal constructor **/
@@ -53,14 +55,14 @@ data class Account(
         institution: Institution = Institution.UNKNOWN,
         color: Color,
         listIndex: Int = -1,
-        value: Float = 0f,
+        balance: Long = 0,
     ) : this(
         key = 0,
         name = name,
         institution = institution,
         colorLong = color.value.data,
         listIndex = listIndex,
-        value = value,
+        balance = balance,
     )
 }
 
@@ -69,13 +71,36 @@ data class Account(
     tableName = accountHistoryTable,
     primaryKeys = ["accountKey", "date"],
 )
-data class AccountHistoryEntity(
-    val accountKey: Long,
-    @Embedded val history: AccountHistory,
-)
-
 data class AccountHistory(
+    val accountKey: Long,
     val date: Int,
     val balance: Long,
 )
+
+@Immutable
+data class BalanceHistory(
+    val date: Int,
+    val balances: MutableMap<Long, Long> = mutableMapOf(),
+)
+
+
+/** This takes a list of account history, assumed in increasing date order, and folds it into a list
+ * indexed by (~date~, accountKey).
+ */
+fun List<AccountHistory>.foldAccounts(): MutableList<BalanceHistory> {
+    val out = mutableListOf<BalanceHistory>()
+    if (isEmpty()) return out
+
+    var current = BalanceHistory(date = this[0].date)
+    forEach {
+        if (it.date != current.date) {
+            out.add(current)
+            current = BalanceHistory(date = it.date)
+        }
+        current.balances[it.accountKey] = it.balance
+    }
+    out.add(current)
+
+    return out
+}
 

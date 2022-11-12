@@ -11,21 +11,15 @@ interface AccountDao {
     @Update fun update(accounts: List<Account>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(accountHistory: AccountHistoryEntity)
+    fun add(accountHistory: AccountHistory)
 
     @Query("SELECT * FROM $accountTable ORDER BY listIndex")
     fun getAccounts(): List<Account>
 
-    @Query("SELECT date, balance FROM $accountHistoryTable WHERE accountKey = :accountKey ORDER BY date")
+    @Query("SELECT * FROM $accountHistoryTable ORDER BY date")
+    fun getHistory(): List<AccountHistory>
+
+    @Query("SELECT * FROM $accountHistoryTable WHERE accountKey = :accountKey ORDER BY date")
     fun getHistory(accountKey: Long): List<AccountHistory>
     fun getHistory(account: Account) = getHistory(account.key)
-
-    @Transaction
-    fun load(): Pair<List<Account>, List<MutableList<AccountHistory>>> {
-        val accounts = getAccounts()
-        val history = accounts.map {
-            getHistory(it.key).toMutableList()
-        }
-        return Pair(accounts, history)
-    }
 }

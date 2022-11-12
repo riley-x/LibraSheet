@@ -1,7 +1,6 @@
 package com.example.librasheet.ui.graphing
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
@@ -12,6 +11,6 @@ fun Path.lineTo(offset: Offset) = lineTo(offset.x, offset.y)
 
 @Immutable
 data class DiscreteGraphState(
-    val axes: State<AxesState>,
-    val values: SnapshotStateList<Float>,
+    val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
+    val values: SnapshotStateList<Float> = mutableStateListOf(),
 )

@@ -15,7 +15,7 @@ import com.example.librasheet.data.entity.*
         Category::class,
         CategoryRuleEntity::class,
         Account::class,
-        AccountHistoryEntity::class,
+        AccountHistory::class,
     ],
     version = 5,
     autoMigrations = [

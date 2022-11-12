@@ -2,12 +2,13 @@ package com.example.librasheet.viewModel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.AccountHistory
-import com.example.librasheet.data.entity.Category
+import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.rangeBetween
 import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.ui.graphing.AxesState
+import com.example.librasheet.ui.graphing.DiscreteGraphState
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.preview.previewAccount
 import com.example.librasheet.viewModel.preview.previewAccounts
@@ -23,23 +24,29 @@ class AccountModel(
     private val dao = viewModel.application.database.accountDao()
 
     val all = mutableStateListOf<Account>()
-    var history: MutableList<MutableList<AccountHistory>> = mutableListOf()
-//    val current = previewAccounts.toMutableStateList()
+    var history: MutableList<BalanceHistory> = mutableListOf()
+    val incomeGraph = DiscreteGraphState()
 
-    fun load() = viewModel.viewModelScope.launch {
-        val (accounts, hist) = withContext(Dispatchers.IO) {
-            val (accounts, hist) = dao.load()
-            val accountsWithLatestBalance = accounts.mapIndexed { index, account ->
-                account.copy(value = hist[index].lastOrNull()?.balance?.toFloatDollar() ?: 0f)
+    suspend fun load() {
+        viewModel.viewModelScope.launch {
+            all.addAll(withContext(Dispatchers.IO) {
+//                dao.getAccounts()
+                previewAccounts
+            })
+            all.forEach {
+                Log.d("Libra/AccountModel/load", "$it")
             }
-            Pair(accountsWithLatestBalance, hist)
         }
-        history = hist.toMutableList()
-        all.addAll(accounts)
+        viewModel.viewModelScope.launch {
+            history = withContext(Dispatchers.IO) {
+                dao.getHistory().foldAccounts()
+            }
+            viewModel.viewModelScope.launch { loadIncomeGraph() }
+        }
+    }
 
-        all.forEach {
-            Log.d("Libra/AccountModel/load", "$it")
-        }
+    fun loadIncomeGraph() {
+
     }
 
 
