@@ -17,8 +17,9 @@ class CategoryModel(
 ) {
     val data = CategoryData(viewModel.viewModelScope)
 
-    /** This are displayed in both the categories settings screen and the respective cash flow
-     * screens **/
+    /** These are displayed in both the categories settings screen and the respective cash flow
+     * screens. It's important that the full list is passed to the cash flow screen so it knows how
+     * to reorder them still. **/
     val income = mutableStateListOf<CategoryUi>()
     val expense = mutableStateListOf<CategoryUi>()
 

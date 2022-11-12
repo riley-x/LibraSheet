@@ -23,12 +23,19 @@ class RuleModel(
     fun updateRule(index: Int, pattern: String, category: Category) {
         Log.d("Libra/RuleMode/updateRule", "Enter: $index $pattern $category")
         val it = displayList[index]
-        if (pattern == it.pattern && category == it.category) return
-        displayList[index] = it.copy(
-            pattern = pattern,
-            categoryKey = category.key,
-            category = category,
-        )
+        var updated = false
+        if (category != it.category.value) {
+            it.category.value = category
+            updated = true
+        }
+        if (pattern != it.pattern) {
+            displayList[index] = it.copy(
+                pattern = pattern,
+                categoryKey = category.key,
+            )
+            updated = true
+        }
+
         // TODO Room update
         Log.d("Libra/RuleMode/updateRule", "Exit: ${displayList[index]}")
     }
@@ -40,7 +47,7 @@ class RuleModel(
             pattern = pattern,
             categoryKey = category.key,
             listIndex = lastIndex,
-            category = category,
+            category = mutableStateOf(category),
         )
         displayList.add(rule)
         // TODO Room update

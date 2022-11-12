@@ -1,6 +1,9 @@
 package com.example.librasheet.data.database
 
 import androidx.annotation.NonNull
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
@@ -18,6 +21,6 @@ data class CategoryRule (
     @NonNull val pattern: String,
     val categoryKey: Int,
     val listIndex: Int,
-    @Ignore val category: Category? = null
+    @Ignore val category: MutableState<Category> = mutableStateOf(Category.None)
 )
 

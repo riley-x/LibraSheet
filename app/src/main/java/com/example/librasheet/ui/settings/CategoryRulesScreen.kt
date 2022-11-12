@@ -75,9 +75,9 @@ fun CategoryRulesScreen(
                         ) {
                             Text(rule.pattern, modifier = Modifier.weight(10f))
                             Spacer(Modifier.width(12.dp))
-                            ColorIndicator(rule.category?.color ?: Color.Unspecified)
+                            ColorIndicator(rule.category.value.color)
                             Text(
-                                text = rule.category?.id?.name ?: "None",
+                                text = rule.category.value.id.name,
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
                                 modifier = Modifier.weight(8f)

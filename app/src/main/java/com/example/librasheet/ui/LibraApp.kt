@@ -387,7 +387,7 @@ fun LibraApp(
             val current = viewModel.rules.displayList[editCategoryRuleIndex]
             CategoryRuleDialog(
                 currentPattern = current.pattern,
-                currentCategory = current.category ?: Category.None,
+                currentCategory = current.category.value,
                 categories = viewModel.rules.filterCategory.subCategories,
                 onClose = ::editRule,
             )
