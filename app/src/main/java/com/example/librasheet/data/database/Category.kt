@@ -6,8 +6,6 @@ package com.example.librasheet.data.database
 import androidx.annotation.NonNull
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
 import androidx.room.ColumnInfo.INTEGER
@@ -39,11 +37,11 @@ internal const val expenseKey = -2L
 @Entity(tableName = categoryTable)
 data class Category (
     @PrimaryKey(autoGenerate = true) var key: Long, // This should only ever be modified on initialization
-    @NonNull val id: CategoryId,
+    @NonNull var id: CategoryId,
     val colorLong: Long,
     @ColumnInfo(index = true) var parentKey: Long,
-    var listIndex: Int, // This is not used by compose, and can be a var
-    @Ignore val subCategories: SnapshotStateList<Category>,
+    var listIndex: Int, // This is not used by compose
+    @Ignore val subCategories: MutableList<Category>,
 ) {
     val color: Color
         get() = Color(value = colorLong.toULong())
@@ -61,7 +59,7 @@ data class Category (
         colorLong = colorLong,
         parentKey = parentKey,
         listIndex = listIndex,
-        subCategories = mutableStateListOf(),
+        subCategories = mutableListOf(),
     )
 
     /** Normal constructor **/
@@ -71,7 +69,7 @@ data class Category (
         key: Long = 0,
         parentKey: Long = 0,
         listIndex: Int = -1,
-        subCategories: SnapshotStateList<Category> = mutableStateListOf(),
+        subCategories: MutableList<Category> = mutableListOf(),
     ) : this(
         key = key,
         id = id,
@@ -157,15 +155,12 @@ fun String.toCategoryId() = CategoryId(this)
 
 
 @Stable
-fun SnapshotStateList<Category>.find(target: CategoryId): Triple<Category, SnapshotStateList<Category>, Int>? {
+fun MutableList<Category>.find(target: CategoryId): Triple<Category, MutableList<Category>, Int>? {
     for ((index, current) in withIndex()) {
         if (current.id == target) return Triple(current, this, index)
         else if (target.isIn(current.id)) return current.subCategories.find(target)
     }
     return null
-}
-fun SnapshotStateList<Category>.replace(index: Int, new: (Category) -> Category) {
-    this[index] = new(this[index])
 }
 
 
