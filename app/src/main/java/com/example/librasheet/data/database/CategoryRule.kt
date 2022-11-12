@@ -66,10 +66,10 @@ data class CategoryRule (
 
 
 fun List<CategoryRule>.matchCategories(parentCategory: Category): List<CategoryRule> {
-    val keyMap = mutableMapOf<Long, Category?>()
+    val keyMap = parentCategory.getKeyMap()
     return map {
         it.copy(
-            category = keyMap.getOrPut(it.categoryKey) { parentCategory.find(it.categoryKey) }
+            category = keyMap.getOrDefault(it.categoryKey, null)
         )
     }
 }

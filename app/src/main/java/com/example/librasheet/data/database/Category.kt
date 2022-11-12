@@ -100,6 +100,7 @@ data class Category (
         return out
     }
 
+    /** Prefer [getKeyMap] **/
     fun find(targetKey: Long) : Category? {
         if (key == targetKey) return this
         subCategories.forEach {
@@ -107,6 +108,17 @@ data class Category (
             if (res != null) return res
         }
         return null
+    }
+
+    fun getKeyMap(): MutableMap<Long, Category> {
+        val out = mutableMapOf<Long, Category>()
+        addKeysToMap(out)
+        return out
+    }
+
+    fun addKeysToMap(map: MutableMap<Long, Category>) {
+        map[key] = this
+        subCategories.forEach { it.addKeysToMap(map) }
     }
 }
 
