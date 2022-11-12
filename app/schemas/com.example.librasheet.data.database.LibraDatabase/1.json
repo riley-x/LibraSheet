@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ac11f1ed705825fe7274958d31eccc2a",
+    "identityHash": "3c9eb9b1dda1781672e508b453fa5db9",
     "entities": [
       {
         "tableName": "categories",
@@ -49,7 +49,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "CategoryHierarchy",
+        "tableName": "category_hierarchy",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parentKey` INTEGER NOT NULL, `childKey` INTEGER NOT NULL, PRIMARY KEY(`parentKey`, `childKey`))",
         "fields": [
           {
@@ -79,7 +79,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac11f1ed705825fe7274958d31eccc2a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3c9eb9b1dda1781672e508b453fa5db9')"
     ]
   }
 }

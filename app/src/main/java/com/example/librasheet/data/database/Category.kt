@@ -64,10 +64,11 @@ data class Category (
     constructor(
         id: CategoryId,
         color: Color,
+        key: Long = 0,
         listIndex: Int = -1,
         subCategories: SnapshotStateList<Category> = mutableStateListOf(),
     ) : this(
-        key = 0,
+        key = key,
         id = id,
         colorLong = color.value.data,
         listIndex = listIndex,

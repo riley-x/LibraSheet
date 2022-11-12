@@ -17,6 +17,7 @@ data class CategoryRule (
     @PrimaryKey(autoGenerate = true) val key: Long = 0,
     @NonNull val pattern: String,
     val categoryKey: Long,
+    val isIncome: Boolean,
     val listIndex: Int = -1, // this is not used by composables, so it can safely be a var
     @Ignore val category: Category? = null
 )

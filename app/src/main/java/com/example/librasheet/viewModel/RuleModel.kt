@@ -16,6 +16,7 @@ class RuleModel(
 ) {
     /** Used by the CategoryRulesScreen **/
     val displayList = mutableStateListOf<CategoryRule>()
+    var currentScreenIsIncome = false
     var targetCategories = mutableStateListOf<Category>()
     var filterCategories = mutableStateListOf<Category>()
     var currentFilter by mutableStateOf(Category.None)
@@ -40,6 +41,7 @@ class RuleModel(
             pattern = pattern,
             categoryKey = category.key,
             category = category,
+            isIncome = currentScreenIsIncome,
         )
         displayList.add(rule)
         // TODO Room update. Need wrapper insert function that finds the current last Index.
@@ -61,9 +63,10 @@ class RuleModel(
     /** Called from navigating to the income or expense rules from the settings screen. **/
     @Callback
     fun setScreen(income: Boolean) {
+        currentScreenIsIncome = income
         val category = viewModel.categories.data.all[if (income) 0 else 1]
         targetCategories.clear()
-        targetCategories.addAll(category.getAllFlattened(!category.id.isSuper))
+        targetCategories.addAll(category.getAllFlattened(false))
         filterCategories.clear()
         filterCategories.add(category)
         filterCategories.addAll(targetCategories)

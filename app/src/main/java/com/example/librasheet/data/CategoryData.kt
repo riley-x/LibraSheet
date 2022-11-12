@@ -1,5 +1,6 @@
 package com.example.librasheet.data
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
@@ -13,6 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CategoryData(private val scope: CoroutineScope, private val dao: CategoryDao) {
+
+    private var lastRowId = 0L
+
     val all = mutableStateListOf(
         Category(
             id = CategoryId(incomeName),
@@ -25,6 +29,8 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
             listIndex = 1,
         )
     )
+
+
 
     fun load() {
         // TODO. Make sure things are ordered correctly...
@@ -42,7 +48,9 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         if (parent.subCategories.any { it.id.name == newCategory }) return "Error: category exists already"
 
         /** Create and add the category **/
+        lastRowId += 1
         val category = Category(
+            key = lastRowId,
             id = joinCategoryPath(parentCategory, newCategory),
             color = randomColor(),
             listIndex = parent.subCategories.size,
@@ -51,11 +59,13 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update the database **/
         scope.launch(Dispatchers.IO) {
-            // TODO the key value needs to block because other parts of the app use it...
-            if (!parentCategory.isSuper) dao.addWithParent(category, parent)
+            Log.d("Libra/CategoryData/add", "$category")
+            if (parentCategory.isSuper) dao.add(category)
+            else dao.addWithParent(category, parent)
         }
         return ""
     }
+
 
     fun rename(categoryId: CategoryId, newName: String): String {
         /** Find category with error checks **/
@@ -67,7 +77,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         val newCategory = category.copy(
             id = joinCategoryPath(category.id.parent, newName)
         )
-        parentList.replace(index) { newCategory }
+        parentList[index] = newCategory
 
         /** Update target's children. Note because we enforce that categories only have one level of
          * nesting, at most we have to check the target's children, not nested ones. Similarly, it's
@@ -82,10 +92,11 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            // TODO DAO update
+            dao.update(staleList)
         }
         return ""
     }
+
 
     fun move(categoryId: CategoryId, newParentId: CategoryId): String {
         val (category, oldParentList, index) = find(categoryId)
@@ -93,7 +104,8 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
             return "Error: can't move category with subcategories"
 
         val (newParent, _) = find(newParentId)
-        if (newParent.subCategories.any { it.id.name == categoryId.name }) return "Error: category exists in destination already"
+        if (newParent.subCategories.any { it.id.name == categoryId.name })
+            return "Error: category exists in destination already"
 
         /** Update add to new parent **/
         val newCategory = category.copy(
@@ -102,9 +114,12 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         )
         newParent.subCategories.add(newCategory)
 
-        /** Update old parent's list and its children's indices **/
-        val staleList = mutableListOf(newCategory)
+        /** Update old parent's list and its children's indices. We should do this here because we
+         * need to know which categories (PKs) to update, and that's hard to get from SQL. This loop
+         * can't be in a dispatched thread though since it reads a list that could be modified
+         * concurrently (would have to copy parentList). **/
         oldParentList.removeAt(index)
+        val staleList = mutableListOf<Category>()
         for (i in index..oldParentList.lastIndex) {
             oldParentList[i].listIndex = i
             staleList.add(oldParentList[i])
@@ -112,16 +127,20 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            // TODO DAO update entity and xref (delete, readd)
+            dao.moveUpdate(newCategory, newParent, staleList)
         }
         return ""
     }
+
 
     fun delete(categoryId: CategoryId) {
         val (category, parentList, index) = find(categoryId)
         parentList.removeAt(index)
 
-        /** Update parent's list and its children's indices **/
+        /** Update old parent's list and its children's indices. We should do this here because we
+         * need to know which categories (PKs) to update, and that's hard to get from SQL. This loop
+         * can't be in a dispatched thread though since it reads a list that could be modified
+         * concurrently (would have to copy parentList). **/
         val staleList = mutableListOf<Category>()
         for (i in index..parentList.lastIndex) {
             parentList[i].listIndex = i
@@ -130,12 +149,10 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            // TODO delete transaction crossrefs
-            // TODO delete category
-            // TODO delete subCategories
-            // TODO update staleList
+            dao.deleteUpdate(category, staleList)
         }
     }
+
 
     fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
         if (startIndex == endIndex) return
@@ -143,7 +160,10 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         val (parent, _) = find(parentId.toCategoryId())
         parent.subCategories.add(endIndex, parent.subCategories.removeAt(startIndex))
 
-        /** Update parent's list and its children's indices **/
+        /** Update old parent's list and its children's indices. We should do this here because we
+         * need to know which categories (PKs) to update, and that's hard to get from SQL. This loop
+         * can't be in a dispatched thread though since it reads a list that could be modified
+         * concurrently (would have to copy parentList). **/
         val staleEntities = mutableListOf<Category>()
         for (i in rangeBetween(startIndex, endIndex)) {
             parent.subCategories[i].listIndex = i
@@ -152,7 +172,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            // TODO update staleList
+            dao.update(staleEntities)
         }
     }
 }
