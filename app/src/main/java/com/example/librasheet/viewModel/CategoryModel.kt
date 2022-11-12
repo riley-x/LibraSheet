@@ -15,7 +15,7 @@ import com.example.librasheet.viewModel.dataClasses.toUi
 class CategoryModel(
     private val viewModel: LibraViewModel,
 ) {
-    val data = CategoryData(viewModel.viewModelScope)
+    val data = CategoryData(viewModel.viewModelScope, viewModel.application.database.categoryDao())
 
     /** This are displayed in both the categories settings screen and the respective cash flow
      * screens **/

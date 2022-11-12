@@ -24,12 +24,17 @@ const val displaySeparator = " > "
  *
  * @param id This is the id used in the rest of the app, and passed to objects like dialogs or the
  * color selector to identify the current selection. See [CategoryId].
+ * @param colorLong Room is unable to handle inlined classes. See
+ * https://issuetracker.google.com/issues/124624218?pli=1.
+ * https://stackoverflow.com/questions/69426421/android-room-with-kotlin-value-class
+ * https://stackoverflow.com/questions/58203953/room-database-with-kotlin-inline-class-as-an-entity-field
+ * So must specify a Long as the type and convert (which should be heap-free).
  * @param listIndex Index of this entry in its parent category list.
  * @property isTop enables an easy search for top-level categories.
  */
 @Entity(tableName = categoryTable)
 data class Category (
-    @PrimaryKey(autoGenerate = true) val key: Int,
+    @PrimaryKey(autoGenerate = true) var key: Long, // This should only ever be modified on initialization
     @NonNull val id: CategoryId,
     val colorLong: Long,
     var listIndex: Int, // This is not used by compose, and can be a var
@@ -39,8 +44,9 @@ data class Category (
     val color: Color
         get() = Color(value = colorLong.toULong())
 
+    /** Used by Room **/
     constructor(
-        key: Int,
+        key: Long,
         id: CategoryId,
         colorLong: Long,
         listIndex: Int,
@@ -54,6 +60,7 @@ data class Category (
         subCategories = mutableStateListOf(),
     )
 
+    /** Normal constructor **/
     constructor(
         id: CategoryId,
         color: Color,
@@ -85,29 +92,6 @@ data class Category (
     }
 }
 
-
-@Entity(primaryKeys = ["parentKey", "childKey"])
-data class CategoryHierarchy(
-    val parentKey: Int,
-    val childKey: Int
-)
-
-data class CategoryWithChildren(
-    @Embedded val current: Category,
-    @Relation(
-        parentColumn = "parentKey",
-        entityColumn = "childKey",
-        associateBy = Junction(CategoryHierarchy::class)
-    )
-    val subCategories: MutableList<Category>
-) {
-    /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
-     * to worry about nested subCategories since we enforce only two levels of categories **/
-    fun toNestedCategory(): Category {
-        current.subCategories.addAll(subCategories)
-        return current
-    }
-}
 
 /** This is a unique string identifier for all categories. This is what is passed throughout the rest
  * of the app, to elements like the color selector or dialog callbacks. The string is composed of a

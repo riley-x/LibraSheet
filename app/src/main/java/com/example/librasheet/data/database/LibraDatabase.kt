@@ -11,6 +11,7 @@ import java.io.File
 @Database(
     entities = [
         Category::class,
+        CategoryHierarchy::class,
     ],
     version = 1,
     autoMigrations = [

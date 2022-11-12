@@ -12,7 +12,7 @@ import com.example.librasheet.ui.graphing.PieChartValue
 
 @Immutable
 data class CategoryUi(
-    val key: Int = 0,
+    val key: Long = 0,
     val id: CategoryId = CategoryId(),
     override val color: Color = Color.White,
     override val value: Float = 0f,

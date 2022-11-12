@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CategoryData(private val scope: CoroutineScope) {
+class CategoryData(private val scope: CoroutineScope, private val dao: CategoryDao) {
     val all = mutableStateListOf(
         Category(
             id = CategoryId(incomeName),
@@ -51,10 +51,8 @@ class CategoryData(private val scope: CoroutineScope) {
 
         /** Update the database **/
         scope.launch(Dispatchers.IO) {
-            // TODO DAO add
-            if (!parentCategory.isSuper) {
-                // TODO DAO add crossref
-            }
+            // TODO the key value needs to block because other parts of the app use it...
+            if (!parentCategory.isSuper) dao.addWithParent(category, parent)
         }
         return ""
     }

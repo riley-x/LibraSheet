@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "57b01d890f1b4d41b6d5b4f5f0594a7c",
+    "identityHash": "ac11f1ed705825fe7274958d31eccc2a",
     "entities": [
       {
         "tableName": "categories",
@@ -47,12 +47,39 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "CategoryHierarchy",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`parentKey` INTEGER NOT NULL, `childKey` INTEGER NOT NULL, PRIMARY KEY(`parentKey`, `childKey`))",
+        "fields": [
+          {
+            "fieldPath": "parentKey",
+            "columnName": "parentKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "childKey",
+            "columnName": "childKey",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "parentKey",
+            "childKey"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '57b01d890f1b4d41b6d5b4f5f0594a7c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac11f1ed705825fe7274958d31eccc2a')"
     ]
   }
 }

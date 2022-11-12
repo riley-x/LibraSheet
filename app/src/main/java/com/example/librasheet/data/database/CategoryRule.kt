@@ -14,9 +14,9 @@ private const val ruleTable = "rules"
  */
 @Entity(tableName = ruleTable)
 data class CategoryRule (
-    @PrimaryKey(autoGenerate = true) val key: Int = 0,
+    @PrimaryKey(autoGenerate = true) val key: Long = 0,
     @NonNull val pattern: String,
-    val categoryKey: Int,
+    val categoryKey: Long,
     val listIndex: Int = -1, // this is not used by composables, so it can safely be a var
     @Ignore val category: Category? = null
 )
