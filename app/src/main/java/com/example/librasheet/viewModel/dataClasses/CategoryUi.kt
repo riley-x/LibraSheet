@@ -4,9 +4,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
-import com.example.librasheet.data.database.Category
-import com.example.librasheet.data.database.CategoryId
-import com.example.librasheet.data.database.find
+import com.example.librasheet.data.entity.Category
+import com.example.librasheet.data.entity.CategoryId
 import com.example.librasheet.ui.graphing.PieChartValue
 
 

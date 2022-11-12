@@ -7,7 +7,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.FilterAlt
-import androidx.compose.material.icons.sharp.FilterList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -19,15 +18,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.librasheet.data.database.Category
-import com.example.librasheet.data.database.CategoryRule
+import com.example.librasheet.data.entity.CategoryRule
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewIncomeCategories
 import com.example.librasheet.viewModel.preview.previewRules
 
 

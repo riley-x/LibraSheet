@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
-import com.example.librasheet.data.database.*
+import com.example.librasheet.data.entity.*
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.find
 import com.example.librasheet.viewModel.dataClasses.toUi

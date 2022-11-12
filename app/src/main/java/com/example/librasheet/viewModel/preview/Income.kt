@@ -5,14 +5,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import com.example.librasheet.data.database.Category
+import com.example.librasheet.data.entity.Category
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.DiscreteGraphState
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.data.database.toCategoryId
+import com.example.librasheet.data.entity.toCategoryId
 
 val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)

@@ -1,24 +1,17 @@
 package com.example.librasheet.ui.settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.data.database.Category
-import com.example.librasheet.data.database.CategoryId
-import com.example.librasheet.data.database.toCategoryId
+import com.example.librasheet.data.entity.Category
 import com.example.librasheet.ui.components.DropdownSelector
 import com.example.librasheet.ui.dialogs.Dialog
-import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.CategoryUi
-import com.example.librasheet.viewModel.preview.previewIncomeCategories
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
 @Composable

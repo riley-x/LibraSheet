@@ -1,6 +1,10 @@
-package com.example.librasheet.data.database
+package com.example.librasheet.data.dao
 
 import androidx.room.*
+import com.example.librasheet.data.entity.Category
+import com.example.librasheet.data.entity.categoryTable
+import com.example.librasheet.data.entity.expenseKey
+import com.example.librasheet.data.entity.incomeKey
 
 data class CategoryWithChildren(
     @Embedded val current: Category,

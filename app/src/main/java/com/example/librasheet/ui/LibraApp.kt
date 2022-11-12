@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
-import com.example.librasheet.data.database.*
+import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.account.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.dialogs.TextFieldDialog
@@ -21,6 +21,7 @@ import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
 import com.example.librasheet.viewModel.dataClasses.*
+import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.*
 
 

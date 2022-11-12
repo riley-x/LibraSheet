@@ -1,7 +1,7 @@
 package com.example.librasheet.viewModel.preview
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.librasheet.data.database.CategoryRule
+import com.example.librasheet.data.entity.CategoryRule
 
 val previewRules = mutableStateListOf(
     CategoryRule(

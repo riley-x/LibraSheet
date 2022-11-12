@@ -1,10 +1,6 @@
 package com.example.librasheet.viewModel
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
-import com.example.librasheet.data.database.Category
-import com.example.librasheet.data.database.CategoryRule
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.dataClasses.Account
 import com.example.librasheet.viewModel.preview.previewAccounts

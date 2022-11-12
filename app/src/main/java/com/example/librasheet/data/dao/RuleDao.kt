@@ -1,6 +1,10 @@
-package com.example.librasheet.data.database
+package com.example.librasheet.data.dao
 
 import androidx.room.*
+import com.example.librasheet.data.entity.CategoryRule
+import com.example.librasheet.data.entity.CategoryRuleEntity
+import com.example.librasheet.data.entity.ruleColumns
+import com.example.librasheet.data.entity.ruleTable
 
 @Dao
 interface RuleDao {

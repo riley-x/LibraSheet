@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.example.librasheet.data.database.Category
-import com.example.librasheet.data.database.CategoryRule
-import com.example.librasheet.data.database.matchCategories
+import com.example.librasheet.data.entity.Category
+import com.example.librasheet.data.entity.CategoryRule
+import com.example.librasheet.data.entity.matchCategories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

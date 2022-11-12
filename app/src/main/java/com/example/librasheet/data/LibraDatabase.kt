@@ -1,19 +1,22 @@
-package com.example.librasheet.data.database
+package com.example.librasheet.data
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import java.io.File
+import com.example.librasheet.data.dao.CategoryDao
+import com.example.librasheet.data.dao.RuleDao
+import com.example.librasheet.data.entity.*
 
 @Database(
     entities = [
         Category::class,
         CategoryRuleEntity::class,
+        Account::class,
+        AccountHistory::class,
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]

@@ -1,14 +1,13 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 // So that we can access the inlined value class Color -> ULong -> Long
 
-package com.example.librasheet.data.database
+package com.example.librasheet.data.entity
 
 import androidx.annotation.NonNull
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
-import androidx.room.ColumnInfo.INTEGER
 
 const val categoryTable = "categories"
 const val incomeName = "Income"

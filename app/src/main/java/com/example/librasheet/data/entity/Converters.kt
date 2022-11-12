@@ -1,7 +1,5 @@
-package com.example.librasheet.data.database
+package com.example.librasheet.data.entity
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.room.TypeConverter
 
 class Converters {
