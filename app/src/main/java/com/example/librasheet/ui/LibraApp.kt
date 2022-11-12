@@ -384,7 +384,7 @@ fun LibraApp(
             CategoryRuleDialog(
                 currentPattern = "",
                 currentCategory = Category.None,
-                categories = viewModel.rules.filterCategory.subCategories,
+                categories = viewModel.rules.targetCategories,
                 onClose = ::addRule,
             )
         }
@@ -393,7 +393,7 @@ fun LibraApp(
             CategoryRuleDialog(
                 currentPattern = current.pattern,
                 currentCategory = current.category ?: Category.None,
-                categories = viewModel.rules.filterCategory.subCategories,
+                categories = viewModel.rules.targetCategories,
                 onClose = ::editRule,
             )
         }

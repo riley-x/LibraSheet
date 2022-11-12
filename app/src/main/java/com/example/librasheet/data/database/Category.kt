@@ -40,6 +40,13 @@ data class Category (
             listIndex = -1,
         )
     }
+
+    fun getAllFlattened(inclusive: Boolean = true) : List<Category> {
+        val out = mutableListOf<Category>()
+        if (inclusive) out.add(this)
+        subCategories.forEach { out.addAll(it.getAllFlattened()) }
+        return out
+    }
 }
 
 
@@ -137,13 +144,7 @@ fun SnapshotStateList<Category>.replace(index: Int, new: (Category) -> Category)
 
 
 @Stable
-fun getCategoryPath(id: String) = id.substringBeforeLast(categoryPathSeparator)
-
-@Stable
 fun getCategoryName(id: String) = id.substringAfterLast(categoryPathSeparator)
-
-@Stable
-fun getCategoryFullDisplay(id: String) = id.replace(categoryPathSeparator, displaySeparator)
 
 @Stable
 fun joinCategoryPath(parent: String, child: String) =
@@ -152,17 +153,3 @@ fun joinCategoryPath(parent: String, child: String) =
 fun joinCategoryPath(parent: CategoryId, child: String) =
     joinCategoryPath(parent.fullName, child)
 
-@Stable
-fun isSuperCategory(path: String) = !path.contains(categoryPathSeparator)
-
-@Stable
-fun isTopCategory(path: String) = path.split(categoryPathSeparator).size == 2
-
-@Stable
-fun isSubCategory(path: String) = path.split(categoryPathSeparator).size == 3
-
-@Stable
-fun getSuperCategory(path: String) = path.substringBefore(categoryPathSeparator)
-
-@Stable
-fun getCategorySuperlessPath(id: String) = id.substringAfter(categoryPathSeparator)

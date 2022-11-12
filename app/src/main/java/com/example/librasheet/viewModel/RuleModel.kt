@@ -16,7 +16,7 @@ class RuleModel(
 ) {
     /** Used by the CategoryRulesScreen **/
     val displayList = mutableStateListOf<CategoryRule>()
-    var filterCategory by mutableStateOf(Category.None)
+    var targetCategories  = mutableStateListOf<Category>()
 
     @Callback
     fun update(index: Int, pattern: String, category: Category) {
@@ -58,6 +58,16 @@ class RuleModel(
 
     @Callback
     fun setFilter(income: Boolean) {
-        filterCategory = viewModel.categories.data.all[if (income) 0 else 1]
+        val category = viewModel.categories.data.all[if (income) 0 else 1]
+        targetCategories.clear()
+        targetCategories.addAll(category.getAllFlattened(false))
+        // TODO reset displayList via room query
+    }
+
+    @Callback
+    fun setFilter(category: Category) {
+        targetCategories.clear()
+        targetCategories.addAll(category.getAllFlattened())
+        // TODO reset displayList via room query
     }
 }
