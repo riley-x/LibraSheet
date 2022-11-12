@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.components.ColorCodedRow
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -19,7 +20,7 @@ fun BalanceRow(
     ColorCodedRow(color = account.color, modifier = modifier) {
         Text(account.name)
         Spacer(modifier = Modifier.weight(10f))
-        Text(formatDollar(account.balance))
+        Text(formatDollar(account.value))
     }
 }
 

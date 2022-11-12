@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
+import com.example.librasheet.data.entity.Account
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.ui.graphing.AxesState
 import com.example.librasheet.ui.graphing.DiscreteGraphState
@@ -14,22 +15,22 @@ import com.example.librasheet.viewModel.dataClasses.NamedValue
 val previewAccounts = mutableStateListOf(
     Account(
         name = "BofA Checking",
-        balance = 2_345_01_00,
+        value = 2_345.01f,
         color = Color(0xFF004940),
     ),
     Account(
         name = "BofA Savings",
-        balance = 16_345_78_00,
+        value = 16_345.78f,
         color = Color(0xFF005D57),
     ),
     Account(
         name = "Robinhood",
-        balance = 6_017_38_00,
+        value = 6_017.38f,
         color = Color(0xFF04B97F),
     ),
     Account(
         name = "IRA",
-        balance = 26_607_39_00,
+        value = 26_607.39f,
         color = Color(0xFF37EFBA),
     ),
 )

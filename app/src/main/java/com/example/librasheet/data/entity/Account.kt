@@ -6,6 +6,7 @@ package com.example.librasheet.data.entity
 import androidx.annotation.NonNull
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -24,13 +25,11 @@ data class Account(
     @NonNull override val name: String,
     val institution: Institution,
     val colorLong: Long,
-    val listIndex: Int,
-    @Ignore val balance: Long,
+    var listIndex: Int, // this is not used by compose, so safe to be a var
+    @Ignore override val value: Float,
 ): PieChartValue {
     override val color: Color
         get() = Color(value = colorLong.toULong())
-    override val value: Float
-        get() = balance.toFloatDollar()
 
     /** Room constructor **/
     constructor(
@@ -45,7 +44,7 @@ data class Account(
         institution = institution,
         colorLong = colorLong,
         listIndex = listIndex,
-        balance = 0,
+        value = 0f,
     )
 
     /** Normal constructor **/
@@ -54,12 +53,14 @@ data class Account(
         institution: Institution = Institution.UNKNOWN,
         color: Color,
         listIndex: Int = -1,
+        value: Float = 0f,
     ) : this(
         key = 0,
         name = name,
         institution = institution,
         colorLong = color.value.data,
         listIndex = listIndex,
+        value = value,
     )
 }
 
@@ -68,8 +69,13 @@ data class Account(
     tableName = accountHistoryTable,
     primaryKeys = ["accountKey", "date"],
 )
-data class AccountHistory(
+data class AccountHistoryEntity(
     val accountKey: Long,
+    @Embedded val history: AccountHistory,
+)
+
+data class AccountHistory(
     val date: Int,
     val balance: Long,
 )
+

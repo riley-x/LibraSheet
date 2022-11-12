@@ -3,6 +3,8 @@ package com.example.librasheet.viewModel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.entity.Category
+import com.example.librasheet.data.rangeBetween
 import com.example.librasheet.ui.theme.randomColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,6 +17,14 @@ class AccountModel(
 
     val all = mutableStateListOf<Account>()
 //    val current = previewAccounts.toMutableStateList()
+
+
+    fun load() = viewModel.viewModelScope.launch {
+        all.addAll(withContext(Dispatchers.IO) {
+            dao.getAccounts()
+        })
+    }
+
 
     @Callback
     fun rename(index: Int, name: String) {
@@ -45,6 +55,15 @@ class AccountModel(
     fun reorder(startIndex: Int, endIndex: Int) {
         if (startIndex == endIndex) return
         all.add(endIndex, all.removeAt(startIndex))
-        // TODO delete and update all affected indices (via a SQL command)
+
+        val staleEntities = mutableListOf<Account>()
+        for (i in rangeBetween(startIndex, endIndex)) {
+            all[i].listIndex = i
+            staleEntities.add(all[i])
+        }
+
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            dao.update(all.slice(startIndex..endIndex))
+        }
     }
 }
