@@ -41,7 +41,7 @@ data class Category (
     @PrimaryKey(autoGenerate = true) var key: Long, // This should only ever be modified on initialization
     @NonNull val id: CategoryId,
     val colorLong: Long,
-    var parentKey: Long,
+    @ColumnInfo(index = true) var parentKey: Long,
     var listIndex: Int, // This is not used by compose, and can be a var
     @Ignore val subCategories: SnapshotStateList<Category>,
 ) {

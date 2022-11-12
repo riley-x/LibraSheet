@@ -12,7 +12,7 @@ import java.io.File
     entities = [
         Category::class,
     ],
-    version = 1,
+    version = 2,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
