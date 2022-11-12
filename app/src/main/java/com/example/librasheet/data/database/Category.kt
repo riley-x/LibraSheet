@@ -68,46 +68,46 @@ data class Category (
         subCategories = subCategories,
     )
 
-//    companion object {
-//        @Ignore
-//        val None = Category(
-//            id = CategoryId(),
-//            color = Color.Unspecified,
-//            listIndex = -1,
-//        )
-//    }
-//
-//    fun getAllFlattened(inclusive: Boolean = true) : List<Category> {
-//        val out = mutableListOf<Category>()
-//        if (inclusive) out.add(this)
-//        subCategories.forEach { out.addAll(it.getAllFlattened()) }
-//        return out
-//    }
+    companion object {
+        @Ignore
+        val None = Category(
+            id = CategoryId(),
+            color = Color.Unspecified,
+            listIndex = -1,
+        )
+    }
+
+    fun getAllFlattened(inclusive: Boolean = true) : List<Category> {
+        val out = mutableListOf<Category>()
+        if (inclusive) out.add(this)
+        subCategories.forEach { out.addAll(it.getAllFlattened()) }
+        return out
+    }
 }
 
 
-//@Entity(primaryKeys = ["parentKey", "childKey"])
-//data class CategoryHierarchy(
-//    val parentKey: Int,
-//    val childKey: Int
-//)
+@Entity(primaryKeys = ["parentKey", "childKey"])
+data class CategoryHierarchy(
+    val parentKey: Int,
+    val childKey: Int
+)
 
-//data class CategoryWithChildren(
-//    @Embedded val current: Category,
-//    @Relation(
-//        parentColumn = "parentKey",
-//        entityColumn = "childKey",
-//        associateBy = Junction(CategoryHierarchy::class)
-//    )
-//    val subCategories: MutableList<Category>
-//) {
-//    /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
-//     * to worry about nested subCategories since we enforce only two levels of categories **/
-//    fun toNestedCategory(): Category {
-//        current.subCategories.addAll(subCategories)
-//        return current
-//    }
-//}
+data class CategoryWithChildren(
+    @Embedded val current: Category,
+    @Relation(
+        parentColumn = "parentKey",
+        entityColumn = "childKey",
+        associateBy = Junction(CategoryHierarchy::class)
+    )
+    val subCategories: MutableList<Category>
+) {
+    /** This should only ever be called on top-level categories (i.e. hierarchy level 1). Don't need
+     * to worry about nested subCategories since we enforce only two levels of categories **/
+    fun toNestedCategory(): Category {
+        current.subCategories.addAll(subCategories)
+        return current
+    }
+}
 
 /** This is a unique string identifier for all categories. This is what is passed throughout the rest
  * of the app, to elements like the color selector or dialog callbacks. The string is composed of a

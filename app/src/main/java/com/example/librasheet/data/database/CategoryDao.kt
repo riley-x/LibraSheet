@@ -4,6 +4,6 @@ import androidx.room.*
 
 @Dao
 interface CategoryDao {
-//    @Insert
-//    fun add(category: Category)
+    @Insert
+    fun add(category: Category)
 }
