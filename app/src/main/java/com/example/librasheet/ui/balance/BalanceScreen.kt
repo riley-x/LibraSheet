@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -32,6 +33,7 @@ fun BalanceScreen(
     dates: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
+    onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -39,55 +41,62 @@ fun BalanceScreen(
     Column(
         modifier = modifier
     ) {
-        HeaderBar(title = "Balances") {
+        HeaderBar(title = "Balances", modifier = Modifier.zIndex(1f)) {
             Spacer(Modifier.weight(10f))
             Text(hoverText, textAlign = TextAlign.End)
         }
 
-        LazyColumn {
-            item("graphic") {
-                GraphSelector(
-                    tabs = tabs,
-                    selectedTab = selectedTab,
-                    onSelection = { selectedTab.value = it },
-                    modifier = Modifier
-                        .height(300.dp)
-                        .fillMaxWidth()
-                ) {
-                    when (it) {
-                        0 -> PieChart(
-                            values = accounts,
-                            modifier = Modifier
-                                .padding(start = 30.dp, end = 30.dp)
-                        )
-                        1 -> StackedLineGraph(
-                            state = history,
-                            modifier = Modifier.fillMaxSize()
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(history.values.first().second[loc]) + "\n" + dates[loc]
-                            else ""
-                        }
-                        else -> BinaryBarGraph(
-                            state = netIncome,
-                            modifier = Modifier.fillMaxSize()
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(netIncome.values[loc]) + "\n" + dates[loc]
-                            else ""
+        DragHost {
+            LazyColumn {
+                item("graphic") {
+                    GraphSelector(
+                        tabs = tabs,
+                        selectedTab = selectedTab,
+                        onSelection = { selectedTab.value = it },
+                        modifier = Modifier
+                            .height(300.dp)
+                            .fillMaxWidth()
+                    ) {
+                        when (it) {
+                            0 -> PieChartFiltered(
+                                values = accounts,
+                                modifier = Modifier
+                                    .padding(start = 30.dp, end = 30.dp)
+                            )
+                            1 -> StackedLineGraph(
+                                state = history,
+                                modifier = Modifier.fillMaxSize()
+                            ) { isHover, loc ->
+                                hoverText = if (isHover)
+                                    formatDollar(history.values.first().second[loc]) + "\n" + dates[loc]
+                                else ""
+                            }
+                            else -> BinaryBarGraph(
+                                state = netIncome,
+                                modifier = Modifier.fillMaxSize()
+                            ) { isHover, loc ->
+                                hoverText = if (isHover)
+                                    formatDollar(netIncome.values[loc]) + "\n" + dates[loc]
+                                else ""
+                            }
                         }
                     }
                 }
-            }
 
-            itemsIndexed(accounts) { index, account ->
-                if (index > 0) RowDivider()
-                
-                BalanceRow(
-                    account = account,
-                    modifier = Modifier
-                        .clickable { onAccountClick(account) }
-                )
+                itemsIndexed(accounts) { index, account ->
+                    if (index > 0) RowDivider(Modifier.zIndex(1f))
+
+                    DragToReorderTarget(
+                        index = index,
+                        onDragEnd = { _, start, end -> onReorder(start, end) },
+                    ) {
+                        BalanceRow(
+                            account = account,
+                            modifier = Modifier
+                                .clickable { onAccountClick(account) }
+                        )
+                    }
+                }
             }
         }
     }

@@ -231,6 +231,7 @@ fun LibraApp(
                         dates = previewLineGraphDates,
                         netIncome = previewNetIncomeState,
                         onAccountClick = ::toAccountDetails,
+                        onReorder = viewModel.accounts::reorder,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
