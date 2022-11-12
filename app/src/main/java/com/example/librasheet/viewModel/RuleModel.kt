@@ -1,5 +1,6 @@
 package com.example.librasheet.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,14 +21,16 @@ class RuleModel(
 
     @Callback
     fun updateRule(index: Int, pattern: String, category: Category) {
+        Log.d("Libra/RuleMode/updateRule", "Enter: $index $pattern $category")
         val it = displayList[index]
-        if (pattern == it.pattern || category.key == it.categoryKey) return
+        if (pattern == it.pattern && category == it.category) return
         displayList[index] = it.copy(
             pattern = pattern,
             categoryKey = category.key,
             category = category,
         )
         // TODO Room update
+        Log.d("Libra/RuleMode/updateRule", "Exit: ${displayList[index]}")
     }
 
     @Callback
