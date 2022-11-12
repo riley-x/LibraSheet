@@ -108,6 +108,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         /** Update add to new parent **/
         category.apply {
             id = joinCategoryPath(newParentId, categoryId.name)
+            parentKey = newParent.key
             listIndex = newParent.subCategories.size
         }
         newParent.subCategories.add(category)

@@ -31,16 +31,17 @@ internal const val expenseKey = -2L
  * https://stackoverflow.com/questions/69426421/android-room-with-kotlin-value-class
  * https://stackoverflow.com/questions/58203953/room-database-with-kotlin-inline-class-as-an-entity-field
  * So must specify a Long as the type and convert (which should be heap-free).
- * @param listIndex Index of this entry in its parent category list.
+ * @param listIndex Index of this entry in its parent category list. Only used when loading from the
+ * database, not inside compose
  * @param parentKey can be [incomeKey] for income, or [expenseKey] for expense
  */
 @Entity(tableName = categoryTable)
 data class Category (
-    @PrimaryKey(autoGenerate = true) var key: Long, // This should only ever be modified on initialization
+    @PrimaryKey(autoGenerate = true) val key: Long,
     @NonNull var id: CategoryId,
     val colorLong: Long,
     @ColumnInfo(index = true) var parentKey: Long,
-    var listIndex: Int, // This is not used by compose
+    var listIndex: Int,
     @Ignore val subCategories: MutableList<Category>,
 ) {
     val color: Color
