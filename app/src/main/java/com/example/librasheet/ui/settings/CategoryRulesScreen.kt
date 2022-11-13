@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -70,7 +71,9 @@ fun CategoryRulesScreen(
                         index = index,
                         onDragEnd = { _, start, end -> onReorder(start, end) },
                     ) {
-                        Surface {
+                        Surface(
+                            Modifier.clickable { onEdit(index) }
+                        ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
@@ -98,12 +101,12 @@ fun CategoryRulesScreen(
                                         .alpha(if (special) ContentAlpha.disabled else ContentAlpha.high)
                                 )
 
-                                DropdownOptions(options = ruleOptions) {
-                                    when (it) {
-                                        RuleOptions.EDIT -> onEdit(index)
-                                        RuleOptions.DELETE -> onDelete(index)
-                                    }
-                                }
+//                                DropdownOptions(options = ruleOptions) {
+//                                    when (it) {
+//                                        RuleOptions.EDIT -> onEdit(index)
+//                                        RuleOptions.DELETE -> onDelete(index)
+//                                    }
+//                                }
                             }
                         }
                     }
