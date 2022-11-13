@@ -16,7 +16,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     suspend fun startup() {
         Log.d("Libra/LibraViewModel/startup", "Startup")
         val jobs = mutableListOf<Job>()
-        jobs.add(accounts.load())
+        accounts.load()
         categories.loadData().join()
         categories.loadUi()
         jobs.joinAll()

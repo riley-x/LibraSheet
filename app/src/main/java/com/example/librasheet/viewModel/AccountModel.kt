@@ -15,10 +15,7 @@ import com.example.librasheet.ui.graphing.autoXTicksDiscrete
 import com.example.librasheet.ui.graphing.autoYTicks
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.dataClasses.NamedValue
-import com.example.librasheet.viewModel.preview.previewAccount
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewStackedLineGraph
-import com.example.librasheet.viewModel.preview.testAccountHistory
+import com.example.librasheet.viewModel.preview.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,7 +46,8 @@ class AccountModel(
         }
         viewModel.viewModelScope.launch {
             history = withContext(Dispatchers.IO) {
-                dao.getHistory().foldAccounts()
+//                dao.getHistory().foldAccounts()
+                testHistory.toMutableList()
             }
             viewModel.viewModelScope.launch { loadIncomeGraph() }
         }
@@ -59,7 +57,7 @@ class AccountModel(
     private suspend fun loadIncomeGraph() {
         if (history.size < 2) return
 
-        withContext(Dispatchers.Default) {
+        val (values, axes) = withContext(Dispatchers.Default) {
             val values = mutableListOf<Float>()
             var minY = 0f
             var maxY = 0f
@@ -93,12 +91,18 @@ class AccountModel(
             val axes = AxesState(
                 ticksY = ticksY,
                 ticksX = ticksX,
-
+                minY = minY,
+                maxY = maxY,
+                minX = -0.5f,
+                maxX = values.size - 0.5f,
             )
+
+            Pair(values, axes)
         }
 
         incomeGraph.values.clear()
-
+        incomeGraph.values.addAll(values)
+        incomeGraph.axes.value = axes
     }
 
 

@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.AccountHistory
+import com.example.librasheet.data.entity.BalanceHistory
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.ui.graphing.AxesState
@@ -17,22 +17,22 @@ import com.example.librasheet.viewModel.dataClasses.NamedValue
 val previewAccounts = mutableStateListOf(
     Account(
         name = "BofA Checking",
-        value = 2_345.01f,
+        balance = 2_345_01_00,
         color = Color(0xFF004940),
     ),
     Account(
         name = "BofA Savings",
-        value = 16_345.78f,
+        balance = 16_345_78_00,
         color = Color(0xFF005D57),
     ),
     Account(
         name = "Robinhood",
-        value = 6_017.38f,
+        balance = 6_017_38_00,
         color = Color(0xFF04B97F),
     ),
     Account(
         name = "IRA",
-        value = 26_607.39f,
+        balance = 26_607_39_00,
         color = Color(0xFF37EFBA),
     ),
 )
@@ -62,13 +62,15 @@ val previewStackedLineGraph = mutableStateListOf(
 )
 
 
-val testAccountHistory = previewStackedLineGraph.map {
-    it.second.mapIndexed {index, value ->
-        AccountHistory(
-            date = 20221101 + index,
-            balance = value.toLongDollar()
-        )
-    }.toMutableList()
+val testHistory = List(previewStackedLineGraph[0].second.size) { dateIndex ->
+    val x = previewStackedLineGraph.withIndex().associateBy(
+        keySelector = { it.index.toLong() },
+        valueTransform = { it.value.second[dateIndex].toLongDollar() }
+    ).toMutableMap()
+    BalanceHistory(
+        date = 2022_10_00 + dateIndex * 100,
+        balances = x
+    )
 }
 
 val previewLineGraph = previewStackedLineGraph[0].second.toMutableStateList()

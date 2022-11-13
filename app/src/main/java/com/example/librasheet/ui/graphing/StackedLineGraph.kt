@@ -31,6 +31,7 @@ typealias StackedLineGraphValue = Pair<Color, List<Float>>
 data class StackedLineGraphState(
     val axes: State<AxesState>,
     val values: SnapshotStateList<StackedLineGraphValue>,
+    val toString: (Float) -> String = { "$it" },
 )
 
 
@@ -81,6 +82,7 @@ fun stackedLineGraphHover(
     indicatorColor: Color = MaterialTheme.colors.onSurface,
     indicatorWidth: Dp = 1.dp,
     labelYStartPad: Dp = 8.dp,
+    toString: (Float) -> String = { "$it" },
 ): DrawScope.(GrapherInputs) -> Unit {
     val textStyle = MaterialTheme.typography.overline
     return fun DrawScope.(it: GrapherInputs) {
@@ -109,9 +111,7 @@ fun stackedLineGraphHover(
                     values[index + 1].second[hoverLoc.value]
                 else 0f
             val layoutResult = it.textMeasurer.measure(
-                text = AnnotatedString(
-                    format2Decimals(value / 1000f)
-                ),
+                text = AnnotatedString(toString(value)),
                 style = textStyle,
             )
 
@@ -155,12 +155,17 @@ fun stackedLineGraphHover(
 fun StackedLineGraph(
     state: StackedLineGraphState,
     modifier: Modifier = Modifier,
+    toString: (Float) -> String = { "$it" },
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
     val hoverLoc = remember { mutableStateOf(-1) }
     val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
     val graph = stackedLineGraphDrawer(values = state.values)
-    val graphHover = stackedLineGraphHover(values = state.values, hoverLoc = hoverLoc)
+    val graphHover = stackedLineGraphHover(
+        values = state.values,
+        hoverLoc = hoverLoc,
+        toString = toString,
+    )
     fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
         if (state.values.isEmpty()) return
         if (isHover) {
@@ -204,7 +209,9 @@ private fun PreviewHover() {
         Surface {
             val hoverLoc = remember { mutableStateOf(2) }
             val graph = stackedLineGraphDrawer(previewStackedLineGraph)
-            val graphHover = stackedLineGraphHover(previewStackedLineGraph, hoverLoc)
+            val graphHover = stackedLineGraphHover(previewStackedLineGraph, hoverLoc) {
+                format2Decimals(it / 1000)
+            }
             Graph(
                 axesState = previewStackedLineGraphAxes,
                 contentBefore = graph,

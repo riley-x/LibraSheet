@@ -17,7 +17,7 @@ import com.example.librasheet.data.entity.*
         Account::class,
         AccountHistory::class,
     ],
-    version = 5,
+    version = 6,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
