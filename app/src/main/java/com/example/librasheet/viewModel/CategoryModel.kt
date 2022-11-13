@@ -17,8 +17,7 @@ class CategoryModel(
 ) {
     val data = CategoryData(viewModel.viewModelScope, viewModel.application.database.categoryDao())
 
-    /** This are displayed in both the categories settings screen and the respective cash flow
-     * screens **/
+    /** This are used in both the categories settings screen and the respective cash flow screens **/
     val income = mutableStateListOf<CategoryUi>()
     val expense = mutableStateListOf<CategoryUi>()
 
@@ -30,8 +29,7 @@ class CategoryModel(
     val moveTargets = mutableStateListOf<String>()
 
     /** Expanded state of each row in the edit category screen. This is needed here since lots of bugs
-     * occur if you try to put it inside the LazyColumn::items. Index with the full category name.
-     */
+     * occur if you try to put it inside the LazyColumn::items. Index with the full category name. **/
     val editScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
     val incomeScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
     val expenseScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()

@@ -30,6 +30,13 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         )
     )
 
+    val history = mutableListOf<CategoryHistory>()
+
+    /** Map categoryKey to value **/
+    val currentMonth = mutableMapOf<Long, Long>()
+    val yearAverage = mutableMapOf<Long, Long>()
+    val allAverage = mutableMapOf<Long, Long>()
+
     fun load(): Job {
         return scope.launch(Dispatchers.IO) {
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
