@@ -11,13 +11,15 @@ import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.format1Decimal
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.graphing.*
-import com.example.librasheet.viewModel.dataClasses.NamedValue
 import com.example.librasheet.viewModel.preview.testHistory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * UI state for the Balance Screen's graphs
+ */
 class BalanceGraphModel(
     private val viewModel: LibraViewModel,
 ) {
@@ -31,32 +33,32 @@ class BalanceGraphModel(
     val incomeGraph = DiscreteGraphState()
     /** State for the history graph in the balance screen **/
     val historyGraph = StackedLineGraphState()
-    /** Dates to display when hovering in the balance screen. Note that the income graph will drop
-     * the first date since its size is one less than the history graph. **/
-    val dates = mutableStateListOf<String>()
+    /** Dates to display when hovering in the balance screen. **/
+    val incomeDates = mutableStateListOf<String>()
+    val historyDates = mutableStateListOf<String>()
 
-    fun load(accounts: List<Account>): List<Job> {
-        val job1 = viewModel.viewModelScope.launch {
-            history = withContext(Dispatchers.IO) {
+    fun loadIncome() = viewModel.viewModelScope.launch {
+        netIncome = withContext(Dispatchers.IO) {
+            categoryHistoryDao.getNetIncome()
+        }.toMutableList()
+        netIncome.mapTo(incomeDates) { formatDateInt(it.date, "MMM yyyy") }
+        calculateIncomeGraph()
+    }
+
+
+    fun loadHistory(accounts: List<Account>) = viewModel.viewModelScope.launch {
+        history = withContext(Dispatchers.IO) {
 //                accountDao.getHistory().foldAccounts()
-                testHistory.toMutableList()
-            }
-            dates.clear()
-            history.mapTo(dates) { formatDateInt(it.date, "MMM yyyy") }
-            loadHistoryGraph(accounts)
+            testHistory.toMutableList()
         }
-        val job2 = viewModel.viewModelScope.launch {
-            netIncome = withContext(Dispatchers.IO) {
-                categoryHistoryDao.getNetIncome()
-            }.toMutableList()
-            loadIncomeGraph()
-        }
-        return listOf(job1, job2)
+        historyDates.clear()
+        history.mapTo(historyDates) { formatDateInt(it.date, "MMM yyyy") }
+        calculateHistoryGraph(accounts)
     }
 
 
     @MainThread
-    private suspend fun loadIncomeGraph() {
+    private suspend fun calculateIncomeGraph() {
         if (netIncome.isEmpty()) return
 
         val (values, axes) = withContext(Dispatchers.Default) {
@@ -87,6 +89,7 @@ class BalanceGraphModel(
             Pair(values, axes)
         }
 
+        incomeDates.clear()
         incomeGraph.values.clear()
         incomeGraph.values.addAll(values)
         incomeGraph.axes.value = axes
@@ -94,7 +97,7 @@ class BalanceGraphModel(
 
 
     @MainThread
-    private suspend fun loadHistoryGraph(accounts: List<Account>) {
+    internal suspend fun calculateHistoryGraph(accounts: List<Account>) {
         if (history.size < 2) return
         if (accounts.isEmpty()) return
 

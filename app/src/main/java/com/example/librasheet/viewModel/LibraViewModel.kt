@@ -6,27 +6,37 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.LibraApplication
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
     val rules = RuleModel(this)
     val accounts = AccountModel(this)
+    val balanceGraphs = BalanceGraphModel(this)
 
     suspend fun startup() {
         Log.d("Libra/LibraViewModel/startup", "Startup")
         viewModelScope.launch {
-            accounts.loadData().joinAll()
-            accounts.loadUi()
+            accounts.load().join()
         }
         viewModelScope.launch {
             categories.loadData().join()
             categories.loadUi()
         }
     }
+
+    internal fun updateDependencies(dependency: Dependency) = when(dependency) {
+        Dependency.ACCOUNT_REORDER -> viewModelScope.launch {
+            balanceGraphs.calculateHistoryGraph(accounts.all)
+        }
+    }
 }
+
+
+internal enum class Dependency {
+    ACCOUNT_REORDER,
+}
+
 
 /**
  * This is needed to pass the application instance to the view model, so it can access the Room DAOs

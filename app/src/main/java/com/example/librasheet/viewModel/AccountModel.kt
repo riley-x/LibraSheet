@@ -1,19 +1,11 @@
 package com.example.librasheet.viewModel
 
 import android.util.Log
-import androidx.annotation.MainThread
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.example.librasheet.data.dao.TimeSeries
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.rangeBetween
-import com.example.librasheet.data.toFloatDollar
-import com.example.librasheet.ui.components.format1Decimal
-import com.example.librasheet.ui.components.formatDateInt
-import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.randomColor
-import com.example.librasheet.viewModel.dataClasses.NamedValue
 import com.example.librasheet.viewModel.preview.*
 import kotlinx.coroutines.*
 
@@ -83,6 +75,6 @@ class AccountModel(
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             dao.update(all.slice(startIndex..endIndex))
         }
-        viewModel.viewModelScope.launch { loadHistoryGraph() }
+        viewModel.updateDependencies(Dependency.ACCOUNT_REORDER)
     }
 }
