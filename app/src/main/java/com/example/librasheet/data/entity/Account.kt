@@ -52,12 +52,13 @@ data class Account(
     /** Normal constructor **/
     constructor(
         name: String,
-        institution: Institution = Institution.UNKNOWN,
         color: Color,
+        institution: Institution = Institution.UNKNOWN,
+        key: Long = 0,
         listIndex: Int = -1,
         balance: Long = 0,
     ) : this(
-        key = 0,
+        key = key,
         name = name,
         institution = institution,
         colorLong = color.value.data,

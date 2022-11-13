@@ -29,9 +29,9 @@ typealias StackedLineGraphValue = Pair<Color, List<Float>>
 
 @Immutable
 data class StackedLineGraphState(
-    val axes: State<AxesState>,
-    val values: SnapshotStateList<StackedLineGraphValue>,
-    val toString: (Float) -> String = { "$it" },
+    val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
+    val values: SnapshotStateList<StackedLineGraphValue> = mutableStateListOf(),
+    val toString: MutableState<(Float) -> String> = mutableStateOf({ "$it" }),
 )
 
 
@@ -155,7 +155,6 @@ fun stackedLineGraphHover(
 fun StackedLineGraph(
     state: StackedLineGraphState,
     modifier: Modifier = Modifier,
-    toString: (Float) -> String = { "$it" },
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
     val hoverLoc = remember { mutableStateOf(-1) }
@@ -164,7 +163,7 @@ fun StackedLineGraph(
     val graphHover = stackedLineGraphHover(
         values = state.values,
         hoverLoc = hoverLoc,
-        toString = toString,
+        toString = state.toString.value,
     )
     fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
         if (state.values.isEmpty()) return

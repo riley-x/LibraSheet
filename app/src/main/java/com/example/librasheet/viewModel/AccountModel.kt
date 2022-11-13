@@ -8,21 +8,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.rangeBetween
 import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.ui.components.format1Decimal
 import com.example.librasheet.ui.components.formatDateInt
-import com.example.librasheet.ui.graphing.AxesState
-import com.example.librasheet.ui.graphing.DiscreteGraphState
-import com.example.librasheet.ui.graphing.autoXTicksDiscrete
-import com.example.librasheet.ui.graphing.autoYTicks
+import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.dataClasses.NamedValue
 import com.example.librasheet.viewModel.preview.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 
 const val graphYPad = 0.1f
-const val graphTicksX = 5
+const val graphTicksX = 4
 const val graphTicksY = 6
 
 class AccountModel(
@@ -30,12 +26,20 @@ class AccountModel(
 ) {
     private val dao = viewModel.application.database.accountDao()
 
-    val all = mutableStateListOf<Account>()
-    var history: MutableList<BalanceHistory> = mutableListOf()
-    val incomeGraph = DiscreteGraphState()
+    private var history: MutableList<BalanceHistory> = mutableListOf()
 
-    suspend fun load() {
-        viewModel.viewModelScope.launch {
+    /** A list of all accounts and their current balances. This is used throughout the app **/
+    val all = mutableStateListOf<Account>()
+    /** State for the net income graph in the balance screen **/
+    val incomeGraph = DiscreteGraphState()
+    /** State for the history graph in the balance screen **/
+    val historyGraph = StackedLineGraphState()
+    /** Dates to display when hovering in the balance screen. Note that the income graph will drop
+     * the first date since its size is one less than the history graph. **/
+    val dates = mutableStateListOf<String>()
+
+    fun loadData(): List<Job> {
+        val job1 = viewModel.viewModelScope.launch {
             all.addAll(withContext(Dispatchers.IO) {
 //                dao.getAccounts()
                 previewAccounts
@@ -44,13 +48,21 @@ class AccountModel(
                 Log.d("Libra/AccountModel/load", "$it")
             }
         }
-        viewModel.viewModelScope.launch {
+        val job2 = viewModel.viewModelScope.launch {
             history = withContext(Dispatchers.IO) {
 //                dao.getHistory().foldAccounts()
                 testHistory.toMutableList()
             }
-            viewModel.viewModelScope.launch { loadIncomeGraph() }
         }
+        return listOf(job1, job2)
+    }
+
+    fun loadUi() {
+        dates.clear()
+        history.mapTo(dates) { formatDateInt(it.date, "MMM yyyy") }
+
+        viewModel.viewModelScope.launch { loadIncomeGraph() }
+        viewModel.viewModelScope.launch { loadHistoryGraph() }
     }
 
     @MainThread
@@ -73,14 +85,11 @@ class AccountModel(
                 if (income > maxY) maxY = income
             }
 
-            val pad = (if (maxY == minY) maxY else (maxY - minY)) * graphYPad
-            maxY += pad
-            minY -= pad
 
             val ticksX = autoXTicksDiscrete(values.size, graphTicksX).map {
                 NamedValue(
-                    value = values[it],
-                    name = formatDateInt(history[it + 1].date, "MMM 'yy"), // add one since income values are one less
+                    value = it.toFloat(),
+                    name = formatDateInt(history[it + 1].date, "MMM ''yy"), // add one since income values are one less
                 )
             }
             val ticksY = autoYTicks(
@@ -88,11 +97,13 @@ class AccountModel(
                 maxY,
                 graphTicksY,
             )
+
+            val pad = (if (maxY == minY) maxY else (maxY - minY)) * graphYPad
             val axes = AxesState(
                 ticksY = ticksY,
                 ticksX = ticksX,
-                minY = minY,
-                maxY = maxY,
+                minY = minY - pad,
+                maxY = maxY + pad,
                 minX = -0.5f,
                 maxX = values.size - 0.5f,
             )
@@ -103,6 +114,59 @@ class AccountModel(
         incomeGraph.values.clear()
         incomeGraph.values.addAll(values)
         incomeGraph.axes.value = axes
+    }
+
+    @MainThread
+    private suspend fun loadHistoryGraph() {
+        if (history.size < 2) return
+        if (all.isEmpty()) return
+
+        val (values, axes, order) = withContext(Dispatchers.Default) {
+            val values = all.reversed().associateBy(
+                keySelector = { it.key },
+                valueTransform = { Pair(it.color, mutableListOf<Float>()) }
+            )
+
+            /** Get values and maximum y value **/
+            var maxY = 0f
+            history.forEach { date ->
+                var total = 0f
+                values.forEach { key, (_, list) ->
+                    total += date.balances.getOrDefault(key, 0).toFloatDollar()
+                    list.add(total)
+                }
+                if (total > maxY) maxY = total
+            }
+
+            /** Create axes **/
+            val ticksX = autoXTicksDiscrete(history.size, graphTicksX).map {
+                NamedValue(
+                    value = it.toFloat(),
+                    name = formatDateInt(history[it].date, "MMM ''yy"),
+                )
+            }
+            val (ticksY, order) = autoYTicksWithOrder(
+                0f,
+                maxY,
+                graphTicksY,
+            )
+            val axes = AxesState(
+                ticksY = ticksY,
+                ticksX = ticksX,
+                minY = 0f,
+                maxY = maxY + maxY * graphYPad,
+                minX = 0f,
+                maxX = history.lastIndex.toFloat(),
+            )
+
+            Triple(values.values.reversed().toMutableList(), axes, order)
+        }
+        Log.d("Libra/AccountModel/loadHistoryGraph", "order=$order maxY=${axes.maxY}")
+
+        historyGraph.values.clear()
+        historyGraph.values.addAll(values)
+        historyGraph.axes.value = axes
+        historyGraph.toString.value = { format1Decimal(it / order) }
     }
 
 

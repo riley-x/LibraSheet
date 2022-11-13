@@ -25,6 +25,16 @@ fun format2Decimals(value: Float, length: Int = 0): String {
     return out.padStart(length)
 }
 
+@Stable
+fun format1Decimal(value: Float, length: Int = 0): String {
+    val format = NumberFormat.getNumberInstance()
+    format.isGroupingUsed = false
+    format.minimumFractionDigits = 1
+    format.maximumFractionDigits = 1
+    val out = format.format(value)
+    return out.padStart(length)
+}
+
 // NOTE: do not pre-multiply by 100!
 @Stable
 fun formatPercent(value: Float): String {

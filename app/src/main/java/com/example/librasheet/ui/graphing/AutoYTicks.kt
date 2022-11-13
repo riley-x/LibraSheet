@@ -7,7 +7,7 @@ import kotlin.math.roundToInt
 /**
  * The number of ticks returned is at most maxDivisions. The center nCenter values are chosen.
  */
-fun autoYTicks(minY: Float, maxY: Float, maxDivisions: Int, nCenter: Int = maxDivisions): List<NamedValue> {
+fun autoYTicksWithOrder(minY: Float, maxY: Float, maxDivisions: Int, nCenter: Int = maxDivisions): Pair<List<NamedValue>, Int> {
     /** Start with assuming perfectly even spacing with [min, max, diff / maxDivision]. Increase the
      * step size to the nearest human readable value. Here, stepDesired = step * stepDesiredFactor.
      * Move human readable factors (2, 5, 10) from stepDesiredFactor to step until stepDesiredFactor
@@ -33,10 +33,14 @@ fun autoYTicks(minY: Float, maxY: Float, maxDivisions: Int, nCenter: Int = maxDi
 
     /** Create the tick list by starting from the nearest integer step **/
     val start = ceil(minY / step).roundToInt()
-    fun label(i: Int): String {
-        return if (step % 1_000_000 == 0) ((start + i) * step / 1_000_000).toString() + "m"
-        else if (step % 1_000 == 0) ((start + i) * step / 1_000).toString() + "k"
-        else ((start + i) * step).toString()
+    val order =
+        if (step % 1_000_000 == 0) 1_000_000
+        else if (step % 1_000 == 0) 1_000
+        else 1
+    fun label(i: Int): String = when (order) {
+        1_000_000 -> ((start + i) * step / 1_000_000).toString() + "m"
+        1_000 -> ((start + i) * step / 1_000).toString() + "k"
+        else -> ((start + i) * step).toString()
     }
     val output = mutableListOf<NamedValue>()
     for (i in 0 until maxDivisions) {
@@ -45,7 +49,7 @@ fun autoYTicks(minY: Float, maxY: Float, maxDivisions: Int, nCenter: Int = maxDi
     }
 
     /** Pick the center most values **/
-    return if (output.size <= nCenter) {
+    val ticks = if (output.size <= nCenter) {
         output
     } else if ((output.size - nCenter) % 2 == 0) {
         val drop = (output.size - nCenter) / 2
@@ -59,4 +63,9 @@ fun autoYTicks(minY: Float, maxY: Float, maxDivisions: Int, nCenter: Int = maxDi
             output.drop(drop).dropLast(drop + 1)
         }
     }
+
+    return Pair(ticks, order)
 }
+
+fun autoYTicks(minY: Float, maxY: Float, maxDivisions: Int, nCenter: Int = maxDivisions) =
+    autoYTicksWithOrder(minY, maxY, maxDivisions, nCenter).first
