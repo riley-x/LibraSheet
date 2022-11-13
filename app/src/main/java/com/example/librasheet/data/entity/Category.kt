@@ -18,6 +18,7 @@ const val displaySeparator = " > "
 
 internal const val incomeKey = -1L
 internal const val expenseKey = -2L
+internal const val ignoreKey = -3L
 
 
 /**
@@ -86,9 +87,14 @@ data class Category (
     companion object {
         @Ignore
         val None = Category(
+            key = 0,
             id = CategoryId(),
             color = Color.Unspecified,
-            listIndex = -1,
+        )
+        val Ignore = Category(
+            key = ignoreKey,
+            id = CategoryId("Ignore"),
+            color = Color.Unspecified,
         )
     }
 

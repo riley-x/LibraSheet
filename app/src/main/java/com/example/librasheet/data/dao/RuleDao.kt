@@ -1,9 +1,8 @@
 package com.example.librasheet.data.dao
 
 import androidx.room.*
-import com.example.librasheet.data.entity.CategoryRule
-import com.example.librasheet.data.entity.CategoryRuleEntity
-import com.example.librasheet.data.entity.ruleColumns
+import com.example.librasheet.data.entity.*
+import com.example.librasheet.data.entity.ignoreKey
 import com.example.librasheet.data.entity.ruleTable
 
 @Dao
@@ -52,6 +51,12 @@ interface RuleDao {
     @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 0 AND categoryKey = :categoryKey ORDER BY listIndex")
     fun getExpenseRules(categoryKey: Long): List<CategoryRule>
 
+    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 1 AND categoryKey = $ignoreKey ORDER BY listIndex")
+    fun getIgnoredIncome(): List<CategoryRule>
+
+    @Query("SELECT $ruleColumns FROM $ruleTable WHERE isIncome = 0 AND categoryKey = $ignoreKey ORDER BY listIndex")
+    fun getIgnoredExpense(): List<CategoryRule>
+
 
 
     /** REORDER FUNCTIONS **/
@@ -75,4 +80,5 @@ interface RuleDao {
             update(movedRule.withIndex(displacedIndex))
         }
     }
+
 }

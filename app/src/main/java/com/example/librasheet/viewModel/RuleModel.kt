@@ -91,11 +91,17 @@ class RuleModel(
     fun setScreen(income: Boolean) {
         currentScreenIsIncome = income
         val category = viewModel.categories.data.all[if (income) 0 else 1]
+        val all = category.getAllFlattened(false)
+
         targetCategories.clear()
-        targetCategories.addAll(category.getAllFlattened(false))
+        targetCategories.addAll(all)
+        targetCategories.add(Category.Ignore)
+
         filterCategories.clear()
         filterCategories.add(category)
-        filterCategories.addAll(targetCategories)
+        filterCategories.addAll(all)
+        filterCategories.add(Category.Ignore)
+
         setFilter(category)
     }
 
@@ -106,11 +112,13 @@ class RuleModel(
             // TODO loading indicator
             val rules = withContext(Dispatchers.IO) {
                 val rules = if (currentScreenIsIncome) {
-                    if (category.id.isSuper) dao.getIncomeRules()
+                    if (category.key == Category.Ignore.key) dao.getIgnoredIncome()
+                    else if (category.id.isSuper) dao.getIncomeRules()
                     else dao.getIncomeRules(category.key)
                 }
                 else {
-                    if (category.id.isSuper) dao.getExpenseRules()
+                    if (category.key == Category.Ignore.key) dao.getIgnoredExpense()
+                    else if (category.id.isSuper) dao.getExpenseRules()
                     else dao.getExpenseRules(category.key)
                 }
                 // TODO is reading category safe here?
