@@ -4,14 +4,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.delay
 
 /**
  * Dialog box with a single text field, with ok and cancel buttons
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFieldDialog(
     modifier: Modifier = Modifier,
@@ -24,6 +31,13 @@ fun TextFieldDialog(
     onDismiss: (String) -> Unit = { },
 ) {
     var text by remember { mutableStateOf(initialText) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        awaitFrame() // This is necessary for the keyboard to popup.
+        // https://stackoverflow.com/questions/69750447/jetpack-compose-focus-requester-not-working-with-dialog
+        focusRequester.requestFocus()
+    }
 
     Dialog(
         title = title,
@@ -48,9 +62,10 @@ fun TextFieldDialog(
                 }
             },
             modifier = Modifier
+                .focusRequester(focusRequester)
                 .fillMaxWidth()
                 .padding(vertical = 6.dp)
-                .height(60.dp)
+                .height(65.dp) // Note a minimum height is required for the droplet to appear. 60.dp was too small
         )
     }
 }
