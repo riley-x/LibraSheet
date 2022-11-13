@@ -18,7 +18,9 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         Log.d("Libra/LibraViewModel/startup", "Startup")
         viewModelScope.launch {
             accounts.load().join()
+            balanceGraphs.loadHistory(accounts.all)
         }
+        viewModelScope.launch { balanceGraphs.loadIncome() }
         viewModelScope.launch {
             categories.loadData().join()
             categories.loadUi()

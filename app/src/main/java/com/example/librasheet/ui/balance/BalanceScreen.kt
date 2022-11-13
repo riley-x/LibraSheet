@@ -30,7 +30,8 @@ fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
     history: StackedLineGraphState,
     netIncome: DiscreteGraphState,
-    dates: SnapshotStateList<String>,
+    historyDates: SnapshotStateList<String>,
+    incomeDates: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
     onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
@@ -68,7 +69,8 @@ fun BalanceScreen(
                                 modifier = Modifier.fillMaxSize()
                             ) { isHover, loc ->
                                 hoverText = if (isHover)
-                                    formatDollar(history.values.first().second[loc]) + "\n" + dates.getOrElse(loc) { "" }
+                                    formatDollar(history.values.first().second[loc]) + "\n" +
+                                            historyDates.getOrElse(loc) { "" }
                                 else ""
                             }
                             else -> BinaryBarGraph(
@@ -76,7 +78,8 @@ fun BalanceScreen(
                                 modifier = Modifier.fillMaxSize()
                             ) { isHover, loc ->
                                 hoverText = if (isHover)
-                                    formatDollar(netIncome.values[loc]) + "\n" + dates.getOrElse(loc + 1) { "" } // add one since income skips the first entry
+                                    formatDollar(netIncome.values[loc]) + "\n" +
+                                            incomeDates.getOrElse(loc) { "" }
                                 else ""
                             }
                         }
@@ -114,7 +117,8 @@ private fun Preview() {
             BalanceScreen(
                 accounts = previewAccounts,
                 history = previewStackedLineGraphState,
-                dates = previewEmptyStringList,
+                historyDates = previewEmptyStringList,
+                incomeDates = previewEmptyStringList,
                 netIncome = previewNetIncomeState,
             )
         }

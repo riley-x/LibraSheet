@@ -227,9 +227,10 @@ fun LibraApp(
                 composable(route = BalanceTab.route) {
                     BalanceScreen(
                         accounts = viewModel.accounts.all,
-                        history = viewModel.accounts.historyGraph,
-                        dates = viewModel.accounts.dates,
-                        netIncome = viewModel.accounts.incomeGraph,
+                        history = viewModel.balanceGraphs.historyGraph,
+                        netIncome = viewModel.balanceGraphs.incomeGraph,
+                        historyDates = viewModel.balanceGraphs.historyDates,
+                        incomeDates = viewModel.balanceGraphs.incomeDates,
                         onAccountClick = ::toAccountDetails,
                         onReorder = viewModel.accounts::reorder,
                         modifier = Modifier.padding(innerPadding),
