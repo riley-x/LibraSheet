@@ -19,21 +19,25 @@ val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
 
 val previewIncomeCategories2 = mutableStateListOf(
     Category(
+        key = 1,
         id = "Income_Compensation".toCategoryId(),
         color = Color(0xFF00BFA5),
         listIndex = 0,
     ),
     Category(
+        key = 2,
         id = "Income_Cash Back".toCategoryId(),
         color = Color(0xFF6FAD48),
         listIndex = 1,
     ),
     Category(
+        key = 3,
         id = "Income_Tax Return".toCategoryId(),
         color = Color(0xFF4899AD),
         listIndex = 2,
     ),
     Category(
+        key = 4,
         id = "Income_Interest".toCategoryId(),
         color = Color(0xFF03C416),
         listIndex = 3,
