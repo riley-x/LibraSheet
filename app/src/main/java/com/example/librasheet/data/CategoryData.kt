@@ -137,6 +137,13 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         val (category, parentList, index) = find(categoryId)
         parentList.removeAt(index)
 
+
+        /** Other objects may store a Category pointer. The removal from the list here will not
+         * invalidate those pointers, and the object won't be garbage collected either. So we need
+         * to manually set it to None. **/
+        val categoryForUpdate = category.copy() // TODO reset should return the full of old categories
+        category.reset()
+
         /** Update old parent's list and its children's indices. We should do this here because we
          * need to know which categories (PKs) to update, and that's hard to get from SQL. This loop
          * can't be in a dispatched thread though since it reads a list that could be modified
@@ -149,7 +156,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            dao.deleteUpdate(category, staleList)
+            dao.deleteUpdate(categoryForUpdate, staleList)
         }
     }
 

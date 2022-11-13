@@ -41,15 +41,16 @@ internal const val ignoreKey = -3L
  */
 @Entity(tableName = categoryTable)
 data class Category (
-    @PrimaryKey(autoGenerate = true) val key: Long,
+    @PrimaryKey(autoGenerate = true) var key: Long, // this only changes on delete, where it is reset to 0
     @NonNull var id: CategoryId,
-    val colorLong: Long,
+    var colorLong: Long,
     @ColumnInfo(index = true) var parentKey: Long,
     var listIndex: Int,
     @Ignore val subCategories: MutableList<Category>,
 ) {
-    val color: Color
+    var color: Color
         get() = Color(value = colorLong.toULong())
+        set(value) { colorLong = value.value.data }
 
     /** Used by Room **/
     constructor(
@@ -96,6 +97,19 @@ data class Category (
             id = CategoryId("Ignore"),
             color = Color.Unspecified,
         )
+    }
+
+    /** Other objects may store a Category pointer. The removal from a list will not
+     * invalidate those pointers, and the object won't be garbage collected either. So we need
+     * to manually set it to None. **/
+    fun reset() {
+        key = 0
+        id = CategoryId()
+        color = Color.Unspecified
+        parentKey = 0
+        listIndex = -1
+        subCategories.forEach { reset() }
+        subCategories.clear()
     }
 
     fun getAllFlattened(inclusive: Boolean = true) : List<Category> {

@@ -1,10 +1,10 @@
 package com.example.librasheet.data.dao
 
 import androidx.room.*
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.data.entity.categoryTable
+import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.entity.expenseKey
 import com.example.librasheet.data.entity.incomeKey
+import com.example.librasheet.data.entity.ruleTable
 
 data class CategoryWithChildren(
     @Embedded val current: Category,
@@ -49,10 +49,20 @@ interface CategoryDao {
     @Delete fun delete(category: Category)
     @Delete fun delete(categories: List<Category>)
 
+    @Query("UPDATE $ruleTable SET categoryKey = 0 WHERE categoryKey = :categoryKey")
+    fun unmatchRules(categoryKey: Long)
+
+//    @Query("UPDATE $transactionTable SET categoryKey = 0 WHERE categoryKey = :categoryKey")
+    @Query("")
+    fun unmatchTransactions(categoryKey: Long)
+
     @Transaction
     fun deleteUpdate(category: Category, staleList: MutableList<Category>) {
         delete(category)
         delete(category.subCategories)
         update(staleList)
+        unmatchRules(category.key)
+        unmatchTransactions(category.key)
+        // update history?
     }
 }
