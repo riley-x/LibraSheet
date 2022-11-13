@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.librasheet.data.dao.AccountDao
 import com.example.librasheet.data.dao.CategoryDao
+import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.dao.RuleDao
 import com.example.librasheet.data.entity.*
 
@@ -26,6 +27,7 @@ import com.example.librasheet.data.entity.*
 @TypeConverters(Converters::class)
 abstract class LibraDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
+    abstract fun categoryHistoryDao(): CategoryHistoryDao
     abstract fun ruleDao(): RuleDao
     abstract fun accountDao(): AccountDao
 
