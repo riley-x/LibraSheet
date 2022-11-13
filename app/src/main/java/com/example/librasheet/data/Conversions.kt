@@ -13,6 +13,12 @@ fun getMonth(date: Int) = (date / 100) % 100
 fun getYear(date: Int) = (date / 10000)
 fun getYearShort(date: Int) = (date / 10000) % 100
 
+fun Int.setDay(day: Int): Int {
+    return (this - getDay(this)) + day
+}
+fun Int.addYears(years: Int) = this + years * 1_00_00
+
+
 fun nextMonthEnd(date: Int): Int {
     val month = getMonth(date)
     val year = getYear(date)

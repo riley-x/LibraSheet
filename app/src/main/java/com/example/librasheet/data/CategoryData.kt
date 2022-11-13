@@ -11,6 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import com.example.librasheet.data.toIntDate
+import java.util.*
 
 class CategoryData(
     private val scope: CoroutineScope,
@@ -38,9 +40,9 @@ class CategoryData(
     val history = mutableListOf<CategoryHistory>()
 
     /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie charts. **/
-    val currentMonth = mutableMapOf<Long, Long>()
-    val yearAverage = mutableMapOf<Long, Long>()
-    val allAverage = mutableMapOf<Long, Long>()
+    var currentMonth = emptyMap<Long, Long>()
+    var yearAverage = emptyMap<Long, Long>()
+    var allAverage = emptyMap<Long, Long>()
 
 
     private fun MutableList<Job>.launchIO(fn: suspend CoroutineScope.() -> Unit) =
@@ -51,16 +53,28 @@ class CategoryData(
         val jobs = mutableListOf<Job>()
         jobs.launchIO {
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
-            Log.d("Libra/CategoryData/load", "key=$lastRowId income=${all[0].subCategories.size} expense=${all[1].subCategories.size}")
+            Log.d("Libra/CategoryData/load", "income=${all[0].subCategories.size}")
         }
         jobs.launchIO {
             dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
+            Log.d("Libra/CategoryData/load", "expense=${all[1].subCategories.size}")
         }
         jobs.launchIO {
             lastRowId = dao.getMaxKey()
+            Log.d("Libra/CategoryData/load", "lastRowId=$lastRowId")
+        }
+        val lastMonthEnd = Calendar.getInstance().toIntDate().setDay(0)
+        jobs.launchIO {
+            currentMonth = historyDao.getAverages(lastMonthEnd)
+            Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
-
+            yearAverage = historyDao.getAverages(lastMonthEnd.addYears(-1))
+            Log.d("Libra/CategoryData/load", "yearAverage=$yearAverage")
+        }
+        jobs.launchIO {
+            allAverage = historyDao.getAverages()
+            Log.d("Libra/CategoryData/load", "allAverage=$allAverage")
         }
         return jobs
     }

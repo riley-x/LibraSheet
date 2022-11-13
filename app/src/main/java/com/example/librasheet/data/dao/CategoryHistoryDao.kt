@@ -23,7 +23,14 @@ interface CategoryHistoryDao {
     @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
     @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
             "SELECT categoryKey, date, SUM(value) as sums " +
-            "FROM $categoryHistoryTable WHERE date > :startDate GROUP BY accountKey" +
+            "FROM $categoryHistoryTable WHERE date >= :startDate GROUP BY accountKey" +
             ") GROUP BY date")
     fun getAverages(startDate: Int): Map<Long, Long>
+
+    @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
+    @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
+            "SELECT categoryKey, date, SUM(value) as sums " +
+            "FROM $categoryHistoryTable GROUP BY accountKey" +
+            ") GROUP BY date")
+    fun getAverages(): Map<Long, Long>
 }
