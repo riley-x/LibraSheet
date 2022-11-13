@@ -12,12 +12,13 @@ import com.example.librasheet.data.entity.*
 
 @Database(
     entities = [
-        Category::class,
-        CategoryRuleEntity::class,
         Account::class,
         AccountHistory::class,
+        Category::class,
+        CategoryRuleEntity::class,
+        CategoryHistory::class,
     ],
-    version = 6,
+    version = 7,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
