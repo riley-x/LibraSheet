@@ -38,6 +38,7 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onClickColor: (String) -> Unit = { },
+    toTransaction: (TransactionEntity) -> Unit = { },
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -118,7 +119,7 @@ fun AccountScreen(
                 TransactionRow(
                     transaction = t,
                     modifier = Modifier
-                        .clickable { /* TODO */ }
+                        .clickable { toTransaction(t) }
                 )
             }
         }
