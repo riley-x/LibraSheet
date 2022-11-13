@@ -15,11 +15,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.entity.CategoryRule
 import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.components.libraRow
 import com.example.librasheet.ui.components.libraRowHorizontalPadding
+import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.preview.previewRules
 
 @Composable
 fun CategoryRuleRow(
@@ -55,5 +58,14 @@ fun CategoryRuleRow(
                     .alpha(if (special) ContentAlpha.disabled else ContentAlpha.high)
             )
         }
+    }
+}
+
+
+@Preview
+@Composable
+private fun Preview() {
+    LibraSheetTheme {
+        CategoryRuleRow(rule = previewRules[0])
     }
 }
