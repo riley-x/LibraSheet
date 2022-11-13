@@ -71,44 +71,11 @@ fun CategoryRulesScreen(
                         index = index,
                         onDragEnd = { _, start, end -> onReorder(start, end) },
                     ) {
-                        Surface(
-                            Modifier.clickable { onEdit(index) }
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .libraRow(horizontalPadding = 0.dp)
-                                    .padding(start = libraRowHorizontalPadding)
-                            ) {
-                                Text(
-                                    text = rule.pattern,
-                                    overflow = TextOverflow.Ellipsis,
-                                    maxLines = 2,
-                                    modifier = Modifier.weight(10f)
-                                )
-
-                                Spacer(Modifier.width(12.dp))
-                                ColorIndicator(rule.category?.color ?: Color.Unspecified)
-
-                                val special = (rule.category == null) || rule.category.key <= 0
-                                Text(
-                                    text = rule.category?.id?.name ?: "None",
-                                    fontStyle = if (special) FontStyle.Italic else FontStyle.Normal,
-                                    overflow = TextOverflow.Ellipsis,
-                                    maxLines = 1,
-                                    modifier = Modifier
-                                        .weight(8f)
-                                        .alpha(if (special) ContentAlpha.disabled else ContentAlpha.high)
-                                )
-
-//                                DropdownOptions(options = ruleOptions) {
-//                                    when (it) {
-//                                        RuleOptions.EDIT -> onEdit(index)
-//                                        RuleOptions.DELETE -> onDelete(index)
-//                                    }
-//                                }
-                            }
-                        }
+                        CategoryRuleRow(
+                            rule = rule,
+                            onDelete = { onDelete(index) },
+                            modifier = Modifier.clickable { onEdit(index) }
+                        )
                     }
                 }
             }
