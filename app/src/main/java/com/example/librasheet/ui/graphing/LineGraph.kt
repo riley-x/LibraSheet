@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils
+import com.example.librasheet.ui.components.NoDataError
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewLineGraph
 import com.example.librasheet.viewModel.preview.previewLineGraphAxes
@@ -60,26 +61,30 @@ fun LineGraph(
     modifier: Modifier = Modifier,
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
-    val hoverLoc = remember { mutableStateOf(-1) }
-    val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-    val graph = lineGraphDrawer(values = state.values)
-    val graphHover = discreteHover(loc = hoverLoc)
-    fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
-        if (state.values.isEmpty()) return
-        if (isHover) {
-            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.lastIndex)
-        } else {
-            hoverLoc.value = -1
+    if (state.values.size < 2) {
+        NoDataError(modifier)
+    } else {
+        val hoverLoc = remember { mutableStateOf(-1) }
+        val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
+        val graph = lineGraphDrawer(values = state.values)
+        val graphHover = discreteHover(loc = hoverLoc)
+        fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
+            if (state.values.isEmpty()) return
+            if (isHover) {
+                hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.lastIndex)
+            } else {
+                hoverLoc.value = -1
+            }
+            onHover(isHover, hoverLoc.value)
         }
-        onHover(isHover, hoverLoc.value)
-    }
-    Graph(
-        axesState = state.axes,
-        onHover = ::onHoverInner,
-        modifier = modifier,
-    ) {
-        graph(it)
-        if (showHover) graphHover(it)
+        Graph(
+            axesState = state.axes,
+            onHover = ::onHoverInner,
+            modifier = modifier,
+        ) {
+            graph(it)
+            if (showHover) graphHover(it)
+        }
     }
 }
 

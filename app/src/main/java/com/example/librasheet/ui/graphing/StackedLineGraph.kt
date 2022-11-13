@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils
+import com.example.librasheet.ui.components.NoDataError
 import com.example.librasheet.ui.components.format2Decimals
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewStackedLineGraph
@@ -159,30 +160,36 @@ fun StackedLineGraph(
     modifier: Modifier = Modifier,
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
-    val hoverLoc = remember { mutableStateOf(-1) }
-    val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-    val graph = stackedLineGraphDrawer(values = state.values)
-    val graphHover = stackedLineGraphHover(
-        values = state.values,
-        hoverLoc = hoverLoc,
-        toString = state.toString.value,
-    )
-    fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
-        if (state.values.isEmpty()) return
-        if (isHover) {
-            hoverLoc.value = MathUtils.clamp(x.roundToInt(), 0, state.values.first().second.lastIndex)
-        } else {
-            hoverLoc.value = -1
+    if (state.values.isEmpty()) {
+        NoDataError()
+    } else {
+        val hoverLoc = remember { mutableStateOf(-1) }
+        val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
+        val graph = stackedLineGraphDrawer(values = state.values)
+        val graphHover = stackedLineGraphHover(
+            values = state.values,
+            hoverLoc = hoverLoc,
+            toString = state.toString.value,
+        )
+
+        fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
+            if (state.values.isEmpty()) return
+            if (isHover) {
+                hoverLoc.value =
+                    MathUtils.clamp(x.roundToInt(), 0, state.values.first().second.lastIndex)
+            } else {
+                hoverLoc.value = -1
+            }
+            onHover(isHover, hoverLoc.value)
         }
-        onHover(isHover, hoverLoc.value)
+        Graph(
+            axesState = state.axes,
+            contentBefore = graph,
+            contentAfter = { if (showHover) graphHover(it) },
+            onHover = ::onHoverInner,
+            modifier = modifier,
+        )
     }
-    Graph(
-        axesState = state.axes,
-        contentBefore = graph,
-        contentAfter = { if (showHover) graphHover(it) },
-        onHover = ::onHoverInner,
-        modifier = modifier,
-    )
 }
 
 
