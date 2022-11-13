@@ -18,7 +18,6 @@ import kotlinx.coroutines.delay
 /**
  * Dialog box with a single text field, with ok and cancel buttons
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFieldDialog(
     modifier: Modifier = Modifier,

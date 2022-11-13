@@ -53,14 +53,13 @@ class AccountModel(
 //                dao.getHistory().foldAccounts()
                 testHistory.toMutableList()
             }
+            dates.clear()
+            history.mapTo(dates) { formatDateInt(it.date, "MMM yyyy") }
         }
         return listOf(job1, job2)
     }
 
     fun loadUi() {
-        dates.clear()
-        history.mapTo(dates) { formatDateInt(it.date, "MMM yyyy") }
-
         viewModel.viewModelScope.launch { loadIncomeGraph() }
         viewModel.viewModelScope.launch { loadHistoryGraph() }
     }
@@ -209,5 +208,6 @@ class AccountModel(
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             dao.update(all.slice(startIndex..endIndex))
         }
+        viewModel.viewModelScope.launch { loadHistoryGraph() }
     }
 }
