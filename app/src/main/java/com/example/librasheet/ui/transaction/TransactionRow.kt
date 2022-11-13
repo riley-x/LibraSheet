@@ -11,19 +11,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.components.ColorCodedRow
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.dataClasses.Transaction
 import com.example.librasheet.viewModel.preview.previewTransactions
 
 @Composable
 fun TransactionRow(
-    transaction: Transaction,
+    transaction: TransactionEntity,
     modifier: Modifier = Modifier
 ) {
-    ColorCodedRow(color = transaction.color, modifier = modifier) {
+    ColorCodedRow(color = transaction.category.color, modifier = modifier) {
         Column(
             modifier = Modifier.weight(10f).padding(end = 10.dp)
         ) {
@@ -33,7 +33,7 @@ fun TransactionRow(
                 maxLines = 1,
             )
             Text(
-                text = transaction.category,
+                text = transaction.category.id.name,
                 style = MaterialTheme.typography.body2,
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
                 maxLines = 1,

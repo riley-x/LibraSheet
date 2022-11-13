@@ -1,6 +1,7 @@
 package com.example.librasheet.data.entity
 
 import androidx.annotation.NonNull
+import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -11,6 +12,7 @@ const val transactionTable = "transaction_table"
 /**
  * Make sure not to mix up names with SQL/Room Transaction.
  */
+@Immutable
 @Entity(
     tableName = transactionTable
 )
@@ -24,4 +26,25 @@ data class TransactionEntity(
     val valueAfterReimbursements: Long,
 ) {
     @Ignore var category = Category.None
+
+    constructor(
+        name: String,
+        date: Int,
+        value: Long,
+        category: Category,
+        key: Long = 0,
+        valueAfterReimbursements: Long = value,
+        accountKey: Long = 0,
+        categoryKey: Long = 0,
+    ) : this(
+        name = name,
+        date = date,
+        value = value,
+        key = key,
+        valueAfterReimbursements = valueAfterReimbursements,
+        accountKey = accountKey,
+        categoryKey = categoryKey,
+    ) {
+        this.category = category
+    }
 }

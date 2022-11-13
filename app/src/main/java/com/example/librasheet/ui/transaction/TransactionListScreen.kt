@@ -34,7 +34,7 @@ fun TransactionScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-//            TransactionScreen(transactions = previewTransactions)
+            TransactionScreen(transactions = previewTransactions)
         }
     }
 }

@@ -15,12 +15,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.transaction.TransactionRow
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.dataClasses.Transaction
 import com.example.librasheet.viewModel.preview.*
 
 private val tabs = ImmutableList(listOf("Balance", "Net Income", "Income", "Spending"))
@@ -34,7 +34,7 @@ fun AccountScreen(
     netIncome: DiscreteGraphState,
     income: StackedLineGraphState,
     spending: StackedLineGraphState,
-    transactions: SnapshotStateList<Transaction>,
+    transactions: SnapshotStateList<TransactionEntity>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onClickColor: (String) -> Unit = { },
