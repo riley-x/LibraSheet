@@ -99,17 +99,19 @@ data class Category (
         )
     }
 
-    /** Other objects may store a Category pointer. The removal from a list will not
-     * invalidate those pointers, and the object won't be garbage collected either. So we need
-     * to manually set it to None. **/
-    fun reset() {
+    /** Other objects may store a Category pointer. The removal from a list will not invalidate
+     * those pointers, and the object won't be garbage collected either. So we need to manually set
+     * it to None. **/
+    fun reset(): MutableList<Category> {
+        val originals = mutableListOf(this.copy())
         key = 0
         id = CategoryId()
         color = Color.Unspecified
         parentKey = 0
         listIndex = -1
-        subCategories.forEach { reset() }
+        subCategories.forEach { originals.addAll(it.reset()) }
         subCategories.clear()
+        return originals
     }
 
     fun getAllFlattened(inclusive: Boolean = true) : List<Category> {

@@ -30,7 +30,6 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         )
     )
 
-
     fun load(): Job {
         return scope.launch(Dispatchers.IO) {
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
@@ -44,7 +43,6 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         all.find(category) ?: throw RuntimeException("CategoryModel::find couldn't find $category")
 
 
-    @Callback
     fun add(parentCategory: CategoryId, newCategory: String): String {
         /** Find parent with error checks **/
         if (newCategory.contains(categoryPathSeparator)) return "Error: name can't contain underscores"
@@ -137,12 +135,10 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
         val (category, parentList, index) = find(categoryId)
         parentList.removeAt(index)
 
-
         /** Other objects may store a Category pointer. The removal from the list here will not
          * invalidate those pointers, and the object won't be garbage collected either. So we need
          * to manually set it to None. **/
-        val categoryForUpdate = category.copy() // TODO reset should return the full of old categories
-        category.reset()
+        val deletedCategories = category.reset()
 
         /** Update old parent's list and its children's indices. We should do this here because we
          * need to know which categories (PKs) to update, and that's hard to get from SQL. This loop
@@ -156,7 +152,7 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
         /** Update database **/
         scope.launch(Dispatchers.IO) {
-            dao.deleteUpdate(categoryForUpdate, staleList)
+            dao.deleteUpdate(deletedCategories, staleList)
         }
     }
 

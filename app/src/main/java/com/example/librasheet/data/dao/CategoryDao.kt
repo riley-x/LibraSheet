@@ -49,20 +49,19 @@ interface CategoryDao {
     @Delete fun delete(category: Category)
     @Delete fun delete(categories: List<Category>)
 
-    @Query("UPDATE $ruleTable SET categoryKey = 0 WHERE categoryKey = :categoryKey")
-    fun unmatchRules(categoryKey: Long)
+    @Query("UPDATE $ruleTable SET categoryKey = 0 WHERE categoryKey IN (:categoryKeys)")
+    fun unmatchRules(categoryKeys: List<Long>)
 
-//    @Query("UPDATE $transactionTable SET categoryKey = 0 WHERE categoryKey = :categoryKey")
     @Query("")
-    fun unmatchTransactions(categoryKey: Long)
+    fun unmatchTransactions(categoryKeys: List<Long>)
 
     @Transaction
-    fun deleteUpdate(category: Category, staleList: MutableList<Category>) {
-        delete(category)
-        delete(category.subCategories)
+    fun deleteUpdate(categories: List<Category>, staleList: MutableList<Category>) {
+        delete(categories)
         update(staleList)
-        unmatchRules(category.key)
-        unmatchTransactions(category.key)
+        val keys = categories.map { it.key }
+        unmatchRules(keys)
+        unmatchTransactions(keys)
         // update history?
     }
 }
