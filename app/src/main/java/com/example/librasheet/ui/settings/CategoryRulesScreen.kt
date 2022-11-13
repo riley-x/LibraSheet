@@ -71,11 +71,14 @@ fun CategoryRulesScreen(
                         index = index,
                         onDragEnd = { _, start, end -> onReorder(start, end) },
                     ) {
-                        CategoryRuleRow(
-                            rule = rule,
+                        SwipeToDelete(
                             onDelete = { onDelete(index) },
-                            modifier = Modifier.clickable { onEdit(index) }
-                        )
+                        ) {
+                            CategoryRuleRow(
+                                rule = rule,
+                                modifier = Modifier.clickable { onEdit(index) }
+                            )
+                        }
                     }
                 }
             }

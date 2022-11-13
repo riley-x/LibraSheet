@@ -9,10 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.settings.CategoryRulesScreen
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewRules
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -50,24 +52,30 @@ fun SwipeToDelete(
     val anchors = mapOf(0f to 0, sizePx.toFloat() to 1)
 
     LaunchedEffect(swipeableState.currentValue) {
-        if (swipeableState.currentValue == 1) onDelete()
+        if (swipeableState.currentValue == 1) {
+            onDelete()
+            swipeableState.snapTo(0)
+        }
     }
 
-    Box(
-        modifier = modifier
-            .onGloballyPositioned { sizePx = it.size.width }
-            .swipeable(
-                state = swipeableState,
-                anchors = anchors,
-                thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                orientation = Orientation.Horizontal,
-                reverseDirection = true,
-//                resistance = ResistanceConfig(100f, 0f, 0f), // disable
-                velocityThreshold = 5000.dp, // default is 125
-            )
-    ) {
+    Box {
         RemoveBanner()
-        content()
+        Box(
+            modifier = modifier
+                .onGloballyPositioned { sizePx = it.size.width }
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                    orientation = Orientation.Horizontal,
+                    reverseDirection = true,
+//                    resistance = null, // disable. the problem with this is that it still captures the dragging, which makes lazy lists unresponsive.
+                    velocityThreshold = 5000.dp, // default is 125
+                )
+                .offset { IntOffset(-swipeableState.offset.value.roundToInt(), 0) }
+        ) {
+            content()
+        }
     }
 }
 

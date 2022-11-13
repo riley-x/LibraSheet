@@ -28,7 +28,6 @@ import com.example.librasheet.viewModel.preview.previewRules
 fun CategoryRuleRow(
     rule: CategoryRule,
     modifier: Modifier = Modifier,
-    onDelete: () -> Unit = { },
 ) {
     Surface(modifier) {
         Row(
