@@ -3,6 +3,11 @@ package com.example.librasheet.data
 import androidx.compose.runtime.Immutable
 import com.example.librasheet.data.entity.AccountHistory
 
+
+/**
+ * Not used anymore...
+ */
+
 @Immutable
 data class BalanceHistory(
     val date: Int,

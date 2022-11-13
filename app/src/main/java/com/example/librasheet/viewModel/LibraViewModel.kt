@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.LibraApplication
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
@@ -22,7 +23,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         }
         viewModelScope.launch { balanceGraphs.loadIncome() }
         viewModelScope.launch {
-            categories.loadData().join()
+            categories.loadData().joinAll()
             categories.loadUi()
         }
     }

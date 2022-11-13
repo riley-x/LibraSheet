@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.room.*
+import com.example.librasheet.data.Series
 
 const val categoryTable = "categories"
 const val incomeName = "Income"
@@ -38,14 +39,14 @@ internal const val ignoreKey = -3L
  */
 @Entity(tableName = categoryTable)
 data class Category (
-    @PrimaryKey(autoGenerate = true) var key: Long, // this only changes on delete, where it is reset to 0
+    @PrimaryKey(autoGenerate = true) override var key: Long, // this only changes on delete, where it is reset to 0
     @NonNull var id: CategoryId,
     var colorLong: Long,
     @ColumnInfo(index = true) var parentKey: Long,
     var listIndex: Int,
     @Ignore val subCategories: MutableList<Category>,
-) {
-    var color: Color
+): Series {
+    override var color: Color
         get() = Color(value = colorLong.toULong())
         set(value) { colorLong = value.value.toLong() }
 

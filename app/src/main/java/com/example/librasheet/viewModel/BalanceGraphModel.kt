@@ -3,9 +3,7 @@ package com.example.librasheet.viewModel
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
-import com.example.librasheet.data.BalanceHistory
 import com.example.librasheet.data.dao.TimeSeries
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.stackedLineGraphValues
@@ -15,7 +13,6 @@ import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.viewModel.preview.testHistory
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

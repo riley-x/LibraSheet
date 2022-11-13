@@ -1,10 +1,7 @@
 package com.example.librasheet.data.dao
 
 import androidx.compose.runtime.Immutable
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.librasheet.data.entity.CategoryHistory
 import com.example.librasheet.data.entity.categoryHistoryTable
 
@@ -22,4 +19,11 @@ interface CategoryHistoryDao {
 
     @Query("SELECT date, SUM(value) as value FROM $categoryHistoryTable GROUP BY accountKey, categoryKey ORDER BY date")
     fun getNetIncome(): List<TimeSeries>
+
+    @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
+    @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
+            "SELECT categoryKey, date, SUM(value) as sums " +
+            "FROM $categoryHistoryTable WHERE date > :startDate GROUP BY accountKey" +
+            ") GROUP BY date")
+    fun getAverages(startDate: Int): Map<Long, Long>
 }

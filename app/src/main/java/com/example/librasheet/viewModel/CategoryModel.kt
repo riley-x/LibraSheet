@@ -15,7 +15,11 @@ import com.example.librasheet.viewModel.dataClasses.toUi
 class CategoryModel(
     private val viewModel: LibraViewModel,
 ) {
-    val data = CategoryData(viewModel.viewModelScope, viewModel.application.database.categoryDao())
+    val data = CategoryData(
+        scope = viewModel.viewModelScope,
+        dao = viewModel.application.database.categoryDao(),
+        historyDao = viewModel.application.database.categoryHistoryDao()
+    )
 
     /** This are used in both the categories settings screen and the respective cash flow screens **/
     val income = mutableStateListOf<CategoryUi>()

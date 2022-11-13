@@ -3,6 +3,7 @@ package com.example.librasheet.data
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.dao.CategoryDao
+import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.Callback
@@ -11,7 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class CategoryData(private val scope: CoroutineScope, private val dao: CategoryDao) {
+class CategoryData(
+    private val scope: CoroutineScope,
+    private val dao: CategoryDao,
+    private val historyDao: CategoryHistoryDao,
+) {
 
     private var lastRowId = 0L
 
@@ -32,18 +37,32 @@ class CategoryData(private val scope: CoroutineScope, private val dao: CategoryD
 
     val history = mutableListOf<CategoryHistory>()
 
-    /** Map categoryKey to value **/
+    /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie charts. **/
     val currentMonth = mutableMapOf<Long, Long>()
     val yearAverage = mutableMapOf<Long, Long>()
     val allAverage = mutableMapOf<Long, Long>()
 
-    fun load(): Job {
-        return scope.launch(Dispatchers.IO) {
+
+    private fun MutableList<Job>.launchIO(fn: suspend CoroutineScope.() -> Unit) =
+        add(scope.launch(Dispatchers.IO, block = fn))
+
+
+    fun load(): List<Job> {
+        val jobs = mutableListOf<Job>()
+        jobs.launchIO {
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
-            dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
-            lastRowId = dao.getMaxKey()
             Log.d("Libra/CategoryData/load", "key=$lastRowId income=${all[0].subCategories.size} expense=${all[1].subCategories.size}")
         }
+        jobs.launchIO {
+            dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
+        }
+        jobs.launchIO {
+            lastRowId = dao.getMaxKey()
+        }
+        jobs.launchIO {
+
+        }
+        return jobs
     }
 
     fun find(category: CategoryId): Triple<Category, MutableList<Category>, Int> =
