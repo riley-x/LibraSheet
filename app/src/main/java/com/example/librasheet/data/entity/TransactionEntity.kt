@@ -3,6 +3,7 @@ package com.example.librasheet.data.entity
 import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 const val transactionTable = "transaction_table"
@@ -21,4 +22,6 @@ data class TransactionEntity(
     @ColumnInfo(index = true) val categoryKey: Long,
     val value: Long,
     val valueAfterReimbursements: Long,
-)
+) {
+    @Ignore var category = Category.None
+}
