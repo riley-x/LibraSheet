@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.BalanceHistory
 import com.example.librasheet.data.dao.TimeSeries
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.stackedLineGraphValues
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.format1Decimal
 import com.example.librasheet.ui.components.formatDateInt
@@ -106,24 +107,8 @@ class BalanceGraphModel(
         if (accounts.isEmpty()) return
 
         val (values, axes, order) = withContext(Dispatchers.Default) {
-            /** Get values and maximum y value **/
-            var maxY = 0f
-            var lastValues: List<Float>? = null
-            val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
-
-            for (account in accounts.reversed()) { // 0th account is top in stack == sum of all other values
-                val balances = history[account.key] ?: continue
-
-                val values = mutableListOf<Float>()
-                balances.forEachIndexed { index, balance ->
-                    val value = balance.toFloatDollar() + (lastValues?.getOrNull(index) ?: 0f)
-                    values.add(value)
-                    if (value > maxY) maxY = value
-                }
-                lastValues = values
-
-                allValues.add(0, Pair(account.color, values)) // StackedLineGraph wants top stack at start of list
-            }
+            /** Get values. We use minY = 0 always **/
+            val (values, _, maxY) = history.stackedLineGraphValues(accounts)
 
             /** Create axes **/
             val ticksX = autoXTicksDiscrete(historyDateInts.size, graphTicksX) {
@@ -139,7 +124,7 @@ class BalanceGraphModel(
                 maxX = historyDateInts.lastIndex.toFloat(),
             )
 
-            Triple(allValues, axes, order)
+            Triple(values, axes, order)
         }
         Log.d("Libra/AccountModel/loadHistoryGraph", "order=$order maxY=${axes.maxY}")
 

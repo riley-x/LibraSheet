@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.librasheet.data.Institution
+import com.example.librasheet.data.Series
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.graphing.PieChartValue
 
@@ -14,13 +15,13 @@ const val accountTable = "account"
     tableName = accountTable
 )
 data class Account(
-    @PrimaryKey(autoGenerate = true) val key: Long,
+    @PrimaryKey(autoGenerate = true) override val key: Long,
     @NonNull override val name: String,
     val institution: Institution,
     val colorLong: Long,
     var listIndex: Int, // this is not used by compose, so safe to be a var
     val balance: Long,
-): PieChartValue {
+): PieChartValue, Series {
     override val color: Color
         get() = Color(value = colorLong.toULong())
     override val value: Float

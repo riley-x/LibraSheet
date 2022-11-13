@@ -19,7 +19,7 @@ import com.example.librasheet.data.entity.*
         CategoryRuleEntity::class,
         CategoryHistory::class,
     ],
-    version = 7,
+    version = 8,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
