@@ -66,7 +66,7 @@ val previewStackedLineGraph = mutableStateListOf(
 )
 
 
-val testHistory = List(previewStackedLineGraph[0].second.size) { dateIndex ->
+val testBalanceHistory = List(previewStackedLineGraph[0].second.size) { dateIndex ->
     val x = previewStackedLineGraph.withIndex().associateBy(
         keySelector = { it.index.toLong() },
         valueTransform = { it.value.second[dateIndex].toLongDollar() }
@@ -76,6 +76,15 @@ val testHistory = List(previewStackedLineGraph[0].second.size) { dateIndex ->
         balances = x
     )
 }
+
+val testHistory = Pair(
+    List(9) { 20220100 + 100 * it }.toMutableList(),
+    previewStackedLineGraph.withIndex().associateBy(
+        { it.index.toLong() },
+        { it.value.second.map { it.toLongDollar() }.toMutableList() }
+    ).toMutableMap()
+)
+
 
 val previewLineGraph = previewStackedLineGraph[0].second.toMutableStateList()
 

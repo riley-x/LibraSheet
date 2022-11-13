@@ -3,6 +3,7 @@ package com.example.librasheet.viewModel
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.BalanceHistory
 import com.example.librasheet.data.dao.TimeSeries
@@ -26,7 +27,8 @@ class BalanceGraphModel(
     private val accountDao = viewModel.application.database.accountDao()
     private val categoryHistoryDao = viewModel.application.database.categoryHistoryDao()
 
-    private var history: MutableList<BalanceHistory> = mutableListOf()
+    private var history: MutableMap<Long, MutableList<Long>> = mutableMapOf()
+    private var historyDateInts: List<Int> = emptyList()
     private var netIncome: MutableList<TimeSeries> = mutableListOf()
 
     /** State for the net income graph in the balance screen **/
@@ -47,12 +49,14 @@ class BalanceGraphModel(
 
 
     fun loadHistory(accounts: List<Account>) = viewModel.viewModelScope.launch {
-        history = withContext(Dispatchers.IO) {
+        val res = withContext(Dispatchers.IO) {
 //                accountDao.getHistory().foldAccounts()
-            testHistory.toMutableList()
+            testHistory
         }
+        historyDateInts = res.first
+        history = res.second
         historyDates.clear()
-        history.mapTo(historyDates) { formatDateInt(it.date, "MMM yyyy") }
+        historyDateInts.mapTo(historyDates) { formatDateInt(it, "MMM yyyy") }
         calculateHistoryGraph(accounts)
     }
 
@@ -102,25 +106,28 @@ class BalanceGraphModel(
         if (accounts.isEmpty()) return
 
         val (values, axes, order) = withContext(Dispatchers.Default) {
-            val values = accounts.reversed().associateBy(
-                keySelector = { it.key },
-                valueTransform = { Pair(it.color, mutableListOf<Float>()) }
-            )
-
             /** Get values and maximum y value **/
             var maxY = 0f
-            history.forEach { date ->
-                var total = 0f
-                values.forEach { key, (_, list) ->
-                    total += date.balances.getOrDefault(key, 0).toFloatDollar()
-                    list.add(total)
+            var lastValues: List<Float>? = null
+            val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
+
+            for (account in accounts.reversed()) { // 0th account is top in stack == sum of all other values
+                val balances = history[account.key] ?: continue
+
+                val values = mutableListOf<Float>()
+                balances.forEachIndexed { index, balance ->
+                    val value = balance.toFloatDollar() + (lastValues?.getOrNull(index) ?: 0f)
+                    values.add(value)
+                    if (value > maxY) maxY = value
                 }
-                if (total > maxY) maxY = total
+                lastValues = values
+
+                allValues.add(0, Pair(account.color, values)) // StackedLineGraph wants top stack at start of list
             }
 
             /** Create axes **/
-            val ticksX = autoXTicksDiscrete(history.size, graphTicksX) {
-                formatDateInt(history[it].date, "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
+            val ticksX = autoXTicksDiscrete(historyDateInts.size, graphTicksX) {
+                formatDateInt(historyDateInts[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
             }
             val (ticksY, order) = autoYTicksWithOrder(0f, maxY, graphTicksY)
             val axes = AxesState(
@@ -129,10 +136,10 @@ class BalanceGraphModel(
                 minY = 0f,
                 maxY = maxY + maxY * graphYPad,
                 minX = 0f,
-                maxX = history.lastIndex.toFloat(),
+                maxX = historyDateInts.lastIndex.toFloat(),
             )
 
-            Triple(values.values.reversed().toMutableList(), axes, order)
+            Triple(allValues, axes, order)
         }
         Log.d("Libra/AccountModel/loadHistoryGraph", "order=$order maxY=${axes.maxY}")
 

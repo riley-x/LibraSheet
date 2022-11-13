@@ -1,6 +1,3 @@
-@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-// So that we can access the inlined value class Color -> ULong -> Long
-
 package com.example.librasheet.data.entity
 
 import androidx.annotation.NonNull
@@ -57,7 +54,7 @@ data class Account(
         key = key,
         name = name,
         institution = institution,
-        colorLong = color.value.data,
+        colorLong = color.value.toLong(),
         listIndex = listIndex,
         balance = balance,
     )

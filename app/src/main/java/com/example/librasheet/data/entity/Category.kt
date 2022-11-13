@@ -1,6 +1,3 @@
-@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-// So that we can access the inlined value class Color -> ULong -> Long
-
 package com.example.librasheet.data.entity
 
 import androidx.annotation.NonNull
@@ -50,7 +47,7 @@ data class Category (
 ) {
     var color: Color
         get() = Color(value = colorLong.toULong())
-        set(value) { colorLong = value.value.data }
+        set(value) { colorLong = value.value.toLong() }
 
     /** Used by Room **/
     constructor(
@@ -79,7 +76,7 @@ data class Category (
     ) : this(
         key = key,
         id = id,
-        colorLong = color.value.data,
+        colorLong = color.value.toLong(),
         parentKey = parentKey,
         listIndex = listIndex,
         subCategories = subCategories,
