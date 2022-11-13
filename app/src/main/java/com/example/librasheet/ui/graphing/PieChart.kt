@@ -5,7 +5,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -27,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.components.NoDataError
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.components.formatPercent
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -66,14 +66,19 @@ fun <T: PieChartValue> PieChart(
                 requestDisallowInterceptTouchEvent = disallowIntercept
             ) { motionEvent ->
                 if (motionEvent.action == MotionEvent.ACTION_MOVE ||
-                    motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    motionEvent.action == MotionEvent.ACTION_DOWN
+                ) {
                     disallowIntercept(true)
                     val x = motionEvent.x - boxSize.width / 2
                     val y = motionEvent.y - boxSize.height / 2
 
                     // Here we map y -> (Right = +x) and x -> (Up = -y)
                     // since we start at the top and move clockwise
-                    var phi = toDegrees(kotlin.math.atan2(x, -y).toDouble())
+                    var phi = toDegrees(
+                        kotlin.math
+                            .atan2(x, -y)
+                            .toDouble()
+                    )
                     if (phi < 0) phi += 360
 
                     val index = angles.indexOfFirst { it > phi }
@@ -132,15 +137,7 @@ fun <T: PieChartValue> PieChartFiltered(
 ) {
     val filteredValues = values.filter { it.value > 0 }
     if (filteredValues.isEmpty()) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = modifier
-        ) {
-            Text("No Data",
-                style = MaterialTheme.typography.h2,
-                color = MaterialTheme.colors.error.copy(alpha = ContentAlpha.medium),
-            )
-        }
+        NoDataError(modifier)
     } else {
         PieChart(filteredValues, modifier)
     }
