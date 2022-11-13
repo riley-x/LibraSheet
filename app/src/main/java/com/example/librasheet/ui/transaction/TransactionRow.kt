@@ -1,7 +1,6 @@
-package com.example.librasheet.ui.account
+package com.example.librasheet.ui.transaction
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
