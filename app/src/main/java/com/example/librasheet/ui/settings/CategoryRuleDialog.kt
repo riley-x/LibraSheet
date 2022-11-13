@@ -44,7 +44,7 @@ fun CategoryRuleDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 6.dp, bottom = 30.dp)
-                .height(60.dp)
+                .height(65.dp)
         )
 
         DropdownSelector(

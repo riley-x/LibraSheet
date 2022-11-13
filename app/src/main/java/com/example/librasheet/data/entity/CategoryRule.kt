@@ -65,6 +65,7 @@ data class CategoryRule (
 
 fun List<CategoryRule>.matchCategories(parentCategory: Category): List<CategoryRule> {
     val keyMap = parentCategory.getKeyMap()
+    keyMap[Category.Ignore.key] = Category.Ignore
     return map {
         it.copy(
             category = keyMap.getOrDefault(it.categoryKey, null)

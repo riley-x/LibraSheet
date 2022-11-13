@@ -77,18 +77,27 @@ fun CategoryRulesScreen(
                                     .libraRow(horizontalPadding = 0.dp)
                                     .padding(start = libraRowHorizontalPadding)
                             ) {
-                                Text(rule.pattern, modifier = Modifier.weight(10f))
+                                Text(
+                                    text = rule.pattern,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 2,
+                                    modifier = Modifier.weight(10f)
+                                )
+
                                 Spacer(Modifier.width(12.dp))
                                 ColorIndicator(rule.category?.color ?: Color.Unspecified)
+
+                                val special = (rule.category == null) || rule.category.key <= 0
                                 Text(
                                     text = rule.category?.id?.name ?: "None",
-                                    fontStyle = if (rule.category == null) FontStyle.Italic else FontStyle.Normal,
+                                    fontStyle = if (special) FontStyle.Italic else FontStyle.Normal,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 1,
                                     modifier = Modifier
                                         .weight(8f)
-                                        .alpha(if (rule.category == null) ContentAlpha.disabled else ContentAlpha.high)
+                                        .alpha(if (special) ContentAlpha.disabled else ContentAlpha.high)
                                 )
+
                                 DropdownOptions(options = ruleOptions) {
                                     when (it) {
                                         RuleOptions.EDIT -> onEdit(index)
