@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.drawText
@@ -80,6 +81,7 @@ fun stackedLineGraphHover(
     values: SnapshotStateList<StackedLineGraphValue>,
     hoverLoc: State<Int>,
     indicatorColor: Color = MaterialTheme.colors.onSurface,
+    textDarkColor: Color = MaterialTheme.colors.background,
     indicatorWidth: Dp = 1.dp,
     labelYStartPad: Dp = 8.dp,
     toString: (Float) -> String = { "$it" },
@@ -139,7 +141,7 @@ fun stackedLineGraphHover(
             )
             drawText(
                 textLayoutResult = layoutResult,
-                color = indicatorColor,
+                color = if (color.luminance() > 0.5) textDarkColor else indicatorColor,
                 topLeft = Offset(
                     x = labelStartX,
                     y = labelCenterY - labelHalfHeight
