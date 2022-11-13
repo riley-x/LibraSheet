@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "1d26b7021b4d1bff4978e45433930a6a",
+    "identityHash": "e50038320b8f518f4b1a80aa7b5a130f",
     "entities": [
       {
         "tableName": "categories",
@@ -114,7 +114,7 @@
       },
       {
         "tableName": "account",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `institution` TEXT NOT NULL, `colorLong` INTEGER NOT NULL, `listIndex` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `institution` TEXT NOT NULL, `colorLong` INTEGER NOT NULL, `listIndex` INTEGER NOT NULL, `balance` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "key",
@@ -143,6 +143,12 @@
           {
             "fieldPath": "listIndex",
             "columnName": "listIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "balance",
+            "columnName": "balance",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -193,7 +199,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1d26b7021b4d1bff4978e45433930a6a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e50038320b8f518f4b1a80aa7b5a130f')"
     ]
   }
 }

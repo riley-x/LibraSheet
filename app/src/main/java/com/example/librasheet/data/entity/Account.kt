@@ -81,7 +81,14 @@ data class AccountHistory(
 data class BalanceHistory(
     val date: Int,
     val balances: MutableMap<Long, Long> = mutableMapOf(),
-)
+) {
+    val total: Long
+        get() {
+            var total = 0L
+            balances.forEach { total += it.value }
+            return total
+        }
+}
 
 
 /** This takes a list of account history, assumed in increasing date order, and folds it into a list

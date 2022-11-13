@@ -1,5 +1,6 @@
 package com.example.librasheet.data
 
+import java.util.*
 import kotlin.math.roundToLong
 
 fun getIntDate(year: Int, month: Int, day: Int): Int {
@@ -18,6 +19,21 @@ fun nextMonthEnd(date: Int): Int {
     return if (month == 12) getIntDate(year + 1, 1, 0)
     else getIntDate(year, month + 1, 0)
 }
+
+fun Calendar.toIntDate() : Int {
+    val year: Int = get(Calendar.YEAR)
+    val month: Int = get(Calendar.MONTH) + 1 // months are 0-indexed
+    val day: Int = get(Calendar.DAY_OF_MONTH)
+    return getIntDate(year, month, day)
+}
+
+fun Calendar.setIntDate(date: Int) {
+    set(getYear(date), getMonth(date) - 1, getDay(date)) // months are 0-indexed
+}
+
+fun Int.toCalendar() =
+    GregorianCalendar(getYear(this), getMonth(this) - 1, getDay(this)) // Named arguments are not allowed for non-Kotlin functions
+fun Int.toTimestamp() = toCalendar().time
 
 fun Float.toLongDollar() : Long {
     return (this * 10000f).roundToLong()

@@ -1,11 +1,9 @@
 package com.example.librasheet.ui.components
 
 import android.icu.text.NumberFormat
+import android.text.format.DateFormat
 import androidx.compose.runtime.Stable
-import com.example.librasheet.data.getDay
-import com.example.librasheet.data.getMonth
-import com.example.librasheet.data.getYearShort
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.*
 
 @Stable
 fun formatDollar(value: Float): String {
@@ -44,4 +42,10 @@ fun formatDateInt(date: Int): String {
     val month = getMonth(date)
     val year = getYearShort(date).toString().padStart(2, '0')
     return "$month/$day/$year"
+}
+
+
+@Stable
+fun formatDateInt(date: Int, format: String): String {
+    return DateFormat.format(format, date.toTimestamp()).toString()
 }

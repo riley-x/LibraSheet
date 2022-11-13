@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.graphing
 
+import com.example.librasheet.viewModel.dataClasses.NamedValue
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
