@@ -385,7 +385,7 @@ fun LibraApp(
         }
         if (deleteCategoryId.isValid) {
             ConfirmationDialog(
-                text = "Delete category " + deleteCategoryId.fullDisplayName + "?\n\nWarning! This will delete any subcategories as well.",
+                text = "Delete category " + deleteCategoryId.fullDisplayName + "?\n\nWarning! This will delete any subcategories, and unset any matching rules and transactions.",
                 onDismiss = ::deleteCategory,
             )
         }
