@@ -121,3 +121,14 @@ object CategoryDetailDestination: DestinationStringArg() {
         navArgument(argName) { type = NavType.StringType }
     )
 }
+
+object TransactionListDestination: DestinationStringArg() {
+    override val routeBase = "transaction_list"
+    override val argName = "clickTarget"
+    override val arguments = listOf(
+        navArgument(argName) { type = NavType.StringType }
+    )
+
+    const val targetDetails = "details"
+    const val targetReimburse = "reimburse"
+}

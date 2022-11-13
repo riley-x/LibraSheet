@@ -22,12 +22,12 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewTransactions
 
 @Composable
-fun TransactionScreen(
+fun TransactionListScreen(
     transactions: SnapshotStateList<TransactionEntity>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onFilter: () -> Unit = { },
-    toTransaction: (TransactionEntity) -> Unit = { },
+    onTransactionClick: (TransactionEntity) -> Unit = { },
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -50,7 +50,7 @@ fun TransactionScreen(
                 TransactionRow(
                     transaction = t,
                     modifier = Modifier
-                        .clickable { toTransaction(t) }
+                        .clickable { onTransactionClick(t) }
                 )
             }
         }
@@ -63,7 +63,7 @@ fun TransactionScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            TransactionScreen(transactions = previewTransactions)
+            TransactionListScreen(transactions = previewTransactions)
         }
     }
 }
