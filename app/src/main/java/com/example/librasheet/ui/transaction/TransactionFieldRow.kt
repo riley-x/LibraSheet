@@ -166,14 +166,20 @@ fun <T> TransactionSelectorRow(
     onSelection: (T) -> Unit = { },
     display: @Composable RowScope.(T) -> Unit = { },
 ) {
+
     TransactionFieldRow(
         label = label,
         modifier = modifier.height(libraRowHeight),
     ) {
         var expanded by remember { mutableStateOf(false) }
+
+        fun onExpandedChange(new: Boolean) {
+            expanded = new
+        }
+
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
+            onExpandedChange = ::onExpandedChange,
             modifier = modifier
         ) {
             Row(

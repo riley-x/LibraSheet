@@ -12,6 +12,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -123,7 +124,6 @@ fun TransactionDetailScreen(
                     onTap = { focusManager.clearFocus(true) }
                 )
             }
-//            .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
     ) {
         HeaderBar(
             title = "Transactions",
@@ -131,9 +131,15 @@ fun TransactionDetailScreen(
             onBack = onBack,
         )
 
+        val imePadding = with(LocalDensity.current) {
+            WindowInsets.ime.getBottom(this).toDp()
+        }
+
         LazyColumn(
             Modifier
-                .windowInsetsPadding(WindowInsets.ime)
+//                .windowInsetsPadding(WindowInsets.ime)
+//                .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
+                .padding(bottom = maxOf(bottomPadding, imePadding))
             /** These paddings need to be placed after the scroll modifier or else they will cause
              * a flicker. The only problem with this is that the bottom ripple doesn't appear anymore.
              */
@@ -221,6 +227,12 @@ fun TransactionDetailScreen(
                     }
                 }
             }
+
+//            item {
+//                with(LocalDensity.current) {
+//                    Spacer(Modifier.height(WindowInsets.ime.getBottom(this).toDp()))
+//                }
+//            }
         }
     }
 }
