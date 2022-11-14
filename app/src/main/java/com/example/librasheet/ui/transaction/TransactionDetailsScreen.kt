@@ -46,7 +46,7 @@ fun TransactionDetailScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
-    onSave: (TransactionEntity) -> Unit = { },
+    onSave: (new: TransactionEntity, old: TransactionEntity) -> Unit = { _, _ -> },
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -84,7 +84,7 @@ fun TransactionDetailScreen(
             accountKey = account.value?.key ?: 0,
 //            valueAfterReimbursements = // TODO,
         )
-        onSave(t)
+        onSave(t, transaction.value)
     }
 
 

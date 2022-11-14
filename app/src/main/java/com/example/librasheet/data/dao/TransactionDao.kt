@@ -56,4 +56,10 @@ interface TransactionDao {
         updateBalanceHistory(t.accountKey, t.date, -t.valueAfterReimbursements)
         updateCategoryHistory(t.accountKey, t.categoryKey, t.date, -t.valueAfterReimbursements)
     }
+
+    @Transaction
+    fun update(new: TransactionEntity, old: TransactionEntity) {
+        undo(old)
+        add(new)
+    }
 }
