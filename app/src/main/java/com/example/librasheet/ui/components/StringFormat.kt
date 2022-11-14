@@ -4,6 +4,8 @@ import android.icu.text.NumberFormat
 import android.text.format.DateFormat
 import androidx.compose.runtime.Stable
 import com.example.librasheet.data.*
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 @Stable
 fun formatDollar(value: Float): String {
@@ -57,4 +59,11 @@ fun formatDateIntSimple(date: Int, separator: String = "/"): String {
 @Stable
 fun formatDateInt(date: Int, format: String): String {
     return DateFormat.format(format, date.toTimestamp()).toString()
+}
+
+@Stable
+fun SimpleDateFormat.parseOrNull(x: String) = try {
+    parse(x)
+} catch (e: ParseException) {
+    null
 }

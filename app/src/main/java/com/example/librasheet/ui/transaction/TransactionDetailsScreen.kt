@@ -33,7 +33,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TransactionDetailScreen(
     transaction: TransactionEntity,
@@ -57,15 +57,7 @@ fun TransactionDetailScreen(
     val date = remember { mutableStateOf(formatDateIntSimple(transaction.date, "-")) }
     val value = remember { mutableStateOf(transaction.value.toFloatDollar().toString()) }
 
-    val dateError by remember { derivedStateOf {
-        try {
-            val date = formatter.parse(date.value)
-            Log.d("Libra", "${date?.time}")
-            false
-        } catch (e: ParseException) {
-            true
-        }
-    } }
+    val dateError by remember { derivedStateOf { formatter.parseOrNull(date.value) == null } }
     val valueError by remember { derivedStateOf { value.value.toFloatOrNull() == null } }
 
     val categoryList by remember { derivedStateOf {
@@ -166,7 +158,7 @@ fun TransactionDetailScreen(
             }
 
 
-            item("reimbursements") {
+            item("Reimbursements") {
                 RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
