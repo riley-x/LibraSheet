@@ -3,6 +3,7 @@ package com.example.librasheet.ui.transaction
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.components.DropdownSelector
+import com.example.librasheet.ui.components.OutlinedTextFieldNoPadding
 import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -84,76 +86,42 @@ fun TransactionEditRow(
     var focused by remember { mutableStateOf(false) }
     val lines = if (number) 1 else 3
 
-    val textIsEmpty by remember(text) { derivedStateOf { text.isEmpty() } }
 
     TransactionFieldRow(
         label = label,
         alignment = if (lines == 1) Alignment.CenterVertically else Alignment.Top,
         modifier = modifier.height(Dp(maxOf(50f, lines * 25f)))
     ) {
-        BasicTextField(
+        OutlinedTextFieldNoPadding(
             value = text,
             onValueChange = onValueChange,
+            isError = error,
             singleLine = lines == 1,
             maxLines = lines,
-            textStyle = MaterialTheme.typography.body1.copy(
-                color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
+            contentPadding = PaddingValues(6.dp),
+            shape = RoundedCornerShape(10.dp),
+            placeholder = {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier.fillMaxHeight(),
+                ) {
+                    Text(
+                        text = placeholder,
+                    )
+                }
+            },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                unfocusedBorderColor = Color.Transparent,
             ),
-            cursorBrush = SolidColor(MaterialTheme.colors.primary),
             keyboardOptions = KeyboardOptions(
                 keyboardType = if (number) KeyboardType.Decimal else KeyboardType.Text
             ),
             keyboardActions = KeyboardActions(
                 onDone = { focusManager.clearFocus(true) }
             ),
-            modifier = Modifier
-                .weight(10f)
-                .focusRequester(focusRequester)
-                .onFocusChanged { focused = it.isFocused }
-        ) {
-            Box(
-                contentAlignment = if (lines == 1) Alignment.CenterStart else Alignment.TopStart,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                if (focused) {
-                    Box(
-                        Modifier.padding(6.dp)
-                    ) {
-                        it()
-                    }
-                } else { // Need this since BasicTextField doesn't have TextOverflow
-                    Text(
-                        text = if (textIsEmpty) placeholder else text,
-                        maxLines = lines,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colors.onSurface.copy(
-                            alpha = if (textIsEmpty) ContentAlpha.disabled else ContentAlpha.high
-                        ),
-                        modifier = Modifier.padding(6.dp)
-                    )
-                }
+            modifier = Modifier.focusRequester(focusRequester).weight(10f).fillMaxHeight()
+        )
 
-                val color =
-                    if (focused) MaterialTheme.colors.primary
-                    else if (error) MaterialTheme.colors.error
-                    else Color.Unspecified
-                val radius: Float
-                val width: Float
-                with(LocalDensity.current) {
-                    radius = 10.dp.toPx()
-                    width = 1.dp.toPx()
-                }
-                Canvas(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(1.dp)) {
-                    drawRoundRect(
-                        color = color,
-                        cornerRadius = CornerRadius(radius, radius),
-                        style = Stroke(width = width),
-                    )
-                }
-            }
-        }
         IconButton(onClick = { focusRequester.requestFocus() }) {
             Icon(imageVector = Icons.Sharp.Edit, contentDescription = null)
         }
