@@ -9,6 +9,8 @@ import androidx.compose.material.icons.sharp.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -59,9 +61,11 @@ fun TransactionEditRow(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     lines: Int = 1,
-    onEnable: () -> Unit = { },
+    onEnable: (FocusRequester) -> Unit = { },
     onValueChange: (String) -> Unit = { },
 ) {
+    val focusRequester = remember { FocusRequester() }
+
     TransactionFieldRow(
         label = label,
         alignment = if (lines == 1) Alignment.CenterVertically else Alignment.Top,
@@ -77,7 +81,9 @@ fun TransactionEditRow(
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
             ),
             cursorBrush = SolidColor(MaterialTheme.colors.primary),
-            modifier = Modifier.weight(10f),
+            modifier = Modifier
+                .weight(10f)
+                .focusRequester(focusRequester)
         ) {
             Box(
                 contentAlignment = if (lines == 1) Alignment.CenterStart else Alignment.TopStart,
@@ -115,7 +121,7 @@ fun TransactionEditRow(
                 }
             }
         }
-        IconButton(onClick = onEnable) {
+        IconButton(onClick = { onEnable(focusRequester) }) {
             Icon(imageVector = Icons.Sharp.Edit, contentDescription = null)
         }
     }

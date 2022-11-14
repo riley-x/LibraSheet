@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
@@ -44,18 +45,43 @@ fun TransactionDetailScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    var name by remember { mutableStateOf(transaction.name) }
-    var date by remember { mutableStateOf(transaction.date.toString()) }
+    val name = remember { mutableStateOf(transaction.name) }
+    val date = remember { mutableStateOf(transaction.date.toString()) }
+    val value = remember { mutableStateOf(transaction.value.toString()) }
 
-    var nameEnabled by remember { mutableStateOf(false) }
-    var dateEnabled by remember { mutableStateOf(false) }
+    val nameEnabled = remember { mutableStateOf(false) }
+    val dateEnabled = remember { mutableStateOf(false) }
+    val valueEnabled = remember { mutableStateOf(false) }
 
 
     fun clearFocus() {
-        nameEnabled = false
-        dateEnabled = false
+        nameEnabled.value = false
+        dateEnabled.value = false
+        valueEnabled.value = false
         keyboardController?.hide()
         focusManager.clearFocus(true)
+    }
+
+    fun LazyListScope.editor(
+        label: String,
+        text: MutableState<String>,
+        enabled: MutableState<Boolean>,
+        lines: Int = 1,
+    ) {
+        item(label) {
+            TransactionEditRow(
+                label = label,
+                text = text.value,
+                lines = lines,
+                enabled = enabled.value,
+                onEnable = {
+                    clearFocus()
+                    enabled.value = true
+                    it.requestFocus()
+                },
+                onValueChange = { text.value = it },
+            )
+        }
     }
 
 
@@ -84,26 +110,9 @@ fun TransactionDetailScreen(
                 RowTitle("Details")
             }
 
-            item("name") {
-                TransactionEditRow(
-                    label = "Name",
-                    text = name,
-                    lines = 3,
-                    enabled = nameEnabled,
-                    onEnable = { clearFocus(); nameEnabled = true },
-                    onValueChange = { name = it },
-                )
-            }
-
-            item("date") {
-                TransactionEditRow(
-                    label = "Date",
-                    text = date,
-                    enabled = dateEnabled,
-                    onEnable = { clearFocus(); dateEnabled = true },
-                    onValueChange = { date = it },
-                )
-            }
+            editor("Name", name, nameEnabled, lines = 3)
+            editor("Date", date, dateEnabled)
+            editor("Value", value, valueEnabled)
         }
     }
 }
