@@ -87,7 +87,10 @@ object RulesDestination {
 object EditAccountsDestination {
     const val route = "edit_accounts"
 }
-
+object TransactionDetailDestination {
+    const val routeBase = "transaction_details"
+    fun route(graph: String) = "${routeBase}_${graph}"
+}
 
 abstract class DestinationStringArg {
     abstract val routeBase: String
@@ -121,6 +124,8 @@ object CategoryDetailDestination: DestinationStringArg() {
         navArgument(argName) { type = NavType.StringType }
     )
 }
+
+
 
 object TransactionListDestination: DestinationStringArg() {
     override val routeBase = "transaction_list"

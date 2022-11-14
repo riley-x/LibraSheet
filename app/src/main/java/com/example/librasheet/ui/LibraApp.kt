@@ -20,6 +20,7 @@ import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
+import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*
@@ -59,6 +60,10 @@ fun LibraApp(
     fun toSettingsAllTransactions() {
         // TODO view model load
         navController.navigate(TransactionListDestination.argRoute(SettingsTab.graph, TransactionListDestination.targetDetails))
+    }
+    fun toSettingsTransactionDetail(t: TransactionEntity) {
+        // TODO
+        navController.navigate(TransactionDetailDestination.route(SettingsTab.graph))
     }
     fun toEditAccountsScreen() = navController.navigate(EditAccountsDestination.route)
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
@@ -218,6 +223,15 @@ fun LibraApp(
                 )
             }
         }
+        fun NavGraphBuilder.transactionDetail() {
+            composable(route = TransactionDetailDestination.route(route!!)) {
+                TransactionDetailScreen(
+                    transaction = previewTransactions[0],
+                    onBack = navController::popBackStack,
+                    bottomPadding = innerPadding.calculateBottomPadding(),
+                )
+            }
+        }
 
         /** If you try to pad the NavHost, there will be a flicker when the soft keyboard animates
          * open. Instead, need to pad the columns inside each screen composable. Only need the special
@@ -344,14 +358,17 @@ fun LibraApp(
                 // TODO this will need to be refactored since this screen can be accessed from the balance tab on account -> transaction -> reimburse
                 composable(route = TransactionListDestination.route(SettingsTab.graph), arguments = TransactionListDestination.arguments) {
                     val target = (it.arguments?.getString(TransactionListDestination.argName) ?: TransactionListDestination.targetDetails)
-                    TransactionListScreen(
-                        transactions = previewTransactions,
-                        onBack = navController::popBackStack,
-                        onFilter = { },
-                        onTransactionClick = { },
-                    )
+                    if (target == TransactionListDestination.targetDetails) {
+                        TransactionListScreen(
+                            transactions = previewTransactions,
+                            onBack = navController::popBackStack,
+                            onFilter = { },
+                            onTransactionClick = ::toSettingsTransactionDetail,
+                        )
+                    }
                 }
                 colorSelector()
+                transactionDetail()
             }
         }
 

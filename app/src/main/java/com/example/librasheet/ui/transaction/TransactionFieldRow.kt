@@ -39,7 +39,7 @@ fun TransactionFieldRow(
             color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
             modifier = Modifier
                 .padding(end = 15.dp)
-                .width(100.dp)
+                .width(60.dp)
         )
         content()
     }
@@ -72,7 +72,7 @@ fun TransactionEditRow(
                 maxLines = lines,
                 modifier = Modifier.weight(10f)
             )
-        } else {
+        } else { // Need this since BasicTextField doesn't have TextOverflow
             Text(
                 text = text,
                 maxLines = lines,
