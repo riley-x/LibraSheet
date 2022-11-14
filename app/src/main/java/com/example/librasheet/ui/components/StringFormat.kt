@@ -46,14 +46,13 @@ fun formatPercent(value: Float): String {
 
 
 @Stable
-fun formatDateInt(date: Int): String {
+fun formatDateIntSimple(date: Int, separator: String = "/"): String {
     if (date == 0) return ""
     val day = getDay(date)
     val month = getMonth(date)
     val year = getYearShort(date).toString().padStart(2, '0')
-    return "$month/$day/$year"
+    return "$month$separator$day$separator$year"
 }
-
 
 @Stable
 fun formatDateInt(date: Int, format: String): String {

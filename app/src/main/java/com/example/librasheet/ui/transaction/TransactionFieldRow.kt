@@ -66,13 +66,17 @@ fun TransactionEditRow(
     label: String,
     text: String,
     modifier: Modifier = Modifier,
+    placeholder: String = "",
     number: Boolean = true,
+    error: Boolean = false,
     onValueChange: (String) -> Unit = { },
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     var focused by remember { mutableStateOf(false) }
     val lines = if (number) 1 else 3
+
+    val textIsEmpty by remember { derivedStateOf { text.isEmpty() } }
 
     TransactionFieldRow(
         label = label,
@@ -109,17 +113,22 @@ fun TransactionEditRow(
                     ) {
                         it()
                     }
-                }
-                else { // Need this since BasicTextField doesn't have TextOverflow
+                } else { // Need this since BasicTextField doesn't have TextOverflow
                     Text(
-                        text = text,
+                        text = if (textIsEmpty) placeholder else text,
                         maxLines = lines,
                         overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colors.onSurface.copy(
+                            alpha = if (textIsEmpty) ContentAlpha.disabled else ContentAlpha.high
+                        ),
                         modifier = Modifier.padding(6.dp)
                     )
                 }
 
-                val color = if (focused) MaterialTheme.colors.primary else Color.Unspecified
+                val color =
+                    if (focused) MaterialTheme.colors.primary
+                    else if (error) MaterialTheme.colors.error
+                    else Color.Unspecified
                 val radius: Float
                 val width: Float
                 with(LocalDensity.current) {
@@ -219,6 +228,23 @@ private fun PreviewEdit() {
         }
     }
 }
+
+@Preview
+@Composable
+private fun PreviewEditBox() {
+    LibraSheetTheme {
+        Surface {
+            TransactionEditRow(
+                label = "Date",
+                text = "",
+                placeholder = "MM-DD-YY",
+                number = true,
+                error = true,
+            )
+        }
+    }
+}
+
 
 
 @Preview

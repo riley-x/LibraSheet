@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.components.ColorCodedRow
-import com.example.librasheet.ui.components.formatDateInt
+import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewTransactions
@@ -49,7 +49,7 @@ fun TransactionRow(
                     else MaterialTheme.colors.primary,
             )
             Text(
-                text = formatDateInt(transaction.date),
+                text = formatDateIntSimple(transaction.date),
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
                 style = MaterialTheme.typography.body2,
             )
