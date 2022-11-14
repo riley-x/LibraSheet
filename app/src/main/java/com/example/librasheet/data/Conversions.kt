@@ -19,7 +19,7 @@ fun Int.setDay(day: Int): Int {
 fun Int.addYears(years: Int) = this + years * 1_00_00
 
 
-fun nextMonthEnd(date: Int): Int {
+fun thisMonthEnd(date: Int): Int {
     val month = getMonth(date)
     val year = getYear(date)
     return if (month == 12) getIntDate(year + 1, 1, 0)

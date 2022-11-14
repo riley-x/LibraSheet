@@ -6,6 +6,7 @@ import androidx.room.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.setDay
+import com.example.librasheet.data.thisMonthEnd
 
 
 @Dao
@@ -34,13 +35,15 @@ interface TransactionDao {
     fun add(t: TransactionEntity) {
         insert(t)
         if (t.accountKey <= 0) return
+
+        val month = thisMonthEnd(t.date)
         addBalanceEntry(AccountHistory(
             accountKey = t.accountKey,
-            date = t.date.setDay(0),
+            date = month,
             balance = 0, // we'll update below
         ))
         updateBalance(t.accountKey, t.valueAfterReimbursements)
-        updateBalanceHistory(t.accountKey, t.date, t.valueAfterReimbursements)
+        updateBalanceHistory(t.accountKey, month, t.valueAfterReimbursements)
 
         if (t.categoryKey < 0) return // we want to still measure uncategorized transactions
         addCategoryEntry(CategoryHistory(
@@ -55,9 +58,10 @@ interface TransactionDao {
     @Transaction
     fun undo(t: TransactionEntity) {
         delete(t)
+        val month = thisMonthEnd(t.date)
         updateBalance(t.accountKey, -t.valueAfterReimbursements)
-        updateBalanceHistory(t.accountKey, t.date, -t.valueAfterReimbursements)
-        updateCategoryHistory(t.accountKey, t.categoryKey, t.date, -t.valueAfterReimbursements)
+        updateBalanceHistory(t.accountKey, month, -t.valueAfterReimbursements)
+        updateCategoryHistory(t.accountKey, t.categoryKey, month, -t.valueAfterReimbursements)
     }
 
     @Transaction
