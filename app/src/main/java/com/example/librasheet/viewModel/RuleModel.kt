@@ -14,17 +14,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-/** This class only stores a filtered set of rules at any given time. When we reorder rules,
+/** Used by the CategoryRulesScreen.
+ *
+ * This class only stores a filtered set of rules at any given time. When we reorder rules,
  * we don't know what intermediate rules there may be. These have to be handled by the dao. Note
  * we don't need a startup function because all the loading is deferred to [setScreen].
+ *
+ *
  */
 class RuleModel(
     private val viewModel: LibraViewModel,
 ) {
     private val dao = viewModel.application.database.ruleDao()
 
-    /** Used by the CategoryRulesScreen **/
     val displayList = mutableStateListOf<CategoryRule>()
+    /** List of categories to show when editing a rule **/
     var targetCategories = mutableStateListOf<Category>()
     var filterCategories = mutableStateListOf<Category>()
     var currentFilter by mutableStateOf(Category.None)

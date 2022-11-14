@@ -23,7 +23,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.components.DropdownSelector
 import com.example.librasheet.ui.components.libraRowHeight
+import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
 @Composable
@@ -112,7 +114,9 @@ fun TransactionEditRow(
                     radius = 10.dp.toPx()
                     width = 1.dp.toPx()
                 }
-                Canvas(modifier = Modifier.fillMaxSize().padding(1.dp)) {
+                Canvas(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(1.dp)) {
                     drawRoundRect(
                         color = color,
                         cornerRadius = CornerRadius(radius, radius),
@@ -123,6 +127,57 @@ fun TransactionEditRow(
         }
         IconButton(onClick = { focusRequester.requestFocus() }) {
             Icon(imageVector = Icons.Sharp.Edit, contentDescription = null)
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun <T> TransactionSelectorRow(
+    label: String,
+    selection: T,
+    options: List<T>,
+    toString: (T) -> String,
+    modifier: Modifier = Modifier,
+    onSelection: (T) -> Unit = { },
+) {
+    TransactionFieldRow(
+        label = label,
+        modifier = modifier,
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier = modifier
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = toString(selection),
+                    modifier = Modifier.weight(10f).padding(6.dp)
+                )
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded
+                )
+            }
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach {
+                    DropdownMenuItem(
+                        onClick = {
+                            onSelection(it)
+                            expanded = false
+                        }
+                    ) {
+                        Text(text = toString(it))
+                    }
+                }
+            }
         }
     }
 }
@@ -150,6 +205,22 @@ private fun PreviewEdit() {
                 label = "Name",
                 text = "BANK OF AMERICA CREDIT CARD Bill Payment",
                 lines = 3,
+            )
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun PreviewSelect() {
+    LibraSheetTheme {
+        Surface {
+            TransactionSelectorRow(
+                label = "Account",
+                selection = "Robinhood",
+                options = listOf(""),
+                toString = { it },
             )
         }
     }
