@@ -1,13 +1,11 @@
 package com.example.librasheet.viewModel
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.setDay
 import com.example.librasheet.data.toIntDate
@@ -43,11 +41,12 @@ class TransactionModel(
 
     @Callback
     fun save(new: TransactionEntity, old: TransactionEntity) {
-        // TODO update state lists
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             if (old.key > 0) dao.update(new, old)
             else dao.add(new)
         }
+        loadFilter(balanceList, balanceFilter.value)
+        loadFilter(settingsList, settingsFilter.value)
     }
 
     @Callback
