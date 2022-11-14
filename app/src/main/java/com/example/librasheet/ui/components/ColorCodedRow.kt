@@ -32,9 +32,10 @@ fun ColorIndicator(
     color: Color = Color.Unspecified,
 ) {
     Spacer(Modifier.padding(end = 12.dp)
-        .padding(vertical = 8.dp)
+//        .padding(vertical = 8.dp)
+//        .fillMaxHeight()
         .width(4.dp)
-        .fillMaxHeight()
+        .height(libraRowHeight - 16.dp)
         .background(color = color)
     )
 }

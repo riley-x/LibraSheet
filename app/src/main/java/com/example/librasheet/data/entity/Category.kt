@@ -220,3 +220,5 @@ fun joinCategoryPath(parent: String, child: String) =
 fun joinCategoryPath(parent: CategoryId, child: String) =
     joinCategoryPath(parent.fullName, child)
 
+
+fun Category?.isValid() = this != null && this.key > 0

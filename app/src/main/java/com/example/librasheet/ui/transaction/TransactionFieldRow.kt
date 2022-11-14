@@ -1,8 +1,11 @@
 package com.example.librasheet.ui.transaction
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Edit
@@ -17,7 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,11 +66,13 @@ fun TransactionEditRow(
     label: String,
     text: String,
     modifier: Modifier = Modifier,
-    lines: Int = 1,
+    number: Boolean = true,
     onValueChange: (String) -> Unit = { },
 ) {
+    val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     var focused by remember { mutableStateOf(false) }
+    val lines = if (number) 1 else 3
 
     TransactionFieldRow(
         label = label,
@@ -81,6 +88,12 @@ fun TransactionEditRow(
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
             ),
             cursorBrush = SolidColor(MaterialTheme.colors.primary),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = if (number) KeyboardType.Decimal else KeyboardType.Text
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { focusManager.clearFocus(true) }
+            ),
             modifier = Modifier
                 .weight(10f)
                 .focusRequester(focusRequester)
@@ -201,7 +214,7 @@ private fun PreviewEdit() {
             TransactionEditRow(
                 label = "Name",
                 text = "BANK OF AMERICA CREDIT CARD Bill Payment",
-                lines = 3,
+                number = false,
             )
         }
     }

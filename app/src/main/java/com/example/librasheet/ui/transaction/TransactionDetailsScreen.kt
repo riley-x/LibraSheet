@@ -6,10 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.FilterAlt
 import androidx.compose.runtime.*
@@ -28,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
+import com.example.librasheet.data.entity.isValid
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.components.DropdownOptions
@@ -58,7 +56,6 @@ fun TransactionDetailScreen(
     onBack: () -> Unit = { },
 ) {
     /** Keyboard and focus **/
-    val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
     val account = remember { mutableStateOf(accounts.find { it.key == transaction.accountKey }) }
@@ -75,20 +72,19 @@ fun TransactionDetailScreen(
     ) }
 
     fun clearFocus() {
-//        keyboardController?.hide()
         focusManager.clearFocus(true)
     }
 
     fun LazyListScope.editor(
         label: String,
         text: MutableState<String>,
-        lines: Int = 1,
+        number: Boolean = true,
     ) {
         item(label) {
             TransactionEditRow(
                 label = label,
                 text = text.value,
-                lines = lines,
+                number = number,
                 onValueChange = { text.value = it },
             )
         }
@@ -125,17 +121,18 @@ fun TransactionDetailScreen(
                     label = "Account",
                     selection = account.value,
                     options = accounts,
+                    onSelection = { account.value = it },
                 ) {
                     Spacer(Modifier.width(6.dp))
-                    ColorIndicator(account.value?.color ?: Color.Unspecified)
+                    ColorIndicator(it?.color ?: Color.Unspecified)
                     Text(
-                        text = account.value?.name ?: "None",
-                        fontStyle = if (account.value == null) FontStyle.Italic else FontStyle.Normal,
+                        text = it?.name ?: "None",
+                        fontStyle = if (it == null) FontStyle.Italic else FontStyle.Normal,
                     )
                 }
             }
 
-            editor("Name", name, lines = 3)
+            editor("Name", name, number = false)
             editor("Date", date)
             editor("Value", value)
 
@@ -144,12 +141,16 @@ fun TransactionDetailScreen(
                     label = "Category",
                     selection = category.value,
                     options = categoryList,
+                    onSelection = { category.value = it },
                 ) {
                     Spacer(Modifier.width(6.dp))
-                    ColorIndicator(category.value?.color ?: Color.Unspecified)
+                    ColorIndicator(it?.color ?: Color.Unspecified)
                     Text(
-                        text = category.value?.id?.name ?: "None",
-                        fontStyle = if (category.value == null) FontStyle.Italic else FontStyle.Normal,
+                        text = it?.id?.name ?: "None",
+                        fontStyle = if (it.isValid()) FontStyle.Normal else FontStyle.Italic,
+                        color = MaterialTheme.colors.onSurface.copy(
+                            alpha = if (it.isValid()) ContentAlpha.high else ContentAlpha.medium,
+                        )
                     )
                 }
             }
