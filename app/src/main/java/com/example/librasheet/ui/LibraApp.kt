@@ -237,6 +237,9 @@ fun LibraApp(
             composable(route = TransactionDetailDestination.route(route!!)) {
                 TransactionDetailScreen(
                     transaction = previewTransactions[0],
+                    accounts = viewModel.accounts.all,
+                    incomeCategories = viewModel.categories.incomeTargets,
+                    expenseCategories = viewModel.categories.expenseTargets,
                     onBack = navController::popBackStack,
                     bottomPadding = innerPadding.calculateBottomPadding(),
                 )
@@ -421,20 +424,26 @@ fun LibraApp(
                 onDismiss = ::deleteCategory,
             )
         }
-        if (editCategoryRuleIndex == -1) {
+        if (editCategoryRuleIndex == -1) { // Add rule
+            val list = if (viewModel.rules.currentScreenIsIncome)
+                viewModel.categories.incomeTargets else
+                viewModel.categories.expenseTargets
             CategoryRuleDialog(
                 currentPattern = "",
                 currentCategory = Category.None,
-                categories = viewModel.rules.targetCategories,
+                categories = list,
                 onClose = ::addRule,
             )
         }
-        else if (editCategoryRuleIndex >= 0) {
+        else if (editCategoryRuleIndex >= 0) { // Edit rule
+            val list = if (viewModel.rules.currentScreenIsIncome)
+                viewModel.categories.incomeTargets else
+                viewModel.categories.expenseTargets
             val current = viewModel.rules.displayList[editCategoryRuleIndex]
             CategoryRuleDialog(
                 currentPattern = current.pattern,
                 currentCategory = current.category ?: Category.None,
-                categories = viewModel.rules.targetCategories,
+                categories = list,
                 onClose = ::editRule,
             )
         }
@@ -445,8 +454,11 @@ fun LibraApp(
             )
         }
         if (showFilterRules) {
+            val list = if (viewModel.rules.currentScreenIsIncome)
+                viewModel.categories.incomeFilters else
+                viewModel.categories.expenseFilters
             SelectorDialog(
-                options = viewModel.rules.filterCategories,
+                options = list,
                 initialSelection = viewModel.rules.currentFilter,
                 toString = { it.id.indentedName() },
                 onDismiss = ::filterRules,

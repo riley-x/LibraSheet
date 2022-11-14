@@ -28,11 +28,8 @@ class RuleModel(
     private val dao = viewModel.application.database.ruleDao()
 
     val displayList = mutableStateListOf<CategoryRule>()
-    /** List of categories to show when editing a rule **/
-    var targetCategories = mutableStateListOf<Category>()
-    var filterCategories = mutableStateListOf<Category>()
     var currentFilter by mutableStateOf(Category.None)
-    private var currentScreenIsIncome = false
+    var currentScreenIsIncome = false
 
 
     @Callback
@@ -95,17 +92,6 @@ class RuleModel(
     fun setScreen(income: Boolean) {
         currentScreenIsIncome = income
         val category = viewModel.categories.data.all[if (income) 0 else 1]
-        val all = category.getAllFlattened(false)
-
-        targetCategories.clear()
-        targetCategories.addAll(all)
-        targetCategories.add(Category.Ignore)
-
-        filterCategories.clear()
-        filterCategories.add(category)
-        filterCategories.addAll(all)
-        filterCategories.add(Category.Ignore)
-
         setFilter(category)
     }
 
