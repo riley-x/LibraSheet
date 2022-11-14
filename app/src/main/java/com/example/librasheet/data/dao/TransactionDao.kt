@@ -116,6 +116,7 @@ fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
         args.add(filter.category.key)
     }
     q += " ORDER BY date DESC"
-    Log.i("Libra/TransactionDao/getTransactionFilteredQuery", q)
-    return SimpleSQLiteQuery(q, args.toTypedArray())
+    val out = SimpleSQLiteQuery(q, args.toTypedArray())
+    Log.i("Libra/TransactionDao/getTransactionFilteredQuery", "$out")
+    return out
 }

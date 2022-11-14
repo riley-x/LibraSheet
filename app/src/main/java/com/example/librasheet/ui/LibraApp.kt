@@ -66,7 +66,7 @@ fun LibraApp(
         navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
     fun toBalanceAllTransactions(account: Account) {
-        // TODO view model load
+        viewModel.transactions.loadBalance(account)
         navController.navigate(TransactionAllDestination.route(BalanceTab.graph))
     }
     fun toBalanceTransactionDetail(t: TransactionEntity) {

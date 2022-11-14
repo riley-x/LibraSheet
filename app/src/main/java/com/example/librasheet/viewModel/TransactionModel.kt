@@ -3,6 +3,7 @@ package com.example.librasheet.viewModel
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
@@ -12,6 +13,7 @@ import com.example.librasheet.data.setDay
 import com.example.librasheet.data.toIntDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -28,10 +30,11 @@ class TransactionModel(
 
     /** Current list to show in settings tab **/
     val settingsList = mutableStateListOf<TransactionEntity>()
-    val settingsFilter = mutableStateOf(defaultFilter)
+    val settingsFilter = mutableStateOf(TransactionFilters())
 
     /** Current list to show in balance tab **/
     val balanceList = mutableStateListOf<TransactionEntity>()
+    val balanceFilter = mutableStateOf(TransactionFilters())
 
     /** Current detailed transaction in the settings tab **/
     val settingsDetail = mutableStateOf(TransactionEntity())
@@ -48,7 +51,39 @@ class TransactionModel(
     }
 
     @Callback
-    fun loadSettings() {
+    fun filterSettings(filter: TransactionFilters) {
+        if (filter == settingsFilter.value) return
+        settingsFilter.value = filter
+        loadFilter(settingsList, filter)
+    }
 
+    @Callback
+    fun filterBalance(filter: TransactionFilters) {
+        if (filter == balanceFilter.value) return
+        balanceFilter.value = filter
+        loadFilter(balanceList, filter)
+    }
+
+
+    @Callback
+    fun loadSettings() {
+        if (settingsList.isNotEmpty()) return
+        filterSettings(defaultFilter)
+    }
+
+    @Callback
+    fun loadBalance(account: Account) {
+        if (balanceList.isNotEmpty()) return
+        filterBalance(defaultFilter.copy(account = account))
+    }
+
+    private fun loadFilter(outList: SnapshotStateList<TransactionEntity>, filter: TransactionFilters) {
+        viewModel.viewModelScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                dao.get(filter)
+            }
+            outList.clear()
+            outList.addAll(list)
+        }
     }
 }
