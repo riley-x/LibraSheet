@@ -102,6 +102,7 @@ fun TransactionDetailScreen(
         number: Boolean = true,
         error: Boolean = false,
         placeholder: String = "",
+        onValueChange: (String) -> Unit = { text.value = it },
     ) {
         item(label) {
             TransactionEditRow(
@@ -110,7 +111,7 @@ fun TransactionDetailScreen(
                 number = number,
                 error = error,
                 placeholder = placeholder,
-                onValueChange = { text.value = it },
+                onValueChange = onValueChange,
             )
         }
     }
@@ -157,7 +158,17 @@ fun TransactionDetailScreen(
             }
 
             editor("Name", name, number = false)
+
             editor("Date", date, error = dateError, placeholder = "mm-dd-yy")
+            // TODO annoying because the cursor might not be at the end. Also need to adjust the cursor
+            // position after adding characters.
+//            {
+//                date.value =
+//                    if (date.value.length == 1 && it.length == 2) "$it-"
+//                    else if (date.value.length == 4 && it.length == 5) "$it-"
+//                    else it
+//            }
+
             editor("Value", value, error = valueError)
 
 

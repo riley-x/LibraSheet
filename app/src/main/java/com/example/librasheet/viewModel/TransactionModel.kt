@@ -85,6 +85,7 @@ class TransactionModel(
         viewModel.viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
                 dao.get(filter)
+                // TODO need to match category objects
             }
             outList.clear()
             outList.addAll(list)
