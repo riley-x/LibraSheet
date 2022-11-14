@@ -52,7 +52,7 @@ fun TransactionFieldRow(
             fontStyle = FontStyle.Italic,
             color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
             modifier = Modifier
-                .padding(top = 6.dp, bottom = 6.dp)
+                .padding(top = 8.dp, bottom = 8.dp)
                 .padding(end = 15.dp)
                 .width(80.dp)
         )
