@@ -88,7 +88,15 @@ object EditAccountsDestination {
     const val route = "edit_accounts"
 }
 object TransactionDetailDestination {
-    const val routeBase = "transaction_details"
+    private const val routeBase = "transaction_details"
+    fun route(graph: String) = "${routeBase}_${graph}"
+}
+object TransactionAllDestination {
+    private const val routeBase = "transaction_all"
+    fun route(graph: String) = "${routeBase}_${graph}"
+}
+object TransactionReimburseDestination {
+    private const val routeBase = "transaction_reimburse"
     fun route(graph: String) = "${routeBase}_${graph}"
 }
 
@@ -127,13 +135,3 @@ object CategoryDetailDestination: DestinationStringArg() {
 
 
 
-object TransactionListDestination: DestinationStringArg() {
-    override val routeBase = "transaction_list"
-    override val argName = "clickTarget"
-    override val arguments = listOf(
-        navArgument(argName) { type = NavType.StringType }
-    )
-
-    const val targetDetails = "details"
-    const val targetReimburse = "reimburse"
-}

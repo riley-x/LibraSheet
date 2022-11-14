@@ -59,7 +59,7 @@ fun LibraApp(
     fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
     fun toSettingsAllTransactions() {
         // TODO view model load
-        navController.navigate(TransactionListDestination.argRoute(SettingsTab.graph, TransactionListDestination.targetDetails))
+        navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
     fun toSettingsTransactionDetail(t: TransactionEntity) {
         // TODO
@@ -223,6 +223,16 @@ fun LibraApp(
                 )
             }
         }
+        fun NavGraphBuilder.transactionAll() {
+            composable(route = TransactionAllDestination.route(route!!)) {
+                TransactionListScreen(
+                    transactions = previewTransactions,
+                    onBack = navController::popBackStack,
+                    onFilter = { },
+                    onTransactionClick = ::toSettingsTransactionDetail,
+                )
+            }
+        }
         fun NavGraphBuilder.transactionDetail() {
             composable(route = TransactionDetailDestination.route(route!!)) {
                 TransactionDetailScreen(
@@ -355,20 +365,9 @@ fun LibraApp(
                         onReorder = viewModel.rules::reorder,
                     )
                 }
-                // TODO this will need to be refactored since this screen can be accessed from the balance tab on account -> transaction -> reimburse
-                composable(route = TransactionListDestination.route(SettingsTab.graph), arguments = TransactionListDestination.arguments) {
-                    val target = (it.arguments?.getString(TransactionListDestination.argName) ?: TransactionListDestination.targetDetails)
-                    if (target == TransactionListDestination.targetDetails) {
-                        TransactionListScreen(
-                            transactions = previewTransactions,
-                            onBack = navController::popBackStack,
-                            onFilter = { },
-                            onTransactionClick = ::toSettingsTransactionDetail,
-                        )
-                    }
-                }
                 colorSelector()
                 transactionDetail()
+                transactionAll()
             }
         }
 
