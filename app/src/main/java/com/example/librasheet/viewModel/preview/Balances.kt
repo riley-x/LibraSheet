@@ -16,7 +16,7 @@ import com.example.librasheet.viewModel.dataClasses.NamedValue
 
 val previewAccounts = mutableStateListOf(
     Account(
-        key = 0,
+        key = 4,
         name = "BofA Checking",
         balance = 2_345_01_00,
         color = Color(0xFF004940),

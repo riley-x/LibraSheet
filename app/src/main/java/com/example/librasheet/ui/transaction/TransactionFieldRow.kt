@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.components.DropdownSelector
 import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.dialogs.Dialog
@@ -37,9 +38,7 @@ fun TransactionFieldRow(
 ) {
     Row(
         verticalAlignment = alignment,
-        modifier = modifier
-            .fillMaxWidth()
-            .requiredHeightIn(min = libraRowHeight)
+        modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = label,
@@ -138,13 +137,13 @@ fun <T> TransactionSelectorRow(
     label: String,
     selection: T,
     options: List<T>,
-    toString: (T) -> String,
     modifier: Modifier = Modifier,
     onSelection: (T) -> Unit = { },
+    display: @Composable RowScope.(T) -> Unit = { },
 ) {
     TransactionFieldRow(
         label = label,
-        modifier = modifier,
+        modifier = modifier.height(libraRowHeight),
     ) {
         var expanded by remember { mutableStateOf(false) }
         ExposedDropdownMenuBox(
@@ -155,10 +154,8 @@ fun <T> TransactionSelectorRow(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = toString(selection),
-                    modifier = Modifier.weight(10f).padding(6.dp)
-                )
+                display(selection)
+                Spacer(Modifier.weight(10f))
                 ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded
                 )
@@ -172,9 +169,9 @@ fun <T> TransactionSelectorRow(
                         onClick = {
                             onSelection(it)
                             expanded = false
-                        }
+                        },
                     ) {
-                        Text(text = toString(it))
+                        display(it)
                     }
                 }
             }
@@ -220,8 +217,10 @@ private fun PreviewSelect() {
                 label = "Account",
                 selection = "Robinhood",
                 options = listOf(""),
-                toString = { it },
-            )
+            ) {
+                ColorIndicator(Color.Green)
+                Text(it)
+            }
         }
     }
 }

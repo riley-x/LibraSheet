@@ -10,6 +10,8 @@ val previewTransactions = mutableStateListOf(
         date = 20221105,
         value = -3_88_00,
         category = previewIncomeCategories2[0],
+        categoryKey = previewIncomeCategories2[0].key,
+        accountKey = 1,
     ),
     TransactionEntity(
         key = 2,
@@ -17,6 +19,8 @@ val previewTransactions = mutableStateListOf(
         date = 20221104,
         value = -42_49_00,
         category = previewIncomeCategories2[1],
+        categoryKey = previewIncomeCategories2[1].key,
+        accountKey = 1,
     ),
     TransactionEntity(
         key = 3,
@@ -24,6 +28,8 @@ val previewTransactions = mutableStateListOf(
         date = 20221103,
         value = -28_59_00,
         category = previewIncomeCategories2[2],
+        categoryKey = previewIncomeCategories2[2].key,
+        accountKey = 1,
     ),
     TransactionEntity(
         key = 4,
@@ -31,6 +37,8 @@ val previewTransactions = mutableStateListOf(
         date = 20221103,
         value = 2_500_00_00,
         category = previewIncomeCategories2[3],
+        categoryKey = previewIncomeCategories2[3].key,
+        accountKey = 1,
     ),
 )
 

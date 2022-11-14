@@ -16,9 +16,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -27,6 +29,7 @@ import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.components.DropdownOptions
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowTitle
@@ -122,8 +125,14 @@ fun TransactionDetailScreen(
                     label = "Account",
                     selection = account.value,
                     options = accounts,
-                    toString = { it?.name ?: "" },
-                )
+                ) {
+                    Spacer(Modifier.width(6.dp))
+                    ColorIndicator(account.value?.color ?: Color.Unspecified)
+                    Text(
+                        text = account.value?.name ?: "None",
+                        fontStyle = if (account.value == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                }
             }
 
             editor("Name", name, lines = 3)
@@ -135,8 +144,14 @@ fun TransactionDetailScreen(
                     label = "Category",
                     selection = category.value,
                     options = categoryList,
-                    toString = { it?.id?.indentedName(1) ?: "" },
-                )
+                ) {
+                    Spacer(Modifier.width(6.dp))
+                    ColorIndicator(category.value?.color ?: Color.Unspecified)
+                    Text(
+                        text = category.value?.id?.name ?: "None",
+                        fontStyle = if (category.value == null) FontStyle.Italic else FontStyle.Normal,
+                    )
+                }
             }
         }
     }
