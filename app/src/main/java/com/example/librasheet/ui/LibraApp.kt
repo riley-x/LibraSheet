@@ -65,6 +65,14 @@ fun LibraApp(
         viewModel.transactions.settingsDetail.value = t
         navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
+    fun toBalanceAllTransactions(account: Account) {
+        // TODO view model load
+        navController.navigate(TransactionAllDestination.route(BalanceTab.graph))
+    }
+    fun toBalanceTransactionDetail(t: TransactionEntity) {
+        viewModel.transactions.balanceDetail.value = t
+        navController.navigateSingleTop(TransactionDetailDestination.route(BalanceTab.graph))
+    }
     fun toEditAccountsScreen() = navController.navigateSingleTop(EditAccountsDestination.route)
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
         // WARNING! This only works because we have at most one level of nesting. Otherwise would have to catch back arrow, etc.
@@ -224,25 +232,26 @@ fun LibraApp(
             }
         }
         fun NavGraphBuilder.transactionAll() {
+            val isSettings = route == SettingsTab.graph
             composable(route = TransactionAllDestination.route(route!!)) {
                 TransactionListScreen(
-                    transactions = previewTransactions,
+                    transactions = if (isSettings) viewModel.transactions.settingsList else viewModel.transactions.balanceList,
                     onBack = navController::popBackStack,
-                    onFilter = { },
-                    onTransactionClick = ::toSettingsTransactionDetail,
+                    onFilter = { }, // TODO
+                    onTransactionClick = if (isSettings) ::toSettingsTransactionDetail else ::toBalanceTransactionDetail,
                 )
             }
         }
         fun NavGraphBuilder.transactionDetail() {
+            val isSettings = route!! == SettingsTab.graph
             composable(route = TransactionDetailDestination.route(route!!)) {
-                val isSettings = route!! == SettingsTab.graph
                 TransactionDetailScreen(
                     transaction = if (isSettings) viewModel.transactions.settingsDetail else viewModel.transactions.balanceDetail,
                     accounts = viewModel.accounts.all,
                     incomeCategories = viewModel.categories.incomeTargets,
                     expenseCategories = viewModel.categories.expenseTargets,
                     onBack = navController::popBackStack,
-                    onSave = { }, // TODO
+                    onSave = viewModel.transactions::save,
                     bottomPadding = innerPadding.calculateBottomPadding(),
                 )
             }

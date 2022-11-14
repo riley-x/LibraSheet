@@ -85,6 +85,7 @@ fun TransactionDetailScreen(
 //            valueAfterReimbursements = // TODO,
         )
         onSave(t, transaction.value)
+        onBack()
     }
 
 
