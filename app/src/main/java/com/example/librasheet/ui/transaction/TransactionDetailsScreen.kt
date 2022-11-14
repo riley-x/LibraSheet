@@ -28,6 +28,7 @@ import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
+import com.example.librasheet.viewModel.preview.previewTransaction
 import com.example.librasheet.viewModel.preview.previewTransactions
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -36,7 +37,7 @@ import java.text.SimpleDateFormat
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TransactionDetailScreen(
-    transaction: TransactionEntity,
+    transaction: State<TransactionEntity>,
     accounts: SnapshotStateList<Account>,
     incomeCategories: SnapshotStateList<Category>,
     expenseCategories: SnapshotStateList<Category>,
@@ -52,10 +53,10 @@ fun TransactionDetailScreen(
         x
     }
 
-    val account = remember { mutableStateOf(accounts.find { it.key == transaction.accountKey }) }
-    val name = remember { mutableStateOf(transaction.name) }
-    val date = remember { mutableStateOf(formatDateIntSimple(transaction.date, "-")) }
-    val value = remember { mutableStateOf(transaction.value.toFloatDollar().toString()) }
+    val account = remember { mutableStateOf(accounts.find { it.key == transaction.value.accountKey }) }
+    val name = remember { mutableStateOf(transaction.value.name) }
+    val date = remember { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
+    val value = remember { mutableStateOf(transaction.value.value.toFloatDollar().toString()) }
 
     val dateError by remember { derivedStateOf { formatter.parseOrNull(date.value) == null } }
     val valueError by remember { derivedStateOf { value.value.toFloatOrNull() == null } }
@@ -64,8 +65,8 @@ fun TransactionDetailScreen(
         if ((value.value.toFloatOrNull() ?: 0f) > 0f) incomeCategories else expenseCategories
     } }
     val category = remember { mutableStateOf(
-        (if (transaction.value > 0) incomeCategories else expenseCategories)
-            .find { it.key == transaction.categoryKey }
+        (if (transaction.value.value > 0) incomeCategories else expenseCategories)
+            .find { it.key == transaction.value.categoryKey }
     ) }
 
     fun clearFocus() {
@@ -187,7 +188,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             TransactionDetailScreen(
-                transaction = previewTransactions[0],
+                transaction = previewTransaction,
                 accounts = previewAccounts,
                 incomeCategories = previewIncomeCategories2,
                 expenseCategories = previewIncomeCategories2,

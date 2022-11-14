@@ -1,6 +1,7 @@
 package com.example.librasheet.viewModel.preview
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import com.example.librasheet.data.entity.TransactionEntity
 
 val previewTransactions = mutableStateListOf(
@@ -41,4 +42,6 @@ val previewTransactions = mutableStateListOf(
         accountKey = 1,
     ),
 )
+
+val previewTransaction = mutableStateOf(previewTransactions[0])
 

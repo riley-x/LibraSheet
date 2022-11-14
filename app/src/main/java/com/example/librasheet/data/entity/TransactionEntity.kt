@@ -28,10 +28,10 @@ data class TransactionEntity(
     @Ignore var category = Category.None
 
     constructor(
-        name: String,
-        date: Int,
-        value: Long,
-        category: Category,
+        name: String = "",
+        date: Int = 0,
+        value: Long = 0,
+        category: Category = Category.None,
         key: Long = 0,
         valueAfterReimbursements: Long = value,
         accountKey: Long = 0,

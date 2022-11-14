@@ -42,12 +42,12 @@ fun LibraApp(
     fun onTabSelected(tab: LibraTab) {
         if (tab.route != currentDestination?.route) {
             if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
-                navController.navigateSingleTopTo(
+                navController.navigateToTab(
                     tab.route,
                     shouldSaveState = false
                 )
             } else {
-                navController.navigateSingleTopTo(tab.graph)
+                navController.navigateToTab(tab.graph)
             }
         }
     }
@@ -55,30 +55,30 @@ fun LibraApp(
         // TODO view model set
         navController.navigate(AccountDestination.route)
     }
-    fun toBalanceColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(BalanceTab.graph, spec))
-    fun toSettingsColorSelector(spec: String) = navController.navigate(ColorDestination.argRoute(SettingsTab.graph, spec))
+    fun toBalanceColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(BalanceTab.graph, spec))
+    fun toSettingsColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(SettingsTab.graph, spec))
     fun toSettingsAllTransactions() {
         // TODO view model load
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
     fun toSettingsTransactionDetail(t: TransactionEntity) {
-        // TODO
-        navController.navigate(TransactionDetailDestination.route(SettingsTab.graph))
+        viewModel.transactions.settingsDetail.value = t
+        navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
-    fun toEditAccountsScreen() = navController.navigate(EditAccountsDestination.route)
+    fun toEditAccountsScreen() = navController.navigateSingleTop(EditAccountsDestination.route)
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
         // WARNING! This only works because we have at most one level of nesting. Otherwise would have to catch back arrow, etc.
         viewModel.categories.loadIncomeDetail(it)
-        navController.navigate(CategoryDetailDestination.argRoute(IncomeTab.graph, it.id.fullName))
+        navController.navigateSingleTop(CategoryDetailDestination.argRoute(IncomeTab.graph, it.id.fullName))
     }
     fun toExpenseCategoryDetailScreen(it: CategoryUi) {
         viewModel.categories.loadExpenseDetail(it)
-        navController.navigate(CategoryDetailDestination.argRoute(SpendingTab.graph, it.id.fullName))
+        navController.navigateSingleTop(CategoryDetailDestination.argRoute(SpendingTab.graph, it.id.fullName))
     }
-    fun toCategoriesScreen() = navController.navigate(CategoriesDestination.route)
+    fun toCategoriesScreen() = navController.navigateSingleTop(CategoriesDestination.route)
     fun toRulesScreen(income: Boolean) {
         viewModel.rules.setScreen(income)
-        navController.navigate(RulesDestination.route)
+        navController.navigateSingleTop(RulesDestination.route)
     }
     fun onSaveColor(spec: String, color: Color) {
         // TODO
@@ -235,8 +235,9 @@ fun LibraApp(
         }
         fun NavGraphBuilder.transactionDetail() {
             composable(route = TransactionDetailDestination.route(route!!)) {
+                val isSettings = route!! == SettingsTab.graph
                 TransactionDetailScreen(
-                    transaction = previewTransactions[0],
+                    transaction = if (isSettings) viewModel.transactions.settingsDetail else viewModel.transactions.balanceDetail,
                     accounts = viewModel.accounts.all,
                     incomeCategories = viewModel.categories.incomeTargets,
                     expenseCategories = viewModel.categories.expenseTargets,
