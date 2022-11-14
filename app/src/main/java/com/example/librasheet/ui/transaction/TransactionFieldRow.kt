@@ -8,6 +8,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.sharp.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +35,9 @@ import com.example.librasheet.ui.components.DropdownSelector
 import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionFieldRow(
@@ -156,7 +161,7 @@ fun TransactionEditRow(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun <T> TransactionSelectorRow(
     label: String,
@@ -172,9 +177,19 @@ fun <T> TransactionSelectorRow(
         modifier = modifier.height(libraRowHeight),
     ) {
         var expanded by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+//        val isImeVisible = WindowInsets.isImeVisible
 
         fun onExpandedChange(new: Boolean) {
-            expanded = new
+            scope.launch {
+                /**
+                 * When switching between a text box and a selector, the closing keyboard causes the
+                 * dropdown box to flicker between above and below. The delay allows the keyboard to
+                 * close first. TODO only delay when keyboard is open? But isImeVisible is false already
+                 */
+                if (!expanded) delay(100)
+                expanded = !expanded
+            }
         }
 
         ExposedDropdownMenuBox(
@@ -187,9 +202,18 @@ fun <T> TransactionSelectorRow(
             ) {
                 display(selection)
                 Spacer(Modifier.weight(10f))
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded
-                )
+
+                /** Using ExposedDropdownMenuDefaults.TrailingIcon doesn't close the keyboard when
+                 * clicked, but also the ripple is confusing.
+                 */
+                Box(
+                    modifier = Modifier.size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                        contentDescription = null)
+                }
             }
             ExposedDropdownMenu(
                 expanded = expanded,

@@ -115,10 +115,14 @@ fun TransactionDetailScreen(
         }
     }
 
+    val imePadding = with(LocalDensity.current) {
+        WindowInsets.ime.getBottom(this).toDp()
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(bottom = maxOf(bottomPadding, imePadding))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = { focusManager.clearFocus(true) }
@@ -131,19 +135,7 @@ fun TransactionDetailScreen(
             onBack = onBack,
         )
 
-        val imePadding = with(LocalDensity.current) {
-            WindowInsets.ime.getBottom(this).toDp()
-        }
-
-        LazyColumn(
-            Modifier
-//                .windowInsetsPadding(WindowInsets.ime)
-//                .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
-                .padding(bottom = maxOf(bottomPadding, imePadding))
-            /** These paddings need to be placed after the scroll modifier or else they will cause
-             * a flicker. The only problem with this is that the bottom ripple doesn't appear anymore.
-             */
-        ) {
+        LazyColumn {
             item("details") {
                 RowTitle("Details")
             }
