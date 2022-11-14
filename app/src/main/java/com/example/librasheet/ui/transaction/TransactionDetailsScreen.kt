@@ -2,6 +2,7 @@ package com.example.librasheet.ui.transaction
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
@@ -65,6 +67,11 @@ fun TransactionDetailScreen(
              */
             .windowInsetsPadding(WindowInsets.ime)
             .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = { clearFocus() }
+                )
+            }
     ) {
         HeaderBar(
             title = "Transactions",

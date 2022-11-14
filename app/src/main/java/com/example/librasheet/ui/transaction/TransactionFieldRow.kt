@@ -67,46 +67,52 @@ fun TransactionEditRow(
         alignment = if (lines == 1) Alignment.CenterVertically else Alignment.Top,
         modifier = modifier.height(Dp(maxOf(50f, lines * 25f)))
     ) {
-        Box(
-            contentAlignment = if (lines == 1) Alignment.CenterStart else Alignment.TopStart,
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(10f)
+        BasicTextField(
+            value = text,
+            onValueChange = onValueChange,
+            enabled = enabled,
+            singleLine = lines == 1,
+            maxLines = lines,
+            textStyle = MaterialTheme.typography.body1.copy(
+                color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colors.primary),
+            modifier = Modifier.weight(10f),
         ) {
-            if (enabled) {
-                BasicTextField(
-                    value = text,
-                    onValueChange = onValueChange,
-                    singleLine = lines == 1,
-                    maxLines = lines,
-                    textStyle = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colors.primary),
-                    modifier = Modifier.padding(6.dp),
-                )
-            } else { // Need this since BasicTextField doesn't have TextOverflow
-                Text(
-                    text = text,
-                    maxLines = lines,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(6.dp)
-                )
-            }
+            Box(
+                contentAlignment = if (lines == 1) Alignment.CenterStart else Alignment.TopStart,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (enabled) {
+                    Box(
+                        Modifier.padding(6.dp)
+                    ) {
+                        it()
+                    }
+                }
+                else { // Need this since BasicTextField doesn't have TextOverflow
+                    Text(
+                        text = text,
+                        maxLines = lines,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(6.dp)
+                    )
+                }
 
-            val color = if (enabled) MaterialTheme.colors.primary else Color.Unspecified
-            val radius: Float
-            val width: Float
-            with(LocalDensity.current) {
-                radius = 10.dp.toPx()
-                width = 1.dp.toPx()
-            }
-            Canvas(modifier = Modifier.fillMaxSize().padding(1.dp)) {
-                drawRoundRect(
-                    color = color,
-                    cornerRadius = CornerRadius(radius, radius),
-                    style = Stroke(width = width),
-                )
+                val color = if (enabled) MaterialTheme.colors.primary else Color.Unspecified
+                val radius: Float
+                val width: Float
+                with(LocalDensity.current) {
+                    radius = 10.dp.toPx()
+                    width = 1.dp.toPx()
+                }
+                Canvas(modifier = Modifier.fillMaxSize().padding(1.dp)) {
+                    drawRoundRect(
+                        color = color,
+                        cornerRadius = CornerRadius(radius, radius),
+                        style = Stroke(width = width),
+                    )
+                }
             }
         }
         IconButton(onClick = onEnable) {
