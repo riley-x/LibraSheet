@@ -1,6 +1,5 @@
 package com.example.librasheet.ui.transaction
 
-import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -31,8 +29,6 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 import com.example.librasheet.viewModel.preview.previewTransaction
-import com.example.librasheet.viewModel.preview.previewTransactions
-import java.text.ParseException
 import java.text.SimpleDateFormat
 
 
@@ -59,10 +55,13 @@ fun TransactionDetailScreen(
     val account = remember { mutableStateOf(accounts.find { it.key == transaction.value.accountKey }) }
     val name = remember { mutableStateOf(transaction.value.name) }
     val date = remember { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
-    val value = remember { mutableStateOf(transaction.value.value.toFloatDollar().toString()) }
+    val value = remember { mutableStateOf(
+        if (transaction.value.value == 0L) ""
+        else transaction.value.value.toFloatDollar().toString())
+    }
 
-    val dateError by remember { derivedStateOf { formatter.parseOrNull(date.value) == null } }
-    val valueError by remember { derivedStateOf { value.value.toFloatOrNull() == null } }
+    var dateError by remember { mutableStateOf(false) }
+    var valueError by remember { mutableStateOf(false) }
 
     val categoryList by remember { derivedStateOf {
         if ((value.value.toFloatOrNull() ?: 0f) > 0f) incomeCategories else expenseCategories
@@ -73,12 +72,18 @@ fun TransactionDetailScreen(
     ) }
 
     fun saveTransaction() {
+        val dateInt = formatter.parseOrNull(date.value)?.toIntDate()
+        val valueLong = value.value.toFloatOrNull()?.toLongDollar()
+
+        dateError = dateInt == null
+        valueError = valueLong == null
         if (dateError || valueError) return
+
         val t = TransactionEntity(
             key = transaction.value.key,
             name = name.value,
-            date = formatter.parseOrNull(date.value)?.toIntDate() ?: return,
-            value = value.value.toFloatOrNull()?.toLongDollar() ?: return,
+            date = dateInt ?: 0,
+            value = valueLong ?: 0L,
             category = category.value ?: Category.None,
             categoryKey = category.value?.key ?: 0,
             accountKey = account.value?.key ?: 0,
@@ -113,16 +118,12 @@ fun TransactionDetailScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            /** These paddings need to be placed after the scroll modifier or else they will cause
-             * a flicker. The only problem with this is that the bottom ripple doesn't appear anymore.
-             */
-            .windowInsetsPadding(WindowInsets.ime)
-            .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onPress = { focusManager.clearFocus(true) }
+                    onTap = { focusManager.clearFocus(true) }
                 )
             }
+//            .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
     ) {
         HeaderBar(
             title = "Transactions",
@@ -131,7 +132,11 @@ fun TransactionDetailScreen(
         )
 
         LazyColumn(
-            Modifier.weight(10f)
+            Modifier
+                .windowInsetsPadding(WindowInsets.ime)
+            /** These paddings need to be placed after the scroll modifier or else they will cause
+             * a flicker. The only problem with this is that the bottom ripple doesn't appear anymore.
+             */
         ) {
             item("details") {
                 RowTitle("Details")
@@ -193,26 +198,28 @@ fun TransactionDetailScreen(
                     }
                 }
             }
-        }
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.error
-                ),
-                onClick = onBack,
-                modifier = Modifier.width(100.dp)
-            ) {
-                Text("Cancel")
-            }
-            Button(
-                onClick = ::saveTransaction,
-                modifier = Modifier.width(100.dp)
-            ) {
-                Text("Save")
+            item("Buttons") {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
+                ) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.error
+                        ),
+                        onClick = onBack,
+                        modifier = Modifier.width(100.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = ::saveTransaction,
+                        modifier = Modifier.width(100.dp)
+                    ) {
+                        Text("Save")
+                    }
+                }
             }
         }
     }

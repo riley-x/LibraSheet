@@ -43,7 +43,10 @@ fun TransactionFieldRow(
 ) {
     Row(
         verticalAlignment = alignment,
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier
+            .padding(vertical = 2.dp)
+            .then(modifier)
+            .fillMaxWidth()
     ) {
         Text(
             text = label,
@@ -76,7 +79,7 @@ fun TransactionEditRow(
     var focused by remember { mutableStateOf(false) }
     val lines = if (number) 1 else 3
 
-    val textIsEmpty by remember { derivedStateOf { text.isEmpty() } }
+    val textIsEmpty by remember(text) { derivedStateOf { text.isEmpty() } }
 
     TransactionFieldRow(
         label = label,

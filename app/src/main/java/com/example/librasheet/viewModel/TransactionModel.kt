@@ -16,8 +16,6 @@ import java.util.*
 
 
 
-
-
 class TransactionModel(
     private val viewModel: LibraViewModel,
 ) {
@@ -63,13 +61,20 @@ class TransactionModel(
         loadFilter(balanceList, filter)
     }
 
-
+    /**
+     * We load these lists lazily, when the user navigates to the respective screens. Don't want to
+     * reload though if they change tabs/screens.
+     */
     @Callback
     fun loadSettings() {
         if (settingsList.isNotEmpty()) return
         filterSettings(defaultFilter)
     }
 
+    /**
+     * We load these lists lazily, when the user navigates to the respective screens. Don't want to
+     * reload though if they change tabs/screens.
+     */
     @Callback
     fun loadBalance(account: Account) {
         if (balanceList.isNotEmpty()) return

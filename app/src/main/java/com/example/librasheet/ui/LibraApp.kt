@@ -61,7 +61,7 @@ fun LibraApp(
         viewModel.transactions.loadSettings()
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
-    fun toSettingsTransactionDetail(t: TransactionEntity) {
+    fun toSettingsTransactionDetail(t: TransactionEntity = TransactionEntity()) {
         viewModel.transactions.settingsDetail.value = t
         navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
@@ -336,7 +336,7 @@ fun LibraApp(
                         toEditAccounts = ::toEditAccountsScreen,
                         toEditCategories = ::toCategoriesScreen,
                         toCategoryRules = ::toRulesScreen,
-                        toAddTransaction = { },
+                        toAddTransaction = ::toSettingsTransactionDetail,
                         toAddCSV = { },
                         toAllTransactions = ::toSettingsAllTransactions,
                         onBackupDatabase = { },
