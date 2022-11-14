@@ -75,6 +75,7 @@ fun TransactionDetailScreen(
     fun saveTransaction() {
         if (dateError || valueError) return
         val t = TransactionEntity(
+            key = transaction.value.key,
             name = name.value,
             date = formatter.parseOrNull(date.value)?.toIntDate() ?: return,
             value = value.value.toFloatOrNull()?.toLongDollar() ?: return,
