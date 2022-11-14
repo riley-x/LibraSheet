@@ -41,13 +41,21 @@ fun TransactionDetailScreen(
     /** Keyboard and focus **/
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    var name by remember { mutableStateOf(transaction.name) }
+    var date by remember { mutableStateOf(transaction.date.toString()) }
+
+    var nameEnabled by remember { mutableStateOf(false) }
+    var dateEnabled by remember { mutableStateOf(false) }
+
+
     fun clearFocus() {
+        nameEnabled = false
+        dateEnabled = false
         keyboardController?.hide()
         focusManager.clearFocus(true)
     }
 
-    var name by remember { mutableStateOf(transaction.name) }
-    var date by remember { mutableStateOf(transaction.date.toString()) }
 
     Column(
         modifier = modifier
@@ -70,11 +78,24 @@ fun TransactionDetailScreen(
             }
 
             item("name") {
-                TransactionEditRow(label = "Name", text = name, lines = 3) { name = it }
+                TransactionEditRow(
+                    label = "Name",
+                    text = name,
+                    lines = 3,
+                    enabled = nameEnabled,
+                    onEnable = { clearFocus(); nameEnabled = true },
+                    onValueChange = { name = it },
+                )
             }
 
             item("date") {
-                TransactionEditRow(label = "Name", text = date) { date = it }
+                TransactionEditRow(
+                    label = "Date",
+                    text = date,
+                    enabled = dateEnabled,
+                    onEnable = { clearFocus(); dateEnabled = true },
+                    onValueChange = { date = it },
+                )
             }
         }
     }

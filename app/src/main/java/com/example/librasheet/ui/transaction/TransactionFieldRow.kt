@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.transaction
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
@@ -8,11 +9,16 @@ import androidx.compose.material.icons.sharp.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -28,8 +34,7 @@ fun TransactionFieldRow(
         verticalAlignment = alignment,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 6.dp, bottom = 6.dp)
-            .heightIn(min = libraRowHeight)
+            .requiredHeightIn(min = libraRowHeight)
     ) {
         Text(
             text = label,
@@ -38,8 +43,9 @@ fun TransactionFieldRow(
             fontStyle = FontStyle.Italic,
             color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
             modifier = Modifier
+                .padding(top = 6.dp, bottom = 6.dp)
                 .padding(end = 15.dp)
-                .width(60.dp)
+                .width(80.dp)
         )
         content()
     }
@@ -50,37 +56,60 @@ fun TransactionFieldRow(
 fun TransactionEditRow(
     label: String,
     text: String,
+    enabled: Boolean,
     modifier: Modifier = Modifier,
     lines: Int = 1,
+    onEnable: () -> Unit = { },
     onValueChange: (String) -> Unit = { },
 ) {
-    var enabled by remember { mutableStateOf(false) }
-
     TransactionFieldRow(
         label = label,
         alignment = if (lines == 1) Alignment.CenterVertically else Alignment.Top,
-        modifier = modifier,
+        modifier = modifier.height(Dp(maxOf(50f, lines * 25f)))
     ) {
-        if (enabled) {
-            BasicTextField(
-                value = text,
-                onValueChange = onValueChange,
-                singleLine = lines == 1,
-                textStyle = MaterialTheme.typography.body1.copy(
-                    color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
-                ),
-                maxLines = lines,
-                modifier = Modifier.weight(10f)
-            )
-        } else { // Need this since BasicTextField doesn't have TextOverflow
-            Text(
-                text = text,
-                maxLines = lines,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(10f)
-            )
+        Box(
+            contentAlignment = if (lines == 1) Alignment.CenterStart else Alignment.TopStart,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(10f)
+        ) {
+            if (enabled) {
+                BasicTextField(
+                    value = text,
+                    onValueChange = onValueChange,
+                    singleLine = lines == 1,
+                    maxLines = lines,
+                    textStyle = MaterialTheme.typography.body1.copy(
+                        color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high)
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colors.primary),
+                    modifier = Modifier.padding(6.dp),
+                )
+            } else { // Need this since BasicTextField doesn't have TextOverflow
+                Text(
+                    text = text,
+                    maxLines = lines,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(6.dp)
+                )
+            }
+
+            val color = if (enabled) MaterialTheme.colors.primary else Color.Unspecified
+            val radius: Float
+            val width: Float
+            with(LocalDensity.current) {
+                radius = 10.dp.toPx()
+                width = 1.dp.toPx()
+            }
+            Canvas(modifier = Modifier.fillMaxSize().padding(1.dp)) {
+                drawRoundRect(
+                    color = color,
+                    cornerRadius = CornerRadius(radius, radius),
+                    style = Stroke(width = width),
+                )
+            }
         }
-        IconButton(onClick = { enabled = true }) {
+        IconButton(onClick = onEnable) {
             Icon(imageVector = Icons.Sharp.Edit, contentDescription = null)
         }
     }
@@ -109,6 +138,7 @@ private fun PreviewEdit() {
                 label = "Name",
                 text = "BANK OF AMERICA CREDIT CARD Bill Payment",
                 lines = 3,
+                enabled = true,
             )
         }
     }
