@@ -31,6 +31,9 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewTransactions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
@@ -49,23 +52,14 @@ fun TransactionDetailScreen(
     val date = remember { mutableStateOf(transaction.date.toString()) }
     val value = remember { mutableStateOf(transaction.value.toString()) }
 
-    val nameEnabled = remember { mutableStateOf(false) }
-    val dateEnabled = remember { mutableStateOf(false) }
-    val valueEnabled = remember { mutableStateOf(false) }
-
-
     fun clearFocus() {
-        nameEnabled.value = false
-        dateEnabled.value = false
-        valueEnabled.value = false
-        keyboardController?.hide()
+//        keyboardController?.hide()
         focusManager.clearFocus(true)
     }
 
     fun LazyListScope.editor(
         label: String,
         text: MutableState<String>,
-        enabled: MutableState<Boolean>,
         lines: Int = 1,
     ) {
         item(label) {
@@ -73,12 +67,6 @@ fun TransactionDetailScreen(
                 label = label,
                 text = text.value,
                 lines = lines,
-                enabled = enabled.value,
-                onEnable = {
-                    clearFocus()
-                    enabled.value = true
-                    it.requestFocus()
-                },
                 onValueChange = { text.value = it },
             )
         }
@@ -110,9 +98,9 @@ fun TransactionDetailScreen(
                 RowTitle("Details")
             }
 
-            editor("Name", name, nameEnabled, lines = 3)
-            editor("Date", date, dateEnabled)
-            editor("Value", value, valueEnabled)
+            editor("Name", name, lines = 3)
+            editor("Date", date)
+            editor("Value", value)
         }
     }
 }

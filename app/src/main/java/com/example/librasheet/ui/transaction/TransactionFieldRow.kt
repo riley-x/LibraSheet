@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -22,7 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.ui.components.*
+import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
 @Composable
@@ -58,13 +59,12 @@ fun TransactionFieldRow(
 fun TransactionEditRow(
     label: String,
     text: String,
-    enabled: Boolean,
     modifier: Modifier = Modifier,
     lines: Int = 1,
-    onEnable: (FocusRequester) -> Unit = { },
     onValueChange: (String) -> Unit = { },
 ) {
     val focusRequester = remember { FocusRequester() }
+    var focused by remember { mutableStateOf(false) }
 
     TransactionFieldRow(
         label = label,
@@ -74,7 +74,6 @@ fun TransactionEditRow(
         BasicTextField(
             value = text,
             onValueChange = onValueChange,
-            enabled = enabled,
             singleLine = lines == 1,
             maxLines = lines,
             textStyle = MaterialTheme.typography.body1.copy(
@@ -84,12 +83,13 @@ fun TransactionEditRow(
             modifier = Modifier
                 .weight(10f)
                 .focusRequester(focusRequester)
+                .onFocusChanged { focused = it.isFocused }
         ) {
             Box(
                 contentAlignment = if (lines == 1) Alignment.CenterStart else Alignment.TopStart,
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (enabled) {
+                if (focused) {
                     Box(
                         Modifier.padding(6.dp)
                     ) {
@@ -105,7 +105,7 @@ fun TransactionEditRow(
                     )
                 }
 
-                val color = if (enabled) MaterialTheme.colors.primary else Color.Unspecified
+                val color = if (focused) MaterialTheme.colors.primary else Color.Unspecified
                 val radius: Float
                 val width: Float
                 with(LocalDensity.current) {
@@ -121,7 +121,7 @@ fun TransactionEditRow(
                 }
             }
         }
-        IconButton(onClick = { onEnable(focusRequester) }) {
+        IconButton(onClick = { focusRequester.requestFocus() }) {
             Icon(imageVector = Icons.Sharp.Edit, contentDescription = null)
         }
     }
@@ -150,7 +150,6 @@ private fun PreviewEdit() {
                 label = "Name",
                 text = "BANK OF AMERICA CREDIT CARD Bill Payment",
                 lines = 3,
-                enabled = true,
             )
         }
     }
