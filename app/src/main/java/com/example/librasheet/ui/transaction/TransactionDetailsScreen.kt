@@ -24,6 +24,8 @@ import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.entity.isValid
 import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toIntDate
+import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
@@ -44,9 +46,10 @@ fun TransactionDetailScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
+    onSave: (TransactionEntity) -> Unit = { },
 ) {
-    /** Keyboard and focus **/
     val focusManager = LocalFocusManager.current
+
     val formatter = remember {
         val x = SimpleDateFormat("MM-dd-yy")
         x.isLenient = false
@@ -69,9 +72,21 @@ fun TransactionDetailScreen(
             .find { it.key == transaction.value.categoryKey }
     ) }
 
-    fun clearFocus() {
-        focusManager.clearFocus(true)
+    fun saveTransaction() {
+        if (dateError || valueError) return
+        val t = TransactionEntity(
+            name = name.value,
+            date = formatter.parseOrNull(date.value)?.toIntDate() ?: return,
+            value = value.value.toFloatOrNull()?.toLongDollar() ?: return,
+            category = category.value ?: Category.None,
+            categoryKey = category.value?.key ?: 0,
+            accountKey = account.value?.key ?: 0,
+//            valueAfterReimbursements = // TODO,
+        )
+        onSave(t)
     }
+
+
 
     fun LazyListScope.editor(
         label: String,
@@ -103,7 +118,7 @@ fun TransactionDetailScreen(
             .padding(bottom = if (WindowInsets.isImeVisible) 0.dp else bottomPadding)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onPress = { clearFocus() }
+                    onPress = { focusManager.clearFocus(true) }
                 )
             }
     ) {
@@ -113,7 +128,9 @@ fun TransactionDetailScreen(
             onBack = onBack,
         )
 
-        LazyColumn {
+        LazyColumn(
+            Modifier.weight(10f)
+        ) {
             item("details") {
                 RowTitle("Details")
             }
@@ -174,7 +191,27 @@ fun TransactionDetailScreen(
                     }
                 }
             }
+        }
 
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.error
+                ),
+                onClick = onBack,
+                modifier = Modifier.width(100.dp)
+            ) {
+                Text("Cancel")
+            }
+            Button(
+                onClick = ::saveTransaction,
+                modifier = Modifier.width(100.dp)
+            ) {
+                Text("Save")
+            }
         }
     }
 }

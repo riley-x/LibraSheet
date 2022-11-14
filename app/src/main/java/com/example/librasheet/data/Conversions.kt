@@ -26,6 +26,13 @@ fun nextMonthEnd(date: Int): Int {
     else getIntDate(year, month + 1, 0)
 }
 
+
+fun Date.toIntDate(): Int {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    return cal.toIntDate()
+}
+
 fun Calendar.toIntDate() : Int {
     val year: Int = get(Calendar.YEAR)
     val month: Int = get(Calendar.MONTH) + 1 // months are 0-indexed

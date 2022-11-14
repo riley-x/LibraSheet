@@ -242,6 +242,7 @@ fun LibraApp(
                     incomeCategories = viewModel.categories.incomeTargets,
                     expenseCategories = viewModel.categories.expenseTargets,
                     onBack = navController::popBackStack,
+                    onSave = { }, // TODO
                     bottomPadding = innerPadding.calculateBottomPadding(),
                 )
             }
