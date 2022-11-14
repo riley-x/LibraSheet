@@ -1,6 +1,9 @@
 package com.example.librasheet.data.dao
 
+import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.room.*
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.setDay
 
@@ -62,4 +65,57 @@ interface TransactionDao {
         undo(old)
         add(new)
     }
+
+
+    @RawQuery
+    fun get(q: SimpleSQLiteQuery): List<TransactionEntity>
+
+    fun get(filters: TransactionFilters): List<TransactionEntity> = get(getTransactionFilteredQuery(filters))
+}
+
+@Immutable
+data class TransactionFilters(
+    val minValue: Float? = null,
+    val maxValue: Float? = null,
+    val startDate: Int? = null,
+    val endDate: Int? = null,
+    val account: Account? = null,
+    val category: Category? = null,
+)
+
+fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
+    val args = mutableListOf<Any>()
+    var q = "SELECT * FROM $transactionTable"
+    if (filter.minValue != null) {
+        q += " WHERE value >= ?"
+        args.add(filter.minValue)
+    }
+    if (filter.maxValue != null) {
+        q += if ("WHERE" in q) " AND" else " WHERE"
+        q += " value <= ?"
+        args.add(filter.maxValue)
+    }
+    if (filter.startDate != null) {
+        q += if ("WHERE" in q) " AND" else " WHERE"
+        q += " date >= ?"
+        args.add(filter.startDate)
+    }
+    if (filter.endDate != null) {
+        q += if ("WHERE" in q) " AND" else " WHERE"
+        q += " date <= ?"
+        args.add(filter.endDate)
+    }
+    if (filter.account != null) {
+        q += if ("WHERE" in q) " AND" else " WHERE"
+        q += " accountKey = ?"
+        args.add(filter.account.key)
+    }
+    if (filter.category != null) {
+        q += if ("WHERE" in q) " AND" else " WHERE"
+        q += " categoryKey = ?"
+        args.add(filter.category.key)
+    }
+    q += " ORDER BY date DESC"
+    Log.i("Libra/TransactionDao/getTransactionFilteredQuery", q)
+    return SimpleSQLiteQuery(q, args.toTypedArray())
 }

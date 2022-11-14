@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
+import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
@@ -13,15 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-@Immutable
-data class TransactionFilters(
-    val minValue: Float? = null,
-    val maxValue: Float? = null,
-    val startDate: Int? = null,
-    val endDate: Int? = null,
-    val account: Account? = null,
-    val category: Category? = null,
-)
+
 
 
 
