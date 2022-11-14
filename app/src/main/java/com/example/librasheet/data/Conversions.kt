@@ -33,7 +33,13 @@ fun Date.toIntDate(): Int {
     return cal.toIntDate()
 }
 
-fun Calendar.toIntDate() : Int {
+fun java.util.Calendar.toIntDate() : Int {
+    val year: Int = get(Calendar.YEAR)
+    val month: Int = get(Calendar.MONTH) + 1 // months are 0-indexed
+    val day: Int = get(Calendar.DAY_OF_MONTH)
+    return getIntDate(year, month, day)
+}
+fun android.icu.util.Calendar.toIntDate() : Int {
     val year: Int = get(Calendar.YEAR)
     val month: Int = get(Calendar.MONTH) + 1 // months are 0-indexed
     val day: Int = get(Calendar.DAY_OF_MONTH)
