@@ -80,17 +80,6 @@ fun LibraApp(
         navController.navigateSingleTop(TransactionDetailDestination.route(BalanceTab.graph))
     }
     fun toEditAccountsScreen() = navController.navigateSingleTop(EditAccountsDestination.route)
-    fun toIncomeCategoryDetailScreen(it: CategoryUi) {
-        /** WARNING! This only works because we have at most one level of nesting. Otherwise would
-         * have to use a launched effect or something
-         */
-        viewModel.incomeDetail.load(it.category)
-        navController.navigateSingleTop(CategoryDetailDestination.argRoute(IncomeTab.graph, it.category.id.fullName))
-    }
-    fun toExpenseCategoryDetailScreen(it: CategoryUi) {
-        viewModel.expenseDetail.load(it.category)
-        navController.navigateSingleTop(CategoryDetailDestination.argRoute(SpendingTab.graph, it.category.id.fullName))
-    }
     fun toCategoriesScreen() = navController.navigateSingleTop(CategoriesDestination.route)
     fun toRulesScreen(income: Boolean) {
         viewModel.rules.setScreen(income)
@@ -221,24 +210,7 @@ fun LibraApp(
                 )
             }
         }
-        fun cashFlow(model: CashFlowModel, isIncome: Boolean, isDetail: Boolean): (@Composable (NavBackStackEntry) -> Unit) = {
-            CashFlowScreen(
-                parentCategory = model.parentCategory.id,
-                headerBackArrow = isDetail,
-                categories = model.pie,
-                expanded = model.isExpanded,
-                history = model.history,
-                historyDates = model.dates,
-                categoryTimeRange = model.pieRange,
-                historyTimeRange = model.historyRange,
-                onBack = navController::popBackStack,
-                onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
-                onCategoryTimeRange = model::setPieRange,
-                onHistoryTimeRange = model::setHistoryRange,
-                onReorder = viewModel.categories::reorder,
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+
         fun NavGraphBuilder.transactionAll() {
             val isSettings = route == SettingsTab.graph
             composable(route = TransactionAllDestination.route(route!!)) {
@@ -306,20 +278,20 @@ fun LibraApp(
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
-                    cashFlow(model = viewModel.incomeScreen, isIncome = true, isDetail = false)(it)
+                    cashFlow(model = viewModel.incomeScreen, isIncome = true, isDetail = false, navController, viewModel, innerPadding)(it)
                 }
                 composable(route = CategoryDetailDestination.route(IncomeTab.graph), arguments = CategoryDetailDestination.arguments) {
-                    cashFlow(model = viewModel.incomeDetail, isIncome = true, isDetail = true)(it)
+                    cashFlow(model = viewModel.incomeDetail, isIncome = true, isDetail = true, navController, viewModel, innerPadding)(it)
                     // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 }
             }
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-                    cashFlow(model = viewModel.expenseScreen, isIncome = false, isDetail = false)(it)
+                    cashFlow(model = viewModel.expenseScreen, isIncome = false, isDetail = false, navController, viewModel, innerPadding)(it)
                 }
                 composable(route = CategoryDetailDestination.route(SpendingTab.graph), arguments = CategoryDetailDestination.arguments) {
-                    cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true)(it)
+                    cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true, navController, viewModel, innerPadding)(it)
                     // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 }
             }
