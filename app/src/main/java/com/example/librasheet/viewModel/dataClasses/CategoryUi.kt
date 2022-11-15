@@ -6,6 +6,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.CategoryId
+import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.graphing.PieChartValue
 
 
@@ -21,11 +22,11 @@ data class CategoryUi(
         get() = id.name
 }
 
-fun Category.toUi(values: Map<CategoryId, Float>): CategoryUi = CategoryUi(
+fun Category.toUi(values: Map<Long, Long>): CategoryUi = CategoryUi(
     key = key,
     id = id,
     color = color,
-    value = values.getOrDefault(id, 0f),
+    value = values.getOrDefault(key, 0L).toFloatDollar(),
     subCategories = subCategories.map { it.toUi(values) }
 )
 

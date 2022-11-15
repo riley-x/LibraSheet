@@ -302,11 +302,14 @@ fun LibraApp(
                         parentCategory = incomeName.toCategoryId(),
                         categories = viewModel.categories.income,
                         expanded = viewModel.categories.incomeScreenIsExpanded,
-                        history = previewStackedLineGraphState,
-                        historyDates = previewLineGraphDates,
-                        categoryTimeRange = previewIncomeCategoryTimeRange,
-                        historyTimeRange = previewIncomeHistoryTimeRange,
+                        history = previewStackedLineGraphState, // TODO
+                        historyDates = previewLineGraphDates, // TODO
+                        categoryTimeRange = viewModel.categories.incomeTimeRange,
+                        historyTimeRange = previewIncomeHistoryTimeRange, // TODO
                         onCategoryClick = ::toIncomeCategoryDetailScreen,
+                        onCategoryTimeRange = viewModel.categories::setIncomeRange,
+                        onHistoryTimeRange = { }, // TODO
+                        onReorder = viewModel.categories::reorder,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
@@ -317,13 +320,16 @@ fun LibraApp(
                 composable(route = SpendingTab.route) {
                     CashFlowScreen(
                         parentCategory = expenseName.toCategoryId(),
-                        categories = previewExpenseCategories,
+                        categories = viewModel.categories.expense,
                         expanded = viewModel.categories.expenseScreenIsExpanded,
-                        history = previewStackedLineGraphState,
-                        historyDates = previewLineGraphDates,
-                        categoryTimeRange = previewIncomeCategoryTimeRange,
-                        historyTimeRange = previewIncomeHistoryTimeRange,
+                        history = previewStackedLineGraphState, // TODO
+                        historyDates = previewLineGraphDates, // TODO
+                        categoryTimeRange = viewModel.categories.expenseTimeRange,
+                        historyTimeRange = previewIncomeHistoryTimeRange, // TODO
                         onCategoryClick = ::toExpenseCategoryDetailScreen,
+                        onCategoryTimeRange = viewModel.categories::setExpenseRange,
+                        onHistoryTimeRange = { }, // TODO
+                        onReorder = viewModel.categories::reorder,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }

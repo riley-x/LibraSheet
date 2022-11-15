@@ -3,6 +3,7 @@ package com.example.librasheet.viewModel
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
@@ -24,9 +25,11 @@ class CategoryModel(
     /** This are used in both the categories settings screen and the respective cash flow screens **/
     val income = mutableStateListOf<CategoryUi>()
     val expense = mutableStateListOf<CategoryUi>()
+    val incomeTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
+    val expenseTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 
     /** These are used by the transaction and rule editors. These do NOT include "Income" or
-     * "Expense". The last element is Category.Ignore, **/
+     * "Expense". The last element is Category.Ignore. **/
     val incomeTargets = mutableStateListOf<Category>()
     val expenseTargets = mutableStateListOf<Category>()
 
@@ -52,12 +55,8 @@ class CategoryModel(
     fun loadData() = data.load()
 
     fun loadUi() {
-        income.clear()
-        expense.clear()
-        // TODO amounts
-        val amounts = emptyMap<CategoryId, Float>()
-        income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
-        expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
+        loadIncome(incomeTimeRange.value)
+        loadExpense(expenseTimeRange.value)
 
         incomeTargets.clear()
         expenseTargets.clear()
@@ -79,6 +78,39 @@ class CategoryModel(
         list.clear()
         list.addAll(category.subCategories)
     }
+
+    private fun loadIncome(range: CategoryTimeRange) {
+        incomeTimeRange.value = range
+        income.clear()
+        val amounts = when(range) {
+            CategoryTimeRange.ONE_MONTH -> data.currentMonth
+            CategoryTimeRange.ONE_YEAR -> data.yearAverage
+            CategoryTimeRange.ALL -> data.allAverage
+        }
+        income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
+    }
+    private fun loadExpense(range: CategoryTimeRange) {
+        expenseTimeRange.value = range
+        expense.clear()
+        val amounts = when(range) {
+            CategoryTimeRange.ONE_MONTH -> data.currentMonth
+            CategoryTimeRange.ONE_YEAR -> data.yearAverage
+            CategoryTimeRange.ALL -> data.allAverage
+        }
+        expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
+    }
+
+    @Callback
+    fun setIncomeRange(range: CategoryTimeRange) {
+        if (incomeTimeRange.value == range) return
+        loadIncome(range)
+    }
+    @Callback
+    fun setExpenseRange(range: CategoryTimeRange) {
+        if (expenseTimeRange.value == range) return
+        loadExpense(range)
+    }
+
 
     @Callback
     fun loadIncomeDetail(category: CategoryUi) {
