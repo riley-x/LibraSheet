@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,10 +54,11 @@ fun TransactionDetailScreen(
         x
     }
 
+    // TODO make account and category saveable
     val account = remember { mutableStateOf(accounts.find { it.key == transaction.value.accountKey }) }
-    val name = remember { mutableStateOf(transaction.value.name) }
-    val date = remember { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
-    val value = remember { mutableStateOf(
+    val name = rememberSaveable { mutableStateOf(transaction.value.name) }
+    val date = rememberSaveable { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
+    val value = rememberSaveable { mutableStateOf(
         if (transaction.value.value == 0L) ""
         else transaction.value.value.toFloatDollar().toString())
     }
