@@ -32,7 +32,11 @@ interface TransactionDao {
     fun updateCategoryHistory(account: Long, category: Long, startDate: Int, value: Long)
 
     @Transaction
-    fun add(t: TransactionEntity) {
+    fun add(transaction: TransactionEntity) {
+        val t = if (transaction.categoryKey == 0L) transaction.copy(
+            categoryKey = if (transaction.value > 0) incomeKey else expenseKey
+        ) else transaction
+
         insert(t)
         if (t.accountKey <= 0) return
 
@@ -45,7 +49,7 @@ interface TransactionDao {
         updateBalance(t.accountKey, t.valueAfterReimbursements)
         updateBalanceHistory(t.accountKey, month, t.valueAfterReimbursements)
 
-        if (t.categoryKey < 0) return // we want to still measure uncategorized transactions
+        if (t.categoryKey == ignoreKey) return // we want to still measure uncategorized transactions
         addCategoryEntry(CategoryHistory(
             accountKey = t.accountKey,
             categoryKey = t.categoryKey,
