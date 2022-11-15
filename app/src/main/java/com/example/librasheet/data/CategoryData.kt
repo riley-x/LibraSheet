@@ -63,17 +63,18 @@ class CategoryData(
             lastRowId = dao.getMaxKey()
             Log.d("Libra/CategoryData/load", "lastRowId=$lastRowId")
         }
-        val lastMonthEnd = Calendar.getInstance().toIntDate().setDay(0)
+        val today = Calendar.getInstance().toIntDate()
+        val lastMonthEnd = today.setDay(0)
         jobs.launchIO {
-            currentMonth = historyDao.getAverages(lastMonthEnd)
+            currentMonth = historyDao.getDate(thisMonthEnd(today))
             Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
-            yearAverage = historyDao.getAverages(lastMonthEnd.addYears(-1))
+            yearAverage = historyDao.getAverages(lastMonthEnd.addYears(-1), lastMonthEnd)
             Log.d("Libra/CategoryData/load", "yearAverage=$yearAverage")
         }
         jobs.launchIO {
-            allAverage = historyDao.getAverages()
+            allAverage = historyDao.getAverages(0, lastMonthEnd)
             Log.d("Libra/CategoryData/load", "allAverage=$allAverage")
         }
         return jobs

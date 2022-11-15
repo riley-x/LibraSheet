@@ -23,14 +23,21 @@ interface CategoryHistoryDao {
     @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
     @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
             "SELECT categoryKey, date, SUM(value) as sums " +
-            "FROM $categoryHistoryTable WHERE date >= :startDate GROUP BY categoryKey, date" +
+            "FROM $categoryHistoryTable WHERE date >= :startDate AND date <= :endDate GROUP BY categoryKey, date" +
             ") GROUP BY categoryKey")
-    fun getAverages(startDate: Int): Map<Long, Long>
+    fun getAverages(startDate: Int, endDate: Int): Map<Long, Long>
 
+    /** The current month might not be complete yet, and if so the returned average is misleading. **/
     @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
     @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
             "SELECT categoryKey, date, SUM(value) as sums " +
             "FROM $categoryHistoryTable GROUP BY categoryKey, date" +
             ") GROUP BY categoryKey")
     fun getAverages(): Map<Long, Long>
+
+    @MapInfo(keyColumn = "categoryKey", valueColumn = "sums")
+    @Query("SELECT categoryKey, SUM(value) as sums " +
+            "FROM $categoryHistoryTable WHERE date = :date GROUP BY categoryKey"
+            )
+    fun getDate(date: Int): Map<Long, Long>
 }

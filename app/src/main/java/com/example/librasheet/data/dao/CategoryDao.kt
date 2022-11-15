@@ -52,7 +52,7 @@ interface CategoryDao {
     @Query("UPDATE $ruleTable SET categoryKey = 0 WHERE categoryKey IN (:categoryKeys)")
     fun unmatchRules(categoryKeys: List<Long>)
 
-    @Query("UPDATE $transactionTable SET categoryKey = IF(value > 0, $incomeKey, $expenseKey) WHERE categoryKey IN (:categoryKeys)")
+    @Query("UPDATE $transactionTable SET categoryKey = IIF(value > 0, $incomeKey, $expenseKey) WHERE categoryKey IN (:categoryKeys)")
     fun unmatchTransactions(categoryKeys: List<Long>)
 
     @Transaction
