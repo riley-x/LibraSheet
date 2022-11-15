@@ -22,13 +22,17 @@ data class CategoryUi(
         get() = id.name
 }
 
-fun Category.toUi(values: Map<Long, Long>, multiplier: Float = 1f): CategoryUi = CategoryUi(
-    key = key,
-    id = id,
-    color = color,
-    value = multiplier * values.getOrDefault(key, 0L).toFloatDollar(),
-    subCategories = subCategories.map { it.toUi(values, multiplier) }
-)
+fun Category.toUi(values: Map<Long, Long>, multiplier: Float = 1f): CategoryUi {
+    val subs = subCategories.map { it.toUi(values, multiplier) }
+    val value = multiplier * values.getOrDefault(key, 0L).toFloatDollar() + subs.sumOf { it.value.toDouble() }.toFloat()
+    return CategoryUi(
+        key = key,
+        id = id,
+        color = color,
+        value = if (value == 0f) 0f else value, // this is needed so that we don't have -$0.00
+        subCategories = subs
+    )
+}
 
 @Stable
 fun List<CategoryUi>.find(target: CategoryId): CategoryUi? {

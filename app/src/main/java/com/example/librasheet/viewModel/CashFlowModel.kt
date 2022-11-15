@@ -72,7 +72,7 @@ class CashFlowModel (
         if (parentValue > 0f) {
             pie.add(
                 CategoryUi(
-                    key = 0,
+                    key = ignoreKey,
                     id = CategoryId("Uncategorized"),
                     color = parentCategory.color,
                     value = parentValue,

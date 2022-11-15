@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import com.example.librasheet.data.entity.CategoryId
+import com.example.librasheet.data.entity.ignoreKey
 import com.example.librasheet.data.entity.toCategoryId
 import com.example.librasheet.ui.categories.*
 import com.example.librasheet.ui.components.*
@@ -89,6 +91,7 @@ fun CashFlowScreen(
                             group = parentCategory.fullName,
                             index = index,
                             startIndex = startIndex,
+                            enabled = category.key != ignoreKey, // "Uncategorized" is added to the end if it exists, but don't want to drag this
                             expanded = expanded,
                             onReorder = onReorder,
                             content = { cat ->

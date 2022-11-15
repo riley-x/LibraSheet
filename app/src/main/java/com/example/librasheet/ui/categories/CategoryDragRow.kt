@@ -24,6 +24,7 @@ fun CategoryDragRow(
     index: Int,
     expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     startIndex: Int = 0,
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
     content: @Composable RowScope.(CategoryUi) -> Unit = { },
@@ -38,6 +39,7 @@ fun CategoryDragRow(
         index = index,
         group = group,
         onDragEnd = onReorder,
+        enabled = enabled,
         modifier = modifier,
     ) { dragScope ->
         CategoryRow(
