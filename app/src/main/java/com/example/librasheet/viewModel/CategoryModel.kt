@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.entity.*
@@ -99,10 +100,16 @@ class CategoryModel(
 
 
     @Callback
-    fun find(category: CategoryId) =
-        income.find(category) ?:
-        expense.find(category) ?:
-        throw RuntimeException("CategoryModel couldn't find $category")
+    fun getColor(id: String): Color {
+        val (category, _) = data.all.find(id.toCategoryId()) ?: return Color.White
+        return category.color
+    }
+    @Callback
+    fun saveColor(id: String, color: Color) {
+        val (category, _) = data.all.find(id.toCategoryId()) ?: return
+        category.color = color
+        viewModel.updateDependencies(Dependency.CATEGORY)
+    }
 
 
     @Callback

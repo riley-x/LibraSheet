@@ -54,7 +54,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         val target = spec.substringAfter("_")
         return when (type) {
             "account" -> accounts.getColor(target)
-            //            "category" -> categories.saveColor(target, color)
+            "category" -> categories.getColor(target)
             else -> Color.White
         }
     }
@@ -65,7 +65,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         val target = spec.substringAfter("_")
         when (type) {
             "account" -> accounts.saveColor(target, color)
-//            "category" -> categories.saveColor(target, color)
+            "category" -> categories.saveColor(target, color)
         }
     }
 }
