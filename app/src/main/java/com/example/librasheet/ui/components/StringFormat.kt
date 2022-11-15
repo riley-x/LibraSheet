@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import com.example.librasheet.data.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import kotlin.math.roundToInt
 
 @Stable
 fun formatDollar(value: Float): String {
@@ -66,4 +67,16 @@ fun SimpleDateFormat.parseOrNull(x: String) = try {
     parse(x)
 } catch (e: ParseException) {
     null
+}
+
+
+
+@Stable
+fun formatOrder(x: Float, order: Int): String {
+    val y = x.roundToInt()
+    return when (order) {
+        1_000_000 -> (y / 1_000_000).toString() + "m"
+        1_000 -> (y / 1_000).toString() + "k"
+        else -> y.toString()
+    }
 }

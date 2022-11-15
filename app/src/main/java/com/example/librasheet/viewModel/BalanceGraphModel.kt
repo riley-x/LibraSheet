@@ -11,6 +11,7 @@ import com.example.librasheet.data.stackedLineGraphValues
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.format1Decimal
 import com.example.librasheet.ui.components.formatDateInt
+import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.viewModel.preview.testHistory
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +47,7 @@ class BalanceGraphModel(
         netIncome = withContext(Dispatchers.IO) {
             categoryHistoryDao.getNetIncome()
         }.toMutableList()
-        Log.d("Libra/BalanceGraphModel/loadIncome", "$netIncome")
+        Log.d("Libra/BalanceGraphModel/loadIncome", "${netIncome.takeLast(10)}")
         incomeDates.clear()
         netIncome.mapTo(incomeDates) { formatDateInt(it.date, "MMM yyyy") }
         calculateIncomeGraph()
@@ -59,6 +60,9 @@ class BalanceGraphModel(
         }
         historyDateInts = res.first
         history = res.second
+        Log.d("Libra/BalanceGraphModel/loadHistory", "${historyDateInts.takeLast(10)}")
+        Log.d("Libra/BalanceGraphModel/loadHistory", "${history}")
+
         historyDates.clear()
         historyDateInts.mapTo(historyDates) { formatDateInt(it, "MMM yyyy") }
         calculateHistoryGraph(accounts)
@@ -105,8 +109,8 @@ class BalanceGraphModel(
 
     @MainThread
     internal suspend fun calculateHistoryGraph(accounts: List<Account>) {
-        if (history.size < 2) return
-        if (accounts.isEmpty()) return
+        if (accounts.isEmpty() || history.isEmpty()) return
+        if (historyDateInts.size < 2) return
 
         val (values, axes, order) = withContext(Dispatchers.Default) {
             /** Get values. We use minY = 0 always **/
@@ -133,7 +137,7 @@ class BalanceGraphModel(
         historyGraph.values.clear()
         historyGraph.values.addAll(values)
         historyGraph.axes.value = axes
-        historyGraph.toString.value = { format1Decimal(it / order) }
+        historyGraph.toString.value = { formatOrder(it, order) }
     }
 
 
