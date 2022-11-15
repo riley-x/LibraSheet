@@ -89,7 +89,7 @@ fun LibraApp(
         navController.navigateSingleTop(RulesDestination.route)
     }
     fun onSaveColor(spec: String, color: Color) {
-        // TODO
+        viewModel.saveColor(spec, color)
         navController.popBackStack()
     }
 

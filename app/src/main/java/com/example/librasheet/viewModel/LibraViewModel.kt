@@ -2,6 +2,7 @@ package com.example.librasheet.viewModel
 
 import android.util.Log
 import androidx.annotation.MainThread
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -36,7 +37,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
     internal fun updateDependencies(dependency: Dependency) {
         when (dependency) {
-            Dependency.ACCOUNT_REORDER -> viewModelScope.launch {
+            Dependency.ACCOUNT_REORDER, Dependency.ACCOUNT_COLOR -> viewModelScope.launch {
                 balanceGraphs.calculateHistoryGraph(accounts.all)
             }
             Dependency.CATEGORY -> {
@@ -46,11 +47,22 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             }
         }
     }
+
+    @Callback
+    fun saveColor(spec: String, color: Color) {
+        val type = spec.substringBefore("_")
+        val target = spec.substringAfter("_")
+        when (type) {
+            "account" -> accounts.saveColor(target, color)
+//            "category" -> categories.saveColor(target, color)
+        }
+    }
 }
 
 
 internal enum class Dependency {
     ACCOUNT_REORDER,
+    ACCOUNT_COLOR,
     CATEGORY,
 }
 

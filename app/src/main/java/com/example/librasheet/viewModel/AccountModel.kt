@@ -2,6 +2,7 @@ package com.example.librasheet.viewModel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.rangeBetween
@@ -17,6 +18,7 @@ class AccountModel(
     private val dao = viewModel.application.database.accountDao()
 
     /** A list of all accounts and their current balances. This is used throughout the app **/
+    /** WARNING! Do not store pointers to accounts, since we copy the data classes **/
     val all = mutableStateListOf<Account>()
 
     fun load(): Job {
@@ -71,5 +73,15 @@ class AccountModel(
             dao.update(all.slice(startIndex..endIndex))
         }
         viewModel.updateDependencies(Dependency.ACCOUNT_REORDER)
+    }
+
+    @Callback
+    fun saveColor(name: String, color: Color) {
+        val (index, account) = all.withIndex().find { it.value.name == name } ?: return
+        all[index] = account.copy(colorLong = color.value.toLong())
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            dao.update(all[index])
+        }
+        viewModel.updateDependencies(Dependency.ACCOUNT_COLOR)
     }
 }
