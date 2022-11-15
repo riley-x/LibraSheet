@@ -206,7 +206,7 @@ fun LibraApp(
                 val spec = it.arguments?.getString(ColorDestination.argName) ?: ""
                 ColorSelectorScreen(
                     spec = spec,
-                    initialColor = Color.White, // TODO
+                    initialColor = viewModel.getColor(spec),
                     onSave = ::onSaveColor,
                     onCancel = navController::popBackStack,
                     bottomPadding = innerPadding.calculateBottomPadding(),

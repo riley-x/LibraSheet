@@ -38,13 +38,24 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     internal fun updateDependencies(dependency: Dependency) {
         when (dependency) {
             Dependency.ACCOUNT_REORDER, Dependency.ACCOUNT_COLOR -> viewModelScope.launch {
-                balanceGraphs.calculateHistoryGraph(accounts.all)
+                balanceGraphs.calculateHistoryGraph(accounts.all) // this could be optimized for color changing but whatever
             }
             Dependency.CATEGORY -> {
                 categories.loadUi()
                 incomeScreen.load()
                 expenseScreen.load()
             }
+        }
+    }
+
+    @Callback
+    fun getColor(spec: String): Color {
+        val type = spec.substringBefore("_")
+        val target = spec.substringAfter("_")
+        return when (type) {
+            "account" -> accounts.getColor(target)
+            //            "category" -> categories.saveColor(target, color)
+            else -> Color.White
         }
     }
 

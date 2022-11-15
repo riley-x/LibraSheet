@@ -76,6 +76,12 @@ class AccountModel(
     }
 
     @Callback
+    fun getColor(name: String): Color {
+        val account = all.find { it.name == name } ?: return Color.White
+        return account.color
+    }
+
+    @Callback
     fun saveColor(name: String, color: Color) {
         val (index, account) = all.withIndex().find { it.value.name == name } ?: return
         all[index] = account.copy(colorLong = color.value.toLong())
