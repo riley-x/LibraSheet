@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
-    val incomeScreen = CashFlowModel(categories.data, true)
-    val expenseScreen = CashFlowModel(categories.data, false)
+    val incomeScreen = CashFlowModel(viewModelScope, categories.data, true)
+    val expenseScreen = CashFlowModel(viewModelScope, categories.data, false)
 
     val rules = RuleModel(this)
     val accounts = AccountModel(this)

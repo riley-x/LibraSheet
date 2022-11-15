@@ -56,7 +56,7 @@ fun List<HistoryEntry>.alignDates(): Pair<MutableList<Int>, MutableMap<Long, Mut
  * Gets a list of values that can be passed to the stacked line graph.
  * @param series should be in order of top of the stack to the bottom. Values should not be pre-added.
  */
-fun Map<Long, List<Long>>.stackedLineGraphValues(series: List<Series>): Triple<List<StackedLineGraphValue>, Float, Float> {
+fun Map<Long, List<Long>>.stackedLineGraphValues(series: List<Series>, multiplier: Float = 1f): Triple<List<StackedLineGraphValue>, Float, Float> {
     var minY = 0f
     var maxY = 0f
     val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
@@ -67,7 +67,7 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(series: List<Series>): Triple<L
 
         val values = mutableListOf<Float>()
         balances.forEachIndexed { index, balance ->
-            val value = balance.toFloatDollar() + (lastValues?.getOrNull(index) ?: 0f)
+            val value = multiplier * balance.toFloatDollar() + (lastValues?.getOrNull(index) ?: 0f)
             values.add(value)
             if (value < minY) minY = value
             if (value > maxY) maxY = value

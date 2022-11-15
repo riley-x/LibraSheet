@@ -40,4 +40,7 @@ interface CategoryHistoryDao {
             "FROM $categoryHistoryTable WHERE date = :date GROUP BY categoryKey"
             )
     fun getDate(date: Int): Map<Long, Long>
+
+    @Query("SELECT accountKey, categoryKey, date, SUM(value) as value FROM $categoryHistoryTable GROUP BY date, categoryKey ORDER BY date")
+    fun getAll(): List<CategoryHistory>
 }

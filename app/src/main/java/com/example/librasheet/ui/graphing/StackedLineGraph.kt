@@ -161,7 +161,7 @@ fun StackedLineGraph(
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
     if (state.values.isEmpty()) {
-        NoDataError()
+        NoDataError(modifier)
     } else {
         val hoverLoc = remember { mutableStateOf(-1) }
         val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }

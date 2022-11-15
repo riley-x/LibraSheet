@@ -37,7 +37,8 @@ class CategoryData(
         )
     )
 
-    val history = mutableListOf<CategoryHistory>()
+    var historyDates = mutableListOf<Int>()
+    var history = mutableMapOf<Long, MutableList<Long>>()
 
     /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie charts. **/
     var currentMonth = emptyMap<Long, Long>()
@@ -51,6 +52,14 @@ class CategoryData(
 
     fun load(): List<Job> {
         val jobs = mutableListOf<Job>()
+
+        /** Index **/
+        jobs.launchIO {
+            lastRowId = dao.getMaxKey()
+            Log.d("Libra/CategoryData/load", "lastRowId=$lastRowId")
+        }
+
+        /** Categories **/
         jobs.launchIO {
             dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
             Log.d("Libra/CategoryData/load", "income=${all[0].subCategories.size}")
@@ -59,10 +68,8 @@ class CategoryData(
             dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
             Log.d("Libra/CategoryData/load", "expense=${all[1].subCategories.size}")
         }
-        jobs.launchIO {
-            lastRowId = dao.getMaxKey()
-            Log.d("Libra/CategoryData/load", "lastRowId=$lastRowId")
-        }
+
+        /** Averages **/
         val today = Calendar.getInstance().toIntDate()
         val lastMonthEnd = today.setDay(0)
         jobs.launchIO {
@@ -77,6 +84,14 @@ class CategoryData(
             allAverage = historyDao.getAverages(0, lastMonthEnd)
             Log.d("Libra/CategoryData/load", "allAverage=$allAverage")
         }
+
+        /** Category History **/
+        jobs.launchIO {
+            val res = historyDao.getAll().alignDates()
+            historyDates = res.first
+            history = res.second
+        }
+
         return jobs
     }
 
