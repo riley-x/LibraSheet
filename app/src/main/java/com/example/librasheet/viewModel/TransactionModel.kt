@@ -42,10 +42,10 @@ class TransactionModel(
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             if (old.key > 0) dao.update(new, old)
             else dao.add(new)
+            viewModel.updateDependencies(Dependency.TRANSACTION)
         }
         loadFilter(balanceList, balanceFilter.value)
         loadFilter(settingsList, settingsFilter.value)
-        viewModel.updateDependencies(Dependency.TRANSACTION)
     }
 
     @Callback
