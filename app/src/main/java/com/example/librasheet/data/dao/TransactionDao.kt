@@ -28,8 +28,8 @@ interface TransactionDao {
     fun updateBalanceHistory(account: Long, startDate: Int, value: Long)
 
     @Query("UPDATE $categoryHistoryTable SET value = value + :value " +
-            "WHERE accountKey = :account AND categoryKey = :category AND date >= :startDate")
-    fun updateCategoryHistory(account: Long, category: Long, startDate: Int, value: Long)
+            "WHERE accountKey = :account AND categoryKey = :category AND date = :date")
+    fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long)
 
     @Transaction
     fun add(transaction: TransactionEntity) {
