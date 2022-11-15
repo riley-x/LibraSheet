@@ -49,10 +49,10 @@ interface TransactionDao {
         addCategoryEntry(CategoryHistory(
             accountKey = t.accountKey,
             categoryKey = t.categoryKey,
-            date = t.date.setDay(0),
+            date = month,
             value = 0, // we'll update below
         ))
-        updateCategoryHistory(t.accountKey, t.categoryKey, t.date, t.valueAfterReimbursements)
+        updateCategoryHistory(t.accountKey, t.categoryKey, month, t.valueAfterReimbursements)
     }
 
     @Transaction
@@ -69,7 +69,6 @@ interface TransactionDao {
         undo(old)
         add(new)
     }
-
 
     @RawQuery
     fun get(q: SimpleSQLiteQuery): List<TransactionEntity>

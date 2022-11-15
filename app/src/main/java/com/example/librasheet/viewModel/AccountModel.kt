@@ -10,9 +10,6 @@ import com.example.librasheet.viewModel.preview.*
 import kotlinx.coroutines.*
 
 
-const val graphYPad = 0.1f
-const val graphTicksX = 4
-const val graphTicksY = 6
 
 class AccountModel(
     private val viewModel: LibraViewModel,
@@ -21,7 +18,6 @@ class AccountModel(
 
     /** A list of all accounts and their current balances. This is used throughout the app **/
     val all = mutableStateListOf<Account>()
-
 
     fun load(): Job {
         return viewModel.viewModelScope.launch {

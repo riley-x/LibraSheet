@@ -22,6 +22,10 @@ import kotlinx.coroutines.withContext
 class BalanceGraphModel(
     private val viewModel: LibraViewModel,
 ) {
+    private val graphYPad = 0.1f
+    private val graphTicksX = 4
+    private val graphTicksY = 6
+
     private val accountDao = viewModel.application.database.accountDao()
     private val categoryHistoryDao = viewModel.application.database.categoryHistoryDao()
 
@@ -41,6 +45,8 @@ class BalanceGraphModel(
         netIncome = withContext(Dispatchers.IO) {
             categoryHistoryDao.getNetIncome()
         }.toMutableList()
+        Log.d("Libra/BalanceGraphModel/loadIncome", "$netIncome")
+        incomeDates.clear()
         netIncome.mapTo(incomeDates) { formatDateInt(it.date, "MMM yyyy") }
         calculateIncomeGraph()
     }
@@ -91,7 +97,6 @@ class BalanceGraphModel(
             Pair(values, axes)
         }
 
-        incomeDates.clear()
         incomeGraph.values.clear()
         incomeGraph.values.addAll(values)
         incomeGraph.axes.value = axes
@@ -123,7 +128,7 @@ class BalanceGraphModel(
 
             Triple(values, axes, order)
         }
-        Log.d("Libra/AccountModel/loadHistoryGraph", "order=$order maxY=${axes.maxY}")
+        Log.d("Libra/BalanceGraphModel/loadHistoryGraph", "order=$order maxY=${axes.maxY}")
 
         historyGraph.values.clear()
         historyGraph.values.addAll(values)

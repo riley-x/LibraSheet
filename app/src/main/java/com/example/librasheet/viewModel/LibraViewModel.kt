@@ -22,7 +22,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             accounts.load().join()
             balanceGraphs.loadHistory(accounts.all)
         }
-        viewModelScope.launch { balanceGraphs.loadIncome() }
+        balanceGraphs.loadIncome()
         viewModelScope.launch {
             categories.loadData().joinAll()
             categories.loadUi()
