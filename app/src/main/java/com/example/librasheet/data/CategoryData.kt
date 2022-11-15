@@ -26,13 +26,13 @@ class CategoryData(
         Category(
             key = incomeKey,
             id = CategoryId(incomeName),
-            color = Color.Unspecified,
+            color = Color(0xFF004940),
             listIndex = 0,
         ),
         Category(
             key = expenseKey,
             id = CategoryId(expenseName),
-            color = Color.Unspecified,
+            color = Color(0xFF5C1604),
             listIndex = 1,
         )
     )

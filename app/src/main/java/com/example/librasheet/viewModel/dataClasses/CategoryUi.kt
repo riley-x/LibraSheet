@@ -22,12 +22,12 @@ data class CategoryUi(
         get() = id.name
 }
 
-fun Category.toUi(values: Map<Long, Long>): CategoryUi = CategoryUi(
+fun Category.toUi(values: Map<Long, Long>, multiplier: Float = 1f): CategoryUi = CategoryUi(
     key = key,
     id = id,
     color = color,
-    value = values.getOrDefault(key, 0L).toFloatDollar(),
-    subCategories = subCategories.map { it.toUi(values) }
+    value = multiplier * values.getOrDefault(key, 0L).toFloatDollar(),
+    subCategories = subCategories.map { it.toUi(values, multiplier) }
 )
 
 @Stable

@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
-    val incomeScreen = CashFlowModel(categories.data, 0)
-    val expenseScreen = CashFlowModel(categories.data, 1)
+    val incomeScreen = CashFlowModel(categories.data, true)
+    val expenseScreen = CashFlowModel(categories.data, false)
 
     val rules = RuleModel(this)
     val accounts = AccountModel(this)
@@ -29,8 +29,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         viewModelScope.launch {
             categories.loadData().joinAll()
             categories.loadUi()
-            incomeScreen.load()
-            expenseScreen.load()
+            incomeScreen.load(categories.data.all[0])
+            expenseScreen.load(categories.data.all[1])
         }
     }
 
