@@ -202,6 +202,9 @@ class CategoryData(
         if (startIndex == endIndex) return
 
         val (parent, _) = find(parentId.toCategoryId())
+        if (startIndex !in parent.subCategories.indices) return // These happen if you try to reorder the "Uncategorized" entry
+        if (endIndex !in parent.subCategories.indices) return
+
         parent.subCategories.add(endIndex, parent.subCategories.removeAt(startIndex))
 
         /** Update old parent's list and its children's indices. We should do this here because we

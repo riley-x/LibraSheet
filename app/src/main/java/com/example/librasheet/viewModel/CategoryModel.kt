@@ -22,11 +22,9 @@ class CategoryModel(
         historyDao = viewModel.application.database.categoryHistoryDao()
     )
 
-    /** This are used in both the categories settings screen and the respective cash flow screens **/
+    /** This are used in the categories settings screen **/
     val income = mutableStateListOf<CategoryUi>()
     val expense = mutableStateListOf<CategoryUi>()
-    val incomeTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
-    val expenseTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 
     /** These are used by the transaction and rule editors. These do NOT include "Income" or
      * "Expense". The last element is Category.Ignore. **/
@@ -48,15 +46,12 @@ class CategoryModel(
     /** Expanded state of each row in the edit category screen. This is needed here since lots of bugs
      * occur if you try to put it inside the LazyColumn::items. Index with the full category name. **/
     val editScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
-    val incomeScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
-    val expenseScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
-
 
     fun loadData() = data.load()
 
     fun loadUi() {
-        loadIncome(incomeTimeRange.value)
-        loadExpense(expenseTimeRange.value)
+        loadIncome()
+        loadExpense()
 
         incomeTargets.clear()
         expenseTargets.clear()
@@ -79,36 +74,15 @@ class CategoryModel(
         list.addAll(category.subCategories)
     }
 
-    private fun loadIncome(range: CategoryTimeRange) {
-        incomeTimeRange.value = range
+    private fun loadIncome() {
         income.clear()
-        val amounts = when(range) {
-            CategoryTimeRange.ONE_MONTH -> data.currentMonth
-            CategoryTimeRange.ONE_YEAR -> data.yearAverage
-            CategoryTimeRange.ALL -> data.allAverage
-        }
+        val amounts = emptyMap<Long, Long>()
         income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
     }
-    private fun loadExpense(range: CategoryTimeRange) {
-        expenseTimeRange.value = range
+    private fun loadExpense() {
         expense.clear()
-        val amounts = when(range) {
-            CategoryTimeRange.ONE_MONTH -> data.currentMonth
-            CategoryTimeRange.ONE_YEAR -> data.yearAverage
-            CategoryTimeRange.ALL -> data.allAverage
-        }
+        val amounts = emptyMap<Long, Long>()
         expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
-    }
-
-    @Callback
-    fun setIncomeRange(range: CategoryTimeRange) {
-        if (incomeTimeRange.value == range) return
-        loadIncome(range)
-    }
-    @Callback
-    fun setExpenseRange(range: CategoryTimeRange) {
-        if (expenseTimeRange.value == range) return
-        loadExpense(range)
     }
 
 
@@ -144,7 +118,7 @@ class CategoryModel(
 
     fun checkError(fn: () -> String): String {
         val error = fn()
-        if (error.isEmpty()) loadUi()
+        if (error.isEmpty()) viewModel.updateDependencies(Dependency.CATEGORY)
         return error
     }
 
@@ -159,12 +133,12 @@ class CategoryModel(
     @Callback
     fun delete(categoryId: CategoryId) {
         data.delete(categoryId)
-        loadUi()
+        viewModel.updateDependencies(Dependency.CATEGORY)
     }
     @Callback
     fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
         data.reorder(parentId, startIndex, endIndex)
-        loadUi()
+        viewModel.updateDependencies(Dependency.CATEGORY)
     }
 
     @Callback
@@ -178,9 +152,9 @@ class CategoryModel(
         editScreenIsExpanded.remove(categoryId.fullName)?.let {
             editScreenIsExpanded[joinCategoryPath(categoryId.parent, newName).fullName] = it
         }
-        loadUi()
+        viewModel.updateDependencies(Dependency.CATEGORY)
 
-        return error
+        return ""
     }
 }
 

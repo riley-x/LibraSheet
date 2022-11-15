@@ -11,6 +11,9 @@ import kotlinx.coroutines.launch
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
+    val incomeScreen = CashFlowModel(categories.data, 0)
+    val expenseScreen = CashFlowModel(categories.data, 1)
+
     val rules = RuleModel(this)
     val accounts = AccountModel(this)
     val balanceGraphs = BalanceGraphModel(this)
@@ -26,12 +29,21 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         viewModelScope.launch {
             categories.loadData().joinAll()
             categories.loadUi()
+            incomeScreen.load()
+            expenseScreen.load()
         }
     }
 
-    internal fun updateDependencies(dependency: Dependency) = when(dependency) {
-        Dependency.ACCOUNT_REORDER -> viewModelScope.launch {
-            balanceGraphs.calculateHistoryGraph(accounts.all)
+    internal fun updateDependencies(dependency: Dependency) {
+        when (dependency) {
+            Dependency.ACCOUNT_REORDER -> viewModelScope.launch {
+                balanceGraphs.calculateHistoryGraph(accounts.all)
+            }
+            Dependency.CATEGORY -> {
+                categories.loadUi()
+                incomeScreen.load()
+                expenseScreen.load()
+            }
         }
     }
 }
@@ -39,6 +51,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
 internal enum class Dependency {
     ACCOUNT_REORDER,
+    CATEGORY,
 }
 
 
