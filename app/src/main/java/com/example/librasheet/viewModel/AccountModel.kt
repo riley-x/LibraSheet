@@ -22,8 +22,7 @@ class AccountModel(
     fun load(): Job {
         return viewModel.viewModelScope.launch {
             all.addAll(withContext(Dispatchers.IO) {
-//                dao.getAccounts()
-                previewAccounts
+                dao.getAccounts()
             })
             all.forEach {
                 Log.d("Libra/AccountModel/load", "$it")

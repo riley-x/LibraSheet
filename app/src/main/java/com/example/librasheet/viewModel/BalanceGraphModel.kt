@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
+import com.example.librasheet.data.alignDates
 import com.example.librasheet.data.dao.TimeSeries
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.stackedLineGraphValues
@@ -54,8 +55,7 @@ class BalanceGraphModel(
 
     fun loadHistory(accounts: List<Account>) = viewModel.viewModelScope.launch {
         val res = withContext(Dispatchers.IO) {
-//                accountDao.getHistory().foldAccounts()
-            testHistory
+            accountDao.getHistory().alignDates()
         }
         historyDateInts = res.first
         history = res.second

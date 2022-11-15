@@ -17,20 +17,20 @@ interface CategoryHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun add(it: CategoryHistory)
 
-    @Query("SELECT date, SUM(value) as value FROM $categoryHistoryTable GROUP BY accountKey, categoryKey ORDER BY date")
+    @Query("SELECT date, SUM(value) as value FROM $categoryHistoryTable GROUP BY date ORDER BY date")
     fun getNetIncome(): List<TimeSeries>
 
     @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
     @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
             "SELECT categoryKey, date, SUM(value) as sums " +
-            "FROM $categoryHistoryTable WHERE date >= :startDate GROUP BY accountKey" +
-            ") GROUP BY date")
+            "FROM $categoryHistoryTable WHERE date >= :startDate GROUP BY categoryKey, date" +
+            ") GROUP BY categoryKey")
     fun getAverages(startDate: Int): Map<Long, Long>
 
     @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
     @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
             "SELECT categoryKey, date, SUM(value) as sums " +
-            "FROM $categoryHistoryTable GROUP BY accountKey" +
-            ") GROUP BY date")
+            "FROM $categoryHistoryTable GROUP BY categoryKey, date" +
+            ") GROUP BY categoryKey")
     fun getAverages(): Map<Long, Long>
 }
