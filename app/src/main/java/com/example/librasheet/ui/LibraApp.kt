@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
@@ -17,6 +18,7 @@ import com.example.librasheet.ui.balance.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
+import com.example.librasheet.ui.components.recomposeHighlighter
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
@@ -24,6 +26,7 @@ import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
 import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
+import com.example.librasheet.viewModel.CashFlowModel
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.preview.*
@@ -218,24 +221,23 @@ fun LibraApp(
                 )
             }
         }
-        fun NavGraphBuilder.categoryDetail() {
-            val isIncome = route == IncomeTab.graph
-            val model = if (isIncome) viewModel.incomeDetail else viewModel.expenseDetail
-            composable(route = CategoryDetailDestination.route(route!!), arguments = CategoryDetailDestination.arguments) {
-//                val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
-                CashFlowScreen(
-                    parentCategory = model.parentCategory.id,
-                    headerBackArrow = true,
-                    categories = model.pie,
-                    expanded = model.isExpanded,
-                    history = model.history,
-                    historyDates = model.dates,
-                    categoryTimeRange = model.pieRange,
-                    historyTimeRange = model.historyRange,
-                    onBack = navController::popBackStack,
-//                    onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
-                )
-            }
+        fun cashFlow(model: CashFlowModel, isIncome: Boolean, isDetail: Boolean): (@Composable (NavBackStackEntry) -> Unit) = {
+            CashFlowScreen(
+                parentCategory = model.parentCategory.id,
+                headerBackArrow = isDetail,
+                categories = model.pie,
+                expanded = model.isExpanded,
+                history = model.history,
+                historyDates = model.dates,
+                categoryTimeRange = model.pieRange,
+                historyTimeRange = model.historyRange,
+                onBack = navController::popBackStack,
+                onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
+                onCategoryTimeRange = model::setPieRange,
+                onHistoryTimeRange = model::setHistoryRange,
+                onReorder = viewModel.categories::reorder,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
         fun NavGraphBuilder.transactionAll() {
             val isSettings = route == SettingsTab.graph
@@ -304,42 +306,22 @@ fun LibraApp(
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
-                    CashFlowScreen(
-                        parentCategory = incomeName.toCategoryId(),
-                        categories = viewModel.incomeScreen.pie,
-                        expanded = viewModel.incomeScreen.isExpanded,
-                        history = viewModel.incomeScreen.history,
-                        historyDates = viewModel.incomeScreen.dates,
-                        categoryTimeRange = viewModel.incomeScreen.pieRange,
-                        historyTimeRange = viewModel.incomeScreen.historyRange,
-                        onCategoryClick = ::toIncomeCategoryDetailScreen,
-                        onCategoryTimeRange = viewModel.incomeScreen::setPieRange,
-                        onHistoryTimeRange = viewModel.incomeScreen::setHistoryRange,
-                        onReorder = viewModel.categories::reorder,
-                        modifier = Modifier.padding(innerPadding),
-                    )
+                    cashFlow(model = viewModel.incomeScreen, isIncome = true, isDetail = false)(it)
                 }
-                categoryDetail()
+                composable(route = CategoryDetailDestination.route(IncomeTab.graph), arguments = CategoryDetailDestination.arguments) {
+                    cashFlow(model = viewModel.incomeDetail, isIncome = true, isDetail = true)(it)
+                    // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
+                }
             }
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-                    CashFlowScreen(
-                        parentCategory = expenseName.toCategoryId(),
-                        categories = viewModel.expenseScreen.pie,
-                        expanded = viewModel.expenseScreen.isExpanded,
-                        history = viewModel.expenseScreen.history,
-                        historyDates = viewModel.expenseScreen.dates,
-                        categoryTimeRange = viewModel.expenseScreen.pieRange,
-                        historyTimeRange = viewModel.expenseScreen.historyRange,
-                        onCategoryClick = ::toExpenseCategoryDetailScreen,
-                        onCategoryTimeRange = viewModel.expenseScreen::setPieRange,
-                        onHistoryTimeRange = viewModel.expenseScreen::setHistoryRange,
-                        onReorder = viewModel.categories::reorder,
-                        modifier = Modifier.padding(innerPadding),
-                    )
+                    cashFlow(model = viewModel.expenseScreen, isIncome = false, isDetail = false)(it)
                 }
-                categoryDetail()
+                composable(route = CategoryDetailDestination.route(SpendingTab.graph), arguments = CategoryDetailDestination.arguments) {
+                    cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true)(it)
+                    // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
+                }
             }
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {

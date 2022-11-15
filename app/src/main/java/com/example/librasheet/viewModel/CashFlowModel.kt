@@ -69,12 +69,12 @@ class CashFlowModel (
     }
 
     fun loadPie() {
-        pie.clear()
         val amounts = when(pieRange.value) {
             CategoryTimeRange.ONE_MONTH -> data.currentMonth
             CategoryTimeRange.ONE_YEAR -> data.yearAverage
             CategoryTimeRange.ALL -> data.allAverage
         }
+        pie.clear()
         pie.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
 
         val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0L).toFloatDollar()
