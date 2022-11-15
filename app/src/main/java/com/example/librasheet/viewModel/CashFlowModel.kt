@@ -27,7 +27,7 @@ class CashFlowModel (
     private val data: CategoryData,
     private val isIncome: Boolean,
 ) {
-    private var parentCategory: Category = Category.None
+    var parentCategory: Category = Category.None
     private val multiplier = if (isIncome) 1f else -1f
 
     private val graphYPad = 0.1f
@@ -52,10 +52,19 @@ class CashFlowModel (
 
     fun load(category: Category = parentCategory) {
         parentCategory = category
-        loadPie()
-        scope.launch {
-            loadFullHistory()
-            loadHistory()
+
+        if (parentCategory.key == 0L) {
+            pie.clear()
+            fullHistory = emptyList()
+            fullDates = emptyList()
+            history.values.clear()
+            dates.clear()
+        } else {
+            loadPie()
+            scope.launch {
+                loadFullHistory()
+                loadHistory()
+            }
         }
     }
 
@@ -72,6 +81,7 @@ class CashFlowModel (
         if (parentValue > 0f) {
             pie.add(
                 CategoryUi(
+                    category = Category.Ignore,
                     key = ignoreKey,
                     id = CategoryId("Uncategorized"),
                     color = parentCategory.color,

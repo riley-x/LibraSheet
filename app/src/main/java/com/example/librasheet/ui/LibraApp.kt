@@ -78,13 +78,15 @@ fun LibraApp(
     }
     fun toEditAccountsScreen() = navController.navigateSingleTop(EditAccountsDestination.route)
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
-        // WARNING! This only works because we have at most one level of nesting. Otherwise would have to catch back arrow, etc.
-        viewModel.categories.loadIncomeDetail(it)
-        navController.navigateSingleTop(CategoryDetailDestination.argRoute(IncomeTab.graph, it.id.fullName))
+        /** WARNING! This only works because we have at most one level of nesting. Otherwise would
+         * have to use a launched effect or something
+         */
+        viewModel.incomeDetail.load(it.category)
+        navController.navigateSingleTop(CategoryDetailDestination.argRoute(IncomeTab.graph, it.category.id.fullName))
     }
     fun toExpenseCategoryDetailScreen(it: CategoryUi) {
-        viewModel.categories.loadExpenseDetail(it)
-        navController.navigateSingleTop(CategoryDetailDestination.argRoute(SpendingTab.graph, it.id.fullName))
+        viewModel.expenseDetail.load(it.category)
+        navController.navigateSingleTop(CategoryDetailDestination.argRoute(SpendingTab.graph, it.category.id.fullName))
     }
     fun toCategoriesScreen() = navController.navigateSingleTop(CategoriesDestination.route)
     fun toRulesScreen(income: Boolean) {
@@ -218,19 +220,20 @@ fun LibraApp(
         }
         fun NavGraphBuilder.categoryDetail() {
             val isIncome = route == IncomeTab.graph
+            val model = if (isIncome) viewModel.incomeDetail else viewModel.expenseDetail
             composable(route = CategoryDetailDestination.route(route!!), arguments = CategoryDetailDestination.arguments) {
-                val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
+//                val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 CashFlowScreen(
-                    parentCategory = category,
+                    parentCategory = model.parentCategory.id,
                     headerBackArrow = true,
-                    categories = if (isIncome) viewModel.categories.incomeDetail else viewModel.categories.expenseDetail,
-                    expanded = viewModel.categories.editScreenIsExpanded, // TODO
-                    history = previewStackedLineGraphState,
-                    historyDates = previewLineGraphDates,
-                    categoryTimeRange = previewIncomeCategoryTimeRange,
-                    historyTimeRange = previewIncomeHistoryTimeRange,
+                    categories = model.pie,
+                    expanded = model.isExpanded,
+                    history = model.history,
+                    historyDates = model.dates,
+                    categoryTimeRange = model.pieRange,
+                    historyTimeRange = model.historyRange,
                     onBack = navController::popBackStack,
-                    onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
+//                    onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
                 )
             }
         }

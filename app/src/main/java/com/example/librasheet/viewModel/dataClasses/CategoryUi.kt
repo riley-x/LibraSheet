@@ -12,6 +12,7 @@ import com.example.librasheet.ui.graphing.PieChartValue
 
 @Immutable
 data class CategoryUi(
+    val category: Category, // TODO don't need repeateaded info anymore? Maybe useful for "Uncategorized" ui element
     val key: Long = 0,
     val id: CategoryId = CategoryId(),
     override val color: Color = Color.White,
@@ -26,6 +27,7 @@ fun Category.toUi(values: Map<Long, Long>, multiplier: Float = 1f): CategoryUi {
     val subs = subCategories.map { it.toUi(values, multiplier) }
     val value = multiplier * values.getOrDefault(key, 0L).toFloatDollar() + subs.sumOf { it.value.toDouble() }.toFloat()
     return CategoryUi(
+        category = this,
         key = key,
         id = id,
         color = color,

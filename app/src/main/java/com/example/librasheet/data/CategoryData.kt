@@ -96,6 +96,8 @@ class CategoryData(
             val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
             historyDates = res.first
             history = res.second
+            /** Sum subCategories into parents **/
+            // TODO, or do sum in category history in database?
         }
 
         return jobs
