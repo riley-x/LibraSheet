@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.components.recomposeHighlighter
 import com.example.librasheet.viewModel.CashFlowModel
@@ -20,7 +23,7 @@ fun cashFlow(
     navController: NavHostController,
     viewModel: LibraViewModel,
     innerPadding: PaddingValues,
-): (@Composable (NavBackStackEntry) -> Unit) {
+): (@Composable () -> Unit) {
     fun toIncomeCategoryDetailScreen(it: CategoryUi) {
         /** WARNING! This only works because we have at most one level of nesting. Otherwise would
          * have to use a launched effect or something

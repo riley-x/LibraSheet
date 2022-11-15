@@ -9,16 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.balance.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
-import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
-import com.example.librasheet.ui.components.recomposeHighlighter
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
@@ -26,7 +23,6 @@ import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
 import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
-import com.example.librasheet.viewModel.CashFlowModel
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.preview.*
@@ -278,20 +274,20 @@ fun LibraApp(
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
-                    cashFlow(model = viewModel.incomeScreen, isIncome = true, isDetail = false, navController, viewModel, innerPadding)(it)
+                    cashFlow(model = viewModel.incomeScreen, isIncome = true, isDetail = false, navController, viewModel, innerPadding)()
                 }
                 composable(route = CategoryDetailDestination.route(IncomeTab.graph), arguments = CategoryDetailDestination.arguments) {
-                    cashFlow(model = viewModel.incomeDetail, isIncome = true, isDetail = true, navController, viewModel, innerPadding)(it)
+                    cashFlow(model = viewModel.incomeDetail, isIncome = true, isDetail = true, navController, viewModel, innerPadding)()
                     // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 }
             }
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-                    cashFlow(model = viewModel.expenseScreen, isIncome = false, isDetail = false, navController, viewModel, innerPadding)(it)
+                    cashFlow(model = viewModel.expenseScreen, isIncome = false, isDetail = false, navController, viewModel, innerPadding)()
                 }
                 composable(route = CategoryDetailDestination.route(SpendingTab.graph), arguments = CategoryDetailDestination.arguments) {
-                    cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true, navController, viewModel, innerPadding)(it)
+                    cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true, navController, viewModel, innerPadding)()
                     // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 }
             }
