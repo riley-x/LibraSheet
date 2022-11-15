@@ -87,7 +87,7 @@ class CategoryData(
 
         /** Category History **/
         jobs.launchIO {
-            val res = historyDao.getAll().alignDates()
+            val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
             historyDates = res.first
             history = res.second
         }

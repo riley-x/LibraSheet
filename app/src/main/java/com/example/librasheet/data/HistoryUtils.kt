@@ -20,7 +20,9 @@ interface Series {
 /** This takes a list of account history, assumed in increasing date order, and folds it into a
  * map accountKey -> balances. The balances of each account will be zero padded so they all have the
  * same length. **/
-fun List<HistoryEntry>.alignDates(): Pair<MutableList<Int>, MutableMap<Long, MutableList<Long>>> {
+fun List<HistoryEntry>.alignDates(
+    useLastIfAbsent: Boolean = true
+): Pair<MutableList<Int>, MutableMap<Long, MutableList<Long>>> {
     /** Outputs **/
     val dates = mutableListOf<Int>()
     val balances = mutableMapOf<Long, MutableList<Long>>()
@@ -32,7 +34,7 @@ fun List<HistoryEntry>.alignDates(): Pair<MutableList<Int>, MutableMap<Long, Mut
     val currentValues = mutableMapOf<Long, Long>()
     fun update(newDate: Int) {
         balances.forEach { (account, list) ->
-            list.add(currentValues.getOrElse(account) { list.lastOrNull() ?: 0 })
+            list.add(currentValues.getOrElse(account) { if (useLastIfAbsent) list.lastOrNull() ?: 0 else 0 })
         }
         currentValues.clear()
         dates.add(currentDate) // this should happen at end of block not beginning, so that newly added accounts are correctly in-sync.
@@ -56,7 +58,10 @@ fun List<HistoryEntry>.alignDates(): Pair<MutableList<Int>, MutableMap<Long, Mut
  * Gets a list of values that can be passed to the stacked line graph.
  * @param series should be in order of top of the stack to the bottom. Values should not be pre-added.
  */
-fun Map<Long, List<Long>>.stackedLineGraphValues(series: List<Series>, multiplier: Float = 1f): Triple<List<StackedLineGraphValue>, Float, Float> {
+fun Map<Long, List<Long>>.stackedLineGraphValues(
+    series: List<Series>,
+    multiplier: Float = 1f,
+): Triple<List<StackedLineGraphValue>, Float, Float> {
     var minY = 0f
     var maxY = 0f
     val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
