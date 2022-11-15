@@ -1,11 +1,13 @@
 package com.example.librasheet.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.librasheet.viewModel.LibraViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
@@ -13,16 +15,17 @@ import androidx.navigation.compose.*
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.balance.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
-import com.example.librasheet.ui.dialogs.TextFieldDialog
-import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
+import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
+import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
 import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
-import com.example.librasheet.viewModel.dataClasses.*
+import com.example.librasheet.viewModel.LibraViewModel
+import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.preview.*
 
 
@@ -302,13 +305,13 @@ fun LibraApp(
                         parentCategory = incomeName.toCategoryId(),
                         categories = viewModel.incomeScreen.pie,
                         expanded = viewModel.incomeScreen.isExpanded,
-                        history = previewStackedLineGraphState, // TODO
-                        historyDates = previewLineGraphDates, // TODO
+                        history = viewModel.incomeScreen.history,
+                        historyDates = viewModel.incomeScreen.dates,
                         categoryTimeRange = viewModel.incomeScreen.pieRange,
-                        historyTimeRange = previewIncomeHistoryTimeRange, // TODO
+                        historyTimeRange = viewModel.incomeScreen.historyRange,
                         onCategoryClick = ::toIncomeCategoryDetailScreen,
                         onCategoryTimeRange = viewModel.incomeScreen::setPieRange,
-                        onHistoryTimeRange = { }, // TODO
+                        onHistoryTimeRange = viewModel.incomeScreen::setHistoryRange,
                         onReorder = viewModel.categories::reorder,
                         modifier = Modifier.padding(innerPadding),
                     )
@@ -322,13 +325,13 @@ fun LibraApp(
                         parentCategory = expenseName.toCategoryId(),
                         categories = viewModel.expenseScreen.pie,
                         expanded = viewModel.expenseScreen.isExpanded,
-                        history = previewStackedLineGraphState, // TODO
-                        historyDates = previewLineGraphDates, // TODO
+                        history = viewModel.expenseScreen.history,
+                        historyDates = viewModel.expenseScreen.dates,
                         categoryTimeRange = viewModel.expenseScreen.pieRange,
-                        historyTimeRange = previewIncomeHistoryTimeRange, // TODO
+                        historyTimeRange = viewModel.expenseScreen.historyRange,
                         onCategoryClick = ::toExpenseCategoryDetailScreen,
                         onCategoryTimeRange = viewModel.expenseScreen::setPieRange,
-                        onHistoryTimeRange = { }, // TODO
+                        onHistoryTimeRange = viewModel.expenseScreen::setHistoryRange,
                         onReorder = viewModel.categories::reorder,
                         modifier = Modifier.padding(innerPadding),
                     )
