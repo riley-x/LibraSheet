@@ -28,7 +28,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         }
         balanceGraphs.loadIncome()
         viewModelScope.launch {
-            categories.loadData().joinAll()
+            (categories.data.loadCategories() + categories.data.loadValues()).joinAll()
             categories.loadUi()
             incomeScreen.load(categories.data.all[0])
             expenseScreen.load(categories.data.all[1])
@@ -42,8 +42,15 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             }
             Dependency.CATEGORY -> {
                 categories.loadUi()
-                incomeScreen.loadPie()
-                expenseScreen.loadPie()
+                incomeScreen.load()
+                expenseScreen.load()
+            }
+            Dependency.TRANSACTION -> viewModelScope.launch {
+                categories.data.loadValues().joinAll()
+                incomeScreen.load()
+                expenseScreen.load()
+                balanceGraphs.loadIncome()
+                balanceGraphs.loadHistory(accounts.all)
             }
         }
     }
@@ -75,6 +82,7 @@ internal enum class Dependency {
     ACCOUNT_REORDER,
     ACCOUNT_COLOR,
     CATEGORY,
+    TRANSACTION,
 }
 
 

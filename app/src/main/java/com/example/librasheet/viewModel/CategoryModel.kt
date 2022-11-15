@@ -48,8 +48,6 @@ class CategoryModel(
      * occur if you try to put it inside the LazyColumn::items. Index with the full category name. **/
     val editScreenIsExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
-    fun loadData() = data.load()
-
     fun loadUi() {
         loadIncome()
         loadExpense()

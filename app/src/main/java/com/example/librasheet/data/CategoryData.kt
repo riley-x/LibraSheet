@@ -50,7 +50,7 @@ class CategoryData(
         add(scope.launch(Dispatchers.IO, block = fn))
 
 
-    fun load(): List<Job> {
+    fun loadCategories(): List<Job> {
         val jobs = mutableListOf<Job>()
 
         /** Index **/
@@ -68,6 +68,12 @@ class CategoryData(
             dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
             Log.d("Libra/CategoryData/load", "expense=${all[1].subCategories.size}")
         }
+
+        return jobs
+    }
+
+    fun loadValues(): List<Job> {
+        val jobs = mutableListOf<Job>()
 
         /** Averages **/
         val today = Calendar.getInstance().toIntDate()

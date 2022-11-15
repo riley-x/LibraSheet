@@ -45,6 +45,7 @@ class TransactionModel(
         }
         loadFilter(balanceList, balanceFilter.value)
         loadFilter(settingsList, settingsFilter.value)
+        viewModel.updateDependencies(Dependency.TRANSACTION)
     }
 
     @Callback
