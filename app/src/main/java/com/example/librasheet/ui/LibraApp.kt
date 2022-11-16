@@ -215,6 +215,7 @@ fun LibraApp(
                     onBack = navController::popBackStack,
                     onFilter = { }, // TODO
                     onTransactionClick = if (isSettings) ::toSettingsTransactionDetail else ::toBalanceTransactionDetail,
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
         }
@@ -328,6 +329,7 @@ fun LibraApp(
                         onChangeName = ::onChangeAccountName,
                         onChangeColor = ::toSettingsColorSelector,
                         onReorder = viewModel.accounts::reorder,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
                 composable(route = RulesDestination.route) {

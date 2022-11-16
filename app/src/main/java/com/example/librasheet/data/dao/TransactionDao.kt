@@ -88,6 +88,7 @@ data class TransactionFilters(
     val endDate: Int? = null,
     val account: Account? = null,
     val category: Category? = null,
+    val limit: Int? = null,
 )
 
 fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
@@ -123,6 +124,10 @@ fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
         args.add(filter.category.key)
     }
     q += " ORDER BY date DESC"
+    if (filter.limit != null) {
+        q += " LIMIT ?"
+        args.add(filter.limit)
+    }
     Log.i("Libra/TransactionDao/getTransactionFilteredQuery", q)
     return SimpleSQLiteQuery(q, args.toTypedArray())
 }

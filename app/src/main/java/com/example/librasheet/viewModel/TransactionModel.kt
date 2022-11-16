@@ -23,7 +23,7 @@ class TransactionModel(
 ) {
     private val dao = viewModel.application.database.transactionDao()
     private val defaultFilter = TransactionFilters(
-        startDate = Calendar.getInstance().toIntDate().setDay(0)
+        limit = 100
     )
 
     /** Current list to show in settings tab **/
