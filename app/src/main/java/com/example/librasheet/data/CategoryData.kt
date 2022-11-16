@@ -40,10 +40,15 @@ class CategoryData(
     var historyDates = mutableListOf<Int>()
     var history = mutableMapOf<Long, MutableList<Long>>()
 
-    /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie charts. **/
+    /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie
+     * charts and display lists. **/
     var currentMonth = emptyMap<Long, Long>()
     var yearAverage = emptyMap<Long, Long>()
     var allAverage = emptyMap<Long, Long>()
+
+    var yearTotal = emptyMap<Long, Long>()
+    var fiveYearTotal = emptyMap<Long, Long>()
+    var allTotal = emptyMap<Long, Long>()
 
 
     private fun MutableList<Job>.launchIO(fn: suspend CoroutineScope.() -> Unit) =
@@ -74,21 +79,36 @@ class CategoryData(
 
     fun loadValues(): List<Job> {
         val jobs = mutableListOf<Job>()
-
-        /** Averages **/
         val today = Calendar.getInstance().toIntDate()
         val lastMonthEnd = today.setDay(0)
+        val lastYearEnd = lastMonthEnd.addYears(-1)
+
+        /** Averages **/
         jobs.launchIO {
             currentMonth = historyDao.getDate(thisMonthEnd(today))
             Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
-            yearAverage = historyDao.getAverages(lastMonthEnd.addYears(-1), lastMonthEnd)
+            yearAverage = historyDao.getAverages(lastYearEnd, lastMonthEnd)
             Log.d("Libra/CategoryData/load", "yearAverage=$yearAverage")
         }
         jobs.launchIO {
             allAverage = historyDao.getAverages(0, lastMonthEnd)
             Log.d("Libra/CategoryData/load", "allAverage=$allAverage")
+        }
+
+        /** Totals **/
+        jobs.launchIO {
+            yearTotal = historyDao.getTotals(lastYearEnd)
+            Log.d("Libra/CategoryData/load", "yearTotal=$yearTotal")
+        }
+        jobs.launchIO {
+            fiveYearTotal = historyDao.getTotals(lastMonthEnd.addYears(-5))
+            Log.d("Libra/CategoryData/load", "fiveYearTotal=$fiveYearTotal")
+        }
+        jobs.launchIO {
+            allTotal = historyDao.getTotals(0)
+            Log.d("Libra/CategoryData/load", "allTotal=$allTotal")
         }
 
         /** Category History **/

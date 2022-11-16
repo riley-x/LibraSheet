@@ -43,4 +43,10 @@ interface CategoryHistoryDao {
 
     @Query("SELECT accountKey, categoryKey, date, SUM(value) as value FROM $categoryHistoryTable GROUP BY date, categoryKey ORDER BY date")
     fun getAll(): List<CategoryHistory>
+
+
+    @MapInfo(keyColumn = "categoryKey", valueColumn = "sums")
+    @Query("SELECT categoryKey, SUM(value) as sums " +
+            "FROM $categoryHistoryTable WHERE date >= :startDate GROUP BY categoryKey")
+    fun getTotals(startDate: Int): Map<Long, Long>
 }

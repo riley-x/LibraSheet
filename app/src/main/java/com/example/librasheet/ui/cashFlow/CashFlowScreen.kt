@@ -29,7 +29,7 @@ import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
 
-private val tabs = ImmutableList(listOf("Categories", "History"))
+private val tabs = ImmutableList(listOf("Monthly Averages", "Totals"))
 
 
 @Composable
@@ -44,12 +44,14 @@ fun CashFlowScreen(
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
     onBack: () -> Unit = { },
+    onTabChange: (Int) -> Unit = { },
     onCategoryClick: (CategoryUi) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
     var hoverText by remember { mutableStateOf("") }
+    val tab = remember { mutableStateOf(0) }
 
     Column(
         modifier = modifier
@@ -68,6 +70,7 @@ fun CashFlowScreen(
             LazyColumn {
                 item("graphic") {
                     CashFlowGraphic(
+                        selectedTab = tab,
                         tabs = tabs,
                         categories = categories,
                         history = history,
@@ -77,6 +80,7 @@ fun CashFlowScreen(
                         updateHoverText = { hoverText = it },
                         onCategoryTimeRange = onCategoryTimeRange,
                         onHistoryTimeRange = onHistoryTimeRange,
+                        onSelection = { },
                     )
                 }
 

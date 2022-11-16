@@ -2,9 +2,8 @@ package com.example.librasheet.viewModel
 
 import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.stackedLineGraphValues
@@ -34,7 +33,12 @@ class CashFlowModel (
     private val graphTicksX = 4
     private val graphTicksY = 6
 
-    /** Pie chart **/
+    /** List of categories displayed below the graphic **/
+    var tab by mutableStateOf(0)
+    val categoryList = mutableStateListOf<CategoryUi>()
+
+    /** Pie chart. This needs to have a separate list because the cash flow screen animates between
+     * the tabs, in which case both the pie and the totals list are shown concurrently. **/
     val pie = mutableStateListOf<CategoryUi>()
     val pieRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 
@@ -61,6 +65,7 @@ class CashFlowModel (
             dates.clear()
         } else {
             loadPie()
+            loadCategoryList()
             scope.launch {
                 loadFullHistory()
                 loadHistory()
@@ -68,18 +73,13 @@ class CashFlowModel (
         }
     }
 
-    fun loadPie() {
-        val amounts = when(pieRange.value) {
-            CategoryTimeRange.ONE_MONTH -> data.currentMonth
-            CategoryTimeRange.ONE_YEAR -> data.yearAverage
-            CategoryTimeRange.ALL -> data.allAverage
-        }
-        pie.clear()
-        pie.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
+    private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Long>) {
+        target.clear()
+        target.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
 
         val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0L).toFloatDollar()
         if (parentValue > 0f) {
-            pie.add(
+            target.add(
                 CategoryUi(
                     category = Category.Ignore,
                     key = ignoreKey,
@@ -88,6 +88,33 @@ class CashFlowModel (
                     value = parentValue,
                 )
             )
+        }
+    }
+
+
+    fun loadPie() {
+        val amounts = when(pieRange.value) {
+            CategoryTimeRange.ONE_MONTH -> data.currentMonth
+            CategoryTimeRange.ONE_YEAR -> data.yearAverage
+            CategoryTimeRange.ALL -> data.allAverage
+        }
+        loadUiList(pie, amounts)
+    }
+
+    fun loadCategoryList() {
+        when (tab) {
+            0 -> {
+                categoryList.clear()
+                categoryList.addAll(pie)
+            }
+            1 -> {
+                val amounts = when(historyRange.value) {
+                    HistoryTimeRange.ONE_YEAR -> data.yearTotal
+                    HistoryTimeRange.FIVE_YEARS -> data.fiveYearTotal
+                    HistoryTimeRange.ALL -> data.allTotal
+                }
+                loadUiList(categoryList, amounts)
+            }
         }
     }
 
@@ -109,20 +136,6 @@ class CashFlowModel (
         Log.d("Libra/CashFlowModel/loadFullHistory", "$fullDates")
     }
 
-
-    @Callback
-    fun setPieRange(range: CategoryTimeRange) {
-        if (pieRange.value == range) return
-        pieRange.value = range
-        loadPie()
-    }
-
-    @Callback
-    fun setHistoryRange(range: HistoryTimeRange) {
-        if (historyRange.value == range) return
-        historyRange.value = range
-        loadHistory()
-    }
 
     private fun <T> List<T>.takeLastOrAll(n: Int) = if (n >= 0) takeLast(n) else this
 
@@ -160,5 +173,30 @@ class CashFlowModel (
         history.toString.value = { formatOrder(it, order) }
 
         Log.d("Libra/CashFlowModel/loadHistory", "$order $maxY")
+    }
+
+
+
+    @Callback
+    fun setPieRange(range: CategoryTimeRange) {
+        if (pieRange.value == range) return
+        pieRange.value = range
+        loadPie()
+        loadCategoryList()
+    }
+
+    @Callback
+    fun setHistoryRange(range: HistoryTimeRange) {
+        if (historyRange.value == range) return
+        historyRange.value = range
+        loadHistory()
+        loadCategoryList()
+    }
+
+    @Callback
+    fun changeTab(tab: Int) { // TODO replace with enum
+        if (this.tab == tab) return
+        this.tab = tab
+        loadCategoryList()
     }
 }

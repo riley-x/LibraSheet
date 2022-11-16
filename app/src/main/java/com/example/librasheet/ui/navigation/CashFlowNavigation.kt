@@ -46,6 +46,7 @@ fun cashFlow(
             categoryTimeRange = model.pieRange,
             historyTimeRange = model.historyRange,
             onBack = navController::popBackStack,
+            onTabChange = model::changeTab,
             onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
             onCategoryTimeRange = model::setPieRange,
             onHistoryTimeRange = model::setHistoryRange,

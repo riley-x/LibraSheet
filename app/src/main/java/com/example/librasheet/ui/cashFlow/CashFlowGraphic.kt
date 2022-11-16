@@ -5,8 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +27,7 @@ import com.example.librasheet.viewModel.preview.*
 
 @Composable
 fun CashFlowGraphic(
+    selectedTab: MutableState<Int>,
     tabs: ImmutableList<String>,
     categories: SnapshotStateList<CategoryUi>,
     history: StackedLineGraphState,
@@ -35,12 +35,15 @@ fun CashFlowGraphic(
     categoryTimeRange: State<CategoryTimeRange>,
     historyTimeRange: State<HistoryTimeRange>,
     modifier: Modifier = Modifier,
+    onSelection: (Int) -> Unit = { },
     updateHoverText: (String) -> Unit = { },
     onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
     GraphSelector(
+        selectedTab = selectedTab,
         tabs = tabs,
+        onSelection = onSelection,
         modifier = modifier
             .fillMaxWidth()
     ) { targetState ->
@@ -92,9 +95,11 @@ fun CashFlowGraphic(
 )
 @Composable
 private fun Preview() {
+    val tab = remember { mutableStateOf(0) }
     LibraSheetTheme {
         Surface {
             CashFlowGraphic(
+                selectedTab = tab,
                 tabs = ImmutableList(listOf("Categories", "History")),
                 categories = previewIncomeCategories,
                 history = previewStackedLineGraphState,
