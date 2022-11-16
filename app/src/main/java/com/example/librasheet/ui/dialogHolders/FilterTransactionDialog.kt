@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.toIntDate
+import com.example.librasheet.ui.components.DateTextField
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.parseOrNull
 import com.example.librasheet.ui.dialogs.Dialog
@@ -115,37 +116,20 @@ fun FilterTransactionDialog(
         onOk = ::onOk,
         modifier = modifier,
     ) {
-        val focusManager = LocalFocusManager.current
 
         Row {
-            OutlinedTextField(
+            DateTextField(
                 value = startDate,
                 onValueChange = { startDate = it },
-                label = { Text(text = "Date Start") },
-                placeholder = { Text(text = "mm-dd-yy") },
+                label = "Date Start",
                 modifier = Modifier.weight(10f),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { focusManager.clearFocus(true) }
-                ),
             )
             Spacer(modifier = Modifier.width(10.dp))
-            OutlinedTextField(
+            DateTextField(
                 value = endDate,
                 onValueChange = { endDate = it },
-                label = { Text(text = "Date End") },
-                placeholder = { Text(text = "mm-dd-yy") },
-                singleLine = true,
+                label = "Date End",
                 modifier = Modifier.weight(10f),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { focusManager.clearFocus(true) }
-                ),
             )
         }
     }
