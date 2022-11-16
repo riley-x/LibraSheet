@@ -45,7 +45,6 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             }
             Dependency.CATEGORY -> viewModelScope.launch {
                 categories.loadUi()
-                categories.data.loadHistory().joinAll()
                 incomeScreen.load()
                 expenseScreen.load()
             }
