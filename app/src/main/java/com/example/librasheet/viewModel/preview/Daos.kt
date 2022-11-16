@@ -1,12 +1,9 @@
 package com.example.librasheet.viewModel.preview
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.example.librasheet.data.HistoryEntryBase
-import com.example.librasheet.data.dao.CategoryDao
-import com.example.librasheet.data.dao.CategoryHistoryDao
-import com.example.librasheet.data.dao.CategoryWithChildren
-import com.example.librasheet.data.dao.TimeSeries
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.data.entity.CategoryHistory
+import com.example.librasheet.data.dao.*
+import com.example.librasheet.data.entity.*
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -99,4 +96,72 @@ internal class FakeHistoryDao: CategoryHistoryDao {
     override fun getTotals(startDate: Int): Map<Long, Long> {
         TODO("Not yet implemented")
     }
+}
+
+
+internal class FakeAccountDao: AccountDao {
+    override fun add(account: Account): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun add(accountHistory: AccountHistory) {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(account: Account) {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(accounts: List<Account>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAccounts(): List<Account> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getHistory(): List<AccountHistory> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getHistory(accountKey: Long): List<AccountHistory> {
+        TODO("Not yet implemented")
+    }
+
+}
+
+
+internal class FakeTransactionDao: TransactionDao {
+    override fun insert(t: TransactionEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(t: TransactionEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun addBalanceEntry(accountHistory: AccountHistory) {
+        TODO("Not yet implemented")
+    }
+
+    override fun addCategoryEntry(categoryHistory: CategoryHistory) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateBalance(account: Long, value: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateBalanceHistory(account: Long, startDate: Int, value: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun get(q: SimpleSQLiteQuery): List<TransactionEntity> {
+        TODO("Not yet implemented")
+    }
+
 }

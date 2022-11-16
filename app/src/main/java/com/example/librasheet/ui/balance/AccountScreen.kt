@@ -114,14 +114,9 @@ fun AccountScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-//            AccountScreen(
-//                account = previewAccount,
-//                incomeDates = previewLineGraphDates,
-//                historyDates = previewLineGraphDates,
-//                balance = previewLineGraphState,
-//                netIncome = previewNetIncomeState,
-//                transactions = previewTransactions,
-//            )
+            AccountScreen(
+                state = previewAccountScreenState,
+            )
         }
     }
 }
