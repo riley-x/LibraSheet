@@ -10,6 +10,7 @@ import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.dao.TransactionDao
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.formatDateInt
@@ -21,6 +22,7 @@ import kotlinx.coroutines.withContext
 
 
 class AccountScreenState(
+    private val categoryRoot: Category,
     private val scope: CoroutineScope,
     private val accountDao: AccountDao,
     private val categoryHistoryDao: CategoryHistoryDao,
@@ -46,7 +48,7 @@ class AccountScreenState(
 
     fun loadIncome() = scope.launch {
         val (dates, flows) = withContext(Dispatchers.IO) {
-            categoryHistoryDao.getIncomeAndExpense(account.value.key).alignDates()
+            categoryHistoryDao.getIncomeAndExpense(account.value.key).alignDates(false)
         }
         val income = flows[0] ?: return@launch
         val expense = flows[1] ?: return@launch
@@ -122,10 +124,12 @@ class AccountScreenState(
 
     fun loadTransactions() = scope.launch {
         val list = withContext(Dispatchers.IO) {
-            transactionDao.get(TransactionFilters(
+            val list = transactionDao.get(TransactionFilters(
                 limit = 100,
                 account = account.value
             ))
+            list.matchCategories(categoryRoot)
+            return@withContext list
         }
         transactions.clear()
         transactions.addAll(list)

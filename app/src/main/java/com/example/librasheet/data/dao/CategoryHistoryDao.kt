@@ -33,7 +33,7 @@ interface CategoryHistoryDao {
             "WHERE accountKey = :account GROUP BY date ORDER BY date")
     fun getNetIncome(account: Long): List<TimeSeries>
 
-    @Query("SELECT IIF(value > 0, 0, 1) as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable " +
+    @Query("SELECT CASE WHEN value > 0 THEN 0 ELSE 1 END as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable " +
             "WHERE accountKey = :account GROUP BY date ORDER BY date")
     fun getIncomeAndExpense(account: Long): List<HistoryEntryBase>
 

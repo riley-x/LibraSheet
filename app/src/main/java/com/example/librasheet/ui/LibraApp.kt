@@ -25,7 +25,6 @@ import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
-import com.example.librasheet.viewModel.preview.*
 
 
 @Composable
@@ -54,7 +53,7 @@ fun LibraApp(
         }
     }
     fun toAccountDetails(account: Account) {
-        // TODO view model set
+        viewModel.accountDetail.load(account)
         navController.navigate(AccountDestination.route)
     }
     fun toBalanceColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(BalanceTab.graph, spec))
