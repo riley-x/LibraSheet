@@ -88,6 +88,7 @@ fun LibraApp(
 
     /** Dialogs **/
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
+    val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel, navController) }
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
@@ -438,5 +439,7 @@ fun LibraApp(
                 onDismiss = ::filterRules,
             )
         }
+
+        filterTransactionDialog.Content()
     }
 }

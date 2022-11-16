@@ -26,6 +26,7 @@ import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
+import com.example.librasheet.viewModel.preview.previewTransactionFilters
 import com.example.librasheet.viewModel.preview.previewTransactions
 
 @Composable
@@ -79,13 +80,7 @@ private fun Preview() {
             TransactionListScreen(
                 transactions = previewTransactions,
                 accounts = previewAccounts,
-                filter = remember { mutableStateOf(TransactionFilters(
-                    startDate = 20221122,
-                    endDate = 20221222,
-                    limit = 1000,
-                    account = 1,
-                    category = previewIncomeCategories2[0],
-                )) },
+                filter = previewTransactionFilters,
             )
         }
     }

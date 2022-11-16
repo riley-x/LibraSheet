@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.transaction
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,7 +35,7 @@ import com.example.librasheet.viewModel.preview.previewTransaction
 import java.text.SimpleDateFormat
 
 
-@OptIn(ExperimentalLayoutApi::class)
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun TransactionDetailScreen(
     transaction: State<TransactionEntity>,

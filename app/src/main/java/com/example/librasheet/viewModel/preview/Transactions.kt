@@ -2,6 +2,7 @@ package com.example.librasheet.viewModel.preview
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.TransactionEntity
 
 val previewTransactions = mutableStateListOf(
@@ -45,3 +46,12 @@ val previewTransactions = mutableStateListOf(
 
 val previewTransaction = mutableStateOf(previewTransactions[0])
 
+val previewTransactionFilters = mutableStateOf(
+    TransactionFilters(
+        startDate = 20221122,
+        endDate = 20221222,
+        limit = 1000,
+        account = 1,
+        category = previewIncomeCategories2[0],
+    )
+)
