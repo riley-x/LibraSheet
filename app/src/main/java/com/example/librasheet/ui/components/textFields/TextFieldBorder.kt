@@ -33,7 +33,7 @@ fun Modifier.textFieldBorder(label: String = "") = composed {
     val layoutResult = textMeasurer.measure(
         text = AnnotatedString(label),
         style = MaterialTheme.typography.subtitle1.copy(
-//            letterSpacing = 1.5.sp,
+            letterSpacing = 1.5.sp,
             fontWeight = FontWeight.W500,
         ),
     )

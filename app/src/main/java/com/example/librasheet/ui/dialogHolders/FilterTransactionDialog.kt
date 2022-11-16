@@ -139,7 +139,7 @@ fun FilterTransactionDialog(
 
         AccountSelector(
             selection = account,
-            options = accounts,
+            options = listOf(null) + accounts,
             onSelection = { account = it },
             modifier = Modifier
                 .fillMaxWidth()

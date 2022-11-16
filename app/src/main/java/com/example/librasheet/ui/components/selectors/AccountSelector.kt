@@ -23,7 +23,7 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 @Composable
 fun AccountSelector(
     selection: Account?,
-    options: List<Account>,
+    options: List<Account?>,
     modifier: Modifier = Modifier,
     onSelection: (Account?) -> Unit = { },
 ) {
