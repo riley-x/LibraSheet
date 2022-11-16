@@ -37,19 +37,10 @@ fun cashFlow(
     }
     return {
         CashFlowScreen(
-            parentCategory = model.parentCategory.id,
+            state = model,
             headerBackArrow = isDetail,
-            categories = model.pie,
-            expanded = model.isExpanded,
-            history = model.history,
-            historyDates = model.dates,
-            categoryTimeRange = model.pieRange,
-            historyTimeRange = model.historyRange,
             onBack = navController::popBackStack,
-            onTabChange = model::changeTab,
             onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
-            onCategoryTimeRange = model::setPieRange,
-            onHistoryTimeRange = model::setHistoryRange,
             onReorder = viewModel.categories::reorder,
             modifier = Modifier.padding(innerPadding)
         )

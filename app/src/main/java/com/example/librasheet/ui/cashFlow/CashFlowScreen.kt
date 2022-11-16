@@ -22,6 +22,7 @@ import com.example.librasheet.ui.categories.*
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.CashFlowModel
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
@@ -34,30 +35,20 @@ private val tabs = ImmutableList(listOf("Monthly Averages", "Totals"))
 
 @Composable
 fun CashFlowScreen(
-    parentCategory: CategoryId,
-    categories: SnapshotStateList<CategoryUi>,
-    expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
-    history: StackedLineGraphState,
-    historyDates: SnapshotStateList<String>,
-    categoryTimeRange: State<CategoryTimeRange>,
-    historyTimeRange: State<HistoryTimeRange>,
+    state: CashFlowModel,
     modifier: Modifier = Modifier,
     headerBackArrow: Boolean = false,
     onBack: () -> Unit = { },
-    onTabChange: (Int) -> Unit = { },
     onCategoryClick: (CategoryUi) -> Unit = { },
-    onCategoryTimeRange: (CategoryTimeRange) -> Unit = { },
-    onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
     var hoverText by remember { mutableStateOf("") }
-    val tab = remember { mutableStateOf(0) }
 
     Column(
         modifier = modifier
     ) {
         HeaderBar(
-            title = parentCategory.name,
+            title = state.parentCategory.id.name,
             backArrow = headerBackArrow,
             onBack = onBack,
             modifier = Modifier.zIndex(1f),
@@ -70,33 +61,33 @@ fun CashFlowScreen(
             LazyColumn {
                 item("graphic") {
                     CashFlowGraphic(
-                        selectedTab = tab,
+                        selectedTab = state.tab,
                         tabs = tabs,
-                        categories = categories,
-                        history = history,
-                        historyDates = historyDates,
-                        categoryTimeRange = categoryTimeRange,
-                        historyTimeRange = historyTimeRange,
+                        categories = state.pie,
+                        history = state.history,
+                        historyDates = state.dates,
+                        categoryTimeRange = state.pieRange,
+                        historyTimeRange = state.historyRange,
                         updateHoverText = { hoverText = it },
-                        onCategoryTimeRange = onCategoryTimeRange,
-                        onHistoryTimeRange = onHistoryTimeRange,
-                        onSelection = { },
+                        onCategoryTimeRange = state::setPieRange,
+                        onHistoryTimeRange = state::setHistoryRange,
+                        onSelection = state::changeTab,
                     )
                 }
 
-                val startIndex = categories.indexOfFirst { it.value > 0 }
+                val startIndex = state.categoryList.indexOfFirst { it.value > 0 }
                 /** Warning the lazy column must be keyed with the index. Keying the lazy column like
                  * `key = { _, it -> it.id.fullName }` messes up the passed index into DragToReorderTarget,
                  * which won't be reset. **/
-                itemsIndexed(categories) { index, category ->
+                itemsIndexed(state.categoryList) { index, category ->
                     if (category.value > 0) {
                         CategoryDragRow(
                             category = category,
-                            group = parentCategory.fullName,
+                            group = state.parentCategory.id.fullName,
                             index = index,
                             startIndex = startIndex,
                             enabled = category.key != ignoreKey, // "Uncategorized" is added to the end if it exists, but don't want to drag this
-                            expanded = expanded,
+                            expanded = state.isExpanded,
                             onReorder = onReorder,
                             content = { cat ->
                                 Spacer(modifier = Modifier.weight(10f))
@@ -126,15 +117,15 @@ fun CashFlowScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            CashFlowScreen(
-                parentCategory = "Income".toCategoryId(),
-                categories = previewIncomeCategories,
-                expanded = previewExpanded,
-                history = previewStackedLineGraphState,
-                historyDates = previewEmptyStringList,
-                categoryTimeRange = previewIncomeCategoryTimeRange,
-                historyTimeRange = previewIncomeHistoryTimeRange,
-            )
+//            CashFlowScreen(
+//                parentCategory = "Income".toCategoryId(),
+//                categories = previewIncomeCategories,
+//                expanded = previewExpanded,
+//                history = previewStackedLineGraphState,
+//                historyDates = previewEmptyStringList,
+//                categoryTimeRange = previewIncomeCategoryTimeRange,
+//                historyTimeRange = previewIncomeHistoryTimeRange,
+//            )
         }
     }
 }

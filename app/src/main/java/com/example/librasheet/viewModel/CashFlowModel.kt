@@ -34,7 +34,7 @@ class CashFlowModel (
     private val graphTicksY = 6
 
     /** List of categories displayed below the graphic **/
-    var tab by mutableStateOf(0)
+    val tab = mutableStateOf(0)
     val categoryList = mutableStateListOf<CategoryUi>()
 
     /** Pie chart. This needs to have a separate list because the cash flow screen animates between
@@ -102,7 +102,7 @@ class CashFlowModel (
     }
 
     fun loadCategoryList() {
-        when (tab) {
+        when (tab.value) {
             0 -> {
                 categoryList.clear()
                 categoryList.addAll(pie)
@@ -195,8 +195,8 @@ class CashFlowModel (
 
     @Callback
     fun changeTab(tab: Int) { // TODO replace with enum
-        if (this.tab == tab) return
-        this.tab = tab
+        if (this.tab.value == tab) return
+        this.tab.value = tab
         loadCategoryList()
     }
 }
