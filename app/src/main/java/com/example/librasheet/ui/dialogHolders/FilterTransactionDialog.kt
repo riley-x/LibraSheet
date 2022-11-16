@@ -17,8 +17,10 @@ import com.example.librasheet.data.toIntDate
 import com.example.librasheet.ui.components.textFields.DateTextField
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.parseOrNull
+import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.textFields.NumberTextField
+import com.example.librasheet.ui.components.textFields.textFieldBorder
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.LibraViewModel
@@ -135,18 +137,24 @@ fun FilterTransactionDialog(
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        AccountSelector(
+            selection = account,
+            options = accounts,
+            onSelection = { account = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .textFieldBorder()
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         CategorySelector(
             selection = category,
             options = categories,
             onSelection = { category = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .border( // This and the padding to match OutlinedTextField defaults
-                    width = 1.dp,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
-                    shape = MaterialTheme.shapes.small,
-                )
-                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .textFieldBorder()
         )
 
         Spacer(modifier = Modifier.height(10.dp))
