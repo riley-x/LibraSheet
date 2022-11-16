@@ -34,7 +34,7 @@ fun CategorySelector(
     ) {
         ColorIndicator(it?.color ?: Color.Unspecified)
         Text(
-            text = it?.id?.name ?: "None",
+            text = it?.id?.name?.ifEmpty { "None" } ?: "None",
             fontStyle = if (it.isValid()) FontStyle.Normal else FontStyle.Italic,
             color = MaterialTheme.colors.onSurface.copy(
                 alpha = if (it.isValid()) ContentAlpha.high else ContentAlpha.medium,

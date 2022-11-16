@@ -180,7 +180,7 @@ fun TransactionDetailScreen(
                         selection = category.value,
                         options = categoryList,
                         onSelection = { category.value = it },
-                        modifier = Modifier.padding(start = 6.dp)
+                        modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
                     )
                 }
             }

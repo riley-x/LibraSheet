@@ -1,10 +1,10 @@
 package com.example.librasheet.ui.dialogHolders
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -12,15 +12,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.ui.components.textFields.DateTextField
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.parseOrNull
+import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.textFields.NumberTextField
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.preview.previewAccounts
+import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 import com.example.librasheet.viewModel.preview.previewTransactionFilters
 import java.text.SimpleDateFormat
 
@@ -59,6 +62,7 @@ class FilterTransactionDialogHolder(
             FilterTransactionDialog(
                 filters = currentFilters,
                 accounts = viewModel.accounts.all,
+                categories = viewModel.categories.allFilters,
                 onCancel = ::cancel,
                 onSave = ::save,
             )
@@ -72,6 +76,7 @@ class FilterTransactionDialogHolder(
 fun FilterTransactionDialog(
     filters: State<TransactionFilters>,
     accounts: SnapshotStateList<Account>,
+    categories: SnapshotStateList<Category>,
     modifier: Modifier = Modifier,
     onCancel: () -> Unit = { },
     onSave: (TransactionFilters) -> Unit = { },
@@ -128,13 +133,29 @@ fun FilterTransactionDialog(
             )
         }
 
+        Spacer(modifier = Modifier.height(10.dp))
 
+        CategorySelector(
+            selection = category,
+            options = categories,
+            onSelection = { category = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .border( // This and the padding to match OutlinedTextField defaults
+                    width = 1.dp,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+                    shape = MaterialTheme.shapes.small,
+                )
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         NumberTextField(
             value = limit,
             onValueChange = { limit = it },
             label = "Limit",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -148,6 +169,7 @@ private fun Preview() {
     LibraSheetTheme {
         FilterTransactionDialog(
             filters = previewTransactionFilters,
+            categories = previewIncomeCategories2,
             accounts = previewAccounts,
         )
     }

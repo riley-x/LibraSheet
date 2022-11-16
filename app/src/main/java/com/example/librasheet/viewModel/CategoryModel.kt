@@ -36,6 +36,7 @@ class CategoryModel(
      * "Expense". The last element is Category.Ignore. **/
     val incomeFilters = mutableStateListOf<Category>()
     val expenseFilters = mutableStateListOf<Category>()
+    val allFilters = mutableStateListOf<Category>()
 
     /** These are displayed in the nested detail screens **/
     val incomeDetail = mutableStateListOf<CategoryUi>()
@@ -52,10 +53,13 @@ class CategoryModel(
         loadIncome()
         loadExpense()
 
+        val incomeList = data.income.getAllFlattened(false)
+        val expenseList = data.expense.getAllFlattened(false)
+
         incomeTargets.clear()
         expenseTargets.clear()
-        incomeTargets.addAll(data.income.getAllFlattened(false))
-        expenseTargets.addAll(data.expense.getAllFlattened(false))
+        incomeTargets.addAll(incomeList)
+        expenseTargets.addAll(expenseList)
         incomeTargets.add(Category.Ignore)
         expenseTargets.add(Category.Ignore)
 
@@ -65,6 +69,14 @@ class CategoryModel(
         expenseFilters.add(data.expense)
         incomeFilters.addAll(incomeTargets)
         expenseFilters.addAll(expenseTargets)
+
+        allFilters.clear()
+        allFilters.add(Category.None)
+        allFilters.add(data.income)
+        allFilters.add(data.expense)
+        allFilters.addAll(incomeList)
+        allFilters.addAll(expenseList)
+        allFilters.add(Category.Ignore)
     }
 
 
