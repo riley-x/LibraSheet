@@ -1,38 +1,30 @@
-package com.example.librasheet.ui
+package com.example.librasheet.ui.dialogHolders
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.parseOrNull
 import com.example.librasheet.ui.dialogs.Dialog
-import com.example.librasheet.ui.settings.CategoryRuleDialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 import com.example.librasheet.viewModel.preview.previewTransactionFilters
 import java.text.SimpleDateFormat
 
 class FilterTransactionDialogHolder(
     private val viewModel: LibraViewModel,
     private val navController: NavController,
-) {
-    var isOpen by mutableStateOf(false)
+): DialogHolder {
+    override var isOpen by mutableStateOf(false)
     private var isSettings = false
     private var currentFilters = mutableStateOf(TransactionFilters())
 
@@ -60,7 +52,7 @@ class FilterTransactionDialogHolder(
     }
 
     @Composable
-    fun Content() {
+    override fun Content() {
         if (isOpen) {
             FilterTransactionDialog(
                 filters = currentFilters,
