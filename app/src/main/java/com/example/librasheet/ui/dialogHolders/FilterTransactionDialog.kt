@@ -3,25 +3,20 @@ package com.example.librasheet.ui.dialogHolders
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.toIntDate
-import com.example.librasheet.ui.components.DateTextField
+import com.example.librasheet.ui.components.textFields.DateTextField
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.parseOrNull
+import com.example.librasheet.ui.components.textFields.NumberTextField
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.LibraViewModel
@@ -132,6 +127,13 @@ fun FilterTransactionDialog(
                 modifier = Modifier.weight(10f),
             )
         }
+
+        NumberTextField(
+            value = limit,
+            onValueChange = { limit = it },
+            label = "Limit",
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

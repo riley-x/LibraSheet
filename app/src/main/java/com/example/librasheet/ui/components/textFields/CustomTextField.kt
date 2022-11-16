@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.components
+package com.example.librasheet.ui.components.textFields
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background

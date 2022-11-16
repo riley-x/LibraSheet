@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.components
+package com.example.librasheet.ui.components.textFields
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,10 +10,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
-fun DateTextField(
+fun NumberTextField(
     value: String,
     modifier: Modifier = Modifier,
     label: String = "",
+    placeholder: String = "",
     onValueChange: (String) -> Unit = { },
 ) {
     val focusManager = LocalFocusManager.current
@@ -24,11 +25,17 @@ fun DateTextField(
             { Text(text = label) }
         }
 
+    val placeholderComposable: @Composable (() -> Unit)? =
+        if (placeholder.isEmpty()) null
+        else {
+            { Text(text = placeholder) }
+        }
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = labelComposable,
-        placeholder = { Text(text = "mm-dd-yy") },
+        placeholder = placeholderComposable,
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
