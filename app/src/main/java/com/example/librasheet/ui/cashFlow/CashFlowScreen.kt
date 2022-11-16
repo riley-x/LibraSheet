@@ -117,15 +117,9 @@ fun CashFlowScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-//            CashFlowScreen(
-//                parentCategory = "Income".toCategoryId(),
-//                categories = previewIncomeCategories,
-//                expanded = previewExpanded,
-//                history = previewStackedLineGraphState,
-//                historyDates = previewEmptyStringList,
-//                categoryTimeRange = previewIncomeCategoryTimeRange,
-//                historyTimeRange = previewIncomeHistoryTimeRange,
-//            )
+            CashFlowScreen(
+                state = previewCashFlowModel,
+            )
         }
     }
 }

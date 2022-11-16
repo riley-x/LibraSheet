@@ -26,7 +26,7 @@ class CashFlowModel (
     private val data: CategoryData,
     private val isIncome: Boolean,
 ) {
-    var parentCategory: Category = Category.None
+    var parentCategory by mutableStateOf(Category.None)
     private val multiplier = if (isIncome) 1f else -1f
 
     private val graphYPad = 0.1f
