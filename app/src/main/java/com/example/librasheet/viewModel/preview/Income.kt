@@ -4,6 +4,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
@@ -130,25 +131,37 @@ val previewExpanded = mutableStateMapOf(
     "Expense_Housing" to MutableTransitionState(true)
 )
 
-
-
-val previewNetIncome = mutableStateListOf(
+val previewIncome = mutableStateListOf(
     1151.21f,
-    -352.3f,
-    203.65f,
+    1056f,
+    1203.65f,
     1036.98f,
-    -405.31f,
-    625.82f,
-    410.2f
+    1405.31f,
+    925.82f,
+    1110.2f
 )
+
+val previewExpense = mutableStateListOf(
+    -543.12f,
+    -352.3f,
+    -1502.36f,
+    -600.25f,
+    -405.31f,
+    -1525.82f,
+    -410.2f
+)
+
+val previewNetIncome = List(previewExpense.size) {
+    previewIncome[it] + previewExpense[it]
+}.toMutableStateList()
 
 val previewNetIncomeAxes = mutableStateOf(AxesState(
     minX = -0.75f,
     maxX = previewNetIncome.lastIndex + 0.5f,
-    minY = -500f,
-    maxY = 1200f,
-    ticksY = List(4) {
-        val value = -400f + it * 400f
+    minY = -2000f,
+    maxY = 2000f,
+    ticksY = List(7) {
+        val value = -1500f + it * 500f
         NamedValue(value, "$value")
     },
     ticksX = List(3) { NamedValue(value = 1f + 2f * it, name = "$it/$it/$it") }

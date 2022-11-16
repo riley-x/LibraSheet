@@ -29,7 +29,6 @@ import kotlin.math.roundToInt
 
 typealias StackedLineGraphValue = Pair<Color, List<Float>>
 
-@Immutable
 data class StackedLineGraphState(
     val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
     val values: SnapshotStateList<StackedLineGraphValue> = mutableStateListOf(),

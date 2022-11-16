@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Path
 fun Path.moveTo(offset: Offset) = moveTo(offset.x, offset.y)
 fun Path.lineTo(offset: Offset) = lineTo(offset.x, offset.y)
 
-@Immutable
 data class DiscreteGraphState(
     val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
     val values: SnapshotStateList<Float> = mutableStateListOf(),
