@@ -53,7 +53,7 @@ fun LibraApp(
         }
     }
     fun toAccountDetails(account: Account) {
-        viewModel.accountDetail.load(account)
+        viewModel.accountDetail.load(account.key)
         navController.navigate(AccountDestination.route)
     }
     fun toBalanceColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(BalanceTab.graph, spec))
@@ -258,6 +258,7 @@ fun LibraApp(
                 composable(route = AccountDestination.route) {
                     AccountScreen(
                         state = viewModel.accountDetail,
+                        accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
                         onClickColor = ::toBalanceColorSelector,
                         modifier = Modifier.padding(innerPadding),

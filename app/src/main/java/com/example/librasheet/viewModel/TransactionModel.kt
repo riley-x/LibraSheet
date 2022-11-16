@@ -81,7 +81,7 @@ class TransactionModel(
     @Callback
     fun loadBalance(account: Account) {
         if (balanceList.isNotEmpty()) return
-        filterBalance(defaultFilter.copy(account = account))
+        filterBalance(defaultFilter.copy(account = account.key))
     }
 
     private fun loadFilter(outList: SnapshotStateList<TransactionEntity>, filter: TransactionFilters) {

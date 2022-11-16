@@ -86,7 +86,7 @@ data class TransactionFilters(
     val maxValue: Float? = null,
     val startDate: Int? = null,
     val endDate: Int? = null,
-    val account: Account? = null,
+    val account: Long? = null,
     val category: Category? = null,
     val limit: Int? = null,
 )
@@ -116,7 +116,7 @@ fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
     if (filter.account != null) {
         q += if ("WHERE" in q) " AND" else " WHERE"
         q += " accountKey = ?"
-        args.add(filter.account.key)
+        args.add(filter.account)
     }
     if (filter.category != null) {
         q += if ("WHERE" in q) " AND" else " WHERE"

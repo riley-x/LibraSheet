@@ -32,14 +32,14 @@ class AccountScreenState(
     private val graphTicksX = 4
     private val graphTicksY = 6
 
-    val account = mutableStateOf(Account(name = "", color = Color.Unspecified))
+    val account = mutableStateOf(0L) // Remember, no storing pointers to accounts!
     val balance = DiscreteGraphState()
     val netIncome = NetIncomeGraphState()
     val transactions = mutableStateListOf<TransactionEntity>()
     val incomeDates = mutableStateListOf<String>()
     val historyDates = mutableStateListOf<String>()
 
-    fun load(account: Account = this.account.value) {
+    fun load(account: Long = this.account.value) {
         this.account.value = account
         loadIncome()
         loadHistory()
@@ -48,7 +48,7 @@ class AccountScreenState(
 
     fun loadIncome() = scope.launch {
         val (dates, flows) = withContext(Dispatchers.IO) {
-            categoryHistoryDao.getIncomeAndExpense(account.value.key).alignDates(false)
+            categoryHistoryDao.getIncomeAndExpense(account.value).alignDates(false)
         }
         val income = flows[0] ?: return@launch
         val expense = flows[1] ?: return@launch
@@ -91,7 +91,7 @@ class AccountScreenState(
 
     fun loadHistory() = scope.launch {
         val history = withContext(Dispatchers.IO) {
-            accountDao.getHistory(account.value.key)
+            accountDao.getHistory(account.value)
         }
 
         historyDates.clear()

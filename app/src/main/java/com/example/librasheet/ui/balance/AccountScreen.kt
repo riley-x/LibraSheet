@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ private val tabs = ImmutableList(listOf("Balance", "Net Income"))
 @Composable
 fun AccountScreen(
     state: AccountScreenState,
+    accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onClickColor: (String) -> Unit = { },
@@ -37,12 +39,16 @@ fun AccountScreen(
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
+    val account = accounts.find { it.key == state.account.value } ?: Account(
+        name = "",
+        color = Color.Unspecified,
+    )
 
     Column(
         modifier = modifier
     ) {
         HeaderBar(
-            title = state.account.value.name,
+            title = account.name,
             backArrow = true,
             onBack = onBack,
         ) {
@@ -54,9 +60,9 @@ fun AccountScreen(
                     modifier = Modifier
                         .padding(end = 15.dp)
                         .size(30.dp)
-                        .clickable { onClickColor("account_" + state.account.value.name) }
+                        .clickable { onClickColor("account_" + account.name) }
                 ) {
-                    drawRect(color = state.account.value.color)
+                    drawRect(color = account.color)
                 }
             }
         }
@@ -116,6 +122,7 @@ private fun Preview() {
         Surface {
             AccountScreen(
                 state = previewAccountScreenState,
+                accounts = previewAccounts,
             )
         }
     }
