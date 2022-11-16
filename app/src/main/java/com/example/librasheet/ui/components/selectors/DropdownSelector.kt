@@ -52,16 +52,13 @@ fun <T> DropdownSelector(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = ::onExpandedChange,
-        modifier = modifier
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier, // I think the modifier needs to go here
         ) {
             display(selection)
             Spacer(Modifier.weight(10f))
-
-            /** Using ExposedDropdownMenuDefaults.TrailingIcon doesn't close the keyboard when
-             * clicked, but also the ripple is confusing. **/
 
             /** Using ExposedDropdownMenuDefaults.TrailingIcon doesn't close the keyboard when
              * clicked, but also the ripple is confusing. **/

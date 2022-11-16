@@ -28,6 +28,7 @@ import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.*
+import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
@@ -175,21 +176,12 @@ fun TransactionDetailScreen(
                 TransactionFieldRow(
                     label = "Category",
                 ) {
-                    DropdownSelector(
+                    CategorySelector(
                         selection = category.value,
                         options = categoryList,
                         onSelection = { category.value = it },
-                    ) {
-                        Spacer(Modifier.width(6.dp))
-                        ColorIndicator(it?.color ?: Color.Unspecified)
-                        Text(
-                            text = it?.id?.name ?: "None",
-                            fontStyle = if (it.isValid()) FontStyle.Normal else FontStyle.Italic,
-                            color = MaterialTheme.colors.onSurface.copy(
-                                alpha = if (it.isValid()) ContentAlpha.high else ContentAlpha.medium,
-                            )
-                        )
-                    }
+                        modifier = Modifier.padding(start = 6.dp)
+                    )
                 }
             }
 
@@ -234,12 +226,6 @@ fun TransactionDetailScreen(
                     }
                 }
             }
-
-//            item {
-//                with(LocalDensity.current) {
-//                    Spacer(Modifier.height(WindowInsets.ime.getBottom(this).toDp()))
-//                }
-//            }
         }
     }
 }
