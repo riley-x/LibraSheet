@@ -16,6 +16,7 @@ import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.balance.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
+import com.example.librasheet.ui.dialogHolders.FilterTransactionDialogHolder
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
@@ -88,7 +89,7 @@ fun LibraApp(
 
     /** Dialogs **/
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
-    val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel, navController) }
+    val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel) }
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
@@ -215,7 +216,7 @@ fun LibraApp(
                     transactions = if (isSettings) viewModel.transactions.settingsList else viewModel.transactions.balanceList,
                     accounts = viewModel.accounts.all,
                     onBack = navController::popBackStack,
-                    onFilter = { }, // TODO
+                    onFilter = if (isSettings) filterTransactionDialog::openSettings else filterTransactionDialog::openBalance,
                     onTransactionClick = if (isSettings) ::toSettingsTransactionDetail else ::toBalanceTransactionDetail,
                     modifier = Modifier.padding(innerPadding),
                 )

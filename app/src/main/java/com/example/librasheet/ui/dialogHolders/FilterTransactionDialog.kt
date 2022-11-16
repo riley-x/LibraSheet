@@ -1,12 +1,16 @@
 package com.example.librasheet.ui.dialogHolders
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
@@ -22,7 +26,6 @@ import java.text.SimpleDateFormat
 
 class FilterTransactionDialogHolder(
     private val viewModel: LibraViewModel,
-    private val navController: NavController,
 ): DialogHolder {
     override var isOpen by mutableStateOf(false)
     private var isSettings = false
@@ -42,7 +45,6 @@ class FilterTransactionDialogHolder(
 
     fun cancel() {
         isOpen = false
-        navController.popBackStack()
     }
 
     fun save(filters: TransactionFilters) {
@@ -105,16 +107,25 @@ fun FilterTransactionDialog(
     }
 
     Dialog(
-        title = "Filters",
         onCancel = onCancel,
         onOk = ::onOk,
         modifier = modifier,
     ) {
-        OutlinedTextField(
-            value = startDate,
-            onValueChange = { startDate = it },
-            label = { Text(text = "Date from:") },
-        )
+        Row {
+            OutlinedTextField(
+                value = startDate,
+                onValueChange = { startDate = it },
+                label = { Text(text = "Date start:") },
+                modifier = Modifier.weight(10f),
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            OutlinedTextField(
+                value = endDate,
+                onValueChange = { endDate = it },
+                label = { Text(text = "Date end:") },
+                modifier = Modifier.weight(10f),
+            )
+        }
     }
 }
 
