@@ -61,3 +61,5 @@ data class Account(
     )
 }
 
+
+fun List<Account>.find(key: Long?) = if (key == null) null else find { it.key == key }

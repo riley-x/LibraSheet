@@ -210,7 +210,9 @@ fun LibraApp(
             val isSettings = route == SettingsTab.graph
             composable(route = TransactionAllDestination.route(route!!)) {
                 TransactionListScreen(
+                    filter = if (isSettings) viewModel.transactions.settingsFilter else viewModel.transactions.balanceFilter,
                     transactions = if (isSettings) viewModel.transactions.settingsList else viewModel.transactions.balanceList,
+                    accounts = viewModel.accounts.all,
                     onBack = navController::popBackStack,
                     onFilter = { }, // TODO
                     onTransactionClick = if (isSettings) ::toSettingsTransactionDetail else ::toBalanceTransactionDetail,

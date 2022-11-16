@@ -93,9 +93,9 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 2.sp,
     ),
-    caption = TextStyle( // Used by OutlinedTextField for the label
+    caption = TextStyle( // Used by OutlinedTextField for the label. Also transaction filters
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
+        fontSize = 14.sp,
     ),
     overline = TextStyle( // Monospaced for graph/etc.
         fontWeight = FontWeight.Normal,
