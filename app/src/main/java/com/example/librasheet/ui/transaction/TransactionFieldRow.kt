@@ -6,8 +6,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.sharp.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,9 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.components.textFields.OutlinedTextFieldNoPadding
 import com.example.librasheet.ui.components.libraRowHeight
+import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionFieldRow(
@@ -41,6 +38,7 @@ fun TransactionFieldRow(
         modifier = Modifier
             .padding(vertical = 2.dp)
             .then(modifier)
+            .heightIn(min = libraRowHeight)
             .fillMaxWidth()
     ) {
         Text(
@@ -107,85 +105,14 @@ fun TransactionEditRow(
             keyboardActions = KeyboardActions(
                 onDone = { focusManager.clearFocus(true) }
             ),
-            modifier = Modifier.focusRequester(focusRequester).weight(10f).fillMaxHeight()
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .weight(10f)
+                .fillMaxHeight()
         )
 
         IconButton(onClick = { focusRequester.requestFocus() }) {
             Icon(imageVector = Icons.Sharp.Edit, contentDescription = null)
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
-@Composable
-fun <T> TransactionSelectorRow(
-    label: String,
-    selection: T,
-    options: List<T>,
-    modifier: Modifier = Modifier,
-    onSelection: (T) -> Unit = { },
-    display: @Composable RowScope.(T) -> Unit = { },
-) {
-
-    TransactionFieldRow(
-        label = label,
-        modifier = modifier.height(libraRowHeight),
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
-//        val isImeVisible = WindowInsets.isImeVisible
-
-        fun onExpandedChange(new: Boolean) {
-            scope.launch {
-                /**
-                 * When switching between a text box and a selector, the closing keyboard causes the
-                 * dropdown box to flicker between above and below. The delay allows the keyboard to
-                 * close first. TODO only delay when keyboard is open? But isImeVisible is false already
-                 */
-                if (!expanded) delay(100)
-                expanded = !expanded
-            }
-        }
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = ::onExpandedChange,
-            modifier = modifier
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                display(selection)
-                Spacer(Modifier.weight(10f))
-
-                /** Using ExposedDropdownMenuDefaults.TrailingIcon doesn't close the keyboard when
-                 * clicked, but also the ripple is confusing.
-                 */
-                Box(
-                    modifier = Modifier.size(48.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (expanded) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
-                        contentDescription = null)
-                }
-            }
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                options.forEach {
-                    DropdownMenuItem(
-                        onClick = {
-                            onSelection(it)
-                            expanded = false
-                        },
-                    ) {
-                        display(it)
-                    }
-                }
-            }
         }
     }
 }
@@ -241,13 +168,16 @@ private fun PreviewEditBox() {
 private fun PreviewSelect() {
     LibraSheetTheme {
         Surface {
-            TransactionSelectorRow(
+            TransactionFieldRow(
                 label = "Account",
-                selection = "Robinhood",
-                options = listOf(""),
             ) {
-                ColorIndicator(Color.Green)
-                Text(it)
+                DropdownSelector(
+                    selection = "Robinhood",
+                    options = emptyList(),
+                ) {
+                    ColorIndicator(Color.Green)
+                    Text(it)
+                }
             }
         }
     }

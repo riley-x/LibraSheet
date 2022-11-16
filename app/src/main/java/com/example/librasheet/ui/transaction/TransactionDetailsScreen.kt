@@ -28,6 +28,7 @@ import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.*
+import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
@@ -145,52 +146,50 @@ fun TransactionDetailScreen(
             }
 
             item("Account") {
-                TransactionSelectorRow(
-                    label = "Account",
-                    selection = account.value,
-                    options = accounts,
-                    onSelection = { account.value = it },
+                TransactionFieldRow(
+                    label = "Account"
                 ) {
-                    Spacer(Modifier.width(6.dp))
-                    ColorIndicator(it?.color ?: Color.Unspecified)
-                    Text(
-                        text = it?.name ?: "None",
-                        fontStyle = if (it == null) FontStyle.Italic else FontStyle.Normal,
-                    )
+                    DropdownSelector(
+                        selection = account.value,
+                        options = accounts,
+                        onSelection = { account.value = it },
+                    ) {
+                        Spacer(Modifier.width(6.dp))
+                        ColorIndicator(it?.color ?: Color.Unspecified)
+                        Text(
+                            text = it?.name ?: "None",
+                            fontStyle = if (it == null) FontStyle.Italic else FontStyle.Normal,
+                        )
+                    }
                 }
             }
 
             editor("Name", name, number = false)
 
             editor("Date", date, error = dateError, placeholder = "mm-dd-yy")
-            // TODO annoying because the cursor might not be at the end. Also need to adjust the cursor
-            // position after adding characters.
-//            {
-//                date.value =
-//                    if (date.value.length == 1 && it.length == 2) "$it-"
-//                    else if (date.value.length == 4 && it.length == 5) "$it-"
-//                    else it
-//            }
 
             editor("Value", value, error = valueError)
 
 
             item("Category") {
-                TransactionSelectorRow(
+                TransactionFieldRow(
                     label = "Category",
-                    selection = category.value,
-                    options = categoryList,
-                    onSelection = { category.value = it },
                 ) {
-                    Spacer(Modifier.width(6.dp))
-                    ColorIndicator(it?.color ?: Color.Unspecified)
-                    Text(
-                        text = it?.id?.name ?: "None",
-                        fontStyle = if (it.isValid()) FontStyle.Normal else FontStyle.Italic,
-                        color = MaterialTheme.colors.onSurface.copy(
-                            alpha = if (it.isValid()) ContentAlpha.high else ContentAlpha.medium,
+                    DropdownSelector(
+                        selection = category.value,
+                        options = categoryList,
+                        onSelection = { category.value = it },
+                    ) {
+                        Spacer(Modifier.width(6.dp))
+                        ColorIndicator(it?.color ?: Color.Unspecified)
+                        Text(
+                            text = it?.id?.name ?: "None",
+                            fontStyle = if (it.isValid()) FontStyle.Normal else FontStyle.Italic,
+                            color = MaterialTheme.colors.onSurface.copy(
+                                alpha = if (it.isValid()) ContentAlpha.high else ContentAlpha.medium,
+                            )
                         )
-                    )
+                    }
                 }
             }
 
@@ -214,7 +213,9 @@ fun TransactionDetailScreen(
             item("Buttons") {
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
                 ) {
                     Button(
                         colors = ButtonDefaults.buttonColors(

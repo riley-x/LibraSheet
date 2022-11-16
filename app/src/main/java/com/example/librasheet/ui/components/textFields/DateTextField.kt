@@ -17,6 +17,14 @@ fun DateTextField(
     onValueChange: (String) -> Unit = { },
 ) {
     // TODO auto insert the "-"
+    // annoying because the cursor might not be at the end. Also need to adjust the cursor
+    // position after adding characters.
+//            {
+//                date.value =
+//                    if (date.value.length == 1 && it.length == 2) "$it-"
+//                    else if (date.value.length == 4 && it.length == 5) "$it-"
+//                    else it
+//            }
 
     NumberTextField(
         value = value,
