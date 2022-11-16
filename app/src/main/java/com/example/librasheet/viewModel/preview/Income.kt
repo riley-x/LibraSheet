@@ -14,6 +14,7 @@ import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.NamedValue
 import com.example.librasheet.data.entity.toCategoryId
+import com.example.librasheet.ui.graphing.NetIncomeGraphState
 
 val previewIncomeCategoryTimeRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
 val previewIncomeHistoryTimeRange = mutableStateOf(HistoryTimeRange.ALL)
@@ -167,8 +168,15 @@ val previewNetIncomeAxes = mutableStateOf(AxesState(
     ticksX = List(3) { NamedValue(value = 1f + 2f * it, name = "$it/$it/$it") }
 ))
 
-val previewNetIncomeState = DiscreteGraphState(
+
+val previewBarState = DiscreteGraphState(
     values = previewNetIncome,
     axes = previewNetIncomeAxes,
 )
 
+val previewNetIncomeState = NetIncomeGraphState(
+    values1 = previewIncome,
+    values2 = previewExpense,
+    valuesNet = previewNetIncome,
+    axes = previewNetIncomeAxes,
+)

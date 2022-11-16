@@ -119,7 +119,7 @@ private fun Preview() {
                 history = previewStackedLineGraphState,
                 historyDates = previewEmptyStringList,
                 incomeDates = previewEmptyStringList,
-                netIncome = previewNetIncomeState,
+                netIncome = previewBarState,
             )
         }
     }

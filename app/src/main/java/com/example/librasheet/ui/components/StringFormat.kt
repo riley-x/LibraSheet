@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import com.example.librasheet.data.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 
 @Stable
@@ -57,9 +58,12 @@ fun formatDateIntSimple(date: Int, separator: String = "/"): String {
     return "$month$separator$day$separator$year"
 }
 
+private val c = GregorianCalendar()
+
 @Stable
 fun formatDateInt(date: Int, format: String): String {
-    return DateFormat.format(format, date.toTimestamp()).toString()
+    c.setIntDate(date)
+    return DateFormat.format(format, c).toString()
 }
 
 @Stable

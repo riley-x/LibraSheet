@@ -31,9 +31,9 @@ class BalanceGraphModel(
     private val accountDao = viewModel.application.database.accountDao()
     private val categoryHistoryDao = viewModel.application.database.categoryHistoryDao()
 
-    private var history: MutableMap<Long, MutableList<Long>> = mutableMapOf()
-    private var historyDateInts: List<Int> = emptyList()
-    private var netIncome: MutableList<TimeSeries> = mutableListOf()
+    var history: MutableMap<Long, MutableList<Long>> = mutableMapOf()
+    var historyDateInts: List<Int> = emptyList()
+    var netIncome: MutableList<TimeSeries> = mutableListOf()
 
     /** State for the net income graph in the balance screen **/
     val incomeGraph = DiscreteGraphState()

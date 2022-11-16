@@ -23,17 +23,16 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
-private val tabs = ImmutableList(listOf("Balance", "Net Income", "Income", "Spending"))
+private val tabs = ImmutableList(listOf("Balance", "Net Income"))
 
 
 @Composable
 fun AccountScreen(
     account: State<Account>,
-    dates: SnapshotStateList<String>,
     balance: DiscreteGraphState,
-    netIncome: DiscreteGraphState,
-    income: StackedLineGraphState,
-    spending: StackedLineGraphState,
+    netIncome: NetIncomeGraphState,
+    historyDates: SnapshotStateList<String>,
+    incomeDates: SnapshotStateList<String>,
     transactions: SnapshotStateList<TransactionEntity>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
@@ -82,31 +81,15 @@ fun AccountScreen(
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(balance.values[loc]) + "\n" + dates[loc]
+                                formatDollar(balance.values[loc]) + "\n" + historyDates[loc]
                             else ""
                         }
-                        1 -> BinaryBarGraph(
+                        1 -> NetIncomeGraph(
                             state = netIncome,
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(netIncome.values[loc]) + "\n" + dates[loc]
-                            else ""
-                        }
-                        2 -> StackedLineGraph(
-                            state = income,
-                            modifier = Modifier.fillMaxSize()
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(income.values.first().second[loc]) + "\n" + dates[loc]
-                            else ""
-                        }
-                        else -> StackedLineGraph(
-                            state = spending,
-                            modifier = Modifier.fillMaxSize()
-                        ) { isHover, loc ->
-                            hoverText = if (isHover)
-                                formatDollar(spending.values.first().second[loc]) + "\n" + dates[loc]
+                                formatDollar(netIncome.valuesNet[loc]) + "\n" + incomeDates[loc]
                             else ""
                         }
                     }
@@ -137,11 +120,10 @@ private fun Preview() {
         Surface {
             AccountScreen(
                 account = previewAccount,
-                dates = previewLineGraphDates,
+                incomeDates = previewLineGraphDates,
+                historyDates = previewLineGraphDates,
                 balance = previewLineGraphState,
                 netIncome = previewNetIncomeState,
-                income = previewStackedLineGraphState,
-                spending = previewStackedLineGraphState,
                 transactions = previewTransactions,
             )
         }

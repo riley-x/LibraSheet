@@ -12,10 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils
 import com.example.librasheet.ui.components.NoDataError
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.preview.previewExpense
-import com.example.librasheet.viewModel.preview.previewIncome
-import com.example.librasheet.viewModel.preview.previewNetIncome
-import com.example.librasheet.viewModel.preview.previewNetIncomeAxes
+import com.example.librasheet.viewModel.preview.*
 import kotlin.math.roundToInt
 
 
@@ -95,12 +92,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             NetIncomeGraph(
-                state = NetIncomeGraphState(
-                    values1 = previewIncome,
-                    values2 = previewExpense,
-                    valuesNet = previewNetIncome,
-                    axes = previewNetIncomeAxes,
-                ),
+                state = previewNetIncomeState,
                 modifier = Modifier.size(360.dp)
             )
         }

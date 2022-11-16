@@ -262,8 +262,6 @@ fun LibraApp(
                         dates = previewLineGraphDates,
                         balance = previewLineGraphState,
                         netIncome = previewNetIncomeState,
-                        income = previewStackedLineGraphState,
-                        spending = previewStackedLineGraphState,
                         transactions = previewTransactions,
                         onBack = navController::popBackStack,
                         onClickColor = ::toBalanceColorSelector,

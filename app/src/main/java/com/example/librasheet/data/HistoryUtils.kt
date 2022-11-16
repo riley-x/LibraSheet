@@ -1,5 +1,6 @@
 package com.example.librasheet.data
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.entity.AccountHistory
 import com.example.librasheet.ui.graphing.StackedLineGraphValue
@@ -10,6 +11,13 @@ interface HistoryEntry {
     val date: Int
     val value: Long
 }
+
+@Immutable
+data class HistoryEntryBase(
+    override val seriesKey: Long,
+    override val value: Long,
+    override val date: Int,
+): HistoryEntry
 
 interface Series {
     val key: Long
