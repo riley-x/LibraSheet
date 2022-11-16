@@ -7,11 +7,8 @@ import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.theme.randomColor
 import com.example.librasheet.viewModel.Callback
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import com.example.librasheet.data.toIntDate
+import kotlinx.coroutines.*
 import java.util.*
 
 class CategoryData(
@@ -77,6 +74,23 @@ class CategoryData(
         return jobs
     }
 
+    fun loadHistory(): List<Job> {
+        val jobs = mutableListOf<Job>()
+
+        /** Category History **/
+        jobs.launchIO {
+            val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
+            historyDates = res.first
+            history = res.second
+            /** Sum subCategories into parents **/
+            all[0].sumChildren(history)
+            all[1].sumChildren(history)
+            Log.d("Libra/CategoryData/load", "history=$history")
+        }
+
+        return jobs
+    }
+
     fun loadValues(): List<Job> {
         val jobs = mutableListOf<Job>()
         val today = Calendar.getInstance().toIntDate()
@@ -109,15 +123,6 @@ class CategoryData(
         jobs.launchIO {
             allTotal = historyDao.getTotals(0)
             Log.d("Libra/CategoryData/load", "allTotal=$allTotal")
-        }
-
-        /** Category History **/
-        jobs.launchIO {
-            val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
-            historyDates = res.first
-            history = res.second
-            /** Sum subCategories into parents **/
-            // TODO, or do sum in category history in database?
         }
 
         return jobs
@@ -265,4 +270,19 @@ class CategoryData(
             dao.update(staleEntities)
         }
     }
+}
+
+/** The values retrieved from the database are per category, not pre-summed by parent/child hierarchy.
+ * This function edits a returned history map of category -> history (retrieved from alignDates) to
+ * add component categories to their parents. The return value is the history list of this category,
+ * and is just used for recursion.
+ */
+fun Category.sumChildren(values: MutableMap<Long, MutableList<Long>>): List<Long>? {
+    val list = values[key] ?: return null
+    subCategories.forEach { sub ->
+        sub.sumChildren(values)?.let {
+            for (i in it.indices) { list[i] += it[i] }
+        }
+    }
+    return list
 }

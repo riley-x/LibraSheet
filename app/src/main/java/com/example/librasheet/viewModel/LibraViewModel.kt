@@ -32,6 +32,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         viewModelScope.launch {
             (categories.data.loadCategories() + categories.data.loadValues()).joinAll()
             categories.loadUi()
+            categories.data.loadHistory().joinAll()
             incomeScreen.load(categories.data.all[0])
             expenseScreen.load(categories.data.all[1])
         }
@@ -42,13 +43,14 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             Dependency.ACCOUNT_REORDER, Dependency.ACCOUNT_COLOR -> viewModelScope.launch {
                 balanceGraphs.calculateHistoryGraph(accounts.all) // this could be optimized for color changing but whatever
             }
-            Dependency.CATEGORY -> {
+            Dependency.CATEGORY -> viewModelScope.launch {
                 categories.loadUi()
+                categories.data.loadHistory().joinAll()
                 incomeScreen.load()
                 expenseScreen.load()
             }
             Dependency.TRANSACTION -> viewModelScope.launch {
-                categories.data.loadValues().joinAll()
+                (categories.data.loadHistory() + categories.data.loadValues()).joinAll()
                 accounts.load().join()
                 incomeScreen.load()
                 expenseScreen.load()
