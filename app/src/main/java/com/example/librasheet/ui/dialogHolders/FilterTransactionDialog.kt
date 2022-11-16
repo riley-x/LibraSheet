@@ -4,11 +4,15 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -111,19 +115,37 @@ fun FilterTransactionDialog(
         onOk = ::onOk,
         modifier = modifier,
     ) {
+        val focusManager = LocalFocusManager.current
+
         Row {
             OutlinedTextField(
                 value = startDate,
                 onValueChange = { startDate = it },
-                label = { Text(text = "Date start:") },
+                label = { Text(text = "Date Start") },
+                placeholder = { Text(text = "mm-dd-yy") },
                 modifier = Modifier.weight(10f),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus(true) }
+                ),
             )
             Spacer(modifier = Modifier.width(10.dp))
             OutlinedTextField(
                 value = endDate,
                 onValueChange = { endDate = it },
-                label = { Text(text = "Date end:") },
+                label = { Text(text = "Date End") },
+                placeholder = { Text(text = "mm-dd-yy") },
+                singleLine = true,
                 modifier = Modifier.weight(10f),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus(true) }
+                ),
             )
         }
     }
