@@ -261,10 +261,13 @@ fun LibraApp(
                         accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
                         onClickColor = ::toBalanceColorSelector,
+                        toTransaction = ::toBalanceTransactionDetail,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
                 colorSelector()
+                transactionDetail()
+                transactionAll()
             }
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {

@@ -9,6 +9,7 @@ val previewAccountScreenState = AccountScreenState(
     categoryHistoryDao = FakeHistoryDao(),
     transactionDao = FakeTransactionDao(),
 ).also {
+    it.account.value = 1
     it.incomeDates.addAll(previewLineGraphDates)
     it.historyDates.addAll(previewLineGraphDates)
     it.balance.values.addAll(previewLineGraph)
