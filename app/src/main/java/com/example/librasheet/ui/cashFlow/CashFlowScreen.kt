@@ -1,33 +1,27 @@
 package com.example.librasheet.ui.cashFlow
 
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
-import com.example.librasheet.data.entity.CategoryId
 import com.example.librasheet.data.entity.ignoreKey
-import com.example.librasheet.data.entity.toCategoryId
-import com.example.librasheet.ui.categories.*
-import com.example.librasheet.ui.components.*
-import com.example.librasheet.ui.graphing.*
+import com.example.librasheet.ui.categories.CategoryDragRow
+import com.example.librasheet.ui.components.DragHost
+import com.example.librasheet.ui.components.HeaderBar
+import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CashFlowModel
-import com.example.librasheet.viewModel.CategoryTimeRange
-import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.preview.*
+import com.example.librasheet.viewModel.preview.previewCashFlowModel
 
 
 private val tabs = ImmutableList(listOf("Monthly Averages", "Totals"))
