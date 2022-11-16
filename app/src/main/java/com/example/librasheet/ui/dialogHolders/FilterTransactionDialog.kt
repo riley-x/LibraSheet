@@ -143,7 +143,7 @@ fun FilterTransactionDialog(
             onSelection = { account = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .textFieldBorder()
+                .textFieldBorder("Account")
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -154,7 +154,7 @@ fun FilterTransactionDialog(
             onSelection = { category = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .textFieldBorder()
+                .textFieldBorder("Category")
         )
 
         Spacer(modifier = Modifier.height(10.dp))
