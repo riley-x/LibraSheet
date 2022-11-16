@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.components
+package com.example.librasheet.ui.components.selectors
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*

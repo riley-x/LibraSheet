@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.ButtonGroup
-import com.example.librasheet.ui.components.GraphSelector
+import com.example.librasheet.ui.components.selectors.GraphSelector
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.graphing.PieChartFiltered
 import com.example.librasheet.ui.graphing.StackedLineGraph

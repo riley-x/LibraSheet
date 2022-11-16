@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.components.*
+import com.example.librasheet.ui.components.selectors.GraphSelector
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.ImmutableList

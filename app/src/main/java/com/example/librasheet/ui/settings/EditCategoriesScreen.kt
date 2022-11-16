@@ -20,6 +20,7 @@ import androidx.compose.ui.zIndex
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.categories.CategoryDragRow
 import com.example.librasheet.ui.components.*
+import com.example.librasheet.ui.components.selectors.DropdownOptions
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.*
 import com.example.librasheet.viewModel.preview.*

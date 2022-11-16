@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.components
+package com.example.librasheet.ui.components.selectors
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.*
@@ -9,6 +9,9 @@ import androidx.compose.ui.Modifier
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 
+/**
+ * A single icon that when clicked, exposes a dropdown menu with clickable text entries.
+ */
 @Composable
 fun <T: HasDisplayName> DropdownOptions(
     options: ImmutableList<T>,
