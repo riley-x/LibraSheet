@@ -10,29 +10,38 @@ import com.example.librasheet.viewModel.Callback
 import com.example.librasheet.data.toIntDate
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.math.exp
 
 class CategoryData(
     private val scope: CoroutineScope,
     private val dao: CategoryDao,
     private val historyDao: CategoryHistoryDao,
 ) {
-
     private var lastRowId = 0L
 
-    val all = mutableListOf(
-        Category(
-            key = incomeKey,
-            id = CategoryId(incomeName),
-            color = Color(0xFF004940),
-            listIndex = 0,
-        ),
-        Category(
-            key = expenseKey,
-            id = CategoryId(expenseName),
-            color = Color(0xFF5C1604),
-            listIndex = 1,
+    val all = Category(
+        key = allKey,
+        id = CategoryId(),
+        color = Color.Unspecified,
+        subCategories = mutableListOf(
+            Category(
+                key = incomeKey,
+                id = CategoryId(incomeName),
+                color = Color(0xFF004940),
+                listIndex = 0,
+            ),
+            Category(
+                key = expenseKey,
+                id = CategoryId(expenseName),
+                color = Color(0xFF5C1604),
+                listIndex = 1,
+            )
         )
     )
+    val income: Category
+        get() = all.subCategories[0]
+    val expense: Category
+        get() = all.subCategories[1]
 
     var historyDates = mutableListOf<Int>()
     var history = mutableMapOf<Long, MutableList<Long>>()
@@ -63,12 +72,12 @@ class CategoryData(
 
         /** Categories **/
         jobs.launchIO {
-            dao.getIncome().mapTo(all[0].subCategories) { it.toNestedCategory() }
-            Log.d("Libra/CategoryData/load", "income=${all[0].subCategories.size}")
+            dao.getIncome().mapTo(income.subCategories) { it.toNestedCategory() }
+            Log.d("Libra/CategoryData/load", "income=${income.subCategories.size}")
         }
         jobs.launchIO {
-            dao.getExpense().mapTo(all[1].subCategories) { it.toNestedCategory() }
-            Log.d("Libra/CategoryData/load", "expense=${all[1].subCategories.size}")
+            dao.getExpense().mapTo(expense.subCategories) { it.toNestedCategory() }
+            Log.d("Libra/CategoryData/load", "expense=${expense.subCategories.size}")
         }
 
         return jobs
@@ -83,8 +92,8 @@ class CategoryData(
             historyDates = res.first
             history = res.second
             /** Sum subCategories into parents **/
-            all[0].sumChildren(history)
-            all[1].sumChildren(history)
+            income.sumChildren(history)
+            expense.sumChildren(history)
             Log.d("Libra/CategoryData/load", "history=$history")
         }
 
@@ -129,7 +138,7 @@ class CategoryData(
     }
 
     fun find(category: CategoryId): Triple<Category, MutableList<Category>, Int> =
-        all.find(category) ?: throw RuntimeException("CategoryModel::find couldn't find $category")
+        all.subCategories.find(category) ?: throw RuntimeException("CategoryModel::find couldn't find $category")
 
 
     fun add(parentCategory: CategoryId, newCategory: String): String {

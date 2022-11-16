@@ -17,6 +17,7 @@ const val displaySeparator = " > "
 internal const val incomeKey = -1L
 internal const val expenseKey = -2L
 internal const val ignoreKey = -3L
+internal const val allKey = -4L
 
 
 /**

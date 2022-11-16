@@ -91,7 +91,7 @@ class RuleModel(
     @Callback
     fun setScreen(income: Boolean) {
         currentScreenIsIncome = income
-        val category = viewModel.categories.data.all[if (income) 0 else 1]
+        val category = if (income) viewModel.categories.data.income else viewModel.categories.data.expense
         setFilter(category)
     }
 

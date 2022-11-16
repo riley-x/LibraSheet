@@ -54,15 +54,15 @@ class CategoryModel(
 
         incomeTargets.clear()
         expenseTargets.clear()
-        incomeTargets.addAll(data.all[0].getAllFlattened(false))
-        expenseTargets.addAll(data.all[1].getAllFlattened(false))
+        incomeTargets.addAll(data.income.getAllFlattened(false))
+        expenseTargets.addAll(data.expense.getAllFlattened(false))
         incomeTargets.add(Category.Ignore)
         expenseTargets.add(Category.Ignore)
 
         incomeFilters.clear()
         expenseFilters.clear()
-        incomeFilters.add(data.all[0])
-        expenseFilters.add(data.all[1])
+        incomeFilters.add(data.income)
+        expenseFilters.add(data.expense)
         incomeFilters.addAll(incomeTargets)
         expenseFilters.addAll(expenseTargets)
     }
@@ -76,12 +76,12 @@ class CategoryModel(
     private fun loadIncome() {
         income.clear()
         val amounts = emptyMap<Long, Long>()
-        income.addAll(data.all[0].subCategories.map { it.toUi(amounts) })
+        income.addAll(data.income.subCategories.map { it.toUi(amounts) })
     }
     private fun loadExpense() {
         expense.clear()
         val amounts = emptyMap<Long, Long>()
-        expense.addAll(data.all[1].subCategories.map { it.toUi(amounts) })
+        expense.addAll(data.expense.subCategories.map { it.toUi(amounts) })
     }
 
 
@@ -99,12 +99,12 @@ class CategoryModel(
 
     @Callback
     fun getColor(id: String): Color {
-        val (category, _) = data.all.find(id.toCategoryId()) ?: return Color.White
+        val (category, _) = data.all.subCategories.find(id.toCategoryId()) ?: return Color.White
         return category.color
     }
     @Callback
     fun saveColor(id: String, color: Color) {
-        val (category, _) = data.all.find(id.toCategoryId()) ?: return
+        val (category, _) = data.all.subCategories.find(id.toCategoryId()) ?: return
         category.color = color
         viewModel.updateDependencies(Dependency.CATEGORY)
     }

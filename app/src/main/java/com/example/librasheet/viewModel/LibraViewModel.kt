@@ -33,8 +33,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             (categories.data.loadCategories() + categories.data.loadValues()).joinAll()
             categories.loadUi()
             categories.data.loadHistory().joinAll()
-            incomeScreen.load(categories.data.all[0])
-            expenseScreen.load(categories.data.all[1])
+            incomeScreen.load(categories.data.income)
+            expenseScreen.load(categories.data.expense)
         }
     }
 

@@ -6,6 +6,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
+import com.example.librasheet.data.entity.Category
+import com.example.librasheet.data.entity.CategoryRule
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.setDay
 import com.example.librasheet.data.toIntDate
@@ -85,11 +87,21 @@ class TransactionModel(
     private fun loadFilter(outList: SnapshotStateList<TransactionEntity>, filter: TransactionFilters) {
         viewModel.viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
-                dao.get(filter)
-                // TODO need to match category objects
+                val list = dao.get(filter)
+                list.matchCategories(viewModel.categories.data.all)
+                return@withContext list
             }
             outList.clear()
             outList.addAll(list)
         }
+    }
+}
+
+
+fun List<TransactionEntity>.matchCategories(parentCategory: Category) {
+    val keyMap = parentCategory.getKeyMap()
+    keyMap[Category.Ignore.key] = Category.Ignore
+    forEach {
+        it.category = keyMap.getOrDefault(it.categoryKey, Category.None)
     }
 }
