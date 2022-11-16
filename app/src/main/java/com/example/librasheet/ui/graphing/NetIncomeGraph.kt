@@ -1,6 +1,7 @@
 package com.example.librasheet.ui.graphing
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -47,9 +48,9 @@ fun NetIncomeGraph(
         val hoverLoc = remember { mutableStateOf(-1) }
         val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
 
-        val graph1 = binaryBarGraphDrawer(values = state.values1, axisColor = Color.Transparent)
-        val graph2 = binaryBarGraphDrawer(values = state.values2, axisColor = Color.Transparent)
-        val graphNet = lineGraphDrawer(values = state.valuesNet)
+        val graph1 = stackedLineGraphDrawer(values = listOf(Pair(MaterialTheme.colors.primary, state.values1)), fillTo = 0f)
+        val graph2 = stackedLineGraphDrawer(values = listOf(Pair(MaterialTheme.colors.error, state.values2)), fillTo = 0f)
+        val graphNet = binaryBarGraphDrawer(values = state.valuesNet, aboveColor = Color.Blue, belowColor = Color.Cyan )
         val graphHover = discreteHover(loc = hoverLoc)
 
         fun onHoverInner(isHover: Boolean, x: Float, y: Float) {

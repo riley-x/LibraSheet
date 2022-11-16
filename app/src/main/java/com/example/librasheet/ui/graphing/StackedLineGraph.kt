@@ -45,7 +45,8 @@ data class StackedLineGraphState(
  */
 @Composable
 fun stackedLineGraphDrawer(
-    values: SnapshotStateList<StackedLineGraphValue>,
+    values: List<StackedLineGraphValue>,
+    fillTo: Float? = null,
 ): DrawScope.(GrapherInputs) -> Unit {
     return fun DrawScope.(grapherInputs: GrapherInputs) {
         values.forEach { (color, series) ->
@@ -55,9 +56,9 @@ fun stackedLineGraphDrawer(
             )
 
             val path = Path().apply {
-                moveTo(grapherInputs.userToPxX(0f), grapherInputs.userToPxY(grapherInputs.axesState.minY))
+                moveTo(grapherInputs.userToPxX(0f), grapherInputs.userToPxY(fillTo ?: grapherInputs.axesState.minY))
                 series.indices.forEach { lineTo(loc(it)) }
-                lineTo(grapherInputs.userToPxX(series.lastIndex.toFloat()), grapherInputs.userToPxY(grapherInputs.axesState.minY))
+                lineTo(grapherInputs.userToPxX(series.lastIndex.toFloat()), grapherInputs.userToPxY(fillTo ?: grapherInputs.axesState.minY))
                 close()
             }
 
