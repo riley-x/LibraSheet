@@ -20,6 +20,7 @@ import com.example.librasheet.ui.transaction.TransactionRow
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.AccountScreenState
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
@@ -28,12 +29,7 @@ private val tabs = ImmutableList(listOf("Balance", "Net Income"))
 
 @Composable
 fun AccountScreen(
-    account: State<Account>,
-    balance: DiscreteGraphState,
-    netIncome: NetIncomeGraphState,
-    historyDates: SnapshotStateList<String>,
-    incomeDates: SnapshotStateList<String>,
-    transactions: SnapshotStateList<TransactionEntity>,
+    state: AccountScreenState,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onClickColor: (String) -> Unit = { },
@@ -46,7 +42,7 @@ fun AccountScreen(
         modifier = modifier
     ) {
         HeaderBar(
-            title = account.value.name,
+            title = state.account.value.name,
             backArrow = true,
             onBack = onBack,
         ) {
@@ -58,9 +54,9 @@ fun AccountScreen(
                     modifier = Modifier
                         .padding(end = 15.dp)
                         .size(30.dp)
-                        .clickable { onClickColor("account_" + account.value.name) }
+                        .clickable { onClickColor("account_" + state.account.value.name) }
                 ) {
-                    drawRect(color = account.value.color)
+                    drawRect(color = state.account.value.color)
                 }
             }
         }
@@ -77,26 +73,26 @@ fun AccountScreen(
                 ) {
                     when (it) {
                         0 -> LineGraph(
-                            state = balance,
+                            state = state.balance,
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(balance.values[loc]) + "\n" + historyDates[loc]
+                                formatDollar(state.balance.values[loc]) + "\n" + state.historyDates[loc]
                             else ""
                         }
                         1 -> NetIncomeGraph(
-                            state = netIncome,
+                            state = state.netIncome,
                             modifier = Modifier.fillMaxSize()
                         ) { isHover, loc ->
                             hoverText = if (isHover)
-                                formatDollar(netIncome.valuesNet[loc]) + "\n" + incomeDates[loc]
+                                formatDollar(state.netIncome.valuesNet[loc]) + "\n" + state.incomeDates[loc]
                             else ""
                         }
                     }
                 }
             }
 
-            itemsIndexed(transactions) { index, t ->
+            itemsIndexed(state.transactions) { index, t ->
                 if (index > 0) RowDivider()
 
                 TransactionRow(
@@ -118,14 +114,14 @@ fun AccountScreen(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            AccountScreen(
-                account = previewAccount,
-                incomeDates = previewLineGraphDates,
-                historyDates = previewLineGraphDates,
-                balance = previewLineGraphState,
-                netIncome = previewNetIncomeState,
-                transactions = previewTransactions,
-            )
+//            AccountScreen(
+//                account = previewAccount,
+//                incomeDates = previewLineGraphDates,
+//                historyDates = previewLineGraphDates,
+//                balance = previewLineGraphState,
+//                netIncome = previewNetIncomeState,
+//                transactions = previewTransactions,
+//            )
         }
     }
 }

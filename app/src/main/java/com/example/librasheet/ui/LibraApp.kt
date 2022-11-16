@@ -258,11 +258,7 @@ fun LibraApp(
                 }
                 composable(route = AccountDestination.route) {
                     AccountScreen(
-                        account = previewAccount,
-                        dates = previewLineGraphDates,
-                        balance = previewLineGraphState,
-                        netIncome = previewNetIncomeState,
-                        transactions = previewTransactions,
+                        state = viewModel.accountDetail,
                         onBack = navController::popBackStack,
                         onClickColor = ::toBalanceColorSelector,
                         modifier = Modifier.padding(innerPadding),

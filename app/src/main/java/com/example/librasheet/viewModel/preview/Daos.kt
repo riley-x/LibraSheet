@@ -1,5 +1,6 @@
 package com.example.librasheet.viewModel.preview
 
+import com.example.librasheet.data.HistoryEntryBase
 import com.example.librasheet.data.dao.CategoryDao
 import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.dao.CategoryWithChildren
@@ -59,7 +60,23 @@ internal class FakeHistoryDao: CategoryHistoryDao {
         TODO("Not yet implemented")
     }
 
+    override fun getIncome(account: Long): List<TimeSeries> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getExpense(account: Long): List<TimeSeries> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getNetIncome(account: Long): List<TimeSeries> {
+        TODO("Not yet implemented")
+    }
+
     override fun getNetIncome(): List<TimeSeries> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getIncomeAndExpense(account: Long): List<HistoryEntryBase> {
         TODO("Not yet implemented")
     }
 

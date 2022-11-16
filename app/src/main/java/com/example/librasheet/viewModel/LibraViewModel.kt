@@ -16,6 +16,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val expenseScreen = CashFlowModel(viewModelScope, categories.data, false)
     val incomeDetail = CashFlowModel(viewModelScope, categories.data, true)
     val expenseDetail = CashFlowModel(viewModelScope, categories.data, false)
+    val accountDetail = AccountScreenState(viewModelScope, application.database.accountDao(), application.database.categoryHistoryDao(), application.database.transactionDao())
 
     val rules = RuleModel(this)
     val accounts = AccountModel(this)
@@ -57,6 +58,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
                 expenseDetail.load()
                 balanceGraphs.loadIncome()
                 balanceGraphs.loadHistory(accounts.all)
+                accountDetail.load()
             }
         }
     }

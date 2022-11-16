@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.alignDates
 import com.example.librasheet.data.dao.AccountDao
 import com.example.librasheet.data.dao.CategoryHistoryDao
+import com.example.librasheet.data.dao.TransactionDao
+import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.toFloatDollar
@@ -20,9 +22,9 @@ import kotlinx.coroutines.withContext
 
 class AccountScreenState(
     private val scope: CoroutineScope,
-    private val balanceGraphModel: BalanceGraphModel,
     private val accountDao: AccountDao,
     private val categoryHistoryDao: CategoryHistoryDao,
+    private val transactionDao: TransactionDao,
 ) {
     private val graphYPad = 0.1f
     private val graphTicksX = 4
@@ -35,12 +37,12 @@ class AccountScreenState(
     val incomeDates = mutableStateListOf<String>()
     val historyDates = mutableStateListOf<String>()
 
-    fun load(account: Account) {
+    fun load(account: Account = this.account.value) {
         this.account.value = account
         loadIncome()
         loadHistory()
+        loadTransactions()
     }
-
 
     fun loadIncome() = scope.launch {
         val (dates, flows) = withContext(Dispatchers.IO) {
@@ -115,5 +117,17 @@ class AccountScreenState(
             minX = -0.5f,
             maxX = history.size - 0.5f,
         )
+    }
+
+
+    fun loadTransactions() = scope.launch {
+        val list = withContext(Dispatchers.IO) {
+            transactionDao.get(TransactionFilters(
+                limit = 100,
+                account = account.value
+            ))
+        }
+        transactions.clear()
+        transactions.addAll(list)
     }
 }
