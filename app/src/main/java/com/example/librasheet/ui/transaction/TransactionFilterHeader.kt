@@ -38,6 +38,30 @@ fun ColumnScope.TransactionFilterHeader(
             .fillMaxWidth()
     ) {
         Text(
+            text = "Account: " + (accounts.find(filter.value.account)?.name ?: "-"),
+            maxLines = 1,
+            style = MaterialTheme.typography.caption,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(10f)
+                .padding(start = 10.dp)
+        )
+        Text(
+            text = "Category: " + (filter.value.category?.id?.name ?: "-"),
+            maxLines = 1,
+            style = MaterialTheme.typography.caption,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .weight(10f)
+                .padding(start = 10.dp)
+        )
+    }
+    Row(
+        Modifier
+            .padding(vertical = 3.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
             text = "Dates: " +
                     (if (filter.value.startDate != null) formatDateIntSimple(filter.value.startDate!!) else "") +
                     " - " +
@@ -52,30 +76,6 @@ fun ColumnScope.TransactionFilterHeader(
             text = "Limit: " + if (filter.value.limit != null) "${filter.value.limit}" else "",
             maxLines = 1,
             style = MaterialTheme.typography.caption,
-            modifier = Modifier
-                .weight(10f)
-                .padding(start = 10.dp)
-        )
-    }
-    Row(
-        Modifier
-            .padding(vertical = 3.dp)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = "Acc: " + (accounts.find(filter.value.account)?.name ?: ""),
-            maxLines = 1,
-            style = MaterialTheme.typography.caption,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .weight(10f)
-                .padding(start = 10.dp)
-        )
-        Text(
-            text = "Cat: " + (filter.value.category?.id?.name ?: ""),
-            maxLines = 1,
-            style = MaterialTheme.typography.caption,
-            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .weight(10f)
                 .padding(start = 10.dp)
