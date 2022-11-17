@@ -1,5 +1,8 @@
 package com.example.librasheet.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -25,10 +28,17 @@ fun AddCsvScreen(
     fileName: String,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
-    loadCsv: () -> Unit = { },
+    loadCsv: (Uri?) -> Unit = { },
 ) {
     var account by remember { mutableStateOf<Account?>(null) }
     var invertValues by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) {
+        loadCsv(it)
+    }
+
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -68,7 +78,7 @@ fun AddCsvScreen(
             Spacer(Modifier.height(16.dp))
 
             Button(
-                onClick = loadCsv,
+                onClick = { launcher.launch(arrayOf("text/*")) },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)

@@ -28,8 +28,11 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val accounts = AccountModel(this)
     val balanceGraphs = BalanceGraphModel(this)
     val transactions = TransactionModel(this)
+    val csv = CsvModel(application.contentResolver, viewModelScope)
 
     suspend fun startup() {
+
+
         Log.d("Libra/LibraViewModel/startup", "Startup")
         viewModelScope.launch {
             accounts.load().join()
