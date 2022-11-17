@@ -59,6 +59,7 @@ fun LibraApp(
     }
     fun toBalanceColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(SettingsTab.graph, spec))
+    fun toAddCsv() = navController.navigateSingleTop(AddCsvDestination.route)
     fun toSettingsAllTransactions() {
         viewModel.transactions.loadSettings()
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
@@ -301,9 +302,9 @@ fun LibraApp(
                         toEditCategories = ::toCategoriesScreen,
                         toCategoryRules = ::toRulesScreen,
                         toAddTransaction = ::toSettingsTransactionDetail,
-                        toAddCSV = { },
+                        toAddCSV = ::toAddCsv,
                         toAllTransactions = ::toSettingsAllTransactions,
-                        onBackupDatabase = { },
+                        onBackupDatabase = { }, // TODO
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
@@ -342,6 +343,14 @@ fun LibraApp(
                         onEdit = ::onEditRule,
                         onDelete = ::onDeleteRule,
                         onReorder = viewModel.rules::reorder,
+                    )
+                }
+                composable(route = AddCsvDestination.route) {
+                    AddCsvScreen(
+                        accounts = viewModel.accounts.all,
+                        fileName = "",
+                        onBack = navController::popBackStack,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
                 colorSelector()

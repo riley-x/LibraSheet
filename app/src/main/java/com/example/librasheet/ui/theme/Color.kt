@@ -12,6 +12,7 @@ val Black90 = Color(0xFF1A1A1A)
 
 val DarkColorPalette = darkColors(
     primary = Green500,
+    secondary = Green500,
     surface = Black90,
     onSurface = Color.White,
     background = Black90,

@@ -25,6 +25,7 @@ fun AddCsvScreen(
     fileName: String,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
+    loadCsv: () -> Unit = { },
 ) {
     var account by remember { mutableStateOf<Account?>(null) }
     var invertValues by remember { mutableStateOf(false) }
@@ -40,9 +41,10 @@ fun AddCsvScreen(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 32.dp)
+            modifier = Modifier.padding(horizontal = 20.dp)
         ) {
             Text("Account:")
+            Spacer(Modifier.width(15.dp))
             AccountSelector(
                 selection = account,
                 options = accounts,
@@ -53,7 +55,7 @@ fun AddCsvScreen(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 32.dp)
+            modifier = Modifier.padding(horizontal = 20.dp)
         ) {
             Text("Invert values:")
             Checkbox(
@@ -66,7 +68,7 @@ fun AddCsvScreen(
             Spacer(Modifier.height(16.dp))
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = loadCsv,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
@@ -79,7 +81,7 @@ fun AddCsvScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 20.dp)
                     .height(48.dp)
             ) {
                 Text("CSV: $fileName")

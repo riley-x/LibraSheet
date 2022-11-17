@@ -87,6 +87,9 @@ object RulesDestination {
 object EditAccountsDestination {
     const val route = "edit_accounts"
 }
+object AddCsvDestination {
+    const val route = "add_csv"
+}
 object TransactionDetailDestination {
     private const val routeBase = "transaction_details"
     fun route(graph: String) = "${routeBase}_${graph}"
