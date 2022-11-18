@@ -1,28 +1,16 @@
 package com.example.librasheet.viewModel
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
+import com.example.librasheet.data.dao.TransactionWithDetails
 import com.example.librasheet.data.entity.*
-import com.example.librasheet.data.setDay
-import com.example.librasheet.data.toIntDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.math.abs
-
-
-@Immutable
-data class TransactionWithDetails(
-    val transaction: TransactionEntity,
-    val reimbursements: List<ReimbursementWithValue>,
-    val allocations: List<Allocation>
-)
 
 
 class TransactionModel(
@@ -40,8 +28,8 @@ class TransactionModel(
     val reimbursements = mutableStateListOf<ReimbursementWithValue>()
     val allocations = mutableStateListOf<Allocation>()
 
-    var oldReimbursements = listOf<ReimbursementWithValue>()
-    var oldAllocations = listOf<Allocation>()
+    private var oldReimbursements = listOf<ReimbursementWithValue>()
+    private var oldAllocations = listOf<Allocation>()
 
     @Callback
     fun save(newTransaction: TransactionEntity) {

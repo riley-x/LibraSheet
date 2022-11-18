@@ -33,10 +33,12 @@ interface TransactionDao {
     fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long)
 
     @Transaction
-    fun add(transaction: TransactionEntity) {
-        val t = if (transaction.categoryKey == 0L) transaction.copy(
-            categoryKey = if (transaction.value > 0) incomeKey else expenseKey
-        ) else transaction
+    fun add(new: TransactionWithDetails) {
+        val t = if (new.transaction.categoryKey == 0L) new.transaction.copy(
+            categoryKey = if (new.transaction.value > 0) incomeKey else expenseKey
+        ) else new.transaction
+
+        // TODO
 
         insert(t)
         if (t.accountKey <= 0) return
@@ -206,3 +208,10 @@ fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
     Log.i("Libra/TransactionDao/getTransactionFilteredQuery", q)
     return SimpleSQLiteQuery(q, args.toTypedArray())
 }
+
+@Immutable
+data class TransactionWithDetails(
+    val transaction: TransactionEntity,
+    val reimbursements: List<ReimbursementWithValue>,
+    val allocations: List<Allocation>
+)

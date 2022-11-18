@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -14,11 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -30,9 +27,7 @@ import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.selectors.DropdownOptions
-import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.TransactionWithDetails
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
@@ -200,30 +195,6 @@ fun TransactionDetailScreen(
                 }
             }
 
-
-            item("Reimbursements") {
-                RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
-                    IconButton(onClick = onAddReimbursement) {
-                        Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
-                    }
-                }
-            }
-
-            itemsIndexed(reimbursements) { i, it ->
-                if (i > 0) RowDivider()
-                ReimbursementRow(
-                    r = it,
-                    accounts = accounts,
-                ) {
-                    DropdownOptions(options = reimbursementOptions) {
-                        when (it) {
-                            ReimbursementOptions.DELETE -> { }
-                            ReimbursementOptions.VALUE -> { }
-                        }
-                    }
-                }
-            }
-
             item("Allocations") {
                 RowTitle("Allocations", Modifier.padding(top = 20.dp)) {
                     IconButton(onClick = { /*TODO*/ }) {
@@ -244,6 +215,30 @@ fun TransactionDetailScreen(
                                 AllocationOptions.DELETE -> {}
                                 AllocationOptions.EDIT -> {}
                             }
+                        }
+                    }
+                }
+            }
+
+
+            item("Reimbursements") {
+                RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
+                    IconButton(onClick = onAddReimbursement) {
+                        Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
+                    }
+                }
+            }
+
+            itemsIndexed(reimbursements) { i, it ->
+                if (i > 0) RowDivider()
+                ReimbursementRow(
+                    r = it,
+                    accounts = accounts,
+                ) {
+                    DropdownOptions(options = reimbursementOptions) {
+                        when (it) {
+                            ReimbursementOptions.DELETE -> { }
+                            ReimbursementOptions.VALUE -> { }
                         }
                     }
                 }
