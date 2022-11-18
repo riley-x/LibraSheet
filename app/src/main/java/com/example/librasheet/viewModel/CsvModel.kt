@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.librasheet.data.dao.RuleDao
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.Category
@@ -23,25 +24,42 @@ import java.text.SimpleDateFormat
 
 const val PICK_CSV_FILE = 2
 
+/** Needed to break out an interface class to enable to preview to work **/
+interface CsvModel {
+    var account: Account?
+    var invertValues: Boolean
+    var pattern: String
+    var dateFormat: String
+    var errorMessage: String
+
+    val transactions: SnapshotStateList<TransactionEntity>
+    val badLines: SnapshotStateList<Pair<Int, String>>
+
+    fun loadCsv(uri: Uri?)
+    fun setAcc(a: Account?)
+    fun setInvert(invert: Boolean)
+    fun setPatt(p: String)
+    fun setDateForm(p: String)
+}
 
 
-class CsvModel(
+class BaseCsvModel(
     private val contentResolver: ContentResolver,
     private val scope: CoroutineScope,
     private val dao: RuleDao,
     private val rootCategory: Category,
-) {
-    var account by mutableStateOf<Account?>(null)
-    var invertValues by mutableStateOf(false)
-    var pattern by mutableStateOf("date,name,value")
-    var dateFormat by mutableStateOf("MM/dd/yyyy")
-    var errorMessage by mutableStateOf("")
+): CsvModel {
+    override var account by mutableStateOf<Account?>(null)
+    override var invertValues by mutableStateOf(false)
+    override var pattern by mutableStateOf("date,name,value")
+    override var dateFormat by mutableStateOf("MM/dd/yyyy")
+    override var errorMessage by mutableStateOf("")
 
-    val transactions = mutableStateListOf<TransactionEntity>()
-    val badLines = mutableStateListOf<Pair<Int, String>>()
+    override val transactions = mutableStateListOf<TransactionEntity>()
+    override val badLines = mutableStateListOf<Pair<Int, String>>()
 
     @Callback
-    fun loadCsv(uri: Uri?) {
+    override fun loadCsv(uri: Uri?) {
         Log.d("Libra/CsvModel/loadCsv", "Loaded uri: ${uri?.path}")
         if (uri == null) {
             errorMessage = "Unable to load file"
@@ -157,8 +175,8 @@ class CsvModel(
         )
     }
 
-    @Callback fun setAcc(a: Account?) { account = a }
-    @Callback fun setInvert(invert: Boolean) { invertValues = invert }
-    @Callback fun setPatt(p: String) { pattern = p }
-    @Callback fun setDateForm(p: String) { dateFormat = p }
+    @Callback override fun setAcc(a: Account?) { account = a }
+    @Callback override fun setInvert(invert: Boolean) { invertValues = invert }
+    @Callback override fun setPatt(p: String) { pattern = p }
+    @Callback override fun setDateForm(p: String) { dateFormat = p }
 }

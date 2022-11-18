@@ -15,12 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowTitle
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CsvModel
+import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewCsvModel
 
@@ -117,8 +119,6 @@ fun AddCsvScreen(
                 Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
             }
         } else {
-
-            
             RowTitle(title = "Preview Transactions:")
 
             LazyColumn(
@@ -131,20 +131,20 @@ fun AddCsvScreen(
 }
 
 
-@Preview(
-    heightDp = 300
-)
-@Composable
-private fun Preview() {
-    LibraSheetTheme {
-        Surface {
-            AddCsvScreen(
-                accounts = previewAccounts,
-                state = previewCsvModel,
-            )
-        }
-    }
-}
+//@Preview(
+//    heightDp = 300
+//)
+//@Composable
+//private fun Preview() {
+//    LibraSheetTheme {
+//        Surface {
+//            AddCsvScreen(
+//                accounts = previewAccounts,
+//                state = previewCsvModel,
+//            )
+//        }
+//    }
+//}
 
 
 @Preview(
@@ -154,10 +154,10 @@ private fun Preview() {
 private fun PreviewLoaded() {
     LibraSheetTheme {
         Surface {
-//            AddCsvScreen(
-//                accounts = previewAccounts,
-//                fileName = "filename.csv",
-//            )
+            AddCsvScreen(
+                accounts = previewAccounts,
+                state = previewCsvModel,
+            )
         }
     }
 }

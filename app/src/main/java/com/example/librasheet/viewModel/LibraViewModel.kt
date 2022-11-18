@@ -28,7 +28,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val accounts = AccountModel(this)
     val balanceGraphs = BalanceGraphModel(this)
     val transactions = TransactionModel(this)
-    val csv = CsvModel(
+    val csv = BaseCsvModel(
         application.contentResolver,
         viewModelScope,
         application.database.ruleDao(),
