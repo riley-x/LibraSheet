@@ -60,6 +60,7 @@ fun LibraApp(
     fun toBalanceColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(BalanceTab.graph, spec))
     fun toSettingsColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(SettingsTab.graph, spec))
     fun toAddCsv() = navController.navigateSingleTop(AddCsvDestination.route)
+    fun toBadLines() = navController.navigateSingleTop(BadCsvDestination.route)
     fun toSettingsAllTransactions() {
         viewModel.transactions.loadSettings()
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
@@ -349,6 +350,14 @@ fun LibraApp(
                     AddCsvScreen(
                         accounts = viewModel.accounts.all,
                         state = viewModel.csv,
+                        onBack = navController::popBackStack,
+                        toBadLines = ::toBadLines,
+                        modifier = Modifier.padding(innerPadding),
+                    )
+                }
+                composable(route = BadCsvDestination.route) {
+                    BadCsvScreen(
+                        lines = viewModel.csv.badLines,
                         onBack = navController::popBackStack,
                         modifier = Modifier.padding(innerPadding),
                     )

@@ -90,6 +90,9 @@ object EditAccountsDestination {
 object AddCsvDestination {
     const val route = "add_csv"
 }
+object BadCsvDestination {
+    const val route = "bad_csv"
+}
 object TransactionDetailDestination {
     private const val routeBase = "transaction_details"
     fun route(graph: String) = "${routeBase}_${graph}"

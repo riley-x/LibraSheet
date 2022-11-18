@@ -3,6 +3,7 @@ package com.example.librasheet.ui
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +42,7 @@ fun AddCsvScreen(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
+    toBadLines: () -> Unit = { },
     onSave: () -> Unit = { },
 ) {
     /** https://developer.android.com/jetpack/compose/libraries#activity_result **/
@@ -140,7 +143,14 @@ fun AddCsvScreen(
                 }
             } else {
                 item("Preview Transactions") {
-                    RowTitle(title = "Preview Transactions")
+                    RowTitle(title = "Preview Transactions") {
+                        Text(
+                            text = "${state.badLines.size}\nbad lines >",
+                            textAlign = TextAlign.End,
+                            color = MaterialTheme.colors.error.copy(alpha = ContentAlpha.medium),
+                            modifier = Modifier.padding(end = 6.dp).clickable(onClick = toBadLines)
+                        )
+                    }
                 }
             }
 
