@@ -1,6 +1,7 @@
 package com.example.librasheet.data.entity
 
 
+import androidx.compose.runtime.Immutable
 import androidx.room.*
 
 
@@ -17,7 +18,7 @@ data class Reimbursement(
     // No list index because there could be multiple "lists" for each reimbursement
 )
 
-
+@Immutable
 data class ReimbursementWithValue (
     @Embedded val transaction: TransactionEntity,
     @ColumnInfo(name = "reimbursedValue") val value: Long,

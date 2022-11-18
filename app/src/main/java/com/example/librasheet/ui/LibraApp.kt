@@ -235,6 +235,8 @@ fun LibraApp(
             composable(route = TransactionDetailDestination.route(route!!)) {
                 TransactionDetailScreen(
                     transaction = state.detail,
+                    reimbursements = state.detailReimbursements,
+                    allocations = state.detailAllocations,
                     accounts = viewModel.accounts.all,
                     incomeCategories = viewModel.categories.incomeTargets,
                     expenseCategories = viewModel.categories.expenseTargets,

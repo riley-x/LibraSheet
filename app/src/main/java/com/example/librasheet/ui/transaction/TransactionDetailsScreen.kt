@@ -5,6 +5,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
@@ -20,10 +22,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.data.entity.TransactionEntity
-import com.example.librasheet.data.entity.isValid
+import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.data.toLongDollar
@@ -32,9 +31,7 @@ import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewIncomeCategories2
-import com.example.librasheet.viewModel.preview.previewTransaction
+import com.example.librasheet.viewModel.preview.*
 import java.text.SimpleDateFormat
 
 
@@ -42,6 +39,8 @@ import java.text.SimpleDateFormat
 @Composable
 fun TransactionDetailScreen(
     transaction: State<TransactionEntity>,
+    reimbursements: SnapshotStateList<ReimbursementWithValue>,
+    allocations: SnapshotStateList<Allocation>,
     accounts: SnapshotStateList<Account>,
     incomeCategories: SnapshotStateList<Category>,
     expenseCategories: SnapshotStateList<Category>,
@@ -150,7 +149,9 @@ fun TransactionDetailScreen(
             item("Account") {
                 LabeledRow(
                     label = "Account",
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp),
                 ) {
                     AccountSelector(
                         selection = account.value,
@@ -191,6 +192,14 @@ fun TransactionDetailScreen(
                 }
             }
 
+            itemsIndexed(reimbursements) { i, it ->
+                if (i > 0) RowDivider()
+                ReimbursementRow(
+                    r = it,
+                    accounts = accounts,
+                )
+            }
+
             item("Allocations") {
                 RowTitle("Allocations", Modifier.padding(top = 20.dp)) {
                     IconButton(onClick = { /*TODO*/ }) {
@@ -198,6 +207,12 @@ fun TransactionDetailScreen(
                     }
                 }
             }
+
+            itemsIndexed(allocations) { i, it ->
+                if (i > 0) RowDivider()
+                AllocationRow(it)
+            }
+
 
             item("Buttons") {
                 Row(
@@ -238,6 +253,8 @@ private fun Preview() {
             TransactionDetailScreen(
                 transaction = previewTransaction,
                 accounts = previewAccounts,
+                reimbursements = previewReimbursements,
+                allocations = previewAllocations,
                 incomeCategories = previewIncomeCategories2,
                 expenseCategories = previewIncomeCategories2,
             )

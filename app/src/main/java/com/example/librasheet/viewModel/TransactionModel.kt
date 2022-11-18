@@ -5,10 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
-import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.data.entity.CategoryRule
-import com.example.librasheet.data.entity.TransactionEntity
+import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.setDay
 import com.example.librasheet.data.toIntDate
 import kotlinx.coroutines.Dispatchers
@@ -28,9 +25,9 @@ class TransactionModel(
 
     val displayList = mutableStateListOf<TransactionEntity>()
     val filter = mutableStateOf(defaultFilter)
-    private var account: Account? = null
     val detail = mutableStateOf(TransactionEntity())
-
+    val detailReimbursements = mutableStateListOf<ReimbursementWithValue>()
+    val detailAllocations = mutableStateListOf<Allocation>()
 
     @Callback
     fun save(new: TransactionEntity, old: TransactionEntity) {
@@ -71,6 +68,15 @@ class TransactionModel(
     @Callback
     fun loadDetail(t: TransactionEntity) {
         detail.value = t
+        detailReimbursements.clear() // should clear before the launch so previous detail's allocations don't show
+        detailAllocations.clear()
+        viewModel.viewModelScope.launch {
+            val (reimbs, allocs) = withContext(Dispatchers.IO) {
+                dao.getDetails(t)
+            }
+            detailReimbursements.addAll(reimbs)
+            detailAllocations.addAll(allocs)
+        }
     }
 }
 
