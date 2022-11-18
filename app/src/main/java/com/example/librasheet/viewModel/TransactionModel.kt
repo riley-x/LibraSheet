@@ -97,6 +97,19 @@ class TransactionModel(
             detail.allocations.addAll(allocs)
         }
     }
+
+    /**
+     * Note this only applies to the ui state. The actual database action happens on save.
+     */
+    @Callback
+    fun addReimbursement(t: TransactionEntity) {
+        detail.reimbursements.add(
+            ReimbursementWithValue(
+                transaction = t,
+                value = minOf(detail.transaction.value.value, t.valueAfterReimbursements)
+            )
+        )
+    }
 }
 
 

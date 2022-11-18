@@ -25,6 +25,7 @@ import com.example.librasheet.ui.settings.*
 import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
 import com.example.librasheet.viewModel.LibraViewModel
+import com.example.librasheet.viewModel.TransactionWithDetails
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 
 
@@ -232,17 +233,34 @@ fun LibraApp(
         fun NavGraphBuilder.transactionDetail() {
             val isSettings = route!! == SettingsTab.graph
             val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
+            fun onAddReimbursement() {
+                navController.navigateSingleTop(TransactionReimburseDestination.route(route!!))
+            }
             composable(route = TransactionDetailDestination.route(route!!)) {
                 TransactionDetailScreen(
-                    transaction = state.detail,
-                    reimbursements = state.detailReimbursements,
-                    allocations = state.detailAllocations,
+                    state = state.detail,
                     accounts = viewModel.accounts.all,
                     incomeCategories = viewModel.categories.incomeTargets,
                     expenseCategories = viewModel.categories.expenseTargets,
                     onBack = navController::popBackStack,
                     onSave = state::save,
+                    onAddReimbursement = ::onAddReimbursement,
                     bottomPadding = innerPadding.calculateBottomPadding(),
+                )
+            }
+        }
+        fun NavGraphBuilder.transactionSelector() {
+            val isSettings = route == SettingsTab.graph
+            val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
+            composable(route = TransactionReimburseDestination.route(route!!)) {
+                TransactionListScreen(
+                    filter = state.filter,
+                    transactions = state.displayList,
+                    accounts = viewModel.accounts.all,
+                    onBack = navController::popBackStack,
+                    onFilter = if (isSettings) filterTransactionDialog::openSettings else filterTransactionDialog::openBalance,
+                    onTransactionClick = state::addReimbursement,
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
         }
@@ -282,6 +300,7 @@ fun LibraApp(
                 colorSelector()
                 transactionDetail()
                 transactionAll()
+                transactionSelector()
             }
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
@@ -375,6 +394,7 @@ fun LibraApp(
                 colorSelector()
                 transactionDetail()
                 transactionAll()
+                transactionSelector()
             }
         }
 

@@ -62,7 +62,7 @@ fun TransactionDetailScreen(
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
     onSave: (new: TransactionEntity, old: TransactionEntity) -> Unit = { _, _ -> },
-    onAddReimbursement: (TransactionWithDetails) -> Unit = { }, // TODO make sure this can handle a new transaction
+    onAddReimbursement: () -> Unit = { }, // TODO make sure this can handle a new transaction
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -201,7 +201,7 @@ fun TransactionDetailScreen(
 
             item("Reimbursements") {
                 RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
-                    IconButton(onClick = { onAddReimbursement(state) }) {
+                    IconButton(onClick = onAddReimbursement) {
                         Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
                     }
                 }
