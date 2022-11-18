@@ -30,6 +30,7 @@ import java.io.InputStream
 class PreviewCsvModel(
     override var account: Account? = previewAccounts[0],
     override var invertValues: Boolean = true,
+    override var loaded: Boolean = true,
     override var pattern: String = "date,name,value",
     override var dateFormat: String = "MM/dd/yyyy",
     override var errorMessage: String = "",
@@ -75,6 +76,7 @@ class PreviewCsvModel(
 val previewCsvModel = PreviewCsvModel()
 
 val previewCsvModel2 = PreviewCsvModel(
+    loaded = false,
     errorMessage = "I'm an error message",
     transactions = mutableStateListOf()
 )

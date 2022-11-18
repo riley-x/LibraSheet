@@ -21,10 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.librasheet.data.entity.Account
-import com.example.librasheet.ui.components.HeaderBar
-import com.example.librasheet.ui.components.LabeledRow
-import com.example.librasheet.ui.components.RowTitle
-import com.example.librasheet.ui.components.SwipeToDelete
+import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.textFields.CustomTextField
 import com.example.librasheet.ui.components.textFields.OutlinedTextFieldNoPadding
@@ -115,7 +112,7 @@ fun AddCsvScreen(
                 }
             }
 
-            if (state.transactions.isEmpty()) {
+            if (!state.loaded) {
                 item("Button") {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -145,7 +142,7 @@ fun AddCsvScreen(
                 item("Preview Transactions") {
                     RowTitle(title = "Preview Transactions") {
                         Text(
-                            text = "${state.badLines.size}\nbad lines >",
+                            text = "${state.badLines.size}\nbad lines",
                             textAlign = TextAlign.End,
                             color = MaterialTheme.colors.error.copy(alpha = ContentAlpha.medium),
                             modifier = Modifier.padding(end = 6.dp).clickable(onClick = toBadLines)
@@ -164,7 +161,7 @@ fun AddCsvScreen(
             }
         }
 
-        if (state.transactions.isNotEmpty()) {
+        if (state.loaded) {
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth().padding(bottom= 4.dp),

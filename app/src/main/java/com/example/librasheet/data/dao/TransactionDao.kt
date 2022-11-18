@@ -60,6 +60,11 @@ interface TransactionDao {
     }
 
     @Transaction
+    fun add(list: List<TransactionEntity>) {
+        list.forEach { add(it) }
+    }
+
+    @Transaction
     fun undo(t: TransactionEntity) {
         delete(t)
         val month = thisMonthEnd(t.date)

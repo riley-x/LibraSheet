@@ -41,13 +41,15 @@ class TransactionModel(
 
     @Callback
     fun save(new: TransactionEntity, old: TransactionEntity) {
-        viewModel.viewModelScope.launch(Dispatchers.IO) {
-            if (old.key > 0) dao.update(new, old)
-            else dao.add(new)
+        viewModel.viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                if (old.key > 0) dao.update(new, old)
+                else dao.add(new)
+            }
+            loadFilter(balanceList, balanceFilter.value)
+            loadFilter(settingsList, settingsFilter.value)
             viewModel.updateDependencies(Dependency.TRANSACTION)
         }
-        loadFilter(balanceList, balanceFilter.value)
-        loadFilter(settingsList, settingsFilter.value)
     }
 
     @Callback

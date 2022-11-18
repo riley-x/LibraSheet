@@ -7,11 +7,11 @@ import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.RuleDao
-import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.data.entity.CategoryRule
-import com.example.librasheet.data.entity.TransactionEntity
+import com.example.librasheet.data.dao.TransactionDao
+import com.example.librasheet.data.entity.*
+import com.example.librasheet.data.entity.ignoreKey
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.parseOrNull
@@ -28,6 +28,7 @@ const val PICK_CSV_FILE = 2
 interface CsvModel {
     var account: Account?
     var invertValues: Boolean
+    var loaded: Boolean
     var pattern: String
     var dateFormat: String
     var errorMessage: String
@@ -47,12 +48,16 @@ interface CsvModel {
 
 
 class BaseCsvModel(
-    private val contentResolver: ContentResolver,
-    private val scope: CoroutineScope,
-    private val dao: RuleDao,
-    private val rootCategory: Category,
+    private val viewModel: LibraViewModel,
 ): CsvModel {
+    private val contentResolver = viewModel.application.contentResolver
+    private val scope = viewModel.viewModelScope
+    private val ruleDao = viewModel.application.database.ruleDao()
+    private val transactionDao = viewModel.application.database.transactionDao()
+    private val rootCategory = viewModel.categories.data.all
+
     override var account by mutableStateOf<Account?>(null)
+    override var loaded by mutableStateOf(false)
     override var invertValues by mutableStateOf(false)
     override var pattern by mutableStateOf("date,name,value")
     override var dateFormat by mutableStateOf("MM/dd/yyyy")
@@ -78,8 +83,8 @@ class BaseCsvModel(
              **/
             val deferred = async(Dispatchers.IO) {
 
-                val incomeRulesDeferred = async(Dispatchers.IO) { dao.getIncomeRules() }
-                val expenseRulesDeferred = async(Dispatchers.IO) { dao.getExpenseRules() }
+                val incomeRulesDeferred = async(Dispatchers.IO) { ruleDao.getIncomeRules() }
+                val expenseRulesDeferred = async(Dispatchers.IO) { ruleDao.getExpenseRules() }
                 parser.incomeRules = incomeRulesDeferred.await()
                 parser.expenseRules = expenseRulesDeferred.await()
 
@@ -106,6 +111,7 @@ class BaseCsvModel(
                 transactions.addAll(trans)
                 badLines.clear()
                 badLines.addAll(bads)
+                loaded = true
             } catch (e: IOException) {
                 Log.d("Libra/CsvModel/loadCsv", e.toString())
                 e.printStackTrace()
@@ -150,7 +156,7 @@ class BaseCsvModel(
         parser.maxIndex = maxOf(parser.dateIndex, parser.nameIndex, parser.valueIndex)
         parser.accountKey = account?.key ?: 0L
         parser.invert = invertValues
-        parser.categoryMap = rootCategory.getKeyMap()
+        parser.categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
         return parser
     }
 
@@ -162,7 +168,8 @@ class BaseCsvModel(
 
         val date = parser.dateFormat.parseOrNull(line[parser.dateIndex])?.toIntDate() ?: return null
         val name = line[parser.nameIndex]
-        val value = line[parser.valueIndex].replace(",", "").toFloatOrNull() ?: return null
+        var value = line[parser.valueIndex].replace(",", "").toFloatOrNull() ?: return null
+        if (parser.invert) value = -value
 
         val rules = if (value > 0) parser.incomeRules else parser.expenseRules
         val rule = rules.find { it.pattern in name }
@@ -186,9 +193,15 @@ class BaseCsvModel(
     @Callback override fun clear() {
         transactions.clear()
         badLines.clear()
+        loaded = false
         errorMessage = ""
     }
     @Callback override fun save() {
-        TODO("Not yet implemented")
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                transactionDao.add(transactions)
+            }
+            viewModel.updateDependencies(dependency = Dependency.TRANSACTION)
+        }
     }
 }

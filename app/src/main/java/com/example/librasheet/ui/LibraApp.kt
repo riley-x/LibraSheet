@@ -87,6 +87,10 @@ fun LibraApp(
         viewModel.saveColor(spec, color)
         navController.popBackStack()
     }
+    fun onSaveCsv() {
+        viewModel.csv.save()
+        navController.popBackStack()
+    }
 
 
     /** Dialogs **/
@@ -351,6 +355,7 @@ fun LibraApp(
                         accounts = viewModel.accounts.all,
                         state = viewModel.csv,
                         onBack = navController::popBackStack,
+                        onSave = ::onSaveCsv,
                         toBadLines = ::toBadLines,
                         modifier = Modifier.padding(innerPadding),
                     )
