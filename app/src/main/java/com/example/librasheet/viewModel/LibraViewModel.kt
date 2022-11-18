@@ -68,6 +68,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
                 balanceGraphs.loadIncome()
                 balanceGraphs.loadHistory(accounts.all)
                 accountDetail.load()
+                transactions.reloadSettings()
+                transactions.reloadBalance()
             }
         }
     }

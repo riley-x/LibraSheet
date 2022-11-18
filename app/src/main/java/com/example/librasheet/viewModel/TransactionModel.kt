@@ -31,6 +31,7 @@ class TransactionModel(
     val settingsFilter = mutableStateOf(TransactionFilters())
 
     /** Current list to show in balance tab **/
+    private var balanceAccount: Account? = null
     val balanceList = mutableStateListOf<TransactionEntity>()
     val balanceFilter = mutableStateOf(TransactionFilters())
 
@@ -71,7 +72,7 @@ class TransactionModel(
      * reload though if they change tabs/screens.
      */
     @Callback
-    fun loadSettings() {
+    fun initSettings() {
         if (settingsList.isNotEmpty()) return
         filterSettings(defaultFilter)
     }
@@ -81,9 +82,17 @@ class TransactionModel(
      * reload though if they change tabs/screens.
      */
     @Callback
-    fun loadBalance(account: Account) {
+    fun initBalance(account: Account) {
         if (balanceList.isNotEmpty()) return
+        balanceAccount = account
         filterBalance(defaultFilter.copy(account = account.key))
+    }
+
+    fun reloadSettings() {
+        loadFilter(settingsList, settingsFilter.value)
+    }
+    fun reloadBalance() {
+        loadFilter(balanceList, balanceFilter.value)
     }
 
     private fun loadFilter(outList: SnapshotStateList<TransactionEntity>, filter: TransactionFilters) {
