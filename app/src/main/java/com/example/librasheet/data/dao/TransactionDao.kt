@@ -114,10 +114,13 @@ interface TransactionDao {
     @Update fun update(x: Reimbursement)
     @Delete fun delete(x: Reimbursement)
 
+    @Insert fun insert(x: Allocation)
+    @Update fun update(x: Allocation)
+    @Delete fun delete(x: Allocation)
+
     /** Value should always be positive **/
     @Transaction
     fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
-        // TODO make sure this can handle a new transaction
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 
@@ -159,6 +162,44 @@ interface TransactionDao {
         update(newExpense, expense)
     }
 
+
+    /** Value should always be positive **/
+    @Transaction
+    fun addAllocation(t: TransactionEntity, allocation: Allocation) {
+        val isIncome = t.value > 0
+
+        val newTransaction = t.copy(
+            valueAfterReimbursements = t.valueAfterReimbursements - (if (isIncome) 1 else -1) * allocation.value
+        )
+        update(newTransaction, t)
+        insert(allocation)
+
+        if (t.accountKey <= 0) return
+        if (allocation.categoryKey == ignoreKey) return
+
+        val month = thisMonthEnd(t.date)
+        updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) 1 else -1) * allocation.value)
+    }
+
+    /** Value should always be positive **/
+    @Transaction
+    fun removeAllocation(t: TransactionEntity, allocation: Allocation) {
+        val isIncome = t.value > 0
+
+        val newTransaction = t.copy(
+            valueAfterReimbursements = t.valueAfterReimbursements + (if (isIncome) 1 else -1) * allocation.value
+        )
+        update(newTransaction, t)
+        delete(allocation)
+
+        if (t.accountKey <= 0) return
+        if (allocation.categoryKey == ignoreKey) return
+
+        val month = thisMonthEnd(t.date)
+        updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) -1 else 1) * allocation.value)
+    }
+
+
     @Transaction
     fun add(t: TransactionWithDetails) {
         val key = add(t.transaction)
@@ -167,10 +208,16 @@ interface TransactionDao {
         t.reimbursements.forEach {
             addReimbursement(trans, it.transaction, it.value)
         }
+        t.allocations.forEach {
+            addAllocation(t.transaction, it)
+        }
     }
 
     @Transaction
     fun undo(t: TransactionWithDetails) {
+        t.allocations.forEach {
+            removeAllocation(t.transaction, it)
+        }
         t.reimbursements.forEach {
             deleteReimbursement(t.transaction, it.transaction, it.value)
         }
