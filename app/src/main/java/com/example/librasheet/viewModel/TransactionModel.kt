@@ -1,5 +1,7 @@
 package com.example.librasheet.viewModel
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -14,6 +16,13 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 
+@Immutable
+data class TransactionWithDetails(
+    val transaction: MutableState<TransactionEntity> = mutableStateOf(TransactionEntity()),
+    val reimbursements: SnapshotStateList<ReimbursementWithValue> = mutableStateListOf(),
+    val allocations: SnapshotStateList<Allocation> = mutableStateListOf(),
+)
+
 
 class TransactionModel(
     private val viewModel: LibraViewModel,
@@ -25,9 +34,7 @@ class TransactionModel(
 
     val displayList = mutableStateListOf<TransactionEntity>()
     val filter = mutableStateOf(defaultFilter)
-    val detail = mutableStateOf(TransactionEntity())
-    val detailReimbursements = mutableStateListOf<ReimbursementWithValue>()
-    val detailAllocations = mutableStateListOf<Allocation>()
+    val detail = TransactionWithDetails()
 
     @Callback
     fun save(new: TransactionEntity, old: TransactionEntity) {
@@ -67,15 +74,27 @@ class TransactionModel(
 
     @Callback
     fun loadDetail(t: TransactionEntity) {
-        detail.value = t
-        detailReimbursements.clear() // should clear before the launch so previous detail's allocations don't show
-        detailAllocations.clear()
+        detail.transaction.value = t
+        detail.reimbursements.clear() // should clear before the launch so previous detail's allocations don't show
+        detail.allocations.clear()
         viewModel.viewModelScope.launch {
             val (reimbs, allocs) = withContext(Dispatchers.IO) {
-                dao.getDetails(t)
+                val (reimbs, allocs) = dao.getDetails(t)
+
+                val keyMap = viewModel.categories.data.all.getKeyMap()
+                keyMap[Category.Ignore.key] = Category.Ignore
+
+                reimbs.forEach {
+                    it.transaction.category = keyMap.getOrDefault(it.transaction.categoryKey, Category.None)
+                }
+                allocs.forEach {
+                    it.category = keyMap.getOrDefault(it.categoryKey, Category.None)
+                }
+
+                return@withContext Pair(reimbs, allocs)
             }
-            detailReimbursements.addAll(reimbs)
-            detailAllocations.addAll(allocs)
+            detail.reimbursements.addAll(reimbs)
+            detail.allocations.addAll(allocs)
         }
     }
 }

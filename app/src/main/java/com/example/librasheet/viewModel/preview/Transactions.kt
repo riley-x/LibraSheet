@@ -6,6 +6,7 @@ import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Allocation
 import com.example.librasheet.data.entity.ReimbursementWithValue
 import com.example.librasheet.data.entity.TransactionEntity
+import com.example.librasheet.viewModel.TransactionWithDetails
 
 val previewTransactions = mutableStateListOf(
     TransactionEntity(
@@ -75,4 +76,10 @@ val previewAllocations = mutableStateListOf(
         value = 10_00_00,
         listIndex = 0,
     ).apply { category = previewIncomeCategories2[0] }
+)
+
+val previewTransactionDetail = TransactionWithDetails(
+    transaction = previewTransaction,
+    reimbursements = previewReimbursements,
+    allocations = previewAllocations,
 )

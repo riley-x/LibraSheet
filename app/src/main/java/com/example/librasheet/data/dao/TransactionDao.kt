@@ -112,6 +112,7 @@ interface TransactionDao {
     /** Value should always be positive **/
     @Transaction
     fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
+        // TODO make sure this can handle a new transaction
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 

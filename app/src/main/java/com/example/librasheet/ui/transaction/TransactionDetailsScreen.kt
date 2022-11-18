@@ -31,6 +31,7 @@ import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.TransactionWithDetails
 import com.example.librasheet.viewModel.preview.*
 import java.text.SimpleDateFormat
 
@@ -38,9 +39,7 @@ import java.text.SimpleDateFormat
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun TransactionDetailScreen(
-    transaction: State<TransactionEntity>,
-    reimbursements: SnapshotStateList<ReimbursementWithValue>,
-    allocations: SnapshotStateList<Allocation>,
+    state: TransactionWithDetails,
     accounts: SnapshotStateList<Account>,
     incomeCategories: SnapshotStateList<Category>,
     expenseCategories: SnapshotStateList<Category>,
@@ -48,6 +47,7 @@ fun TransactionDetailScreen(
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
     onSave: (new: TransactionEntity, old: TransactionEntity) -> Unit = { _, _ -> },
+    onAddReimbursement: (TransactionWithDetails) -> Unit = { }, // TODO make sure this can handle a new transaction
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -58,12 +58,12 @@ fun TransactionDetailScreen(
     }
 
     // TODO make account and category saveable
-    val account = remember { mutableStateOf(accounts.find { it.key == transaction.value.accountKey }) }
-    val name = rememberSaveable { mutableStateOf(transaction.value.name) }
-    val date = rememberSaveable { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
+    val account = remember { mutableStateOf(accounts.find { it.key == state.transaction.value.accountKey }) }
+    val name = rememberSaveable { mutableStateOf(state.transaction.value.name) }
+    val date = rememberSaveable { mutableStateOf(formatDateIntSimple(state.transaction.value.date, "-")) }
     val value = rememberSaveable { mutableStateOf(
-        if (transaction.value.value == 0L) ""
-        else transaction.value.value.toFloatDollar().toString())
+        if (state.transaction.value.value == 0L) ""
+        else state.transaction.value.value.toFloatDollar().toString())
     }
 
     var dateError by remember { mutableStateOf(false) }
@@ -73,8 +73,8 @@ fun TransactionDetailScreen(
         if ((value.value.toFloatOrNull() ?: 0f) > 0f) incomeCategories else expenseCategories
     } }
     val category = remember { mutableStateOf(
-        (if (transaction.value.value > 0) incomeCategories else expenseCategories)
-            .find { it.key == transaction.value.categoryKey }
+        (if (state.transaction.value.value > 0) incomeCategories else expenseCategories)
+            .find { it.key == state.transaction.value.categoryKey }
     ) }
 
     fun saveTransaction() {
@@ -86,7 +86,7 @@ fun TransactionDetailScreen(
         if (dateError || valueError) return
 
         val t = TransactionEntity(
-            key = transaction.value.key,
+            key = state.transaction.value.key,
             name = name.value,
             date = dateInt ?: 0,
             value = valueLong ?: 0L,
@@ -95,7 +95,7 @@ fun TransactionDetailScreen(
             accountKey = account.value?.key ?: 0,
 //            valueAfterReimbursements = // TODO,
         )
-        onSave(t, transaction.value)
+        onSave(t, state.transaction.value)
         onBack()
     }
 
@@ -186,13 +186,13 @@ fun TransactionDetailScreen(
 
             item("Reimbursements") {
                 RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { onAddReimbursement(state) }) {
                         Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
                     }
                 }
             }
 
-            itemsIndexed(reimbursements) { i, it ->
+            itemsIndexed(state.reimbursements) { i, it ->
                 if (i > 0) RowDivider()
                 ReimbursementRow(
                     r = it,
@@ -208,7 +208,7 @@ fun TransactionDetailScreen(
                 }
             }
 
-            itemsIndexed(allocations) { i, it ->
+            itemsIndexed(state.allocations) { i, it ->
                 if (i > 0) RowDivider()
                 AllocationRow(it)
             }
@@ -251,10 +251,8 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             TransactionDetailScreen(
-                transaction = previewTransaction,
+                state = previewTransactionDetail,
                 accounts = previewAccounts,
-                reimbursements = previewReimbursements,
-                allocations = previewAllocations,
                 incomeCategories = previewIncomeCategories2,
                 expenseCategories = previewIncomeCategories2,
             )
