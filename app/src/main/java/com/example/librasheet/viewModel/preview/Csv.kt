@@ -60,6 +60,14 @@ class PreviewCsvModel(
     override fun deleteTransaction(index: Int) {
         TODO("Not yet implemented")
     }
+
+    override fun clear() {
+        TODO("Not yet implemented")
+    }
+
+    override fun save() {
+        TODO("Not yet implemented")
+    }
 }
 
 

@@ -350,7 +350,6 @@ fun LibraApp(
                         accounts = viewModel.accounts.all,
                         state = viewModel.csv,
                         onBack = navController::popBackStack,
-                        loadCsv = viewModel.csv::loadCsv,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }

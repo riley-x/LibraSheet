@@ -41,6 +41,8 @@ interface CsvModel {
     fun setPatt(p: String)
     fun setDateForm(p: String)
     fun deleteTransaction(index: Int)
+    fun clear()
+    fun save()
 }
 
 
@@ -181,4 +183,12 @@ class BaseCsvModel(
     @Callback override fun setPatt(p: String) { pattern = p }
     @Callback override fun setDateForm(p: String) { dateFormat = p }
     @Callback override fun deleteTransaction(index: Int) { if (index in transactions.indices) transactions.removeAt(index) }
+    @Callback override fun clear() {
+        transactions.clear()
+        badLines.clear()
+        errorMessage = ""
+    }
+    @Callback override fun save() {
+        TODO("Not yet implemented")
+    }
 }

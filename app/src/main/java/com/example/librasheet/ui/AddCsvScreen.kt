@@ -40,13 +40,13 @@ fun AddCsvScreen(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
-    loadCsv: (Uri?) -> Unit = { },
+    onSave: () -> Unit = { },
 ) {
     /** https://developer.android.com/jetpack/compose/libraries#activity_result **/
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) {
-        loadCsv(it)
+        state.loadCsv(it)
     }
 
     Column(
@@ -58,88 +58,121 @@ fun AddCsvScreen(
             onBack = onBack,
         )
 
-        LabeledRow(label = "Account") {
-            AccountSelector(
-                selection = state.account,
-                options = accounts,
-                onSelection = state::setAcc,
-                modifier = Modifier.padding(start = 6.dp),
-            )
-        }
-
-        Spacer(Modifier.height(6.dp))
-
-        LabeledRow(
-            label = "Pattern",
-            modifier = Modifier.padding(end = 12.dp)
+        LazyColumn(
+            modifier = Modifier.weight(10f)
         ) {
-            OutlinedTextFieldNoPadding(
-                value = state.pattern,
-                onValueChange = state::setPatt,
-                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
-                modifier = Modifier.weight(10f)
-            )
-        }
-
-        Spacer(Modifier.height(6.dp))
-
-        LabeledRow(
-            label = "Date Format",
-            modifier = Modifier.padding(end = 12.dp)
-        ) {
-            OutlinedTextFieldNoPadding(
-                value = state.dateFormat,
-                onValueChange = state::setDateForm,
-                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
-                modifier = Modifier.weight(10f)
-            )
-        }
-
-        LabeledRow(
-            label = "Invert Values",
-            modifier = Modifier.padding(end = 12.dp)
-        ) {
-            Checkbox(
-                checked = state.invertValues,
-                onCheckedChange = state::setInvert,
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        if (state.transactions.isEmpty()) {
-            Button(
-                onClick = { launcher.launch(arrayOf("text/*")) },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
-                Spacer(Modifier.width(12.dp))
-                Text("Load CSV", fontSize = 18.sp)
-                Spacer(Modifier.width(12.dp))
-                Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
+            item("Account") {
+                LabeledRow(label = "Account") {
+                    AccountSelector(
+                        selection = state.account,
+                        options = accounts,
+                        onSelection = state::setAcc,
+                        modifier = Modifier.padding(start = 6.dp, bottom = 6.dp),
+                    )
+                }
             }
 
-            if (state.errorMessage.isNotEmpty()) {
-                Text(
-                    text = state.errorMessage,
-                    color = MaterialTheme.colors.error,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 20.dp)
-                )
+            item("Pattern") {
+                LabeledRow(
+                    label = "Pattern",
+                    modifier = Modifier.padding(end = 12.dp, bottom = 6.dp)
+                ) {
+                    OutlinedTextFieldNoPadding(
+                        value = state.pattern,
+                        onValueChange = state::setPatt,
+                        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
+                        modifier = Modifier.weight(10f)
+                    )
+                }
             }
-        } else {
-            RowTitle(title = "Preview Transactions")
 
-            LazyColumn(
-                modifier = Modifier.weight(10f)
-            ) {
-                itemsIndexed(state.transactions) { i, transaction ->
-                    SwipeToDelete(
-                        onDelete = { state.deleteTransaction(i) },
+            item("Date Format") {
+                LabeledRow(
+                    label = "Date Format",
+                    modifier = Modifier.padding(end = 12.dp)
+                ) {
+                    OutlinedTextFieldNoPadding(
+                        value = state.dateFormat,
+                        onValueChange = state::setDateForm,
+                        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
+                        modifier = Modifier.weight(10f)
+                    )
+                }
+            }
+
+            item("Invert Values") {
+                LabeledRow(
+                    label = "Invert Values",
+                    modifier = Modifier.padding(end = 12.dp, bottom = 12.dp)
+                ) {
+                    Checkbox(
+                        checked = state.invertValues,
+                        onCheckedChange = state::setInvert,
+                    )
+                }
+            }
+
+            if (state.transactions.isEmpty()) {
+                item("Button") {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        TransactionRow(transaction = transaction)
+                        Button(
+                            onClick = { launcher.launch(arrayOf("text/*")) },
+                        ) {
+                            Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
+                            Spacer(Modifier.width(12.dp))
+                            Text("Load CSV", fontSize = 18.sp)
+                            Spacer(Modifier.width(12.dp))
+                            Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
+                        }
+
+                        if (state.errorMessage.isNotEmpty()) {
+                            Text(
+                                text = state.errorMessage,
+                                color = MaterialTheme.colors.error,
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                            )
+                        }
                     }
+                }
+            } else {
+                item("Preview Transactions") {
+                    RowTitle(title = "Preview Transactions")
+                }
+            }
+
+
+            itemsIndexed(state.transactions) { i, transaction ->
+                SwipeToDelete(
+                    onDelete = { state.deleteTransaction(i) },
+                ) {
+                    TransactionRow(transaction = transaction)
+                }
+            }
+        }
+
+        if (state.transactions.isNotEmpty()) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth().padding(bottom= 4.dp),
+            ) {
+                Button(
+                    onClick = state::clear,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.error,
+                    ),
+                    modifier = Modifier.width(80.dp)
+                ) {
+                    Text("Clear", fontSize = 18.sp)
+                }
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.width(80.dp)
+                ) {
+                    Text("Save", fontSize = 18.sp)
                 }
             }
         }
