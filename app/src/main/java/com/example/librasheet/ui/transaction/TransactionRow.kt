@@ -1,11 +1,9 @@
 package com.example.librasheet.ui.transaction
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -18,6 +16,7 @@ import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.components.ColorCodedRow
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.formatDollar
+import com.example.librasheet.ui.components.libraRowHorizontalPadding
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewAllocations
@@ -32,7 +31,9 @@ fun TransactionRow(
 ) {
     ColorCodedRow(color = transaction.category.color, modifier = modifier) {
         Column(
-            modifier = Modifier.weight(10f).padding(end = 10.dp)
+            modifier = Modifier
+                .weight(10f)
+                .padding(end = 10.dp)
         ) {
             Text(
                 text = transaction.name,
@@ -73,11 +74,18 @@ fun ReimbursementRow(
     r: ReimbursementWithValue,
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit = { },
 ) {
     val account = accounts.find(r.transaction.accountKey)
-    ColorCodedRow(color = account?.color ?: Color.Unspecified, modifier = modifier) {
+    ColorCodedRow(
+        color = account?.color ?: Color.Unspecified,
+        horizontalPadding = 0.dp,
+        modifier = modifier.padding(start = libraRowHorizontalPadding),
+    ) {
         Column(
-            modifier = Modifier.weight(10f).padding(end = 10.dp)
+            modifier = Modifier
+                .weight(10f)
+                .padding(end = 10.dp)
         ) {
             Text(
                 text = r.transaction.name,
@@ -104,6 +112,7 @@ fun ReimbursementRow(
                 style = MaterialTheme.typography.body2,
             )
         }
+        content()
     }
 }
 
@@ -112,10 +121,17 @@ fun ReimbursementRow(
 fun AllocationRow(
     allocation: Allocation,
     modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit = { },
 ) {
-    ColorCodedRow(color = allocation.category.color, modifier = modifier) {
+    ColorCodedRow(
+        color = allocation.category.color,
+        horizontalPadding = 0.dp,
+        modifier = modifier.padding(start = libraRowHorizontalPadding),
+    ) {
         Column(
-            modifier = Modifier.weight(10f).padding(end = 10.dp)
+            modifier = Modifier
+                .weight(10f)
+                .padding(end = 10.dp)
         ) {
             Text(
                 text = allocation.name,
@@ -137,6 +153,7 @@ fun AllocationRow(
                 text = formatDollar(allocation.value),
             )
         }
+        content()
     }
 }
 

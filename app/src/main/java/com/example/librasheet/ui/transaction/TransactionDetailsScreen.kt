@@ -29,11 +29,26 @@ import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.selectors.CategorySelector
+import com.example.librasheet.ui.components.selectors.DropdownOptions
 import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.TransactionWithDetails
+import com.example.librasheet.viewModel.dataClasses.HasDisplayName
+import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 import java.text.SimpleDateFormat
+
+
+private enum class ReimbursementOptions(override val displayName: String): HasDisplayName {
+    VALUE("Change Amount"),
+    DELETE("Delete"),
+}
+private enum class AllocationOptions(override val displayName: String): HasDisplayName {
+    EDIT("Edit"),
+    DELETE("Delete"),
+}
+private val reimbursementOptions = ImmutableList(ReimbursementOptions.values().toList())
+private val allocationOptions = ImmutableList(AllocationOptions.values().toList())
 
 
 @SuppressLint("SimpleDateFormat")
@@ -197,7 +212,14 @@ fun TransactionDetailScreen(
                 ReimbursementRow(
                     r = it,
                     accounts = accounts,
-                )
+                ) {
+                    DropdownOptions(options = reimbursementOptions) {
+                        when (it) {
+                            ReimbursementOptions.DELETE -> { }
+                            ReimbursementOptions.VALUE -> { }
+                        }
+                    }
+                }
             }
 
             item("Allocations") {
@@ -208,9 +230,21 @@ fun TransactionDetailScreen(
                 }
             }
 
-            itemsIndexed(state.allocations) { i, it ->
+            itemsIndexed(state.allocations) { i, allocation ->
                 if (i > 0) RowDivider()
-                AllocationRow(it)
+                DragToReorderTarget(
+                    index = i,
+                    onDragEnd = { _, _, _ ->  }, // TODO
+                ) {
+                    AllocationRow(allocation) {
+                        DropdownOptions(options = allocationOptions) {
+                            when (it) {
+                                AllocationOptions.DELETE -> {}
+                                AllocationOptions.EDIT -> {}
+                            }
+                        }
+                    }
+                }
             }
 
 
