@@ -39,13 +39,13 @@ class FilterTransactionDialogHolder(
     fun openSettings() {
         isOpen = true
         isSettings = true
-        currentFilters = viewModel.transactions.settingsFilter
+        currentFilters = viewModel.transactionsSettings.filter
     }
 
     fun openBalance() {
         isOpen = true
         isSettings = false
-        currentFilters = viewModel.transactions.balanceFilter
+        currentFilters = viewModel.transactionsBalance.filter
     }
 
     fun cancel() {
@@ -54,8 +54,8 @@ class FilterTransactionDialogHolder(
 
     fun save(filters: TransactionFilters) {
         isOpen = false
-        if (isSettings) viewModel.transactions.filterSettings(filters)
-        else viewModel.transactions.filterBalance(filters)
+        if (isSettings) viewModel.transactionsSettings.filter(filters)
+        else viewModel.transactionsBalance.filter(filters)
     }
 
     @Composable

@@ -27,7 +27,7 @@ class TransactionModel(
     )
 
     val displayList = mutableStateListOf<TransactionEntity>()
-    val filter = mutableStateOf(TransactionFilters())
+    val filter = mutableStateOf(defaultFilter)
     private var account: Account? = null
     val detail = mutableStateOf(TransactionEntity())
 
@@ -47,21 +47,15 @@ class TransactionModel(
     fun filter(newFilter: TransactionFilters) {
         if (newFilter == filter.value) return
         filter.value = newFilter
-        loadList()
+        load()
     }
-
 
     @Callback
-    fun load(newAccount: Account? = null) {
-        if (account == newAccount) return
-        account = newAccount
-        filter.value = defaultFilter.copy(account = account?.key)
-        loadList()
+    fun init() {
+        if (displayList.isEmpty()) load()
     }
 
-    fun reload() = loadList()
-
-    private fun loadList() {
+    fun load() {
         viewModel.viewModelScope.launch {
             val filter = filter.value
             val list = withContext(Dispatchers.IO) {

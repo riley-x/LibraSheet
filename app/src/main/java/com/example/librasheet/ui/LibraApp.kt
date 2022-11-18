@@ -62,7 +62,7 @@ fun LibraApp(
     fun toAddCsv() = navController.navigateSingleTop(AddCsvDestination.route)
     fun toBadLines() = navController.navigateSingleTop(BadCsvDestination.route)
     fun toSettingsAllTransactions() {
-        viewModel.transactionsSettings.load()
+        viewModel.transactionsSettings.init()
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
     fun toSettingsTransactionDetail(t: TransactionEntity = TransactionEntity()) {
@@ -70,7 +70,7 @@ fun LibraApp(
         navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
     fun toBalanceAllTransactions(account: Account) {
-        viewModel.transactionsBalance.load(account)
+        viewModel.transactionsBalance.init()
         navController.navigate(TransactionAllDestination.route(BalanceTab.graph))
     }
     fun toBalanceTransactionDetail(t: TransactionEntity) {
