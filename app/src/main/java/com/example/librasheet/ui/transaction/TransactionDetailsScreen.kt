@@ -71,8 +71,9 @@ fun TransactionDetailScreen(
         x
     }
 
-    // TODO make account and category saveable
-    val account = remember { mutableStateOf(accounts.find { it.key == transaction.value.accountKey }) }
+    // TODO this could belong in the view model
+    val accountKey = rememberSaveable { mutableStateOf(transaction.value.accountKey) }
+    val categoryKey = rememberSaveable { mutableStateOf(transaction.value.categoryKey) }
     val name = rememberSaveable { mutableStateOf(transaction.value.name) }
     val date = rememberSaveable { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
     val value = rememberSaveable { mutableStateOf(
@@ -86,10 +87,12 @@ fun TransactionDetailScreen(
     val categoryList by remember { derivedStateOf {
         if ((value.value.toFloatOrNull() ?: 0f) > 0f) incomeCategories else expenseCategories
     } }
-    val category = remember { mutableStateOf(
-        (if (transaction.value.value > 0) incomeCategories else expenseCategories)
-            .find { it.key == transaction.value.categoryKey }
-    ) }
+    val account = remember { derivedStateOf {
+        accounts.find(accountKey.value)
+    } }
+    val category = remember { derivedStateOf {
+        categoryList.find { it.key == categoryKey.value }
+    } }
 
     fun saveTransaction() {
         val dateInt = formatter.parseOrNull(date.value)?.toIntDate()
@@ -170,7 +173,7 @@ fun TransactionDetailScreen(
                     AccountSelector(
                         selection = account.value,
                         options = accounts,
-                        onSelection = { account.value = it },
+                        onSelection = { accountKey.value = it?.key ?: 0 },
                         modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
                     )
                 }
@@ -192,7 +195,7 @@ fun TransactionDetailScreen(
                         selection = category.value,
                         options = categoryList,
                         delayOpen = 100,
-                        onSelection = { category.value = it },
+                        onSelection = { categoryKey.value = it?.key ?: 0 },
                         modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
                     )
                 }

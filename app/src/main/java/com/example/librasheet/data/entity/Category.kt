@@ -210,7 +210,6 @@ fun MutableList<Category>.find(target: CategoryId): Triple<Category, MutableList
 }
 
 
-
 @Stable
 fun getCategoryName(id: String) = id.substringAfterLast(categoryPathSeparator)
 

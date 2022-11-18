@@ -32,6 +32,7 @@ interface TransactionDao {
 
     @Transaction
     fun add(transaction: TransactionEntity): Long {
+        Log.d("Libra/TransactionDao/add", "$transaction")
         val t = if (transaction.categoryKey == 0L) transaction.copy(
             categoryKey = if (transaction.value > 0) incomeKey else expenseKey
         ) else transaction
