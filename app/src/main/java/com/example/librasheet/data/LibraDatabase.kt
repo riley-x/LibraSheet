@@ -16,8 +16,10 @@ import com.example.librasheet.data.entity.*
         CategoryRuleEntity::class,
         CategoryHistory::class,
         TransactionEntity::class,
+        Allocation::class,
+        Reimbursement::class,
     ],
-    version = 9,
+    version = 10,
     autoMigrations = [
 //        AutoMigration (from = 7, to = 8)
     ]
