@@ -24,12 +24,14 @@ fun CategorySelector(
     selection: Category?,
     options: List<Category>,
     modifier: Modifier = Modifier,
+    delayOpen: Long = 0,
     onSelection: (Category?) -> Unit = { },
 ) {
     DropdownSelector(
         selection = selection,
         options = options,
         onSelection = onSelection,
+        delayOpen = delayOpen,
         modifier = modifier,
     ) {
         ColorIndicator(it?.color ?: Color.Unspecified)

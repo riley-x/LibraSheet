@@ -5,9 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.room.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.example.librasheet.data.entity.*
-import com.example.librasheet.data.setDay
 import com.example.librasheet.data.thisMonthEnd
-import kotlin.math.exp
 
 
 @Dao
@@ -33,12 +31,10 @@ interface TransactionDao {
     fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long)
 
     @Transaction
-    fun add(new: TransactionWithDetails) {
-        val t = if (new.transaction.categoryKey == 0L) new.transaction.copy(
-            categoryKey = if (new.transaction.value > 0) incomeKey else expenseKey
-        ) else new.transaction
-
-        // TODO
+    fun add(transaction: TransactionEntity) {
+        val t = if (transaction.categoryKey == 0L) transaction.copy(
+            categoryKey = if (transaction.value > 0) incomeKey else expenseKey
+        ) else transaction
 
         insert(t)
         if (t.accountKey <= 0) return
@@ -73,8 +69,8 @@ interface TransactionDao {
     fun undo(t: TransactionEntity) {
         delete(t)
         val month = thisMonthEnd(t.date)
-        updateBalance(t.accountKey, -t.valueAfterReimbursements)
-        updateBalanceHistory(t.accountKey, month, -t.valueAfterReimbursements)
+        updateBalance(t.accountKey, -t.value)
+        updateBalanceHistory(t.accountKey, month, -t.value)
         updateCategoryHistory(t.accountKey, t.categoryKey, month, -t.valueAfterReimbursements)
     }
 
@@ -136,7 +132,7 @@ interface TransactionDao {
 
     /** Value should always be positive **/
     @Transaction
-    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long, listIndex: Int) {
+    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 
@@ -154,6 +150,28 @@ interface TransactionDao {
         delete(reimbursement)
         update(newIncome, income)
         update(newExpense, expense)
+    }
+
+    @Transaction
+    fun add(t: TransactionWithDetails) {
+        add(t.transaction)
+        t.reimbursements.forEach {
+            addReimbursement(t.transaction, it.transaction, it.value)
+        }
+    }
+
+    @Transaction
+    fun undo(t: TransactionWithDetails) {
+        t.reimbursements.forEach {
+            deleteReimbursement(t.transaction, it.transaction, it.value)
+        }
+        undo(t.transaction)
+    }
+
+    @Transaction
+    fun update(new: TransactionWithDetails, old: TransactionWithDetails) {
+        undo(old)
+        add(new)
     }
 }
 

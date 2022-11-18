@@ -189,6 +189,7 @@ fun TransactionDetailScreen(
                     CategorySelector(
                         selection = category.value,
                         options = categoryList,
+                        delayOpen = 100,
                         onSelection = { category.value = it },
                         modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
                     )
