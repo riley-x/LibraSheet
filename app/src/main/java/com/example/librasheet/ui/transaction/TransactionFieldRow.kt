@@ -21,40 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.ColorIndicator
+import com.example.librasheet.ui.components.LabeledRow
 import com.example.librasheet.ui.components.textFields.OutlinedTextFieldNoPadding
 import com.example.librasheet.ui.components.libraRowHeight
 import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
-
-@Composable
-fun TransactionFieldRow(
-    label: String,
-    modifier: Modifier = Modifier,
-    alignment: Alignment.Vertical = Alignment.CenterVertically,
-    content: @Composable RowScope.() -> Unit = { },
-) {
-    Row(
-        verticalAlignment = alignment,
-        modifier = Modifier
-            .padding(vertical = 2.dp)
-            .then(modifier)
-            .heightIn(min = libraRowHeight)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = label,
-            textAlign = TextAlign.End,
-            style = MaterialTheme.typography.body2,
-            fontStyle = FontStyle.Italic,
-            color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp)
-                .padding(end = 15.dp)
-                .width(80.dp)
-        )
-        content()
-    }
-}
 
 
 @Composable
@@ -73,10 +44,10 @@ fun TransactionEditRow(
     val lines = if (number) 1 else 3
 
 
-    TransactionFieldRow(
+    LabeledRow(
         label = label,
         alignment = if (lines == 1) Alignment.CenterVertically else Alignment.Top,
-        modifier = modifier.height(Dp(maxOf(50f, lines * 25f)))
+        modifier = modifier.height(Dp(maxOf(50f, lines * 25f))).fillMaxWidth()
     ) {
         OutlinedTextFieldNoPadding(
             value = text,
@@ -121,18 +92,6 @@ fun TransactionEditRow(
 
 @Preview
 @Composable
-private fun Preview() {
-    LibraSheetTheme {
-        Surface {
-            TransactionFieldRow(
-                label = "Category"
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
 private fun PreviewEdit() {
     LibraSheetTheme {
         Surface {
@@ -168,7 +127,7 @@ private fun PreviewEditBox() {
 private fun PreviewSelect() {
     LibraSheetTheme {
         Surface {
-            TransactionFieldRow(
+            LabeledRow(
                 label = "Account",
             ) {
                 DropdownSelector(

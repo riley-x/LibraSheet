@@ -32,7 +32,7 @@ class PreviewCsvModel(
     override var invertValues: Boolean = true,
     override var pattern: String = "date,name,value",
     override var dateFormat: String = "MM/dd/yyyy",
-    override var errorMessage: String = "I'm an error message",
+    override var errorMessage: String = "",
     override val transactions: SnapshotStateList<TransactionEntity> = previewTransactions,
     override val badLines: SnapshotStateList<Pair<Int, String>> = mutableStateListOf(Pair(1, "this is a bad line"), Pair(50, "oh no!")),
 ): CsvModel {
@@ -61,3 +61,8 @@ class PreviewCsvModel(
 
 
 val previewCsvModel = PreviewCsvModel()
+
+val previewCsvModel2 = PreviewCsvModel(
+    errorMessage = "I'm an error message",
+    transactions = mutableStateListOf()
+)

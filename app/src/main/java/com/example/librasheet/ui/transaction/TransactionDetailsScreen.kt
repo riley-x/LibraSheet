@@ -147,8 +147,9 @@ fun TransactionDetailScreen(
             }
 
             item("Account") {
-                TransactionFieldRow(
-                    label = "Account"
+                LabeledRow(
+                    label = "Account",
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
                 ) {
                     DropdownSelector(
                         selection = account.value,
@@ -173,8 +174,9 @@ fun TransactionDetailScreen(
 
 
             item("Category") {
-                TransactionFieldRow(
+                LabeledRow(
                     label = "Category",
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     CategorySelector(
                         selection = category.value,

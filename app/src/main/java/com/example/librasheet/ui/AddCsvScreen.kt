@@ -20,6 +20,8 @@ import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowTitle
 import com.example.librasheet.ui.components.selectors.AccountSelector
+import com.example.librasheet.ui.components.textFields.CustomTextField
+import com.example.librasheet.ui.components.textFields.OutlinedTextFieldNoPadding
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CsvModel
 import com.example.librasheet.viewModel.LibraViewModel
@@ -68,28 +70,30 @@ fun AddCsvScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
-                .height(48.dp)
         ) {
             Text("Pattern:")
             Spacer(Modifier.width(15.dp))
-            OutlinedTextField(
+            OutlinedTextFieldNoPadding(
                 value = state.pattern,
                 onValueChange = state::setPatt,
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
                 modifier = Modifier.weight(10f)
             )
         }
+
+        Spacer(Modifier.height(6.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
-                .height(48.dp)
         ) {
             Text("Date format:")
             Spacer(Modifier.width(15.dp))
-            OutlinedTextField(
+            OutlinedTextFieldNoPadding(
                 value = state.dateFormat,
                 onValueChange = state::setDateForm,
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp),
                 modifier = Modifier.weight(10f)
             )
         }
