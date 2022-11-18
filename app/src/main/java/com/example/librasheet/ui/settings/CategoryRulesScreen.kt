@@ -37,6 +37,7 @@ private val ruleOptions = ImmutableList(RuleOptions.values().toList())
 @Composable
 fun CategoryRulesScreen(
     rules: SnapshotStateList<CategoryRule>,
+    isIncome: Boolean,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     onAdd: () -> Unit = { },
@@ -47,7 +48,7 @@ fun CategoryRulesScreen(
 ) {
     Column(modifier) {
         HeaderBar(
-            title = "Rules",
+            title = if (isIncome) "Income Rules" else "Expense Rules",
             backArrow = true,
             onBack = onBack,
             modifier = Modifier.zIndex(2f)
@@ -94,6 +95,7 @@ private fun Preview() {
         Surface {
             CategoryRulesScreen(
                 rules = previewRules,
+                isIncome = false,
             )
         }
     }

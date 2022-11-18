@@ -342,6 +342,7 @@ fun LibraApp(
                 composable(route = RulesDestination.route) {
                     CategoryRulesScreen(
                         rules = viewModel.rules.displayList,
+                        isIncome = viewModel.rules.currentScreenIsIncome,
                         onBack = navController::popBackStack,
                         onAdd = ::onAddRule,
                         onFilter = ::onFilterRules,

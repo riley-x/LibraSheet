@@ -1,12 +1,10 @@
-package com.example.librasheet.ui
+package com.example.librasheet.ui.settings
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -19,16 +17,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.components.selectors.AccountSelector
-import com.example.librasheet.ui.components.textFields.CustomTextField
 import com.example.librasheet.ui.components.textFields.OutlinedTextFieldNoPadding
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.ui.transaction.TransactionRow
 import com.example.librasheet.viewModel.CsvModel
-import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewCsvModel
 import com.example.librasheet.viewModel.preview.previewCsvModel2

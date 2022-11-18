@@ -29,7 +29,7 @@ class RuleModel(
 
     val displayList = mutableStateListOf<CategoryRule>()
     var currentFilter by mutableStateOf(Category.None)
-    var currentScreenIsIncome = false
+    var currentScreenIsIncome by mutableStateOf(false)
 
 
     @Callback

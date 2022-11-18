@@ -1,9 +1,8 @@
-package com.example.librasheet.ui
+package com.example.librasheet.ui.settings
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,13 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.librasheet.data.entity.Account
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.LabeledRow
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.CsvModel
-import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewCsvModel2
 
 @Composable
 fun BadCsvScreen(
