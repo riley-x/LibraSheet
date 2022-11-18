@@ -56,6 +56,10 @@ class PreviewCsvModel(
     override fun setDateForm(p: String) {
         TODO("Not yet implemented")
     }
+
+    override fun deleteTransaction(index: Int) {
+        TODO("Not yet implemented")
+    }
 }
 
 
