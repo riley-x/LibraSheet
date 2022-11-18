@@ -47,7 +47,9 @@ fun NavGraphBuilder.transactionScreens(
 
     composable(route = TransactionDetailDestination.route(route!!)) {
         TransactionDetailScreen(
-            state = state.detail,
+            transaction = state.detail,
+            reimbursements = state.reimbursements,
+            allocations = state.allocations,
             accounts = viewModel.accounts.all,
             incomeCategories = viewModel.categories.incomeTargets,
             expenseCategories = viewModel.categories.expenseTargets,

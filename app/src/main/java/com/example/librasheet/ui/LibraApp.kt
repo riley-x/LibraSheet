@@ -271,7 +271,6 @@ fun LibraApp(
                 }
                 composable(route = CategoryDetailDestination.route(SpendingTab.graph), arguments = CategoryDetailDestination.arguments) {
                     cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true, navController, viewModel, innerPadding)()
-                    // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
                 }
             }
 

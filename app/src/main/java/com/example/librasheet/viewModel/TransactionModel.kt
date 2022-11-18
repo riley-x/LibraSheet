@@ -19,9 +19,9 @@ import kotlin.math.abs
 
 @Immutable
 data class TransactionWithDetails(
-    val transaction: MutableState<TransactionEntity> = mutableStateOf(TransactionEntity()),
-    val reimbursements: SnapshotStateList<ReimbursementWithValue> = mutableStateListOf(),
-    val allocations: SnapshotStateList<Allocation> = mutableStateListOf(),
+    val transaction: TransactionEntity,
+    val reimbursements: List<ReimbursementWithValue>,
+    val allocations: List<Allocation>
 )
 
 
@@ -35,13 +35,30 @@ class TransactionModel(
 
     val displayList = mutableStateListOf<TransactionEntity>()
     val filter = mutableStateOf(defaultFilter)
-    val detail = TransactionWithDetails()
+
+    val detail = mutableStateOf(TransactionEntity())
+    val reimbursements = mutableStateListOf<ReimbursementWithValue>()
+    val allocations = mutableStateListOf<Allocation>()
+
+    var oldReimbursements = listOf<ReimbursementWithValue>()
+    var oldAllocations = listOf<Allocation>()
 
     @Callback
-    fun save(new: TransactionEntity, old: TransactionEntity) {
+    fun save(newTransaction: TransactionEntity) {
+        // Copy old values before they get changed by the ui
+        val old = TransactionWithDetails(
+            transaction = detail.value,
+            reimbursements = oldReimbursements,
+            allocations = oldAllocations,
+        )
+        val new = TransactionWithDetails(
+            transaction = newTransaction,
+            reimbursements = reimbursements.toList(),
+            allocations = allocations.toList()
+        )
         viewModel.viewModelScope.launch {
             withContext(Dispatchers.IO){
-                if (old.key > 0) dao.update(new, old)
+                if (old.transaction.key > 0) dao.update(new, old)
                 else dao.add(new)
             }
             viewModel.updateDependencies(Dependency.TRANSACTION)
@@ -75,9 +92,9 @@ class TransactionModel(
 
     @Callback
     fun loadDetail(t: TransactionEntity) {
-        detail.transaction.value = t
-        detail.reimbursements.clear() // should clear before the launch so previous detail's allocations don't show
-        detail.allocations.clear()
+        detail.value = t
+        reimbursements.clear() // should clear before the launch so previous detail's allocations don't show
+        allocations.clear()
         viewModel.viewModelScope.launch {
             val (reimbs, allocs) = withContext(Dispatchers.IO) {
                 val (reimbs, allocs) = dao.getDetails(t)
@@ -94,8 +111,10 @@ class TransactionModel(
 
                 return@withContext Pair(reimbs, allocs)
             }
-            detail.reimbursements.addAll(reimbs)
-            detail.allocations.addAll(allocs)
+            oldReimbursements = reimbs
+            oldAllocations = allocs
+            reimbursements.addAll(reimbs)
+            allocations.addAll(allocs)
         }
     }
 
@@ -104,10 +123,10 @@ class TransactionModel(
      */
     @Callback
     fun addReimbursement(t: TransactionEntity) {
-        detail.reimbursements.add(
+        reimbursements.add(
             ReimbursementWithValue(
                 transaction = t,
-                value = minOf(abs(detail.transaction.value.value), abs(t.valueAfterReimbursements))
+                value = minOf(abs(detail.value.value), abs(t.valueAfterReimbursements))
             )
         )
     }

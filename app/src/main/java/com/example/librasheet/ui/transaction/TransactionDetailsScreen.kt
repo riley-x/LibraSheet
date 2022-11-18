@@ -54,14 +54,16 @@ private val allocationOptions = ImmutableList(AllocationOptions.values().toList(
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun TransactionDetailScreen(
-    state: TransactionWithDetails,
+    transaction: MutableState<TransactionEntity>,
+    reimbursements: SnapshotStateList<ReimbursementWithValue>,
+    allocations: SnapshotStateList<Allocation>,
     accounts: SnapshotStateList<Account>,
     incomeCategories: SnapshotStateList<Category>,
     expenseCategories: SnapshotStateList<Category>,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
-    onSave: (new: TransactionEntity, old: TransactionEntity) -> Unit = { _, _ -> },
+    onSave: (TransactionEntity) -> Unit = { },
     onAddReimbursement: () -> Unit = { }, // TODO make sure this can handle a new transaction
 ) {
     val focusManager = LocalFocusManager.current
@@ -73,12 +75,12 @@ fun TransactionDetailScreen(
     }
 
     // TODO make account and category saveable
-    val account = remember { mutableStateOf(accounts.find { it.key == state.transaction.value.accountKey }) }
-    val name = rememberSaveable { mutableStateOf(state.transaction.value.name) }
-    val date = rememberSaveable { mutableStateOf(formatDateIntSimple(state.transaction.value.date, "-")) }
+    val account = remember { mutableStateOf(accounts.find { it.key == transaction.value.accountKey }) }
+    val name = rememberSaveable { mutableStateOf(transaction.value.name) }
+    val date = rememberSaveable { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
     val value = rememberSaveable { mutableStateOf(
-        if (state.transaction.value.value == 0L) ""
-        else state.transaction.value.value.toFloatDollar().toString())
+        if (transaction.value.value == 0L) ""
+        else transaction.value.value.toFloatDollar().toString())
     }
 
     var dateError by remember { mutableStateOf(false) }
@@ -88,8 +90,8 @@ fun TransactionDetailScreen(
         if ((value.value.toFloatOrNull() ?: 0f) > 0f) incomeCategories else expenseCategories
     } }
     val category = remember { mutableStateOf(
-        (if (state.transaction.value.value > 0) incomeCategories else expenseCategories)
-            .find { it.key == state.transaction.value.categoryKey }
+        (if (transaction.value.value > 0) incomeCategories else expenseCategories)
+            .find { it.key == transaction.value.categoryKey }
     ) }
 
     fun saveTransaction() {
@@ -101,7 +103,7 @@ fun TransactionDetailScreen(
         if (dateError || valueError) return
 
         val t = TransactionEntity(
-            key = state.transaction.value.key,
+            key = transaction.value.key,
             name = name.value,
             date = dateInt ?: 0,
             value = valueLong ?: 0L,
@@ -110,7 +112,7 @@ fun TransactionDetailScreen(
             accountKey = account.value?.key ?: 0,
 //            valueAfterReimbursements = // TODO,
         )
-        onSave(t, state.transaction.value)
+        onSave(t)
         onBack()
     }
 
@@ -207,7 +209,7 @@ fun TransactionDetailScreen(
                 }
             }
 
-            itemsIndexed(state.reimbursements) { i, it ->
+            itemsIndexed(reimbursements) { i, it ->
                 if (i > 0) RowDivider()
                 ReimbursementRow(
                     r = it,
@@ -230,7 +232,7 @@ fun TransactionDetailScreen(
                 }
             }
 
-            itemsIndexed(state.allocations) { i, allocation ->
+            itemsIndexed(allocations) { i, allocation ->
                 if (i > 0) RowDivider()
                 DragToReorderTarget(
                     index = i,
@@ -285,7 +287,9 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             TransactionDetailScreen(
-                state = previewTransactionDetail,
+                transaction = previewTransaction,
+                reimbursements = previewReimbursements,
+                allocations = previewAllocations,
                 accounts = previewAccounts,
                 incomeCategories = previewIncomeCategories2,
                 expenseCategories = previewIncomeCategories2,
