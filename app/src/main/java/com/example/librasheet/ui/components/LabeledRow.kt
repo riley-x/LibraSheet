@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
@@ -18,6 +19,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 fun LabeledRow(
     label: String,
     modifier: Modifier = Modifier,
+    labelWidth: Dp = 80.dp,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable RowScope.() -> Unit = { },
 ) {
@@ -34,7 +36,7 @@ fun LabeledRow(
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 8.dp)
                 .padding(end = 15.dp)
-                .width(80.dp)
+                .width(labelWidth)
         )
         content()
     }
@@ -48,7 +50,8 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             LabeledRow(
-                label = "Category"
+                label = "Category",
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

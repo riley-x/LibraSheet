@@ -40,6 +40,7 @@ interface CsvModel {
     fun setInvert(invert: Boolean)
     fun setPatt(p: String)
     fun setDateForm(p: String)
+    fun deleteTransaction(index: Int)
 }
 
 
@@ -179,4 +180,5 @@ class BaseCsvModel(
     @Callback override fun setInvert(invert: Boolean) { invertValues = invert }
     @Callback override fun setPatt(p: String) { pattern = p }
     @Callback override fun setDateForm(p: String) { dateFormat = p }
+    @Callback override fun deleteTransaction(index: Int) { if (index in transactions.indices) transactions.removeAt(index) }
 }

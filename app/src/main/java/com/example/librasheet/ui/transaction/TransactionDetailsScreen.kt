@@ -28,6 +28,7 @@ import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.*
+import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -151,18 +152,12 @@ fun TransactionDetailScreen(
                     label = "Account",
                     modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
                 ) {
-                    DropdownSelector(
+                    AccountSelector(
                         selection = account.value,
                         options = accounts,
                         onSelection = { account.value = it },
-                    ) {
-                        Spacer(Modifier.width(6.dp))
-                        ColorIndicator(it?.color ?: Color.Unspecified)
-                        Text(
-                            text = it?.name ?: "None",
-                            fontStyle = if (it == null) FontStyle.Italic else FontStyle.Normal,
-                        )
-                    }
+                        modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
+                    )
                 }
             }
 
