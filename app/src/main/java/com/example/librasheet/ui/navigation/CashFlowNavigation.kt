@@ -24,23 +24,26 @@ fun cashFlow(
     viewModel: LibraViewModel,
     innerPadding: PaddingValues,
 ): (@Composable () -> Unit) {
-    fun toIncomeCategoryDetailScreen(it: CategoryUi) {
-        /** WARNING! This only works because we have at most one level of nesting. Otherwise would
-         * have to use a launched effect or something
-         */
-        viewModel.incomeDetail.load(it.category)
-        navController.navigateSingleTop(CategoryDetailDestination.argRoute(IncomeTab.graph, it.category.id.fullName))
-    }
-    fun toExpenseCategoryDetailScreen(it: CategoryUi) {
-        viewModel.expenseDetail.load(it.category)
-        navController.navigateSingleTop(CategoryDetailDestination.argRoute(SpendingTab.graph, it.category.id.fullName))
+    /** WARNING! This only works because we have at most one level of nesting. Otherwise would
+     * have to use a launched effect or something **/
+    fun toDetail(it: CategoryUi) {
+        val detail = if (isIncome) viewModel.incomeDetail else viewModel.expenseDetail
+        val graph = if (isIncome) IncomeTab.graph else SpendingTab.graph
+
+        detail.load(it.category)
+        navController.navigateSingleTop(
+            CategoryDetailDestination.argRoute(
+                graph,
+                it.category.id.fullName
+            )
+        )
     }
     return {
         CashFlowScreen(
             state = model,
             headerBackArrow = isDetail,
             onBack = navController::popBackStack,
-            onCategoryClick = if (isIncome) ::toIncomeCategoryDetailScreen else ::toExpenseCategoryDetailScreen,
+            onCategoryClick = ::toDetail,
             onReorder = viewModel.categories::reorder,
             modifier = Modifier.padding(innerPadding)
         )

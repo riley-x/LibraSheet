@@ -25,7 +25,6 @@ import com.example.librasheet.ui.settings.*
 import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
 import com.example.librasheet.viewModel.LibraViewModel
-import com.example.librasheet.viewModel.TransactionWithDetails
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 
 
@@ -63,7 +62,7 @@ fun LibraApp(
     fun toAddCsv() = navController.navigateSingleTop(AddCsvDestination.route)
     fun toBadLines() = navController.navigateSingleTop(BadCsvDestination.route)
     fun toSettingsAllTransactions() {
-        viewModel.transactionsSettings.init()
+        viewModel.transactionsSettings.initList()
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
     fun toSettingsTransactionDetail(t: TransactionEntity = TransactionEntity()) {
@@ -211,60 +210,13 @@ fun LibraApp(
             }
         }
 
-        fun NavGraphBuilder.transactionAll() {
-            val isSettings = route == SettingsTab.graph
-            val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
-            composable(route = TransactionAllDestination.route(route!!)) {
-                TransactionListScreen(
-                    filter = state.filter,
-                    transactions = state.displayList,
-                    accounts = viewModel.accounts.all,
-                    onBack = navController::popBackStack,
-                    onFilter = if (isSettings) filterTransactionDialog::openSettings else filterTransactionDialog::openBalance,
-                    onTransactionClick = if (isSettings) ::toSettingsTransactionDetail else ::toBalanceTransactionDetail,
-                    modifier = Modifier.padding(innerPadding),
-                )
-            }
-        }
-        fun NavGraphBuilder.transactionDetail() {
-            val isSettings = route!! == SettingsTab.graph
-            val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
-            fun onAddReimbursement() {
-                state.init()
-                navController.navigateSingleTop(TransactionReimburseDestination.route(route!!))
-            }
-            composable(route = TransactionDetailDestination.route(route!!)) {
-                TransactionDetailScreen(
-                    state = state.detail,
-                    accounts = viewModel.accounts.all,
-                    incomeCategories = viewModel.categories.incomeTargets,
-                    expenseCategories = viewModel.categories.expenseTargets,
-                    onBack = navController::popBackStack,
-                    onSave = state::save,
-                    onAddReimbursement = ::onAddReimbursement,
-                    bottomPadding = innerPadding.calculateBottomPadding(),
-                )
-            }
-        }
-        fun NavGraphBuilder.transactionSelector() {
-            val isSettings = route == SettingsTab.graph
-            val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
-            fun onSelect(t: TransactionEntity) {
-                navController.popBackStack()
-                state.addReimbursement(t)
-            }
-            composable(route = TransactionReimburseDestination.route(route!!)) {
-                TransactionListScreen(
-                    title = "Select Reimb.",
-                    filter = state.filter,
-                    transactions = state.displayList,
-                    accounts = viewModel.accounts.all,
-                    onBack = navController::popBackStack,
-                    onFilter = if (isSettings) filterTransactionDialog::openSettings else filterTransactionDialog::openBalance,
-                    onTransactionClick = ::onSelect,
-                    modifier = Modifier.padding(innerPadding),
-                )
-            }
+        fun NavGraphBuilder.transactions() {
+            transactionScreens(
+                viewModel = viewModel,
+                navController = navController,
+                innerPadding = innerPadding,
+                filterDialog = filterTransactionDialog,
+            )
         }
 
         /** If you try to pad the NavHost, there will be a flicker when the soft keyboard animates
@@ -300,9 +252,7 @@ fun LibraApp(
                     )
                 }
                 colorSelector()
-                transactionDetail()
-                transactionAll()
-                transactionSelector()
+                transactions()
             }
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
@@ -394,9 +344,7 @@ fun LibraApp(
                     )
                 }
                 colorSelector()
-                transactionDetail()
-                transactionAll()
-                transactionSelector()
+                transactions()
             }
         }
 

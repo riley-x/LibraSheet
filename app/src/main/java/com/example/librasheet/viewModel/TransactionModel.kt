@@ -56,7 +56,7 @@ class TransactionModel(
     }
 
     @Callback
-    fun init() {
+    fun initList() {
         if (displayList.isEmpty()) load()
     }
 
