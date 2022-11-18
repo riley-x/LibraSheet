@@ -20,26 +20,23 @@ import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowTitle
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.CsvModel
 import com.example.librasheet.viewModel.preview.previewAccounts
 
 @Composable
 fun AddCsvScreen(
+    state: CsvModel,
     accounts: SnapshotStateList<Account>,
-    fileName: String,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
     loadCsv: (Uri?) -> Unit = { },
 ) {
-    var account by remember { mutableStateOf<Account?>(null) }
-    var invertValues by remember { mutableStateOf(false) }
-
     /** https://developer.android.com/jetpack/compose/libraries#activity_result **/
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) {
         loadCsv(it)
     }
-
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -133,10 +130,10 @@ private fun Preview() {
 private fun PreviewLoaded() {
     LibraSheetTheme {
         Surface {
-            AddCsvScreen(
-                accounts = previewAccounts,
-                fileName = "filename.csv",
-            )
+//            AddCsvScreen(
+//                accounts = previewAccounts,
+//                fileName = "filename.csv",
+//            )
         }
     }
 }
