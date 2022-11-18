@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.math.abs
 
 
 @Immutable
@@ -106,7 +107,7 @@ class TransactionModel(
         detail.reimbursements.add(
             ReimbursementWithValue(
                 transaction = t,
-                value = minOf(detail.transaction.value.value, t.valueAfterReimbursements)
+                value = minOf(abs(detail.transaction.value.value), abs(t.valueAfterReimbursements))
             )
         )
     }

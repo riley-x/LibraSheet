@@ -35,6 +35,7 @@ fun TransactionListScreen(
     transactions: SnapshotStateList<TransactionEntity>,
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
+    title: String = "Transactions",
     onBack: () -> Unit = { },
     onFilter: () -> Unit = { },
     onTransactionClick: (TransactionEntity) -> Unit = { },
@@ -43,7 +44,7 @@ fun TransactionListScreen(
         modifier = modifier.fillMaxSize()
     ) {
         HeaderBar(
-            title = "Transactions",
+            title = title,
             backArrow = true,
             onBack = onBack,
         ) {

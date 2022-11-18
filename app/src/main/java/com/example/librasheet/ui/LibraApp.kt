@@ -70,10 +70,6 @@ fun LibraApp(
         viewModel.transactionsSettings.loadDetail(t)
         navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
-    fun toBalanceAllTransactions(account: Account) {
-        viewModel.transactionsBalance.init()
-        navController.navigate(TransactionAllDestination.route(BalanceTab.graph))
-    }
     fun toBalanceTransactionDetail(t: TransactionEntity) {
         viewModel.transactionsBalance.loadDetail(t)
         navController.navigateSingleTop(TransactionDetailDestination.route(BalanceTab.graph))
@@ -234,6 +230,7 @@ fun LibraApp(
             val isSettings = route!! == SettingsTab.graph
             val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
             fun onAddReimbursement() {
+                state.init()
                 navController.navigateSingleTop(TransactionReimburseDestination.route(route!!))
             }
             composable(route = TransactionDetailDestination.route(route!!)) {
@@ -252,14 +249,19 @@ fun LibraApp(
         fun NavGraphBuilder.transactionSelector() {
             val isSettings = route == SettingsTab.graph
             val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
+            fun onSelect(t: TransactionEntity) {
+                navController.popBackStack()
+                state.addReimbursement(t)
+            }
             composable(route = TransactionReimburseDestination.route(route!!)) {
                 TransactionListScreen(
+                    title = "Select Reimb.",
                     filter = state.filter,
                     transactions = state.displayList,
                     accounts = viewModel.accounts.all,
                     onBack = navController::popBackStack,
                     onFilter = if (isSettings) filterTransactionDialog::openSettings else filterTransactionDialog::openBalance,
-                    onTransactionClick = state::addReimbursement,
+                    onTransactionClick = ::onSelect,
                     modifier = Modifier.padding(innerPadding),
                 )
             }
