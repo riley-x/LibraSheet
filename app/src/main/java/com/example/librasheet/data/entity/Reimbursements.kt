@@ -6,7 +6,13 @@ import androidx.room.Entity
 import androidx.room.Junction
 import androidx.room.Relation
 
-@Entity(primaryKeys = ["expenseId", "incomeId"])
+
+const val reimbursementTable = "reimbursements"
+
+@Entity(
+    primaryKeys = ["expenseId", "incomeId"],
+    tableName = reimbursementTable,
+)
 data class Reimbursement(
     val expenseId: Long,
     val incomeId: Long

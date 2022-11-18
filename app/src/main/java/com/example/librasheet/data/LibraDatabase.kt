@@ -1,10 +1,7 @@
 package com.example.librasheet.data
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.example.librasheet.data.dao.*
 import com.example.librasheet.data.entity.*
 
@@ -21,7 +18,7 @@ import com.example.librasheet.data.entity.*
     ],
     version = 10,
     autoMigrations = [
-//        AutoMigration (from = 7, to = 8)
+        AutoMigration (from = 9, to = 10)
     ]
 )
 @TypeConverters(Converters::class)
@@ -43,7 +40,7 @@ abstract class LibraDatabase : RoomDatabase() {
                     LibraDatabase::class.java,
                     "app_database"
                 )
-                    .fallbackToDestructiveMigration() // this will delete the old database!
+//                    .fallbackToDestructiveMigration() // this will delete the old database!
                     .build()
                 INSTANCE = instance
                 instance

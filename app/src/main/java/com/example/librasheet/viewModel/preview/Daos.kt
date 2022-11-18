@@ -163,6 +163,18 @@ internal class FakeTransactionDao: TransactionDao {
     override fun get(q: SimpleSQLiteQuery): List<TransactionEntity> {
         TODO("Not yet implemented")
     }
+
+    override fun getIncomeReimbursements(incomeKey: Long): List<TransactionEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getExpenseReimbursements(expenseKey: Long): List<TransactionEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllocations(key: Long): List<Allocation> {
+        TODO("Not yet implemented")
+    }
 }
 
 internal class FakeRuleDao: RuleDao {

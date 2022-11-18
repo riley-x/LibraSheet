@@ -83,6 +83,24 @@ interface TransactionDao {
     fun get(q: SimpleSQLiteQuery): List<TransactionEntity>
 
     fun get(filters: TransactionFilters): List<TransactionEntity> = get(getTransactionFilteredQuery(filters))
+
+    @Query("SELECT * FROM $transactionTable t JOIN $reimbursementTable r ON t.`key` = r.expenseId WHERE r.incomeId = :incomeKey")
+    fun getIncomeReimbursements(incomeKey: Long): List<TransactionEntity>
+
+    @Query("SELECT * FROM $transactionTable t JOIN $reimbursementTable r ON t.`key` = r.incomeId WHERE r.expenseId = :expenseKey")
+    fun getExpenseReimbursements(expenseKey: Long): List<TransactionEntity>
+
+    @Query("SELECT * FROM $allocationTable WHERE transactionKey = :key ORDER BY listIndex")
+    fun getAllocations(key: Long): List<Allocation>
+
+    @Transaction
+    fun getDetails(transaction: TransactionEntity): Pair<List<TransactionEntity>, List<Allocation>> {
+        val reimbursements =
+            if (transaction.value > 0) getIncomeReimbursements(transaction.key)
+            else getExpenseReimbursements(transaction.key)
+        val allocations = getAllocations(transaction.key)
+        return Pair(reimbursements, allocations)
+    }
 }
 
 @Immutable
