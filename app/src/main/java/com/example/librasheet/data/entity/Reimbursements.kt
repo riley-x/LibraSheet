@@ -1,10 +1,7 @@
 package com.example.librasheet.data.entity
 
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Junction
-import androidx.room.Relation
+import androidx.room.*
 
 
 const val reimbursementTable = "reimbursements"
@@ -15,8 +12,17 @@ const val reimbursementTable = "reimbursements"
 )
 data class Reimbursement(
     val expenseId: Long,
-    val incomeId: Long
+    val incomeId: Long,
+    val value: Long,
+    // No list index because there could be multiple "lists" for each reimbursement
 )
+
+
+data class ReimbursementWithValue (
+    @Embedded val transaction: TransactionEntity,
+    @ColumnInfo(name = "reimbursedValue") val value: Long,
+)
+
 
 interface TransactionWithReimbursements {
     val parent: TransactionEntity

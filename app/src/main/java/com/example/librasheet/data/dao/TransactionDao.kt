@@ -7,6 +7,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.setDay
 import com.example.librasheet.data.thisMonthEnd
+import kotlin.math.exp
 
 
 @Dao
@@ -84,22 +85,69 @@ interface TransactionDao {
 
     fun get(filters: TransactionFilters): List<TransactionEntity> = get(getTransactionFilteredQuery(filters))
 
-    @Query("SELECT * FROM $transactionTable t JOIN $reimbursementTable r ON t.`key` = r.expenseId WHERE r.incomeId = :incomeKey")
-    fun getIncomeReimbursements(incomeKey: Long): List<TransactionEntity>
+    @Query("SELECT $transactionFields, r.value as reimbursedValue FROM $transactionTable t JOIN $reimbursementTable r ON t.`key` = r.expenseId WHERE r.incomeId = :incomeKey")
+    fun getIncomeReimbursements(incomeKey: Long): List<ReimbursementWithValue>
 
-    @Query("SELECT * FROM $transactionTable t JOIN $reimbursementTable r ON t.`key` = r.incomeId WHERE r.expenseId = :expenseKey")
-    fun getExpenseReimbursements(expenseKey: Long): List<TransactionEntity>
+    @Query("SELECT $transactionFields, r.value as reimbursedValue FROM $transactionTable t JOIN $reimbursementTable r ON t.`key` = r.incomeId WHERE r.expenseId = :expenseKey")
+    fun getExpenseReimbursements(expenseKey: Long): List<ReimbursementWithValue>
 
     @Query("SELECT * FROM $allocationTable WHERE transactionKey = :key ORDER BY listIndex")
     fun getAllocations(key: Long): List<Allocation>
 
     @Transaction
-    fun getDetails(transaction: TransactionEntity): Pair<List<TransactionEntity>, List<Allocation>> {
+    fun getDetails(transaction: TransactionEntity): Pair<List<ReimbursementWithValue>, List<Allocation>> {
         val reimbursements =
             if (transaction.value > 0) getIncomeReimbursements(transaction.key)
             else getExpenseReimbursements(transaction.key)
         val allocations = getAllocations(transaction.key)
         return Pair(reimbursements, allocations)
+    }
+
+    @Insert fun insert(x: Reimbursement)
+    @Update fun update(x: Reimbursement)
+    @Delete fun delete(x: Reimbursement)
+
+    /** Value should always be positive **/
+    @Transaction
+    fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
+        val expense = if (t1.value > 0) t2 else t1
+        val income = if (t1.value > 0) t1 else t2
+
+        val reimbursement = Reimbursement(
+            expenseId = expense.key,
+            incomeId = income.key,
+            value = value
+        )
+        val newIncome = income.copy(
+            valueAfterReimbursements = income.valueAfterReimbursements - value
+        )
+        val newExpense = expense.copy(
+            valueAfterReimbursements = expense.valueAfterReimbursements + value
+        )
+        insert(reimbursement)
+        update(newIncome, income)
+        update(newExpense, expense)
+    }
+
+    @Transaction
+    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long, listIndex: Int) {
+        val expense = if (t1.value > 0) t2 else t1
+        val income = if (t1.value > 0) t1 else t2
+
+        val reimbursement = Reimbursement(
+            expenseId = expense.key,
+            incomeId = income.key,
+            value = 0
+        )
+        val newIncome = income.copy(
+            valueAfterReimbursements = income.valueAfterReimbursements + value
+        )
+        val newExpense = expense.copy(
+            valueAfterReimbursements = expense.valueAfterReimbursements - value
+        )
+        delete(reimbursement)
+        update(newIncome, income)
+        update(newExpense, expense)
     }
 }
 

@@ -8,6 +8,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 const val transactionTable = "transaction_table"
+const val transactionFields = "t.`key`, t.name, t.date, t.accountKey, t.categoryKey, t.value, t.valueAfterReimbursements"
 
 /**
  * Make sure not to mix up names with SQL/Room Transaction.

@@ -136,7 +136,15 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
+    override fun insert(x: Reimbursement) {
+        TODO("Not yet implemented")
+    }
+
     override fun delete(t: TransactionEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(x: Reimbursement) {
         TODO("Not yet implemented")
     }
 
@@ -160,15 +168,19 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
+    override fun update(x: Reimbursement) {
+        TODO("Not yet implemented")
+    }
+
     override fun get(q: SimpleSQLiteQuery): List<TransactionEntity> {
         TODO("Not yet implemented")
     }
 
-    override fun getIncomeReimbursements(incomeKey: Long): List<TransactionEntity> {
+    override fun getIncomeReimbursements(incomeKey: Long): List<ReimbursementWithValue> {
         TODO("Not yet implemented")
     }
 
-    override fun getExpenseReimbursements(expenseKey: Long): List<TransactionEntity> {
+    override fun getExpenseReimbursements(expenseKey: Long): List<ReimbursementWithValue> {
         TODO("Not yet implemented")
     }
 
