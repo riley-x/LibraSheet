@@ -132,7 +132,7 @@ internal class FakeAccountDao: AccountDao {
 
 
 internal class FakeTransactionDao: TransactionDao {
-    override fun insert(t: TransactionEntity) {
+    override fun insert(t: TransactionEntity): Long {
         TODO("Not yet implemented")
     }
 

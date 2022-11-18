@@ -11,7 +11,7 @@ import com.example.librasheet.data.thisMonthEnd
 @Dao
 interface TransactionDao {
 
-    @Insert fun insert(t: TransactionEntity)
+    @Insert fun insert(t: TransactionEntity): Long
     @Delete fun delete(t: TransactionEntity)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -31,13 +31,13 @@ interface TransactionDao {
     fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long)
 
     @Transaction
-    fun add(transaction: TransactionEntity) {
+    fun add(transaction: TransactionEntity): Long {
         val t = if (transaction.categoryKey == 0L) transaction.copy(
             categoryKey = if (transaction.value > 0) incomeKey else expenseKey
         ) else transaction
 
-        insert(t)
-        if (t.accountKey <= 0) return
+        val newKey = insert(t)
+        if (t.accountKey <= 0) return newKey
 
         val month = thisMonthEnd(t.date)
         addBalanceEntry(AccountHistory(
@@ -48,7 +48,7 @@ interface TransactionDao {
         updateBalance(t.accountKey, t.value)
         updateBalanceHistory(t.accountKey, month, t.value)
 
-        if (t.categoryKey == ignoreKey) return // we want to still measure uncategorized transactions
+        if (t.categoryKey == ignoreKey) return newKey // we want to still measure uncategorized transactions
         addCategoryEntry(CategoryHistory(
             accountKey = t.accountKey,
             categoryKey = t.categoryKey,
@@ -58,6 +58,8 @@ interface TransactionDao {
         updateCategoryHistory(t.accountKey, t.categoryKey, month, t.valueAfterReimbursements)
         // this should use the reimbursed value since category history is used for income/expenses.
         // But the account balance ones above should use the normal value.
+
+        return newKey
     }
 
     @Transaction
@@ -69,8 +71,12 @@ interface TransactionDao {
     fun undo(t: TransactionEntity) {
         delete(t)
         val month = thisMonthEnd(t.date)
+
+        if (t.accountKey <= 0) return
         updateBalance(t.accountKey, -t.value)
         updateBalanceHistory(t.accountKey, month, -t.value)
+
+        if (t.categoryKey == ignoreKey) return
         updateCategoryHistory(t.accountKey, t.categoryKey, month, -t.valueAfterReimbursements)
     }
 
@@ -154,9 +160,11 @@ interface TransactionDao {
 
     @Transaction
     fun add(t: TransactionWithDetails) {
-        add(t.transaction)
+        val key = add(t.transaction)
+        Log.d("Libra", "oldKey=${t.transaction.key} $key")
+        val trans = t.transaction.copy(key = key)
         t.reimbursements.forEach {
-            addReimbursement(t.transaction, it.transaction, it.value)
+            addReimbursement(trans, it.transaction, it.value)
         }
     }
 

@@ -22,17 +22,24 @@ class ReimbursementDialog: DialogHolder {
         this.onSave = onSave
     }
 
-    fun cancel() {
+    fun clear() {
         isOpen = false
         onSave = null
+        errorMessage = ""
     }
 
-    fun save(input: String) {
-        val valueLong = input.toFloatOrNull()?.toLongDollar()
-        if (valueLong == null) {
-            errorMessage = "Couldn't parse value"
-        } else {
-            onSave?.invoke(valueLong)
+    fun onDismiss(input: String) {
+        if (input.isEmpty()) { clear() }
+        else {
+            val valueLong = input.toFloatOrNull()?.toLongDollar()
+            if (valueLong == null) {
+                errorMessage = "Couldn't parse value"
+            } else if (valueLong < 0) {
+                errorMessage = "Value should be positive"
+            } else {
+                onSave?.invoke(valueLong)
+                clear()
+            }
         }
     }
 
@@ -42,7 +49,7 @@ class ReimbursementDialog: DialogHolder {
             TextFieldDialog(
                 title = "New Value",
                 errorMessage = errorMessage,
-                onDismiss = ::save,
+                onDismiss = ::onDismiss,
             )
         }
     }
