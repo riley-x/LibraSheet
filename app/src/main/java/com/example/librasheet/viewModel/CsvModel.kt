@@ -156,4 +156,9 @@ class CsvModel(
             categoryKey = category?.key ?: 0,
         )
     }
+
+    @Callback fun setAcc(a: Account?) { account = a }
+    @Callback fun setInvert(invert: Boolean) { invertValues = invert }
+    @Callback fun setPatt(p: String) { pattern = p }
+    @Callback fun setDateForm(p: String) { dateFormat = p }
 }

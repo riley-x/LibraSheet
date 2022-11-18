@@ -348,7 +348,7 @@ fun LibraApp(
                 composable(route = AddCsvDestination.route) {
                     AddCsvScreen(
                         accounts = viewModel.accounts.all,
-                        fileName = "",
+                        state = viewModel.csv,
                         onBack = navController::popBackStack,
                         loadCsv = viewModel.csv::loadCsv,
                         modifier = Modifier.padding(innerPadding),

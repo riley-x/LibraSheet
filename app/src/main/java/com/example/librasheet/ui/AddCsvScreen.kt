@@ -22,6 +22,7 @@ import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CsvModel
 import com.example.librasheet.viewModel.preview.previewAccounts
+import com.example.librasheet.viewModel.preview.previewCsvModel
 
 @Composable
 fun AddCsvScreen(
@@ -54,10 +55,40 @@ fun AddCsvScreen(
             Text("Account:")
             Spacer(Modifier.width(15.dp))
             AccountSelector(
-                selection = account,
+                selection = state.account,
                 options = accounts,
-                onSelection = { account = it },
+                onSelection = state::setAcc,
                 modifier = Modifier.weight(10f),
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .height(48.dp)
+        ) {
+            Text("Pattern:")
+            Spacer(Modifier.width(15.dp))
+            OutlinedTextField(
+                value = state.pattern,
+                onValueChange = state::setPatt,
+                modifier = Modifier.weight(10f)
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .height(48.dp)
+        ) {
+            Text("Date format:")
+            Spacer(Modifier.width(15.dp))
+            OutlinedTextField(
+                value = state.dateFormat,
+                onValueChange = state::setDateForm,
+                modifier = Modifier.weight(10f)
             )
         }
 
@@ -67,12 +98,12 @@ fun AddCsvScreen(
         ) {
             Text("Invert values:")
             Checkbox(
-                checked = invertValues,
-                onCheckedChange = { invertValues = it },
+                checked = state.invertValues,
+                onCheckedChange = state::setInvert,
             )
         }
 
-        if (fileName.isEmpty()) {
+        if (state.transactions.isEmpty()) {
             Spacer(Modifier.height(16.dp))
 
             Button(
@@ -86,14 +117,7 @@ fun AddCsvScreen(
                 Icon(imageVector = Icons.Outlined.FileUpload, contentDescription = null)
             }
         } else {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .height(48.dp)
-            ) {
-                Text("CSV: $fileName")
-            }
+
             
             RowTitle(title = "Preview Transactions:")
 
@@ -116,7 +140,7 @@ private fun Preview() {
         Surface {
             AddCsvScreen(
                 accounts = previewAccounts,
-                fileName = "",
+                state = previewCsvModel,
             )
         }
     }

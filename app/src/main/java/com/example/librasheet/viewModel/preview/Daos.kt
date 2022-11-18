@@ -163,5 +163,63 @@ internal class FakeTransactionDao: TransactionDao {
     override fun get(q: SimpleSQLiteQuery): List<TransactionEntity> {
         TODO("Not yet implemented")
     }
+}
+
+internal class FakeRuleDao: RuleDao {
+    override fun getIndex(key: Long): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun getMaxIndex(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(rule: CategoryRule) {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(rule: CategoryRuleEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override fun add(rule: CategoryRuleEntity): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(key: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getIncomeRules(): List<CategoryRule> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getIncomeRules(categoryKey: Long): List<CategoryRule> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getExpenseRules(): List<CategoryRule> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getExpenseRules(categoryKey: Long): List<CategoryRule> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getIgnoredIncome(): List<CategoryRule> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getIgnoredExpense(): List<CategoryRule> {
+        TODO("Not yet implemented")
+    }
+
+    override fun decrementIndices(startIndex: Int, endIndex: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun incrementIndices(startIndex: Int, endIndex: Int) {
+        TODO("Not yet implemented")
+    }
 
 }
