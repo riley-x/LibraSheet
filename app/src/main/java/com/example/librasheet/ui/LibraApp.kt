@@ -16,14 +16,13 @@ import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.balance.AccountScreen
 import com.example.librasheet.ui.balance.BalanceScreen
 import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
-import com.example.librasheet.ui.dialogHolders.FilterTransactionDialogHolder
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
-import com.example.librasheet.ui.transaction.TransactionDetailScreen
-import com.example.librasheet.ui.transaction.TransactionListScreen
+import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
+import com.example.librasheet.ui.transaction.ReimbursementDialog
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 
@@ -92,6 +91,7 @@ fun LibraApp(
     /** Dialogs **/
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
     val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel) }
+    val reimbursementDialog = remember { ReimbursementDialog() }
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
@@ -216,6 +216,7 @@ fun LibraApp(
                 navController = navController,
                 innerPadding = innerPadding,
                 filterDialog = filterTransactionDialog,
+                reimbursementDialog = reimbursementDialog,
             )
         }
 
@@ -439,5 +440,6 @@ fun LibraApp(
         }
 
         filterTransactionDialog.Content()
+        reimbursementDialog.Content()
     }
 }

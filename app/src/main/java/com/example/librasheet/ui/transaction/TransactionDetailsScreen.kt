@@ -60,6 +60,8 @@ fun TransactionDetailScreen(
     onBack: () -> Unit = { },
     onSave: (TransactionEntity) -> Unit = { },
     onAddReimbursement: () -> Unit = { }, // TODO make sure this can handle a new transaction
+    onDeleteReimbursement: (Int) -> Unit = { },
+    onChangeReimbursementValue: (Int) -> Unit = { },
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -238,8 +240,8 @@ fun TransactionDetailScreen(
                 ) {
                     DropdownOptions(options = reimbursementOptions) {
                         when (it) {
-                            ReimbursementOptions.DELETE -> { }
-                            ReimbursementOptions.VALUE -> { }
+                            ReimbursementOptions.DELETE -> { onDeleteReimbursement(i) }
+                            ReimbursementOptions.VALUE -> { onChangeReimbursementValue(i) }
                         }
                     }
                 }

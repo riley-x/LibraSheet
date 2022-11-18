@@ -114,8 +114,21 @@ class TransactionModel(
         reimbursements.add(
             ReimbursementWithValue(
                 transaction = t,
-                value = minOf(abs(detail.value.value), abs(t.valueAfterReimbursements))
+                value = abs(t.valueAfterReimbursements)
             )
+        )
+    }
+
+    @Callback
+    fun deleteReimbursement(index: Int) {
+        reimbursements.removeAt(index)
+    }
+
+    @Callback
+    fun changeReimbursementValue(index: Int, value: Long) {
+        if (index !in reimbursements.indices) return
+        reimbursements[index] = reimbursements[index].copy(
+            value = value
         )
     }
 }

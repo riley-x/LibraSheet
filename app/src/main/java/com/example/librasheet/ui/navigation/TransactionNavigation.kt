@@ -6,7 +6,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.librasheet.data.entity.TransactionEntity
-import com.example.librasheet.ui.dialogHolders.FilterTransactionDialogHolder
+import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
+import com.example.librasheet.ui.transaction.ReimbursementDialog
 import com.example.librasheet.ui.transaction.TransactionDetailScreen
 import com.example.librasheet.ui.transaction.TransactionListScreen
 import com.example.librasheet.viewModel.LibraViewModel
@@ -15,7 +16,8 @@ fun NavGraphBuilder.transactionScreens(
     viewModel: LibraViewModel,
     navController: NavHostController,
     innerPadding: PaddingValues,
-    filterDialog: FilterTransactionDialogHolder
+    filterDialog: FilterTransactionDialogHolder,
+    reimbursementDialog: ReimbursementDialog,
 ) {
     val isSettings = route == SettingsTab.graph
     val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
@@ -31,6 +33,11 @@ fun NavGraphBuilder.transactionScreens(
     fun onSelectReimbursement(t: TransactionEntity) {
         navController.popBackStack()
         state.addReimbursement(t)
+    }
+    fun onChangeReimbursementValue(index: Int) {
+        reimbursementDialog.open {
+            state.changeReimbursementValue(index, it)
+        }
     }
 
     composable(route = TransactionAllDestination.route(route!!)) {
@@ -56,6 +63,8 @@ fun NavGraphBuilder.transactionScreens(
             onBack = navController::popBackStack,
             onSave = state::save,
             onAddReimbursement = ::onAddReimbursement,
+            onDeleteReimbursement = state::deleteReimbursement,
+            onChangeReimbursementValue = ::onChangeReimbursementValue,
             bottomPadding = innerPadding.calculateBottomPadding(),
         )
     }
