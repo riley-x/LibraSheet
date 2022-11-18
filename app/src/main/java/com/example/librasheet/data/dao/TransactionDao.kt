@@ -47,8 +47,8 @@ interface TransactionDao {
             date = month,
             balance = 0, // we'll update below
         ))
-        updateBalance(t.accountKey, t.valueAfterReimbursements)
-        updateBalanceHistory(t.accountKey, month, t.valueAfterReimbursements)
+        updateBalance(t.accountKey, t.value)
+        updateBalanceHistory(t.accountKey, month, t.value)
 
         if (t.categoryKey == ignoreKey) return // we want to still measure uncategorized transactions
         addCategoryEntry(CategoryHistory(
@@ -58,6 +58,8 @@ interface TransactionDao {
             value = 0, // we'll update below
         ))
         updateCategoryHistory(t.accountKey, t.categoryKey, month, t.valueAfterReimbursements)
+        // this should use the reimbursed value since category history is used for income/expenses.
+        // But the account balance ones above should use the normal value.
     }
 
     @Transaction
@@ -129,6 +131,7 @@ interface TransactionDao {
         update(newExpense, expense)
     }
 
+    /** Value should always be positive **/
     @Transaction
     fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long, listIndex: Int) {
         val expense = if (t1.value > 0) t2 else t1

@@ -27,7 +27,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val rules = RuleModel(this)
     val accounts = AccountModel(this)
     val balanceGraphs = BalanceGraphModel(this)
-    val transactions = TransactionModel(this)
+    val transactionsSettings = TransactionModel(this)
+    val transactionsBalance = TransactionModel(this)
     val csv = BaseCsvModel(this)
 
     suspend fun startup() {
@@ -68,8 +69,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
                 balanceGraphs.loadIncome()
                 balanceGraphs.loadHistory(accounts.all)
                 accountDetail.load()
-                transactions.reloadSettings()
-                transactions.reloadBalance()
+                transactionsSettings.reload()
+                transactionsBalance.reload()
             }
         }
     }

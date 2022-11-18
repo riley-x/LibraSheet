@@ -26,19 +26,11 @@ class TransactionModel(
         limit = 100
     )
 
-    /** Current list to show in settings tab **/
-    val settingsList = mutableStateListOf<TransactionEntity>()
-    val settingsFilter = mutableStateOf(TransactionFilters())
+    val displayList = mutableStateListOf<TransactionEntity>()
+    val filter = mutableStateOf(TransactionFilters())
+    private var account: Account? = null
+    val detail = mutableStateOf(TransactionEntity())
 
-    /** Current list to show in balance tab **/
-    private var balanceAccount: Account? = null
-    val balanceList = mutableStateListOf<TransactionEntity>()
-    val balanceFilter = mutableStateOf(TransactionFilters())
-
-    /** Current detailed transaction in the settings tab **/
-    val settingsDetail = mutableStateOf(TransactionEntity())
-    /** Current detailed transaction in the balance tab **/
-    val balanceDetail = mutableStateOf(TransactionEntity())
 
     @Callback
     fun save(new: TransactionEntity, old: TransactionEntity) {
@@ -47,64 +39,44 @@ class TransactionModel(
                 if (old.key > 0) dao.update(new, old)
                 else dao.add(new)
             }
-            loadFilter(balanceList, balanceFilter.value)
-            loadFilter(settingsList, settingsFilter.value)
             viewModel.updateDependencies(Dependency.TRANSACTION)
         }
     }
 
     @Callback
-    fun filterSettings(filter: TransactionFilters) {
-        if (filter == settingsFilter.value) return
-        settingsFilter.value = filter
-        loadFilter(settingsList, filter)
+    fun filter(newFilter: TransactionFilters) {
+        if (newFilter == filter.value) return
+        filter.value = newFilter
+        loadList()
     }
+
 
     @Callback
-    fun filterBalance(filter: TransactionFilters) {
-        if (filter == balanceFilter.value) return
-        balanceFilter.value = filter
-        loadFilter(balanceList, filter)
+    fun load(newAccount: Account? = null) {
+        if (account == newAccount) return
+        account = newAccount
+        filter.value = defaultFilter.copy(account = account?.key)
+        loadList()
     }
 
-    /**
-     * We load these lists lazily, when the user navigates to the respective screens. Don't want to
-     * reload though if they change tabs/screens.
-     */
-    @Callback
-    fun initSettings() {
-        if (settingsList.isNotEmpty()) return
-        filterSettings(defaultFilter)
-    }
+    fun reload() = loadList()
 
-    /**
-     * We load these lists lazily, when the user navigates to the respective screens. Don't want to
-     * reload though if they change tabs/screens.
-     */
-    @Callback
-    fun initBalance(account: Account) {
-        if (balanceList.isNotEmpty()) return
-        balanceAccount = account
-        filterBalance(defaultFilter.copy(account = account.key))
-    }
-
-    fun reloadSettings() {
-        loadFilter(settingsList, settingsFilter.value)
-    }
-    fun reloadBalance() {
-        loadFilter(balanceList, balanceFilter.value)
-    }
-
-    private fun loadFilter(outList: SnapshotStateList<TransactionEntity>, filter: TransactionFilters) {
+    private fun loadList() {
         viewModel.viewModelScope.launch {
+            val filter = filter.value
             val list = withContext(Dispatchers.IO) {
                 val list = dao.get(filter)
                 list.matchCategories(viewModel.categories.data.all)
                 return@withContext list
             }
-            outList.clear()
-            outList.addAll(list)
+            displayList.clear()
+            displayList.addAll(list)
         }
+    }
+
+    @Callback
+    fun loadDetail(t: TransactionEntity) {
+        detail.value = t
     }
 }
 

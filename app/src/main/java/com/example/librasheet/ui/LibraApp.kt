@@ -62,19 +62,19 @@ fun LibraApp(
     fun toAddCsv() = navController.navigateSingleTop(AddCsvDestination.route)
     fun toBadLines() = navController.navigateSingleTop(BadCsvDestination.route)
     fun toSettingsAllTransactions() {
-        viewModel.transactions.initSettings()
+        viewModel.transactionsSettings.load()
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
     fun toSettingsTransactionDetail(t: TransactionEntity = TransactionEntity()) {
-        viewModel.transactions.settingsDetail.value = t
+        viewModel.transactionsSettings.loadDetail(t)
         navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
     }
     fun toBalanceAllTransactions(account: Account) {
-        viewModel.transactions.initBalance(account)
+        viewModel.transactionsBalance.load(account)
         navController.navigate(TransactionAllDestination.route(BalanceTab.graph))
     }
     fun toBalanceTransactionDetail(t: TransactionEntity) {
-        viewModel.transactions.balanceDetail.value = t
+        viewModel.transactionsBalance.loadDetail(t)
         navController.navigateSingleTop(TransactionDetailDestination.route(BalanceTab.graph))
     }
     fun toEditAccountsScreen() = navController.navigateSingleTop(EditAccountsDestination.route)
@@ -216,10 +216,11 @@ fun LibraApp(
 
         fun NavGraphBuilder.transactionAll() {
             val isSettings = route == SettingsTab.graph
+            val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
             composable(route = TransactionAllDestination.route(route!!)) {
                 TransactionListScreen(
-                    filter = if (isSettings) viewModel.transactions.settingsFilter else viewModel.transactions.balanceFilter,
-                    transactions = if (isSettings) viewModel.transactions.settingsList else viewModel.transactions.balanceList,
+                    filter = state.filter,
+                    transactions = state.displayList,
                     accounts = viewModel.accounts.all,
                     onBack = navController::popBackStack,
                     onFilter = if (isSettings) filterTransactionDialog::openSettings else filterTransactionDialog::openBalance,
@@ -230,14 +231,15 @@ fun LibraApp(
         }
         fun NavGraphBuilder.transactionDetail() {
             val isSettings = route!! == SettingsTab.graph
+            val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
             composable(route = TransactionDetailDestination.route(route!!)) {
                 TransactionDetailScreen(
-                    transaction = if (isSettings) viewModel.transactions.settingsDetail else viewModel.transactions.balanceDetail,
+                    transaction = state.detail,
                     accounts = viewModel.accounts.all,
                     incomeCategories = viewModel.categories.incomeTargets,
                     expenseCategories = viewModel.categories.expenseTargets,
                     onBack = navController::popBackStack,
-                    onSave = viewModel.transactions::save,
+                    onSave = state::save,
                     bottomPadding = innerPadding.calculateBottomPadding(),
                 )
             }
