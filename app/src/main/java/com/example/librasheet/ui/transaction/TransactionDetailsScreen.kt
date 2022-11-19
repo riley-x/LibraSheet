@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toIntDate
@@ -161,120 +162,122 @@ fun TransactionDetailScreen(
             onBack = onBack,
         )
 
-        LazyColumn {
-            item("details") {
-                RowTitle("Details")
-            }
-
-            item("Account") {
-                LabeledRow(
-                    label = "Account",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 4.dp),
-                ) {
-                    AccountSelector(
-                        selection = account.value,
-                        options = accounts,
-                        onSelection = { accountKey.value = it?.key ?: 0 },
-                        modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
-                    )
+        DragHost {
+            LazyColumn {
+                item("details") {
+                    RowTitle("Details")
                 }
-            }
 
-            editor("Name", name, number = false)
-
-            editor("Date", date, error = dateError, placeholder = "mm-dd-yy")
-
-            editor("Value", value, error = valueError)
-
-
-            item("Category") {
-                LabeledRow(
-                    label = "Category",
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    CategorySelector(
-                        selection = category.value,
-                        options = categoryList,
-                        delayOpen = 100,
-                        onSelection = { categoryKey.value = it?.key ?: 0 },
-                        modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
-                    )
-                }
-            }
-
-            item("Allocations") {
-                RowTitle("Allocations", Modifier.padding(top = 20.dp)) {
-                    IconButton(onClick = onAddAllocation) {
-                        Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
+                item("Account") {
+                    LabeledRow(
+                        label = "Account",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 4.dp),
+                    ) {
+                        AccountSelector(
+                            selection = account.value,
+                            options = accounts,
+                            onSelection = { accountKey.value = it?.key ?: 0 },
+                            modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
+                        )
                     }
                 }
-            }
 
-            itemsIndexed(allocations) { i, allocation ->
-                if (i > 0) RowDivider()
-                DragToReorderTarget(
-                    index = i,
-                    onDragEnd = { _, start, end -> onReorderAllocation(start, end) },
-                ) {
-                    AllocationRow(allocation) {
-                        DropdownOptions(options = allocationOptions) {
-                            when (it) {
-                                AllocationOptions.DELETE -> { onDeleteAllocation(i) }
-                                AllocationOptions.EDIT -> { onEditAllocation(i) }
+                editor("Name", name, number = false)
+
+                editor("Date", date, error = dateError, placeholder = "mm-dd-yy")
+
+                editor("Value", value, error = valueError)
+
+
+                item("Category") {
+                    LabeledRow(
+                        label = "Category",
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        CategorySelector(
+                            selection = category.value,
+                            options = categoryList,
+                            delayOpen = 100,
+                            onSelection = { categoryKey.value = it?.key ?: 0 },
+                            modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
+                        )
+                    }
+                }
+
+                item("Allocations") {
+                    RowTitle("Allocations", Modifier.padding(top = 20.dp)) {
+                        IconButton(onClick = onAddAllocation) {
+                            Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
+                        }
+                    }
+                }
+
+                itemsIndexed(allocations) { i, allocation ->
+                    if (i > 0) RowDivider(Modifier.zIndex(1f))
+                    DragToReorderTarget(
+                        index = i,
+                        onDragEnd = { _, start, end -> onReorderAllocation(start, end) },
+                    ) {
+                        AllocationRow(allocation) {
+                            DropdownOptions(options = allocationOptions) {
+                                when (it) {
+                                    AllocationOptions.DELETE -> { onDeleteAllocation(i) }
+                                    AllocationOptions.EDIT -> { onEditAllocation(i) }
+                                }
                             }
                         }
                     }
                 }
-            }
 
 
-            item("Reimbursements") {
-                RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
-                    IconButton(onClick = onAddReimbursement) {
-                        Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
-                    }
-                }
-            }
-
-            itemsIndexed(reimbursements) { i, it ->
-                if (i > 0) RowDivider()
-                ReimbursementRow(
-                    r = it,
-                    accounts = accounts,
-                ) {
-                    DropdownOptions(options = reimbursementOptions) {
-                        when (it) {
-                            ReimbursementOptions.DELETE -> { onDeleteReimbursement(i) }
-                            ReimbursementOptions.VALUE -> { onChangeReimbursementValue(i) }
+                item("Reimbursements") {
+                    RowTitle("Reimbursements", Modifier.padding(top = 20.dp)) {
+                        IconButton(onClick = onAddReimbursement) {
+                            Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
                         }
                     }
                 }
-            }
 
-
-            item("Buttons") {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp)
-                ) {
-                    Button(
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.error
-                        ),
-                        onClick = onBack,
-                        modifier = Modifier.width(100.dp)
+                itemsIndexed(reimbursements) { i, it ->
+                    if (i > 0) RowDivider()
+                    ReimbursementRow(
+                        r = it,
+                        accounts = accounts,
                     ) {
-                        Text("Cancel")
+                        DropdownOptions(options = reimbursementOptions) {
+                            when (it) {
+                                ReimbursementOptions.DELETE -> { onDeleteReimbursement(i) }
+                                ReimbursementOptions.VALUE -> { onChangeReimbursementValue(i) }
+                            }
+                        }
                     }
-                    Button(
-                        onClick = ::saveTransaction,
-                        modifier = Modifier.width(100.dp)
+                }
+
+
+                item("Buttons") {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 20.dp)
                     ) {
-                        Text("Save")
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.error
+                            ),
+                            onClick = onBack,
+                            modifier = Modifier.width(100.dp)
+                        ) {
+                            Text("Cancel")
+                        }
+                        Button(
+                            onClick = ::saveTransaction,
+                            modifier = Modifier.width(100.dp)
+                        ) {
+                            Text("Save")
+                        }
                     }
                 }
             }

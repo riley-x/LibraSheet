@@ -6,6 +6,7 @@ import androidx.room.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.thisMonthEnd
+import kotlin.math.exp
 
 
 @Dao
@@ -120,7 +121,7 @@ interface TransactionDao {
 
     /** Value should always be positive **/
     @Transaction
-    fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
+    fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long): Pair<TransactionEntity, TransactionEntity> {
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 
@@ -138,11 +139,15 @@ interface TransactionDao {
         insert(reimbursement)
         update(newIncome, income)
         update(newExpense, expense)
+
+        val new1 = if (t1.value > 0) income else expense
+        val new2 = if (t1.value > 0) expense else income
+        return Pair(new1, new2)
     }
 
     /** Value should always be positive **/
     @Transaction
-    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
+    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long): Pair<TransactionEntity, TransactionEntity> {
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 
@@ -160,12 +165,16 @@ interface TransactionDao {
         delete(reimbursement)
         update(newIncome, income)
         update(newExpense, expense)
+
+        val new1 = if (t1.value > 0) income else expense
+        val new2 = if (t1.value > 0) expense else income
+        return Pair(new1, new2)
     }
 
 
     /** Value should always be positive **/
     @Transaction
-    fun addAllocation(t: TransactionEntity, allocation: Allocation) {
+    fun addAllocation(t: TransactionEntity, allocation: Allocation): TransactionEntity {
         val isIncome = t.value > 0
 
         val newTransaction = t.copy(
@@ -174,16 +183,17 @@ interface TransactionDao {
         update(newTransaction, t)
         insert(allocation)
 
-        if (t.accountKey <= 0) return
-        if (allocation.categoryKey == ignoreKey) return
+        if (t.accountKey <= 0) return newTransaction
+        if (allocation.categoryKey == ignoreKey) return newTransaction
 
         val month = thisMonthEnd(t.date)
         updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) 1 else -1) * allocation.value)
+        return newTransaction
     }
 
     /** Value should always be positive **/
     @Transaction
-    fun removeAllocation(t: TransactionEntity, allocation: Allocation) {
+    fun removeAllocation(t: TransactionEntity, allocation: Allocation): TransactionEntity {
         val isIncome = t.value > 0
 
         val newTransaction = t.copy(
@@ -192,11 +202,12 @@ interface TransactionDao {
         update(newTransaction, t)
         delete(allocation)
 
-        if (t.accountKey <= 0) return
-        if (allocation.categoryKey == ignoreKey) return
+        if (t.accountKey <= 0) return newTransaction
+        if (allocation.categoryKey == ignoreKey) return newTransaction
 
         val month = thisMonthEnd(t.date)
         updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) -1 else 1) * allocation.value)
+        return newTransaction
     }
 
 
@@ -204,24 +215,25 @@ interface TransactionDao {
     fun add(t: TransactionWithDetails) {
         val key = add(t.transaction)
         Log.d("Libra", "oldKey=${t.transaction.key} $key")
-        val trans = t.transaction.copy(key = key)
+        var trans = t.transaction.copy(key = key)
         t.reimbursements.forEach {
-            addReimbursement(trans, it.transaction, it.value)
+            trans = addReimbursement(trans, it.transaction, it.value).first
         }
         t.allocations.forEach {
-            addAllocation(t.transaction, it)
+            trans = addAllocation(t.transaction, it)
         }
     }
 
     @Transaction
     fun undo(t: TransactionWithDetails) {
+        var trans = t.transaction
         t.allocations.forEach {
-            removeAllocation(t.transaction, it)
+            trans = removeAllocation(trans, it)
         }
         t.reimbursements.forEach {
-            deleteReimbursement(t.transaction, it.transaction, it.value)
+            trans = deleteReimbursement(trans, it.transaction, it.value).first
         }
-        undo(t.transaction)
+        undo(trans)
     }
 
     @Transaction

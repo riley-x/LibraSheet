@@ -142,7 +142,7 @@ class TransactionModel(
                 categoryKey = category?.key ?: 0,
                 value = value,
                 listIndex = allocations.size, // TODO edit listIndexes on save
-            )
+            ).also { it.category = category ?: Category.None }
         )
     }
     @Callback
@@ -154,12 +154,13 @@ class TransactionModel(
             categoryKey = category?.key ?: 0,
             value = value,
             listIndex = i, // TODO edit listIndexes on save
-        )
+        ).also { it.category = category ?: Category.None }
     }
     @Callback
     fun reorderAllocation(start: Int, end: Int) {
         if (start !in allocations.indices || end !in allocations.indices) return
         allocations.add(end, allocations.removeAt(start))
+        // TODO database
     }
 }
 
