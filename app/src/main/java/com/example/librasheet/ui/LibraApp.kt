@@ -21,6 +21,7 @@ import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
+import com.example.librasheet.ui.transaction.AllocationDialog
 import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
 import com.example.librasheet.ui.transaction.ReimbursementDialog
 import com.example.librasheet.viewModel.LibraViewModel
@@ -92,6 +93,7 @@ fun LibraApp(
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
     val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel) }
     val reimbursementDialog = remember { ReimbursementDialog() }
+    val allocationDialog = remember { AllocationDialog(viewModel) }
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
@@ -217,6 +219,7 @@ fun LibraApp(
                 innerPadding = innerPadding,
                 filterDialog = filterTransactionDialog,
                 reimbursementDialog = reimbursementDialog,
+                allocationDialog = allocationDialog,
             )
         }
 
@@ -441,5 +444,6 @@ fun LibraApp(
 
         filterTransactionDialog.Content()
         reimbursementDialog.Content()
+        allocationDialog.Content()
     }
 }

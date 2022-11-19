@@ -59,9 +59,13 @@ fun TransactionDetailScreen(
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
     onSave: (TransactionEntity) -> Unit = { },
-    onAddReimbursement: () -> Unit = { }, // TODO make sure this can handle a new transaction
+    onAddReimbursement: () -> Unit = { },
     onDeleteReimbursement: (Int) -> Unit = { },
     onChangeReimbursementValue: (Int) -> Unit = { },
+    onAddAllocation: () -> Unit = { },
+    onEditAllocation: (Int) -> Unit = { },
+    onDeleteAllocation: (Int) -> Unit = { },
+    onReorderAllocation: (Int, Int) -> Unit = { _, _ -> },
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -110,7 +114,6 @@ fun TransactionDetailScreen(
             category = category.value ?: Category.None,
             categoryKey = category.value?.key ?: 0,
             accountKey = account.value?.key ?: 0,
-//            valueAfterReimbursements = // TODO,
         )
         onSave(t)
         onBack()
@@ -203,7 +206,7 @@ fun TransactionDetailScreen(
 
             item("Allocations") {
                 RowTitle("Allocations", Modifier.padding(top = 20.dp)) {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = onAddAllocation) {
                         Icon(imageVector = Icons.Sharp.Add, contentDescription = null)
                     }
                 }
@@ -213,13 +216,13 @@ fun TransactionDetailScreen(
                 if (i > 0) RowDivider()
                 DragToReorderTarget(
                     index = i,
-                    onDragEnd = { _, _, _ ->  }, // TODO
+                    onDragEnd = { _, start, end -> onReorderAllocation(start, end) },
                 ) {
                     AllocationRow(allocation) {
                         DropdownOptions(options = allocationOptions) {
                             when (it) {
-                                AllocationOptions.DELETE -> {}
-                                AllocationOptions.EDIT -> {}
+                                AllocationOptions.DELETE -> { onDeleteAllocation(i) }
+                                AllocationOptions.EDIT -> { onEditAllocation(i) }
                             }
                         }
                     }

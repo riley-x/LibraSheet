@@ -107,7 +107,7 @@ class TransactionModel(
     }
 
     /**
-     * Note this only applies to the ui state. The actual database action happens on save.
+     * Note these only apply to the ui state. The actual database action happens on save.
      */
     @Callback
     fun addReimbursement(t: TransactionEntity) {
@@ -130,6 +130,36 @@ class TransactionModel(
         reimbursements[index] = reimbursements[index].copy(
             value = value
         )
+    }
+
+    @Callback
+    fun addAllocation(name: String, value: Long, category: Category?) {
+        allocations.add(
+            Allocation(
+                key = 0,
+                name = name,
+                transactionKey = detail.value.key,
+                categoryKey = category?.key ?: 0,
+                value = value,
+                listIndex = allocations.size, // TODO edit listIndexes on save
+            )
+        )
+    }
+    @Callback
+    fun editAllocation(i: Int, name: String, value: Long, category: Category?) {
+        allocations[i] = Allocation(
+            key = 0,
+            name = name,
+            transactionKey = detail.value.key,
+            categoryKey = category?.key ?: 0,
+            value = value,
+            listIndex = i, // TODO edit listIndexes on save
+        )
+    }
+    @Callback
+    fun reorderAllocation(start: Int, end: Int) {
+        if (start !in allocations.indices || end !in allocations.indices) return
+        allocations.add(end, allocations.removeAt(start))
     }
 }
 

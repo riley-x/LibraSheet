@@ -6,10 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.librasheet.data.entity.TransactionEntity
-import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
-import com.example.librasheet.ui.transaction.ReimbursementDialog
-import com.example.librasheet.ui.transaction.TransactionDetailScreen
-import com.example.librasheet.ui.transaction.TransactionListScreen
+import com.example.librasheet.ui.transaction.*
 import com.example.librasheet.viewModel.LibraViewModel
 
 fun NavGraphBuilder.transactionScreens(
@@ -18,6 +15,7 @@ fun NavGraphBuilder.transactionScreens(
     innerPadding: PaddingValues,
     filterDialog: FilterTransactionDialogHolder,
     reimbursementDialog: ReimbursementDialog,
+    allocationDialog: AllocationDialog,
 ) {
     val isSettings = route == SettingsTab.graph
     val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
@@ -37,6 +35,20 @@ fun NavGraphBuilder.transactionScreens(
     fun onChangeReimbursementValue(index: Int) {
         reimbursementDialog.open {
             state.changeReimbursementValue(index, it)
+        }
+    }
+    fun onAddAllocation() {
+        allocationDialog.open(
+            isIncome = state.detail.value.value > 0,
+            onSave = state::addAllocation,
+        )
+    }
+    fun onEditAllocation(i: Int) {
+        allocationDialog.open(
+            isIncome = state.detail.value.value > 0,
+            allocation = state.allocations[i],
+        ) { name, value, category ->
+            state.editAllocation(i, name, value, category)
         }
     }
 
@@ -65,6 +77,9 @@ fun NavGraphBuilder.transactionScreens(
             onAddReimbursement = ::onAddReimbursement,
             onDeleteReimbursement = state::deleteReimbursement,
             onChangeReimbursementValue = ::onChangeReimbursementValue,
+            onAddAllocation = ::onAddAllocation,
+            onEditAllocation = ::onEditAllocation,
+            onReorderAllocation = state::reorderAllocation,
             bottomPadding = innerPadding.calculateBottomPadding(),
         )
     }

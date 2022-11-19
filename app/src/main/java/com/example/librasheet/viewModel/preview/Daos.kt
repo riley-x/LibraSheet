@@ -140,11 +140,19 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
+    override fun insert(x: Allocation) {
+        TODO("Not yet implemented")
+    }
+
     override fun delete(t: TransactionEntity) {
         TODO("Not yet implemented")
     }
 
     override fun delete(x: Reimbursement) {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(x: Allocation) {
         TODO("Not yet implemented")
     }
 
@@ -169,6 +177,10 @@ internal class FakeTransactionDao: TransactionDao {
     }
 
     override fun update(x: Reimbursement) {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(x: Allocation) {
         TODO("Not yet implemented")
     }
 
