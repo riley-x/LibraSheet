@@ -79,6 +79,7 @@ fun NavGraphBuilder.transactionScreens(
             onChangeReimbursementValue = ::onChangeReimbursementValue,
             onAddAllocation = ::onAddAllocation,
             onEditAllocation = ::onEditAllocation,
+            onDeleteAllocation = state::deleteAllocation,
             onReorderAllocation = state::reorderAllocation,
             bottomPadding = innerPadding.calculateBottomPadding(),
         )

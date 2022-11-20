@@ -187,6 +187,12 @@ interface TransactionDao {
         if (allocation.categoryKey == ignoreKey) return newTransaction
 
         val month = thisMonthEnd(t.date)
+        addCategoryEntry(CategoryHistory(
+            accountKey = t.accountKey,
+            categoryKey = allocation.categoryKey,
+            date = month,
+            value = 0, // we'll update below
+        ))
         updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) 1 else -1) * allocation.value)
         return newTransaction
     }
@@ -220,7 +226,9 @@ interface TransactionDao {
             trans = addReimbursement(trans, it.transaction, it.value).first
         }
         t.allocations.forEach {
-            trans = addAllocation(t.transaction, it)
+            trans = addAllocation(trans, it.copy(
+                transactionKey = key
+            ))
         }
     }
 

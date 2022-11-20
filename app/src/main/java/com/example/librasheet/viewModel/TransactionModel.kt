@@ -162,6 +162,11 @@ class TransactionModel(
         allocations.add(end, allocations.removeAt(start))
         // TODO database
     }
+    @Callback
+    fun deleteAllocation(index: Int) {
+        allocations.removeAt(index)
+    }
+
 }
 
 
