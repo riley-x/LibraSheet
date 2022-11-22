@@ -12,6 +12,8 @@ import com.example.librasheet.data.entity.*
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.find
 import com.example.librasheet.viewModel.dataClasses.toUi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class CategoryModel(
@@ -118,6 +120,9 @@ class CategoryModel(
     fun saveColor(id: String, color: Color) {
         val (category, _) = data.all.subCategories.find(id.toCategoryId()) ?: return
         category.color = color
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
+            viewModel.application.database.categoryDao().update(category)
+        }
         viewModel.updateDependencies(Dependency.CATEGORY)
     }
 
