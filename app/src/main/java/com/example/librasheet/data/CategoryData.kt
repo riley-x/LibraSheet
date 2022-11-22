@@ -35,7 +35,8 @@ class CategoryData(
                 id = CategoryId(expenseName),
                 color = Color(0xFF5C1604),
                 listIndex = 1,
-            )
+            ),
+            Category.Ignore, // Enables easy searching for ignore
         )
     )
     val income: Category

@@ -144,7 +144,6 @@ class TransactionModel(
                 val (reimbs, allocs) = dao.getDetails(t)
 
                 val keyMap = viewModel.categories.data.all.getKeyMap()
-                keyMap[Category.Ignore.key] = Category.Ignore
 
                 reimbs.forEach {
                     it.transaction.category = keyMap.getOrDefault(it.transaction.categoryKey, Category.None)

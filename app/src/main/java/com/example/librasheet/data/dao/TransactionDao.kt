@@ -71,6 +71,7 @@ interface TransactionDao {
 
     @Transaction
     fun undo(t: TransactionEntity) {
+        Log.d("Libra/TransactionDao/undo", "$t")
         delete(t)
         val month = thisMonthEnd(t.date)
 
@@ -122,6 +123,8 @@ interface TransactionDao {
     /** Value should always be positive **/
     @Transaction
     fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long): Pair<TransactionEntity, TransactionEntity> {
+        Log.d("Libra/TransactionDao/addReimbursement", "1: $t1")
+        Log.d("Libra/TransactionDao/addReimbursement", "2: $t2")
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 
@@ -148,6 +151,8 @@ interface TransactionDao {
     /** Value should always be positive **/
     @Transaction
     fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long): Pair<TransactionEntity, TransactionEntity> {
+        Log.d("Libra/TransactionDao/deleteReimbursement", "1: $t1")
+        Log.d("Libra/TransactionDao/deleteReimbursement", "2: $t2")
         val expense = if (t1.value > 0) t2 else t1
         val income = if (t1.value > 0) t1 else t2
 
@@ -166,8 +171,8 @@ interface TransactionDao {
         update(newIncome, income)
         update(newExpense, expense)
 
-        val new1 = if (t1.value > 0) income else expense
-        val new2 = if (t1.value > 0) expense else income
+        val new1 = if (t1.value > 0) newIncome else newExpense
+        val new2 = if (t1.value > 0) newExpense else newIncome
         return Pair(new1, new2)
     }
 
@@ -175,6 +180,8 @@ interface TransactionDao {
     /** Value should always be positive **/
     @Transaction
     fun addAllocation(t: TransactionEntity, allocation: Allocation): TransactionEntity {
+        Log.d("Libra/TransactionDao/addAllocation", "t: $t")
+        Log.d("Libra/TransactionDao/addAllocation", "a: $allocation")
         val isIncome = t.value > 0
 
         val newTransaction = t.copy(
@@ -200,6 +207,8 @@ interface TransactionDao {
     /** Value should always be positive **/
     @Transaction
     fun removeAllocation(t: TransactionEntity, allocation: Allocation): TransactionEntity {
+        Log.d("Libra/TransactionDao/removeAllocation", "t: $t")
+        Log.d("Libra/TransactionDao/removeAllocation", "a: $allocation")
         val isIncome = t.value > 0
 
         val newTransaction = t.copy(
@@ -220,7 +229,7 @@ interface TransactionDao {
     @Transaction
     fun add(t: TransactionWithDetails) {
         val key = add(t.transaction)
-        Log.d("Libra", "oldKey=${t.transaction.key} $key")
+        Log.d("Libra/TransactionDao/add", "oldKey=${t.transaction.key} newKey=$key")
         var trans = t.transaction.copy(key = key)
         t.reimbursements.forEach {
             trans = addReimbursement(trans, it.transaction, it.value).first
