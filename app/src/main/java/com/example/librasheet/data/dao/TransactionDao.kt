@@ -143,8 +143,8 @@ interface TransactionDao {
         update(newIncome, income)
         update(newExpense, expense)
 
-        val new1 = if (t1.value > 0) income else expense
-        val new2 = if (t1.value > 0) expense else income
+        val new1 = if (t1.value > 0) newIncome else newExpense
+        val new2 = if (t1.value > 0) newExpense else newIncome
         return Pair(new1, new2)
     }
 
