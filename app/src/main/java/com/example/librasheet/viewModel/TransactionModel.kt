@@ -1,18 +1,26 @@
 package com.example.librasheet.viewModel
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import android.annotation.SuppressLint
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.dao.TransactionWithDetails
 import com.example.librasheet.data.entity.*
+import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toIntDate
+import com.example.librasheet.data.toLongDollar
+import com.example.librasheet.ui.components.formatDateIntSimple
+import com.example.librasheet.ui.components.parseOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
 
+@Stable
 class TransactionModel(
     private val viewModel: LibraViewModel,
 ) {
@@ -21,26 +29,64 @@ class TransactionModel(
         limit = 100
     )
 
+    @SuppressLint("SimpleDateFormat")
+    private val formatter = SimpleDateFormat("MM-dd-yy").apply { isLenient = false }
+
     val displayList = mutableStateListOf<TransactionEntity>()
     val filter = mutableStateOf(defaultFilter)
 
-    val detail = mutableStateOf(TransactionEntity())
+    /** Edit/details screen **/
+    val detailAccount = mutableStateOf<Account?>(null)
+    val detailCategory = mutableStateOf<Category?>(null)
+    val detailName = mutableStateOf("")
+    val detailDate = mutableStateOf("")
+    val detailValue = mutableStateOf("")
     val reimbursements = mutableStateListOf<ReimbursementWithValue>()
     val allocations = mutableStateListOf<Allocation>()
 
+    val dateError = mutableStateOf(false)
+    val valueError = mutableStateOf(false)
+
+    /** Old edit/details **/
+    private var oldDetail = TransactionEntity()
     private var oldReimbursements = listOf<ReimbursementWithValue>()
     private var oldAllocations = listOf<Allocation>()
 
+    fun isIncome() = (detailValue.value.toFloatOrNull() ?: 0f) > 0f
+
+    private fun createTransaction(): TransactionEntity? {
+        val dateInt = formatter.parseOrNull(detailDate.value)?.toIntDate()
+        val valueLong = detailValue.value.toFloatOrNull()?.toLongDollar()
+
+        dateError.value = dateInt == null
+        valueError.value = valueLong == null
+        if (dateError.value || valueError.value) return null
+
+        return TransactionEntity(
+            key = oldDetail.key,
+            name = detailName.value,
+            date = dateInt ?: 0,
+            value = valueLong ?: 0L,
+            category = detailCategory.value ?: Category.None,
+            categoryKey = detailCategory.value?.key ?: 0,
+            accountKey = detailAccount.value?.key ?: 0,
+        )
+    }
+
+
+
     @Callback
-    fun save(newTransaction: TransactionEntity) {
+    fun save(): Boolean {
+        val t = createTransaction() ?: return false
+
         // Copy old values before they get changed by the ui
         val old = TransactionWithDetails(
-            transaction = detail.value,
+            transaction = oldDetail,
             reimbursements = oldReimbursements,
             allocations = oldAllocations,
         )
         val new = TransactionWithDetails(
-            transaction = newTransaction,
+            transaction = t,
             reimbursements = reimbursements.toList(),
             allocations = allocations.toList()
         )
@@ -51,6 +97,7 @@ class TransactionModel(
             }
             viewModel.updateDependencies(Dependency.TRANSACTION)
         }
+        return true
     }
 
     @Callback
@@ -80,7 +127,16 @@ class TransactionModel(
 
     @Callback
     fun loadDetail(t: TransactionEntity) {
-        detail.value = t
+        oldDetail = t
+        dateError.value = false
+        valueError.value = false
+
+        detailAccount.value = viewModel.accounts.all.find(t.accountKey)
+        detailCategory.value = viewModel.categories.data.all.find(t.categoryKey)
+        detailName.value = t.name
+        detailDate.value = formatDateIntSimple(t.date, "-")
+        detailValue.value = if (t.value == 0L) "" else t.value.toFloatDollar().toString()
+
         reimbursements.clear() // should clear before the launch so previous detail's allocations don't show
         allocations.clear()
         viewModel.viewModelScope.launch {
@@ -138,7 +194,7 @@ class TransactionModel(
             Allocation(
                 key = 0,
                 name = name,
-                transactionKey = detail.value.key,
+                transactionKey = oldDetail.key,
                 categoryKey = category?.key ?: 0,
                 value = value,
                 listIndex = allocations.size, // TODO edit listIndexes on save
@@ -150,7 +206,7 @@ class TransactionModel(
         allocations[i] = Allocation(
             key = 0,
             name = name,
-            transactionKey = detail.value.key,
+            transactionKey = oldDetail.key,
             categoryKey = category?.key ?: 0,
             value = value,
             listIndex = i, // TODO edit listIndexes on save

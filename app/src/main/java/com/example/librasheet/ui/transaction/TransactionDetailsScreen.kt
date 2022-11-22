@@ -50,7 +50,13 @@ private val allocationOptions = ImmutableList(AllocationOptions.values().toList(
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun TransactionDetailScreen(
-    transaction: MutableState<TransactionEntity>,
+    account: MutableState<Account?>,
+    category: MutableState<Category?>,
+    name: MutableState<String>,
+    date: MutableState<String>,
+    value: MutableState<String>,
+    dateError: State<Boolean>,
+    valueError: State<Boolean>,
     reimbursements: SnapshotStateList<ReimbursementWithValue>,
     allocations: SnapshotStateList<Allocation>,
     accounts: SnapshotStateList<Account>,
@@ -59,7 +65,7 @@ fun TransactionDetailScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onBack: () -> Unit = { },
-    onSave: (TransactionEntity) -> Unit = { },
+    onSave: () -> Boolean = { false },
     onAddReimbursement: () -> Unit = { },
     onDeleteReimbursement: (Int) -> Unit = { },
     onChangeReimbursementValue: (Int) -> Unit = { },
@@ -70,57 +76,14 @@ fun TransactionDetailScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    val formatter = remember {
-        val x = SimpleDateFormat("MM-dd-yy")
-        x.isLenient = false
-        x
-    }
-
-    // TODO this could belong in the view model
-    val accountKey = rememberSaveable { mutableStateOf(transaction.value.accountKey) }
-    val categoryKey = rememberSaveable { mutableStateOf(transaction.value.categoryKey) }
-    val name = rememberSaveable { mutableStateOf(transaction.value.name) }
-    val date = rememberSaveable { mutableStateOf(formatDateIntSimple(transaction.value.date, "-")) }
-    val value = rememberSaveable { mutableStateOf(
-        if (transaction.value.value == 0L) ""
-        else transaction.value.value.toFloatDollar().toString())
-    }
-
-    var dateError by remember { mutableStateOf(false) }
-    var valueError by remember { mutableStateOf(false) }
-
     val categoryList by remember { derivedStateOf {
         if ((value.value.toFloatOrNull() ?: 0f) > 0f) incomeCategories else expenseCategories
     } }
-    val account = remember { derivedStateOf {
-        accounts.find(accountKey.value)
-    } }
-    val category = remember { derivedStateOf {
-        categoryList.find { it.key == categoryKey.value }
-    } }
 
     fun saveTransaction() {
-        val dateInt = formatter.parseOrNull(date.value)?.toIntDate()
-        val valueLong = value.value.toFloatOrNull()?.toLongDollar()
-
-        dateError = dateInt == null
-        valueError = valueLong == null
-        if (dateError || valueError) return
-
-        val t = TransactionEntity(
-            key = transaction.value.key,
-            name = name.value,
-            date = dateInt ?: 0,
-            value = valueLong ?: 0L,
-            category = category.value ?: Category.None,
-            categoryKey = category.value?.key ?: 0,
-            accountKey = account.value?.key ?: 0,
-        )
-        onSave(t)
-        onBack()
+        val ok = onSave()
+        if (ok) onBack()
     }
-
-
 
     fun LazyListScope.editor(
         label: String,
@@ -178,7 +141,7 @@ fun TransactionDetailScreen(
                         AccountSelector(
                             selection = account.value,
                             options = accounts,
-                            onSelection = { accountKey.value = it?.key ?: 0 },
+                            onSelection = { account.value = it },
                             modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
                         )
                     }
@@ -186,9 +149,9 @@ fun TransactionDetailScreen(
 
                 editor("Name", name, number = false)
 
-                editor("Date", date, error = dateError, placeholder = "mm-dd-yy")
+                editor("Date", date, error = dateError.value, placeholder = "mm-dd-yy")
 
-                editor("Value", value, error = valueError)
+                editor("Value", value, error = valueError.value)
 
 
                 item("Category") {
@@ -200,7 +163,7 @@ fun TransactionDetailScreen(
                             selection = category.value,
                             options = categoryList,
                             delayOpen = 100,
-                            onSelection = { categoryKey.value = it?.key ?: 0 },
+                            onSelection = { category.value = it },
                             modifier = Modifier.padding(start = 6.dp) // to match the padding of the editors between the box and the text
                         )
                     }
@@ -294,7 +257,13 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             TransactionDetailScreen(
-                transaction = previewTransaction,
+                account = previewAccountNull,
+                category = previewCategory,
+                name = remember { mutableStateOf("TARGET STORED ID:XXXXXX") },
+                date = remember { mutableStateOf("11-15-22") },
+                value = remember { mutableStateOf("-26.34") },
+                dateError = remember { mutableStateOf(false) },
+                valueError = remember { mutableStateOf(true) },
                 reimbursements = previewReimbursements,
                 allocations = previewAllocations,
                 accounts = previewAccounts,

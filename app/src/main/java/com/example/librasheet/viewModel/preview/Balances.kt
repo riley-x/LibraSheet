@@ -42,6 +42,7 @@ val previewAccounts = mutableStateListOf(
 )
 
 val previewAccount = mutableStateOf(previewAccounts[0])
+val previewAccountNull = mutableStateOf<Account?>(previewAccounts[0])
 
 
 val previewGraphLabels = ImmutableList(listOf("Pie Chart", "History"))

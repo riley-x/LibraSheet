@@ -39,13 +39,13 @@ fun NavGraphBuilder.transactionScreens(
     }
     fun onAddAllocation() {
         allocationDialog.open(
-            isIncome = state.detail.value.value > 0,
+            isIncome = state.isIncome(),
             onSave = state::addAllocation,
         )
     }
     fun onEditAllocation(i: Int) {
         allocationDialog.open(
-            isIncome = state.detail.value.value > 0,
+            isIncome = state.isIncome(),
             allocation = state.allocations[i],
         ) { name, value, category ->
             state.editAllocation(i, name, value, category)
@@ -66,7 +66,13 @@ fun NavGraphBuilder.transactionScreens(
 
     composable(route = TransactionDetailDestination.route(route!!)) {
         TransactionDetailScreen(
-            transaction = state.detail,
+            account = state.detailAccount,
+            category = state.detailCategory,
+            name = state.detailName,
+            date = state.detailDate,
+            value = state.detailValue,
+            dateError = state.dateError,
+            valueError = state.valueError,
             reimbursements = state.reimbursements,
             allocations = state.allocations,
             accounts = viewModel.accounts.all,
