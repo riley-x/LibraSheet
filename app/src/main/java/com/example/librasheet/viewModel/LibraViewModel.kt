@@ -1,14 +1,20 @@
 package com.example.librasheet.viewModel
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.LibraApplication
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
@@ -93,6 +99,45 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         when (type) {
             "account" -> accounts.saveColor(target, color)
             "category" -> categories.saveColor(target, color)
+        }
+    }
+
+    @Callback
+    fun backupDatabase(context: Context) {
+        viewModelScope.launch {
+
+            /** First we copy the database file to the app's private cache directory **/
+            val db = application.getDatabasePath("app_database")
+            val backup = File(application.cacheDir, "libra_sheet.db")
+            withContext(Dispatchers.IO) {
+                /** Force synchronize the wal file **/
+                // https://stackoverflow.com/a/51560124/10988347transactionDao.checkpoint()
+                application.database.accountDao().checkpoint()
+
+                // https://stackoverflow.com/a/46344186/10988347
+                db.inputStream().use { input ->
+                    backup.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            }
+            // This is defined in the app manifest xml file
+            val backupUri =
+                FileProvider.getUriForFile(application, "com.example.librasheet.fileprovider", backup)
+
+            /** Next create an intent to share the file. See
+             * https://developer.android.com/training/secure-file-sharing/setup-sharing
+             * https://developer.android.com/reference/androidx/core/content/FileProvider
+             * https://stackoverflow.com/a/62928442/10988347
+             **/
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "application/sql" // this is the MIME type, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                putExtra(Intent.EXTRA_STREAM, backupUri)
+            }
+            val shareIntent = Intent.createChooser(sendIntent, "Backup Database")
+            context.startActivity(shareIntent)
         }
     }
 }

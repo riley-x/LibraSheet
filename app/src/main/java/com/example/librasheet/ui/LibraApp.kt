@@ -8,6 +8,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
@@ -32,6 +33,9 @@ import com.example.librasheet.viewModel.dataClasses.CategoryUi
 fun LibraApp(
     viewModel: LibraViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
+    fun backupDatabase() { viewModel.backupDatabase(context) }
+
     /** Navigation **/
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
@@ -287,7 +291,7 @@ fun LibraApp(
                         toAddTransaction = ::toSettingsTransactionDetail,
                         toAddCSV = ::toAddCsv,
                         toAllTransactions = ::toSettingsAllTransactions,
-                        onBackupDatabase = { }, // TODO
+                        onBackupDatabase = ::backupDatabase,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }

@@ -1,6 +1,8 @@
 package com.example.librasheet.data.dao
 
 import androidx.room.*
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.example.librasheet.data.entity.*
 
 
@@ -22,4 +24,10 @@ interface AccountDao {
     @Query("SELECT * FROM $accountHistoryTable WHERE accountKey = :accountKey ORDER BY date")
     fun getHistory(accountKey: Long): List<AccountHistory>
     fun getHistory(account: Account) = getHistory(account.key)
+
+    @RawQuery
+    fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+    fun checkpoint() {
+        checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"));
+    }
 }
