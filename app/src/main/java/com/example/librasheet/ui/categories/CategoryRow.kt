@@ -27,6 +27,7 @@ import com.example.librasheet.viewModel.preview.previewIncomeCategories
 fun CategoryRow(
     category: CategoryUi,
     modifier: Modifier = Modifier,
+    filterZeros: Boolean = false,
     expanded: MutableTransitionState<Boolean> = remember { MutableTransitionState(false) },
     onExpand: (Boolean) -> Unit = { expanded.targetState = it },
     content: @Composable RowScope.(CategoryUi) -> Unit = { },
@@ -58,7 +59,10 @@ fun CategoryRow(
                 content(category)
             }
 
-            if (category.subCategories.isNotEmpty()) {
+            val hasExpanded =
+                if (filterZeros) category.subCategories.any { it.value != 0f }
+                else category.subCategories.isNotEmpty()
+            if (hasExpanded) {
                 AnimatedVisibility(
                     visibleState = expanded,
                     enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(initialAlpha = 0.3f),
@@ -66,7 +70,8 @@ fun CategoryRow(
                 ) {
                     Column {
                         category.subCategories.forEachIndexed { index, cat ->
-                            subRow(index, cat)
+                            if (cat.value != 0f) { subRow(index, cat) }
+                            // It's important that the index passed here is the full list's index for reordering!
                         }
                     }
                 }

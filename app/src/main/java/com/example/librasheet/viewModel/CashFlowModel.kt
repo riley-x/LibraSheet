@@ -40,7 +40,7 @@ class CashFlowModel (
     /** Pie chart. This needs to have a separate list because the cash flow screen animates between
      * the tabs, in which case both the pie and the totals list are shown concurrently. **/
     val pie = mutableStateListOf<CategoryUi>()
-    val pieRange = mutableStateOf(CategoryTimeRange.ONE_MONTH)
+    val pieRange = mutableStateOf(CategoryTimeRange.ONE_YEAR)
 
     /** History graph **/
     private var fullHistory = listOf<StackedLineGraphValue>()

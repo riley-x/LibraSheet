@@ -73,10 +73,12 @@ class CategoryData(
 
         /** Categories **/
         jobs.launchIO {
+            income.subCategories.clear()
             dao.getIncome().mapTo(income.subCategories) { it.toNestedCategory() }
             Log.d("Libra/CategoryData/load", "income=${income.subCategories.size}")
         }
         jobs.launchIO {
+            expense.subCategories.clear()
             dao.getExpense().mapTo(expense.subCategories) { it.toNestedCategory() }
             Log.d("Libra/CategoryData/load", "expense=${expense.subCategories.size}")
         }
