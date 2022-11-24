@@ -151,6 +151,7 @@ class CashFlowModel (
 
         dates.clear()
         dates.addAll(fullDates.takeLastOrAll(n))
+        val intDates = data.historyDates.takeLastOrAll(n)
 
         history.values.clear()
         fullHistory.mapTo(history.values) {
@@ -159,7 +160,9 @@ class CashFlowModel (
 
         // We only need to look at [0] because that's the top stack
         val maxY = history.values[0].second.max()
-        val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) { dates[it] }
+        val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) {
+            formatDateInt(intDates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
+        }
         val (ticksY, order) = autoYTicksWithOrder(0f, maxY, graphTicksY)
         val axes = AxesState(
             ticksY = ticksY,

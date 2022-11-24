@@ -1,5 +1,6 @@
 package com.example.librasheet.data
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.entity.AccountHistory
@@ -64,7 +65,7 @@ fun List<HistoryEntry>.alignDates(
 
 /**
  * Gets a list of values that can be passed to the stacked line graph.
- * @param series should be in order of top of the stack to the bottom. Values should not be pre-added.
+ * @param series should be in order of bottom of the stack to the top. Values should not be pre-added.
  */
 fun Map<Long, List<Long>>.stackedLineGraphValues(
     series: List<Series>,
@@ -75,7 +76,8 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(
     val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
 
     var lastValues: List<Float>? = null
-    for (line in series.reversed()) { // 0th account is top in stack == sum of all other values
+    for (line in series) { // 0th account is top in stack == sum of all other values
+        Log.d("Libra/HistoryUtils", "line $line")
         val balances = this[line.key] ?: continue
 
         val values = mutableListOf<Float>()
@@ -88,6 +90,7 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(
         lastValues = values
 
         allValues.add(0, Pair(line.color, values)) // StackedLineGraph wants top stack at start of list
+        Log.d("Libra/HistoryUtils", "values $values")
     }
 
     return Triple(allValues, minY, maxY)

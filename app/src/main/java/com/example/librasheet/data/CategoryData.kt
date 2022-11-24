@@ -291,10 +291,18 @@ class CategoryData(
  * and is just used for recursion.
  */
 fun Category.sumChildren(values: MutableMap<Long, MutableList<Long>>): List<Long>? {
-    val list = values[key] ?: return null
+    var list = values.getOrDefault(key, null)
     subCategories.forEach { sub ->
         sub.sumChildren(values)?.let {
-            for (i in it.indices) { list[i] += it[i] }
+            if (list == null) {
+                list = it.toMutableList()
+                values[key] = list!!
+            }
+            else {
+                for (i in it.indices) {
+                    list!![i] += it[i]
+                }
+            }
         }
     }
     return list

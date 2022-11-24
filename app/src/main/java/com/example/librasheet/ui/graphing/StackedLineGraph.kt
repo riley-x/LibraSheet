@@ -106,12 +106,16 @@ fun stackedLineGraphHover(
         val endX = it.userToPxX(it.axesState.maxX)
         val flagPointX = endX + 2f
         val flagBaseX = endX + labelYStartPad.toPx()
-        values.forEachIndexed { index, (color, series) ->
+        for (index in values.indices) {
+            val color = values[index].first
+            val series = values[index].second
+
             /** Get the label text layout **/
             val value = series[hoverLoc.value] -
-                if (index < values.lastIndex)
-                    values[index + 1].second[hoverLoc.value]
+                if (index < values.lastIndex) values[index + 1].second[hoverLoc.value]
                 else 0f
+            if (value == 0f) continue
+
             val layoutResult = it.textMeasurer.measure(
                 text = AnnotatedString(toString(value)),
                 style = textStyle,
