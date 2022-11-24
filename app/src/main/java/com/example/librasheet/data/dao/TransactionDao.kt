@@ -50,7 +50,7 @@ interface TransactionDao {
         updateBalance(t.accountKey, t.value)
         updateBalanceHistory(t.accountKey, month, t.value)
 
-        if (t.categoryKey == ignoreKey) return newKey // we want to still measure uncategorized transactions
+        if (t.categoryKey == ignoreKey) return newKey
         addCategoryEntry(CategoryHistory(
             accountKey = t.accountKey,
             categoryKey = t.categoryKey,

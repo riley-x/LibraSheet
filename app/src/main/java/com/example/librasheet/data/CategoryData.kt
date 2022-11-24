@@ -94,9 +94,10 @@ class CategoryData(
             val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
             historyDates = res.first
             history = res.second
-            /** Sum subCategories into parents **/
-            income.sumChildren(history)
-            expense.sumChildren(history)
+            /** Sum subCategories into parents. Don't sum top categories into super category though,
+             * which are displayed as "uncategorized". **/
+            income.subCategories.forEach { it.sumChildren(history) }
+            expense.subCategories.forEach { it.sumChildren(history) }
             Log.d("Libra/CategoryData/load", "history=$history")
         }
 

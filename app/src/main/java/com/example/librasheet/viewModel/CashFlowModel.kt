@@ -134,6 +134,7 @@ class CashFlowModel (
             data.history.stackedLineGraphValues(categoryList, multiplier).first
         }
         Log.d("Libra/CashFlowModel/loadFullHistory", "$fullDates")
+        Log.d("Libra/CashFlowModel/loadFullHistory", "$fullHistory")
     }
 
 
