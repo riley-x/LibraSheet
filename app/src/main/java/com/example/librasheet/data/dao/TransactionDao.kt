@@ -298,7 +298,7 @@ fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
         q += " accountKey = ?"
         args.add(filter.account)
     }
-    if (filter.category != null) {
+    if (filter.category != null && filter.category.key != 0L) {
         q += if ("WHERE" in q) " AND" else " WHERE"
         q += " categoryKey = ?"
         args.add(filter.category.key)
