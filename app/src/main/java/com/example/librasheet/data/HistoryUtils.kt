@@ -77,7 +77,6 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(
 
     var lastValues: List<Float>? = null
     for (line in series) { // 0th account is top in stack == sum of all other values
-        Log.d("Libra/HistoryUtils", "line $line")
         val balances = this[line.key] ?: continue
 
         val values = mutableListOf<Float>()
@@ -90,7 +89,6 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(
         lastValues = values
 
         allValues.add(0, Pair(line.color, values)) // StackedLineGraph wants top stack at start of list
-        Log.d("Libra/HistoryUtils", "values $values")
     }
 
     return Triple(allValues, minY, maxY)
