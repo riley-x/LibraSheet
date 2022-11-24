@@ -77,6 +77,7 @@ fun CashFlowScreen(
                     if (category.value > 0) {
                         CategoryDragRow(
                             category = category,
+                            filterZeros = true,
                             group = state.parentCategory.id.fullName,
                             index = index,
                             startIndex = startIndex,

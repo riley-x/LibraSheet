@@ -24,6 +24,7 @@ fun CategoryDragRow(
     index: Int,
     expanded: SnapshotStateMap<String, MutableTransitionState<Boolean>>,
     modifier: Modifier = Modifier,
+    filterZeros: Boolean = false,
     enabled: Boolean = true,
     startIndex: Int = 0,
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
@@ -44,6 +45,7 @@ fun CategoryDragRow(
     ) { dragScope ->
         CategoryRow(
             category = category,
+            filterZeros = filterZeros,
             expanded = expanded.getOrPut(category.id.fullName) { MutableTransitionState(false) },
             modifier = Modifier.rowDivider(enabled = index > startIndex && !dragScope.isTarget(group, index), color = dividerColor),
             content = content,

@@ -41,13 +41,17 @@ fun CategoryRow(
         }
     },
 ) {
+    val hasExpanded =
+        if (filterZeros) category.subCategories.any { it.value != 0f }
+        else category.subCategories.isNotEmpty()
+
     Surface(modifier) {
         Column {
             ColorCodedRow(
                 color = category.color,
             ) {
                 Text(category.name)
-                if (category.subCategories.isNotEmpty()) {
+                if (hasExpanded) {
                     IconButton(onClick = { onExpand(!expanded.targetState) }) {
                         if (expanded.targetState) Icon(
                             imageVector = Icons.Sharp.ExpandLess,
@@ -59,9 +63,6 @@ fun CategoryRow(
                 content(category)
             }
 
-            val hasExpanded =
-                if (filterZeros) category.subCategories.any { it.value != 0f }
-                else category.subCategories.isNotEmpty()
             if (hasExpanded) {
                 AnimatedVisibility(
                     visibleState = expanded,
@@ -70,8 +71,11 @@ fun CategoryRow(
                 ) {
                     Column {
                         category.subCategories.forEachIndexed { index, cat ->
-                            if (cat.value != 0f) { subRow(index, cat) }
-                            // It's important that the index passed here is the full list's index for reordering!
+                            if (!filterZeros || cat.value != 0f) {
+                                subRow(index, cat)
+                                // It's important that the index passed here is the full list's index
+                                // for reordering!
+                            }
                         }
                     }
                 }
