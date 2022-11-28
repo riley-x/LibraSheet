@@ -50,7 +50,6 @@ interface TransactionDao {
         updateBalance(t.accountKey, t.value)
         updateBalanceHistory(t.accountKey, month, t.value)
 
-        if (t.categoryKey == ignoreKey) return newKey
         addCategoryEntry(CategoryHistory(
             accountKey = t.accountKey,
             categoryKey = t.categoryKey,
@@ -78,8 +77,6 @@ interface TransactionDao {
         if (t.accountKey <= 0) return
         updateBalance(t.accountKey, -t.value)
         updateBalanceHistory(t.accountKey, month, -t.value)
-
-        if (t.categoryKey == ignoreKey) return
         updateCategoryHistory(t.accountKey, t.categoryKey, month, -t.valueAfterReimbursements)
     }
 
@@ -191,7 +188,6 @@ interface TransactionDao {
         insert(allocation)
 
         if (t.accountKey <= 0) return newTransaction
-        if (allocation.categoryKey == ignoreKey) return newTransaction
 
         val month = thisMonthEnd(t.date)
         addCategoryEntry(CategoryHistory(
@@ -218,7 +214,6 @@ interface TransactionDao {
         delete(allocation)
 
         if (t.accountKey <= 0) return newTransaction
-        if (allocation.categoryKey == ignoreKey) return newTransaction
 
         val month = thisMonthEnd(t.date)
         updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) -1 else 1) * allocation.value)

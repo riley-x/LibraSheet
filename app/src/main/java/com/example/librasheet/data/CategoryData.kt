@@ -36,7 +36,7 @@ class CategoryData(
                 color = Color(0xFF5C1604),
                 listIndex = 1,
             ),
-            Category.Ignore, // Enables easy searching for ignore
+            Category.Ignore,
         )
     )
     val income: Category
@@ -86,16 +86,15 @@ class CategoryData(
         return jobs
     }
 
+    /** Category history. This relies on the categories to be loaded first. **/
     fun loadHistory(): List<Job> {
         val jobs = mutableListOf<Job>()
 
-        /** Category History **/
         jobs.launchIO {
             val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
             historyDates = res.first
             history = res.second
-            /** Sum subCategories into parents. Don't sum top categories into super category though,
-             * which are displayed as "uncategorized". **/
+            /** Sum subCategories into parents. **/
             income.sumChildren(history)
             expense.sumChildren(history)
             Log.d("Libra/CategoryData/load", "history=$history")

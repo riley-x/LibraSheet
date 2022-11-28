@@ -85,7 +85,6 @@ data class Category (
     )
 
     companion object {
-        @Ignore
         val None = Category(
             key = 0,
             id = CategoryId(),
