@@ -6,11 +6,8 @@ import com.example.librasheet.data.dao.CategoryDao
 import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.ui.theme.randomColor
-import com.example.librasheet.viewModel.Callback
-import com.example.librasheet.data.toIntDate
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.math.exp
 
 class CategoryData(
     private val scope: CoroutineScope,
@@ -91,7 +88,7 @@ class CategoryData(
         val jobs = mutableListOf<Job>()
 
         jobs.launchIO {
-            val res = historyDao.getAll().alignDates(useLastIfAbsent = false)
+            val res = historyDao.getAll().alignDates(cumulativeSum = false)
             historyDates = res.first
             history = res.second
             /** Sum subCategories into parents. **/

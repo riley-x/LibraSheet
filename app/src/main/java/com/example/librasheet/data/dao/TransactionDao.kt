@@ -15,17 +15,12 @@ interface TransactionDao {
     @Insert fun insert(t: TransactionEntity): Long
     @Delete fun delete(t: TransactionEntity)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun addBalanceEntry(accountHistory: AccountHistory)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addCategoryEntry(categoryHistory: CategoryHistory)
 
     @Query("UPDATE $accountTable SET balance = balance + :value WHERE `key` = :account")
     fun updateBalance(account: Long, value: Long)
-
-    @Query("UPDATE $accountHistoryTable SET balance = balance + :value WHERE accountKey = :account AND date >= :startDate")
-    fun updateBalanceHistory(account: Long, startDate: Int, value: Long)
 
     @Query("UPDATE $categoryHistoryTable SET value = value + :value " +
             "WHERE accountKey = :account AND categoryKey = :category AND date = :date")
@@ -42,14 +37,8 @@ interface TransactionDao {
         if (t.accountKey <= 0) return newKey
 
         val month = thisMonthEnd(t.date)
-        addBalanceEntry(AccountHistory(
-            accountKey = t.accountKey,
-            date = month,
-            balance = 0, // we'll update below
-        ))
-        updateBalance(t.accountKey, t.value)
-        updateBalanceHistory(t.accountKey, month, t.value)
 
+        updateBalance(t.accountKey, t.value)
         addCategoryEntry(CategoryHistory(
             accountKey = t.accountKey,
             categoryKey = t.categoryKey,
@@ -76,7 +65,6 @@ interface TransactionDao {
 
         if (t.accountKey <= 0) return
         updateBalance(t.accountKey, -t.value)
-        updateBalanceHistory(t.accountKey, month, -t.value)
         updateCategoryHistory(t.accountKey, t.categoryKey, month, -t.valueAfterReimbursements)
     }
 

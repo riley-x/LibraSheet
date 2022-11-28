@@ -1,9 +1,7 @@
 package com.example.librasheet.data
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import com.example.librasheet.data.entity.AccountHistory
 import com.example.librasheet.ui.graphing.StackedLineGraphValue
 
 
@@ -30,7 +28,7 @@ interface Series {
  * map accountKey -> balances. The balances of each account will be zero padded so they all have the
  * same length. **/
 fun List<HistoryEntry>.alignDates(
-    useLastIfAbsent: Boolean = true
+    cumulativeSum: Boolean = true
 ): Pair<MutableList<Int>, MutableMap<Long, MutableList<Long>>> {
     /** Outputs **/
     val dates = mutableListOf<Int>()
@@ -43,7 +41,9 @@ fun List<HistoryEntry>.alignDates(
     val currentValues = mutableMapOf<Long, Long>()
     fun update(newDate: Int) {
         balances.forEach { (account, list) ->
-            list.add(currentValues.getOrElse(account) { if (useLastIfAbsent) list.lastOrNull() ?: 0 else 0 })
+            var value = currentValues.getOrDefault(account, 0L)
+            if (cumulativeSum) value += list.lastOrNull() ?: 0
+            list.add(value)
         }
         currentValues.clear()
         dates.add(currentDate) // this should happen at end of block not beginning, so that newly added accounts are correctly in-sync.

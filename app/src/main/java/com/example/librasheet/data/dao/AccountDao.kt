@@ -3,6 +3,7 @@ package com.example.librasheet.data.dao
 import androidx.room.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.example.librasheet.data.HistoryEntryBase
 import com.example.librasheet.data.entity.*
 
 
@@ -12,22 +13,18 @@ interface AccountDao {
     @Update fun update(account: Account)
     @Update fun update(accounts: List<Account>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun add(accountHistory: AccountHistory)
-
     @Query("SELECT * FROM $accountTable ORDER BY listIndex")
     fun getAccounts(): List<Account>
-
-    @Query("SELECT * FROM $accountHistoryTable ORDER BY date")
-    fun getHistory(): List<AccountHistory>
-
-    @Query("SELECT * FROM $accountHistoryTable WHERE accountKey = :accountKey ORDER BY date")
-    fun getHistory(accountKey: Long): List<AccountHistory>
-    fun getHistory(account: Account) = getHistory(account.key)
 
     @RawQuery
     fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
     fun checkpoint() {
         checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"));
     }
+
+    @Query("SELECT accountKey as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable GROUP BY date, accountKey ORDER BY date")
+    fun getHistory(): List<HistoryEntryBase>
+
+    @Query("SELECT accountKey as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable WHERE accountKey = :key GROUP BY date ORDER BY date")
+    fun getHistory(key: Long): List<HistoryEntryBase>
 }

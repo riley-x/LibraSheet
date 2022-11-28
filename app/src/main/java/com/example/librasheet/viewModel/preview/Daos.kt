@@ -105,10 +105,6 @@ internal class FakeAccountDao: AccountDao {
         TODO("Not yet implemented")
     }
 
-    override fun add(accountHistory: AccountHistory) {
-        TODO("Not yet implemented")
-    }
-
     override fun update(account: Account) {
         TODO("Not yet implemented")
     }
@@ -121,17 +117,18 @@ internal class FakeAccountDao: AccountDao {
         TODO("Not yet implemented")
     }
 
-    override fun getHistory(): List<AccountHistory> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getHistory(accountKey: Long): List<AccountHistory> {
-        TODO("Not yet implemented")
-    }
-
     override fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int {
         TODO("Not yet implemented")
     }
+
+    override fun getHistory(): List<HistoryEntryBase> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getHistory(key: Long): List<HistoryEntryBase> {
+        TODO("Not yet implemented")
+    }
+
 
 }
 
@@ -161,19 +158,11 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
-    override fun addBalanceEntry(accountHistory: AccountHistory) {
-        TODO("Not yet implemented")
-    }
-
     override fun addCategoryEntry(categoryHistory: CategoryHistory) {
         TODO("Not yet implemented")
     }
 
     override fun updateBalance(account: Long, value: Long) {
-        TODO("Not yet implemented")
-    }
-
-    override fun updateBalanceHistory(account: Long, startDate: Int, value: Long) {
         TODO("Not yet implemented")
     }
 

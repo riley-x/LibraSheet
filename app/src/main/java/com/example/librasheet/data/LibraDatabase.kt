@@ -2,13 +2,13 @@ package com.example.librasheet.data
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.AutoMigrationSpec
 import com.example.librasheet.data.dao.*
 import com.example.librasheet.data.entity.*
 
 @Database(
     entities = [
         Account::class,
-        AccountHistory::class,
         Category::class,
         CategoryRuleEntity::class,
         CategoryHistory::class,
@@ -16,9 +16,10 @@ import com.example.librasheet.data.entity.*
         Allocation::class,
         Reimbursement::class,
     ],
-    version = 10,
+    version = 11,
     autoMigrations = [
-        AutoMigration (from = 9, to = 10)
+        AutoMigration(from = 9, to = 10),
+        AutoMigration(from = 10, to = 11, spec = LibraDatabase.AutoMigration10to11::class),
     ]
 )
 @TypeConverters(Converters::class)
@@ -47,4 +48,7 @@ abstract class LibraDatabase : RoomDatabase() {
             }
         }
     }
+
+    @DeleteTable(tableName = "account_history")
+    class AutoMigration10to11 : AutoMigrationSpec
 }
