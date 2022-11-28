@@ -90,6 +90,7 @@ class AccountScreenState(
 
 
     fun loadHistory() = scope.launch {
+        // TODO replace this with a data class, shared with balance screen
         val history = withContext(Dispatchers.IO) {
             accountDao.getHistory(account.value)
         }
@@ -97,12 +98,14 @@ class AccountScreenState(
         historyDates.clear()
         history.mapTo(historyDates) { formatDateInt(it.date, "MMM yyyy") }
 
+        var last = 0f
         var minY = 0f
         var maxY = 0f
         balance.values.clear()
         history.forEach {
-            val x = it.value.toFloatDollar()
+            val x = last + it.value.toFloatDollar()
             balance.values.add(x)
+            last = x
             if (x < minY) minY = x
             if (x > maxY) maxY = x
         }
