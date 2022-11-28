@@ -30,7 +30,7 @@ fun <T> DropdownSelector(
     modifier: Modifier = Modifier,
     delayOpen: Long = 0,
     onSelection: (T) -> Unit = { },
-    display: @Composable RowScope.(T) -> Unit = { },
+    display: @Composable RowScope.(T, isSelection: Boolean) -> Unit = { _, _ -> },
 ) {
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -57,7 +57,7 @@ fun <T> DropdownSelector(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier, // I think the modifier needs to go here
         ) {
-            display(selection)
+            display(selection, true)
             Spacer(Modifier.weight(10f))
 
             /** Using ExposedDropdownMenuDefaults.TrailingIcon doesn't close the keyboard when
@@ -82,7 +82,7 @@ fun <T> DropdownSelector(
                         expanded = false
                     },
                 ) {
-                    display(it)
+                    display(it, false)
                 }
             }
         }
@@ -204,7 +204,7 @@ private fun PreviewCustom() {
             DropdownSelector(
                 selection = "Robinhood",
                 options = emptyList(),
-            ) {
+            ) { it, _ ->
                 ColorIndicator(Color.Green)
                 Text(it)
             }

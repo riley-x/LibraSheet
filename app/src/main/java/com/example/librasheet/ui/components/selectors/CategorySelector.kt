@@ -33,8 +33,8 @@ fun CategorySelector(
         onSelection = onSelection,
         delayOpen = delayOpen,
         modifier = modifier,
-    ) {
-        if (it?.id?.isSub == true) Spacer(Modifier.width(20.dp))
+    ) { it, isSelection ->
+        if (!isSelection && it?.id?.isSub == true) Spacer(Modifier.width(20.dp))
         if (it != null && it.color != Color.Unspecified) ColorIndicator(it.color)
         Text(
             text = it?.id?.name?.ifEmpty { "None" } ?: "None",

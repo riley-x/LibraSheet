@@ -32,7 +32,7 @@ fun AccountSelector(
         options = options,
         onSelection = onSelection,
         modifier = modifier,
-    ) {
+    ) { it, _ ->
         ColorIndicator(it?.color ?: Color.Unspecified)
 
         Text(

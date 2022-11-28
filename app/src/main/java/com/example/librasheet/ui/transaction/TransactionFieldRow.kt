@@ -133,7 +133,7 @@ private fun PreviewSelect() {
                 DropdownSelector(
                     selection = "Robinhood",
                     options = emptyList(),
-                ) {
+                ) { it, _ ->
                     ColorIndicator(Color.Green)
                     Text(it)
                 }

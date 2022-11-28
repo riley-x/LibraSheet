@@ -95,11 +95,12 @@ fun LibraApp(
 
 
     /** Dialogs **/
-    var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
     val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel) }
     val reimbursementDialog = remember { ReimbursementDialog() }
     val allocationDialog = remember { AllocationDialog(viewModel) }
     val categoryRuleDialog = remember { CategoryRuleDialog(viewModel) }
+
+    var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
