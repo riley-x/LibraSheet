@@ -103,7 +103,9 @@ val LocalDragScope = compositionLocalOf { DragScope() }
  * calculates the reordering based on the y positions of the targets.
  *
  * @param index Should uniquely identify the target in its group (usually the list index). It should
- * always be non-negative.
+ * always be non-negative, and increasing in the downward direction. That is, the element that is
+ * below another should have the larger [index]. The absolute value does not matter, so you don't
+ * need to start at 0 or make sure they're consecutive integers.
  * @param group Should uniquely identify the group this target belongs in. Targets can only be
  * reordered within the same group.
  * @param onDragEnd Returns the current dragged element id and the final index it was dropped at.

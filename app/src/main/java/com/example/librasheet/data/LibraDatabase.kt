@@ -16,10 +16,11 @@ import com.example.librasheet.data.entity.*
         Allocation::class,
         Reimbursement::class,
     ],
-    version = 11,
+    version = 12,
     autoMigrations = [
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11, spec = LibraDatabase.AutoMigration10to11::class),
+        AutoMigration(from = 11, to = 12),
     ]
 )
 @TypeConverters(Converters::class)

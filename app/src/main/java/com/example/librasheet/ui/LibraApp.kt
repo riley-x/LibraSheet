@@ -239,7 +239,8 @@ fun LibraApp(
             navigation(startDestination = BalanceTab.route, route = BalanceTab.graph) {
                 composable(route = BalanceTab.route) {
                     BalanceScreen(
-                        accounts = viewModel.accounts.all,
+                        accounts = viewModel.accounts.assets,
+                        liabilities = viewModel.accounts.liabilities,
                         history = viewModel.balanceGraphs.historyGraph,
                         netIncome = viewModel.balanceGraphs.incomeGraph,
                         historyDates = viewModel.balanceGraphs.historyDates,

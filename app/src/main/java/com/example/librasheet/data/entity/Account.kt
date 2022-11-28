@@ -1,7 +1,9 @@
 package com.example.librasheet.data.entity
 
 import androidx.annotation.NonNull
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.librasheet.data.Institution
@@ -11,6 +13,7 @@ import com.example.librasheet.ui.graphing.PieChartValue
 
 const val accountTable = "account"
 
+@Immutable
 @Entity(
     tableName = accountTable
 )
@@ -18,6 +21,7 @@ data class Account(
     @PrimaryKey(autoGenerate = true) override val key: Long,
     @NonNull override val name: String,
     val institution: Institution,
+    @NonNull @ColumnInfo(defaultValue = "") val csvPattern: String,
     val colorLong: Long,
     var listIndex: Int, // this is not used by compose, so safe to be a var
     val balance: Long,
@@ -32,12 +36,14 @@ data class Account(
         key: Long,
         name: String,
         institution: Institution,
+        csvPattern: String,
         colorLong: Long,
         listIndex: Int,
     ) : this(
         key = key,
         name = name,
         institution = institution,
+        csvPattern = csvPattern,
         colorLong = colorLong,
         listIndex = listIndex,
         balance = 0,
@@ -48,6 +54,7 @@ data class Account(
         name: String,
         color: Color,
         institution: Institution = Institution.UNKNOWN,
+        csvPattern: String = "",
         key: Long = 0,
         listIndex: Int = -1,
         balance: Long = 0,
@@ -55,6 +62,7 @@ data class Account(
         key = key,
         name = name,
         institution = institution,
+        csvPattern = csvPattern,
         colorLong = color.value.toLong(),
         listIndex = listIndex,
         balance = balance,

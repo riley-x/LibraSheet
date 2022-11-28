@@ -29,6 +29,7 @@ private val tabs = ImmutableList(listOf("Current", "History", "Net Income"))
 @Composable
 fun BalanceScreen(
     accounts: SnapshotStateList<Account>,
+    liabilities: SnapshotStateList<Account>,
     history: StackedLineGraphState,
     netIncome: DiscreteGraphState,
     historyDates: SnapshotStateList<String>,
@@ -87,12 +88,39 @@ fun BalanceScreen(
                     }
                 }
 
+//                item {
+//                    RowTitle(title = "Assets")
+//                }
+
                 itemsIndexed(accounts) { index, account ->
                     if (index > 0) RowDivider(Modifier.zIndex(1f))
 
                     DragToReorderTarget(
-                        index = index,
+                        index = account.listIndex,
+                        group = "assets",
                         onDragEnd = { _, start, end -> onReorder(start, end) },
+                    ) {
+                        BalanceRow(
+                            account = account,
+                            modifier = Modifier
+                                .clickable { onAccountClick(account) }
+                        )
+                    }
+                }
+
+                item {
+                    if (liabilities.isNotEmpty()) {
+                        RowTitle(title = "Liabilities", modifier = Modifier.padding(top = 20.dp))
+                    }
+                }
+
+                itemsIndexed(liabilities) { index, account ->
+                    if (index > 0) RowDivider(Modifier.zIndex(1f))
+
+                    DragToReorderTarget(
+                        index = account.listIndex,
+                        group = "liabilities",
+//                        onDragEnd = { _, start, end -> onReorder(start, end) },
                     ) {
                         BalanceRow(
                             account = account,
@@ -117,6 +145,7 @@ private fun Preview() {
         Surface {
             BalanceScreen(
                 accounts = previewAccounts,
+                liabilities = previewAccounts,
                 history = previewStackedLineGraphState,
                 historyDates = previewEmptyStringList,
                 incomeDates = previewEmptyStringList,

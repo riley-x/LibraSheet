@@ -20,6 +20,8 @@ class AccountModel(
     /** A list of all accounts and their current balances. This is used throughout the app **/
     /** WARNING! Do not store pointers to accounts, since we copy the data classes **/
     val all = mutableStateListOf<Account>()
+    val assets = mutableStateListOf<Account>()
+    val liabilities = mutableStateListOf<Account>()
 
     fun load(): Job {
         return viewModel.viewModelScope.launch {
@@ -27,8 +29,12 @@ class AccountModel(
                 dao.getAccounts()
             }
             all.clear()
-            all.addAll(new)
-            all.forEach {
+            assets.clear()
+            liabilities.clear()
+            new.forEach {
+                all.add(it)
+                if (it.balance >= 0) assets.add(it)
+                else liabilities.add(it)
                 Log.d("Libra/AccountModel/load", "$it")
             }
         }
@@ -72,7 +78,7 @@ class AccountModel(
         }
 
         viewModel.viewModelScope.launch(Dispatchers.IO) {
-            dao.update(all.slice(startIndex..endIndex))
+            dao.update(staleEntities)
         }
         viewModel.updateDependencies(Dependency.ACCOUNT_REORDER)
     }
