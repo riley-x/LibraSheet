@@ -80,6 +80,7 @@ val previewIncomeCategories = mutableStateListOf(
 )
 
 val previewCategory = mutableStateOf<Category?>(previewIncomeCategories2[0])
+val previewCategory2 = mutableStateOf<Category>(previewIncomeCategories2[0])
 
 
 val previewExpenseCategories = mutableStateListOf(

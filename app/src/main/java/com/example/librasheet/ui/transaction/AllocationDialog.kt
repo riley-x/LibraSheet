@@ -21,11 +21,15 @@ import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CategoryModel
 import com.example.librasheet.viewModel.LibraViewModel
+import com.example.librasheet.viewModel.preview.previewCategory
+import com.example.librasheet.viewModel.preview.previewCategory2
+import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
 class AllocationDialog(
     private val viewModel: LibraViewModel,
 ): DialogHolder {
     override var isOpen by mutableStateOf(false)
+        private set
 
     private var isIncome = false
     private var errorMessage by mutableStateOf("")
@@ -146,6 +150,11 @@ fun AllocationDialogComposable(
 @Composable
 private fun Preview() {
     LibraSheetTheme {
-
+        AllocationDialogComposable(
+            name = remember { mutableStateOf("This is a name") },
+            value = remember { mutableStateOf("356.42") },
+            category = previewCategory2,
+            categories = previewIncomeCategories2,
+        )
     }
 }

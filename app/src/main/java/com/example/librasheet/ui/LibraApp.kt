@@ -22,6 +22,7 @@ import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
+import com.example.librasheet.ui.settings.dialogs.CategoryRuleDialog
 import com.example.librasheet.ui.transaction.AllocationDialog
 import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
 import com.example.librasheet.ui.transaction.ReimbursementDialog
@@ -98,6 +99,7 @@ fun LibraApp(
     val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel) }
     val reimbursementDialog = remember { ReimbursementDialog() }
     val allocationDialog = remember { AllocationDialog(viewModel) }
+    val categoryRuleDialog = remember { CategoryRuleDialog(viewModel) }
 
     var openAddAccountDialog by remember { mutableStateOf(false) }
     fun onAddAccount() { openAddAccountDialog = true }
@@ -158,18 +160,6 @@ fun LibraApp(
     fun deleteCategory(confirm: Boolean) {
         if (confirm) viewModel.categories.delete(categoryId = deleteCategoryId)
         deleteCategoryId = CategoryId()
-    }
-
-    var editCategoryRuleIndex by remember { mutableStateOf(-2) }
-    fun onAddRule() { editCategoryRuleIndex = -1 }
-    fun onEditRule(index: Int) { editCategoryRuleIndex = index }
-    fun addRule(cancel: Boolean, pattern: String, category: Category) {
-        if (!cancel) viewModel.rules.add(pattern, category)
-        editCategoryRuleIndex = -2
-    }
-    fun editRule(cancel: Boolean, pattern: String, category: Category) {
-        if (!cancel) viewModel.rules.update(editCategoryRuleIndex, pattern, category)
-        editCategoryRuleIndex = -2
     }
 
     var showFilterRules by remember { mutableStateOf(false) }
@@ -327,9 +317,9 @@ fun LibraApp(
                         rules = viewModel.rules.displayList,
                         isIncome = viewModel.rules.currentScreenIsIncome,
                         onBack = navController::popBackStack,
-                        onAdd = ::onAddRule,
+                        onAdd = categoryRuleDialog::openForNewRule,
                         onFilter = ::onFilterRules,
-                        onEdit = ::onEditRule,
+                        onEdit = categoryRuleDialog::openForEditRule,
                         onDelete = ::onDeleteRule,
                         onReorder = viewModel.rules::reorder,
                     )
@@ -406,29 +396,6 @@ fun LibraApp(
                 onDismiss = ::deleteCategory,
             )
         }
-        if (editCategoryRuleIndex == -1) { // Add rule
-            val list = if (viewModel.rules.currentScreenIsIncome)
-                viewModel.categories.incomeTargets else
-                viewModel.categories.expenseTargets
-            CategoryRuleDialog(
-                currentPattern = "",
-                currentCategory = Category.None,
-                categories = list,
-                onClose = ::addRule,
-            )
-        }
-        else if (editCategoryRuleIndex >= 0) { // Edit rule
-            val list = if (viewModel.rules.currentScreenIsIncome)
-                viewModel.categories.incomeTargets else
-                viewModel.categories.expenseTargets
-            val current = viewModel.rules.displayList[editCategoryRuleIndex]
-            CategoryRuleDialog(
-                currentPattern = current.pattern,
-                currentCategory = current.category ?: Category.None,
-                categories = list,
-                onClose = ::editRule,
-            )
-        }
         if (deleteRuleIndex >= 0) {
             ConfirmationDialog(
                 text = "Delete rule ${viewModel.rules.displayList[deleteRuleIndex].pattern}?",
@@ -450,5 +417,6 @@ fun LibraApp(
         filterTransactionDialog.Content()
         reimbursementDialog.Content()
         allocationDialog.Content()
+        categoryRuleDialog.Content()
     }
 }
