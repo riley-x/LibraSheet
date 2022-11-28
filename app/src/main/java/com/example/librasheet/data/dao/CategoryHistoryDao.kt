@@ -4,10 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.room.*
 import com.example.librasheet.data.HistoryEntry
 import com.example.librasheet.data.HistoryEntryBase
-import com.example.librasheet.data.entity.CategoryHistory
-import com.example.librasheet.data.entity.categoryHistoryTable
-import com.example.librasheet.data.entity.expenseKey
-import com.example.librasheet.data.entity.incomeKey
+import com.example.librasheet.data.entity.*
 
 
 @Immutable
@@ -38,7 +35,7 @@ interface CategoryHistoryDao {
     fun getIncomeAndExpense(account: Long): List<HistoryEntryBase>
 
 
-    @Query("SELECT date, SUM(value) as value FROM $categoryHistoryTable GROUP BY date ORDER BY date")
+    @Query("SELECT date, SUM(value) as value FROM $categoryHistoryTable WHERE categoryKey != $ignoreKey GROUP BY date ORDER BY date")
     fun getNetIncome(): List<TimeSeries>
 
     @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
