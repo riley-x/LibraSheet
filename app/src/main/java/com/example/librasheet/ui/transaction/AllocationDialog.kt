@@ -15,7 +15,9 @@ import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.DialogHolder
+import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.selectors.DropdownSelector
+import com.example.librasheet.ui.components.textFields.textFieldBorder
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -134,13 +136,11 @@ fun AllocationDialogComposable(
         )
 
 
-        DropdownSelector(
-            label = "Category",
-            toString = { it.id.indentedName(1) },
-            currentValue = category.value,
-            allValues = categories,
-            onSelection = { category.value = it },
-            modifier = Modifier.padding(bottom = 6.dp)
+        CategorySelector(
+            selection = category.value,
+            options = categories,
+            onSelection = { category.value = it ?: Category.None },
+            modifier = Modifier.padding(bottom = 6.dp).textFieldBorder(label = "Category")
         )
     }
 }
