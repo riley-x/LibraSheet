@@ -41,6 +41,7 @@ abstract class LibraDatabase : RoomDatabase() {
                     LibraDatabase::class.java,
                     "app_database"
                 )
+                    .createFromAsset("libra_sheet.db")
 //                    .fallbackToDestructiveMigration() // this will delete the old database!
                     .build()
                 INSTANCE = instance
