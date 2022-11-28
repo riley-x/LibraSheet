@@ -131,7 +131,7 @@ class CashFlowModel (
         ))
 
         fullHistory = withContext(Dispatchers.Default) {
-            data.history.stackedLineGraphValues(categoryList, multiplier).first
+            data.history.stackedLineGraphValues(categoryList, multiplier, lastSeriesIsTotal = true).first
         }
         Log.d("Libra/CashFlowModel/loadFullHistory", "$fullDates")
         Log.d("Libra/CashFlowModel/loadFullHistory", "$fullHistory")

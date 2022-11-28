@@ -96,8 +96,8 @@ class CategoryData(
             history = res.second
             /** Sum subCategories into parents. Don't sum top categories into super category though,
              * which are displayed as "uncategorized". **/
-            income.subCategories.forEach { it.sumChildren(history) }
-            expense.subCategories.forEach { it.sumChildren(history) }
+            income.sumChildren(history)
+            expense.sumChildren(history)
             Log.d("Libra/CategoryData/load", "history=$history")
         }
 

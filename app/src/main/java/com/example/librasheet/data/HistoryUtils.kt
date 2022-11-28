@@ -64,20 +64,26 @@ fun List<HistoryEntry>.alignDates(
 }
 
 /**
- * Gets a list of values that can be passed to the stacked line graph.
+ * Gets a list of values that can be passed to the stacked line graph. [this] should be a map as
+ * returned by [alignDates].
+ *
  * @param series should be in order of bottom of the stack to the top. Values should not be pre-added.
+ * @param multiplier factor to multiply the values of [this] by.
+ * @param lastSeriesIsTotal the last entry of [series] has been pre-added with all previous entries.
  */
 fun Map<Long, List<Long>>.stackedLineGraphValues(
     series: List<Series>,
     multiplier: Float = 1f,
+    lastSeriesIsTotal: Boolean = false,
 ): Triple<List<StackedLineGraphValue>, Float, Float> {
     var minY = 0f
     var maxY = 0f
     val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
 
     var lastValues: List<Float>? = null
-    for (line in series) { // 0th account is top in stack == sum of all other values
+    for (line in series) {
         val balances = this[line.key] ?: continue
+        if (lastSeriesIsTotal && line == series.last()) lastValues = null
 
         val values = mutableListOf<Float>()
         balances.forEachIndexed { index, balance ->
