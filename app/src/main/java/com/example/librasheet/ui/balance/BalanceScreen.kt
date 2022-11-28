@@ -88,10 +88,6 @@ fun BalanceScreen(
                     }
                 }
 
-//                item {
-//                    RowTitle(title = "Assets")
-//                }
-
                 itemsIndexed(accounts) { index, account ->
                     if (index > 0) RowDivider(Modifier.zIndex(1f))
 
@@ -110,7 +106,10 @@ fun BalanceScreen(
 
                 item {
                     if (liabilities.isNotEmpty()) {
-                        RowTitle(title = "Liabilities", modifier = Modifier.padding(top = 20.dp))
+                        RowTitle(
+                            title = "Liabilities",
+                            modifier = Modifier.padding(top = 20.dp)
+                        )
                     }
                 }
 
@@ -120,7 +119,7 @@ fun BalanceScreen(
                     DragToReorderTarget(
                         index = account.listIndex,
                         group = "liabilities",
-//                        onDragEnd = { _, start, end -> onReorder(start, end) },
+                        onDragEnd = { _, start, end -> onReorder(start, end) },
                     ) {
                         BalanceRow(
                             account = account,

@@ -23,7 +23,7 @@ data class Account(
     val institution: Institution,
     @NonNull @ColumnInfo(defaultValue = "") val csvPattern: String,
     val colorLong: Long,
-    var listIndex: Int, // this is not used by compose, so safe to be a var
+    val listIndex: Int,
     val balance: Long,
 ): PieChartValue, Series {
     override val color: Color

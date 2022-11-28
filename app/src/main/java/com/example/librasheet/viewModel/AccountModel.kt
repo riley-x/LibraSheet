@@ -17,8 +17,8 @@ class AccountModel(
 ) {
     private val dao = viewModel.application.database.accountDao()
 
-    /** A list of all accounts and their current balances. This is used throughout the app **/
-    /** WARNING! Do not store pointers to accounts, since we copy the data classes **/
+    /** A list of all accounts and their current balances. This is used throughout the app.
+      * WARNING! Do not store pointers to accounts, since we copy the data classes **/
     val all = mutableStateListOf<Account>()
     val assets = mutableStateListOf<Account>()
     val liabilities = mutableStateListOf<Account>()
@@ -73,7 +73,7 @@ class AccountModel(
 
         val staleEntities = mutableListOf<Account>()
         for (i in rangeBetween(startIndex, endIndex)) {
-            all[i].listIndex = i
+            all[i] = all[i].copy(listIndex = i)
             staleEntities.add(all[i])
         }
 
