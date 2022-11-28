@@ -34,7 +34,8 @@ fun CategorySelector(
         delayOpen = delayOpen,
         modifier = modifier,
     ) {
-        ColorIndicator(it?.color ?: Color.Unspecified)
+        if (it?.id?.isSub == true) Spacer(Modifier.width(20.dp))
+        if (it != null && it.color != Color.Unspecified) ColorIndicator(it.color)
         Text(
             text = it?.id?.name?.ifEmpty { "None" } ?: "None",
             fontStyle = if (it.isValid()) FontStyle.Normal else FontStyle.Italic,
