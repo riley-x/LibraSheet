@@ -8,6 +8,7 @@ import androidx.annotation.MainThread
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
+import com.example.librasheet.data.Institution
 import com.example.librasheet.data.dao.RuleDao
 import com.example.librasheet.data.dao.TransactionDao
 import com.example.librasheet.data.entity.*
@@ -125,10 +126,10 @@ class BaseCsvModel(
         dateFormatString: String
     ) {
         var dateIndex = -1
-        var nameIndex = -1
+        var nameFields = mutableListOf<Int>()
         var valueIndex = -1
-        var maxIndex = -1
         val fixedFields = mutableMapOf<Int, String>()
+        var maxIndex = -1
 
         var accountKey = 0L
         var invert = false
@@ -146,13 +147,13 @@ class BaseCsvModel(
         val split = pattern.split(",")
         for (i in split.indices) {
             if (split[i] == "date") parser.dateIndex = i
-            else if (split[i] == "name") parser.nameIndex = i
+            else if (split[i] == "name") parser.nameFields.add(i)
             else if (split[i] == "value") parser.valueIndex = i
             else if (split[i].isNotBlank()) parser.fixedFields[i] = split[i]
             else continue
             parser.maxIndex = i
         }
-        if (parser.dateIndex == -1 || parser.nameIndex == -1 || parser.valueIndex == -1) {
+        if (parser.dateIndex == -1 || parser.nameFields.isEmpty() || parser.valueIndex == -1) {
             errorMessage = "Unable to parse pattern"
             return null
         }
@@ -170,7 +171,7 @@ class BaseCsvModel(
         if (line.size <= parser.maxIndex) return null
 
         val date = parser.dateFormat.parseOrNull(line[parser.dateIndex])?.toIntDate() ?: return null
-        val name = line[parser.nameIndex]
+        val name = parser.nameFields.joinToString { line[it] }
         var value = line[parser.valueIndex].replace(",", "").toFloatOrNull() ?: return null
         if (parser.invert) value = -value
 
@@ -192,7 +193,12 @@ class BaseCsvModel(
         )
     }
 
-    @Callback override fun setAcc(a: Account?) { account = a }
+    @Callback override fun setAcc(a: Account?) {
+        val institution = a?.institution ?: Institution.UNKNOWN
+        account = a
+        pattern = institution.csvPattern
+        dateFormat = institution.dateFormat
+    }
     @Callback override fun setInvert(invert: Boolean) { invertValues = invert }
     @Callback override fun setPatt(p: String) { pattern = p }
     @Callback override fun setDateForm(p: String) { dateFormat = p }
