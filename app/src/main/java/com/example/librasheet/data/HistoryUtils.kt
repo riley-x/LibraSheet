@@ -65,7 +65,8 @@ fun List<HistoryEntry>.alignDates(
 
 /**
  * Gets a list of values that can be passed to the stacked line graph. [this] should be a map as
- * returned by [alignDates].
+ * returned by [alignDates]. This function will skip any series that have negative values (after
+ * application of [multiplier]).
  *
  * @param series should be in order of bottom of the stack to the top. Values should not be pre-added.
  * @param multiplier factor to multiply the values of [this] by.
@@ -81,13 +82,15 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(
     val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
 
     var lastValues: List<Float>? = null
-    for (line in series) {
+    series@ for (line in series) {
         val balances = this[line.key] ?: continue
         if (lastSeriesIsTotal && line == series.last()) lastValues = null
 
         val values = mutableListOf<Float>()
-        balances.forEachIndexed { index, balance ->
-            val value = multiplier * balance.toFloatDollar() + (lastValues?.getOrNull(index) ?: 0f)
+        for ((index, balance) in balances.withIndex()) {
+            var value = multiplier * balance.toFloatDollar()
+            if (value < 0) continue@series
+            value += (lastValues?.getOrNull(index) ?: 0f)
             values.add(value)
             if (value < minY) minY = value
             if (value > maxY) maxY = value
