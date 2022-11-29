@@ -2,6 +2,7 @@ package com.example.librasheet.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -66,7 +67,7 @@ fun NavGraphBuilder.transactionScreens(
             onBack = navController::popBackStack,
             onFilter = ::openFilter,
             onTransactionClick = ::toDetail,
-            modifier = androidx.compose.ui.Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
         )
     }
 
@@ -106,7 +107,7 @@ fun NavGraphBuilder.transactionScreens(
             onBack = navController::popBackStack,
             onFilter = ::openReimbFilter,
             onTransactionClick = ::onSelectReimbursement,
-            modifier = androidx.compose.ui.Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 
 @Stable
@@ -196,10 +197,12 @@ class TransactionModel(
      */
     @Callback
     fun addReimbursement(t: TransactionEntity) {
+        val targetValue = abs(t.valueAfterReimbursements)
+        val currentValue = detailValue.value.toFloatOrNull()?.toLongDollar()?.absoluteValue
         reimbursements.add(
             ReimbursementWithValue(
                 transaction = t,
-                value = abs(t.valueAfterReimbursements)
+                value = if (currentValue != null) minOf(targetValue, currentValue) else targetValue
             )
         )
     }
