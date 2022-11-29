@@ -33,6 +33,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.preview.previewAccounts
 import java.lang.Math.toDegrees
 
+/** 1.8 degrees or 0.5% **/
 private const val DividerLengthInDegrees = 1.8f
 
 interface PieChartValue {
@@ -104,10 +105,11 @@ fun <T: PieChartValue> PieChart(
             val totalAngle = 360f
             values.forEachIndexed { index, account ->
                 val sweep = totalAngle * account.value / total
+                val divider = minOf(DividerLengthInDegrees, sweep * 0.2f)
                 drawArc(
                     color = account.color,
-                    startAngle = startAngle + DividerLengthInDegrees / 2,
-                    sweepAngle = sweep - DividerLengthInDegrees,
+                    startAngle = startAngle + divider / 2,
+                    sweepAngle = sweep - divider,
                     topLeft = topLeft,
                     size = size,
                     useCenter = false,
