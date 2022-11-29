@@ -23,8 +23,6 @@ import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 
 
-const val PICK_CSV_FILE = 2
-
 /** Needed to break out an interface class to enable to preview to work **/
 interface CsvModel {
     var account: Account?
@@ -215,9 +213,11 @@ class BaseCsvModel(
     }
     @Callback override fun save() {
         scope.launch {
+            val list = transactions.toList()
             withContext(Dispatchers.IO) {
-                transactionDao.add(transactions)
+                transactionDao.add(list)
             }
+            clear()
             viewModel.updateDependencies(dependency = Dependency.TRANSACTION)
         }
     }

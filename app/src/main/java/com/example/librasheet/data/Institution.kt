@@ -25,7 +25,7 @@ enum class Institution(
     ),
     CHASE(
         displayName = "Chase",
-        csvPattern = ",date,name,,,value,",
+        csvPattern = "date,,name,,,value,",
         dateFormat = "MM/dd/yyyy"
     ),
     UNKNOWN(
