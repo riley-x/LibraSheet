@@ -188,16 +188,12 @@ interface TransactionDao {
         update(newTransaction, t)
         insert(allocation)
 
-        if (t.accountKey <= 0) return newTransaction
-
-        val month = thisMonthEnd(t.date)
-        addCategoryEntry(CategoryHistory(
-            accountKey = t.accountKey,
-            categoryKey = allocation.categoryKey,
-            date = month,
-            value = 0, // we'll update below
-        ))
-        updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) 1 else -1) * allocation.value)
+        if (t.accountKey > 0) updateCategoryHistory(
+            account = t.accountKey,
+            category = allocation.categoryKey,
+            date = thisMonthEnd(t.date),
+            value = (if (isIncome) 1 else -1) * allocation.value
+        )
         return newTransaction
     }
 
@@ -214,10 +210,12 @@ interface TransactionDao {
         update(newTransaction, t)
         delete(allocation)
 
-        if (t.accountKey <= 0) return newTransaction
-
-        val month = thisMonthEnd(t.date)
-        updateCategoryHistory(t.accountKey, allocation.categoryKey, month, (if (isIncome) -1 else 1) * allocation.value)
+        if (t.accountKey > 0) updateCategoryHistory(
+            account = t.accountKey,
+            category = allocation.categoryKey,
+            date = thisMonthEnd(t.date),
+            value = (if (isIncome) -1 else 1) * allocation.value
+        )
         return newTransaction
     }
 
