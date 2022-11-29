@@ -128,6 +128,7 @@ class BaseCsvModel(
         var nameIndex = -1
         var valueIndex = -1
         var maxIndex = -1
+        val fixedFields = mutableMapOf<Int, String>()
 
         var accountKey = 0L
         var invert = false
@@ -147,13 +148,15 @@ class BaseCsvModel(
             if (split[i] == "date") parser.dateIndex = i
             else if (split[i] == "name") parser.nameIndex = i
             else if (split[i] == "value") parser.valueIndex = i
+            else if (split[i].isNotBlank()) parser.fixedFields[i] = split[i]
+            else continue
+            parser.maxIndex = i
         }
         if (parser.dateIndex == -1 || parser.nameIndex == -1 || parser.valueIndex == -1) {
             errorMessage = "Unable to parse pattern"
             return null
         }
 
-        parser.maxIndex = maxOf(parser.dateIndex, parser.nameIndex, parser.valueIndex)
         parser.accountKey = account?.key ?: 0L
         parser.invert = invertValues
         parser.categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
@@ -170,6 +173,10 @@ class BaseCsvModel(
         val name = line[parser.nameIndex]
         var value = line[parser.valueIndex].replace(",", "").toFloatOrNull() ?: return null
         if (parser.invert) value = -value
+
+        parser.fixedFields.forEach { (index, pattern) ->
+            if (line[index] != pattern) return null
+        }
 
         val rules = if (value > 0) parser.incomeRules else parser.expenseRules
         val rule = rules.find { it.pattern in name }

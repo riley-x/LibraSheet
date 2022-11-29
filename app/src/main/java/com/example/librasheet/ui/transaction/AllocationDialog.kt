@@ -90,7 +90,7 @@ class AllocationDialog(
 
 
 @Composable
-fun AllocationDialogComposable(
+private fun AllocationDialogComposable(
     name: MutableState<String>,
     value: MutableState<String>,
     category: MutableState<Category>,
