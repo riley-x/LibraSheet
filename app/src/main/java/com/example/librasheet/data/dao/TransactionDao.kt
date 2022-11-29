@@ -15,16 +15,29 @@ interface TransactionDao {
     @Insert fun insert(t: TransactionEntity): Long
     @Delete fun delete(t: TransactionEntity)
 
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun addCategoryEntry(categoryHistory: CategoryHistory)
-
     @Query("UPDATE $accountTable SET balance = balance + :value WHERE `key` = :account")
     fun updateBalance(account: Long, value: Long)
 
+    /** Don't use this function, use instead [updateCategoryHistory] **/
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun addCategoryEntry(categoryHistory: CategoryHistory)
+
+    /** Don't use this function, use instead [updateCategoryHistory] **/
     @Query("UPDATE $categoryHistoryTable SET value = value + :value " +
             "WHERE accountKey = :account AND categoryKey = :category AND date = :date")
-    fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long)
+    fun updateCategoryHistoryTable(account: Long, category: Long, date: Int, value: Long)
+
+    @Transaction
+    fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long) {
+        /** Need to make sure the entry exists before trying to update it **/
+        addCategoryEntry(CategoryHistory(
+            accountKey = account,
+            categoryKey = category,
+            date = date,
+            value = 0, // we'll update below
+        ))
+        updateCategoryHistoryTable(account, category, date, value)
+    }
 
     @Transaction
     fun add(transaction: TransactionEntity): Long {
@@ -36,19 +49,8 @@ interface TransactionDao {
         val newKey = insert(t)
         if (t.accountKey <= 0) return newKey
 
-        val month = thisMonthEnd(t.date)
-
         updateBalance(t.accountKey, t.value)
-        addCategoryEntry(CategoryHistory(
-            accountKey = t.accountKey,
-            categoryKey = t.categoryKey,
-            date = month,
-            value = 0, // we'll update below
-        ))
-        updateCategoryHistory(t.accountKey, t.categoryKey, month, t.valueAfterReimbursements)
-        // this should use the reimbursed value since category history is used for income/expenses.
-        // But the account balance ones above should use the normal value.
-
+        updateCategoryHistory(t.accountKey, t.categoryKey, thisMonthEnd(t.date), t.valueAfterReimbursements)
         return newKey
     }
 
@@ -61,11 +63,10 @@ interface TransactionDao {
     fun undo(t: TransactionEntity) {
         Log.d("Libra/TransactionDao/undo", "$t")
         delete(t)
-        val month = thisMonthEnd(t.date)
 
         if (t.accountKey <= 0) return
         updateBalance(t.accountKey, -t.value)
-        updateCategoryHistory(t.accountKey, t.categoryKey, month, -t.valueAfterReimbursements)
+        updateCategoryHistory(t.accountKey, t.categoryKey, thisMonthEnd(t.date), -t.valueAfterReimbursements)
     }
 
     @Transaction
@@ -128,6 +129,12 @@ interface TransactionDao {
         update(newIncome, income)
         update(newExpense, expense)
 
+        /** Need to also log difference to "Ignore category" for balance history total **/
+        if (income.accountKey != expense.accountKey) {
+            updateCategoryHistory(income.accountKey, ignoreKey, thisMonthEnd(income.date), value)
+            updateCategoryHistory(expense.accountKey, ignoreKey, thisMonthEnd(expense.date), -value)
+        }
+
         val new1 = if (t1.value > 0) newIncome else newExpense
         val new2 = if (t1.value > 0) newExpense else newIncome
         return Pair(new1, new2)
@@ -155,6 +162,12 @@ interface TransactionDao {
         delete(reimbursement)
         update(newIncome, income)
         update(newExpense, expense)
+
+        /** Need to also log difference to "Ignore category" for balance history total **/
+        if (income.accountKey != expense.accountKey) {
+            updateCategoryHistory(income.accountKey, ignoreKey, thisMonthEnd(income.date), -value)
+            updateCategoryHistory(expense.accountKey, ignoreKey, thisMonthEnd(expense.date), value)
+        }
 
         val new1 = if (t1.value > 0) newIncome else newExpense
         val new2 = if (t1.value > 0) newExpense else newIncome
