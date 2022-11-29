@@ -48,6 +48,9 @@ interface CsvModel {
 }
 
 
+private val valueRegex = """\$|,|\s|\+""".toRegex()
+
+
 class BaseCsvModel(
     private val viewModel: LibraViewModel,
 ): CsvModel {
@@ -172,11 +175,12 @@ class BaseCsvModel(
 
         val date = parser.dateFormat.parseOrNull(line[parser.dateIndex])?.toIntDate() ?: return null
         val name = parser.nameFields.joinToString { line[it] }
-        var value = line[parser.valueIndex].replace(",", "").toFloatOrNull() ?: return null
+        var value = line[parser.valueIndex].replace(valueRegex, "").toFloatOrNull() ?: return null
         if (parser.invert) value = -value
 
+        // TODO document
         parser.fixedFields.forEach { (index, pattern) ->
-            if (line[index] != pattern) return null
+            if (line[index].isNotEmpty() && pattern !in line[index]) return null
         }
 
         val rules = if (value > 0) parser.incomeRules else parser.expenseRules

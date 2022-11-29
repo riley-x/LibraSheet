@@ -306,6 +306,7 @@ fun LibraApp(
                         onEdit = categoryRuleDialog::openForEditRule,
                         onDelete = ::onDeleteRule,
                         onReorder = viewModel.rules::reorder,
+                        modifier = Modifier.padding(innerPadding),
                     )
                 }
                 composable(route = AddCsvDestination.route) {

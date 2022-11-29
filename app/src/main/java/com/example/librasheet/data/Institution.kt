@@ -8,11 +8,31 @@ enum class Institution(
     val csvPattern: String,
     val dateFormat: String,
 ): HasDisplayName {
-    BANK_OF_AMERICA("Bank of America", "date,name,value", "MM/dd/yyyy"),
-    BANK_OF_AMERICA_CREDIT_CARD("Bank of America (Credit Cards)", "date,,name,,value", "MM/dd/yyyy"),
-    VENMO("Venmo", ",,date,,Complete,name,name,name,value,,,,,,Venmo balance", "yyyy-MM-dd"),
-    CHASE("Chase", ",date,name,,,value,", "MM/dd/yyyy"),
-    UNKNOWN("Unknown", "date,name,value", "MM/dd/yyyy"),
+    BANK_OF_AMERICA(
+        displayName = "Bank of America",
+        csvPattern = "date,name,value",
+        dateFormat = "MM/dd/yyyy"
+    ),
+    BANK_OF_AMERICA_CREDIT_CARD(
+        displayName = "Bank of America (Credit Cards)",
+        csvPattern = "date,,name,,value",
+        dateFormat = "MM/dd/yyyy"
+    ),
+    VENMO(
+        displayName = "Venmo",
+        csvPattern = ",,date,,Complete,name,name,name,value,,,,,,Venmo balance",
+        dateFormat = "yyyy-MM-dd"
+    ),
+    CHASE(
+        displayName = "Chase",
+        csvPattern = ",date,name,,,value,",
+        dateFormat = "MM/dd/yyyy"
+    ),
+    UNKNOWN(
+        displayName = "Unknown",
+        csvPattern = "date,name,value",
+        dateFormat = "MM/dd/yyyy"
+    ),
 }
 
 val allInstitutions = ImmutableList(Institution.values().toList())
