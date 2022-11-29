@@ -40,10 +40,6 @@ class CategoryModel(
     val expenseFilters = mutableStateListOf<Category>()
     val allFilters = mutableStateListOf<Category>()
 
-    /** These are displayed in the nested detail screens **/
-    val incomeDetail = mutableStateListOf<CategoryUi>()
-    val expenseDetail = mutableStateListOf<CategoryUi>()
-
     /** Options to display when moving a category **/
     val moveTargets = mutableStateListOf<String>()
 
@@ -82,11 +78,6 @@ class CategoryModel(
     }
 
 
-    fun loadDetail(list: SnapshotStateList<CategoryUi>, category: CategoryUi) {
-        list.clear()
-        list.addAll(category.subCategories)
-    }
-
     private fun loadIncome() {
         income.clear()
         val amounts = emptyMap<Long, Float>()
@@ -96,18 +87,6 @@ class CategoryModel(
         expense.clear()
         val amounts = emptyMap<Long, Float>()
         expense.addAll(data.expense.subCategories.map { it.toUi(amounts) })
-    }
-
-
-    @Callback
-    fun loadIncomeDetail(category: CategoryUi) {
-        loadDetail(incomeDetail, category)
-        // TODO transactions, etc.
-    }
-    @Callback
-    fun loadExpenseDetail(category: CategoryUi) {
-        loadDetail(expenseDetail, category)
-        // TODO
     }
 
 
