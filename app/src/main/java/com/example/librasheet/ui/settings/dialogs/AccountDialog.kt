@@ -8,9 +8,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.data.Institution
+import com.example.librasheet.data.allInstitutions
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.ui.components.DialogHolder
 import com.example.librasheet.ui.components.selectors.CategorySelector
+import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.components.textFields.textFieldBorder
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
@@ -18,32 +21,31 @@ import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.preview.previewCategory2
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
-
-class CategoryRuleDialog(
+class AccountDialog(
     private val viewModel: LibraViewModel,
 ): DialogHolder {
     override var isOpen by mutableStateOf(false)
         private set
 
-    private var pattern = mutableStateOf("")
-    private var category = mutableStateOf(Category.None)
+    private var name = mutableStateOf("")
+    private var institution = mutableStateOf(Institution.UNKNOWN)
     private var onSave: (() -> Unit)? = null
 
-    fun openForNewRule() {
+    fun openNew() {
         isOpen = true
-        pattern.value = ""
-        category.value = Category.None
-        onSave = { viewModel.rules.add(pattern.value, category.value) }
+        name.value = ""
+        institution.value = Institution.UNKNOWN
+        onSave = { viewModel.accounts.add(name.value, institution.value) }
     }
 
-    fun openForEditRule(
+    fun openEdit(
         index: Int,
     ) {
         isOpen = true
-        val current = viewModel.rules.displayList[index]
-        this.pattern.value = current.pattern
-        this.category.value = current.category ?: Category.None
-        this.onSave = { viewModel.rules.update(index, pattern.value, category.value) }
+        val current = viewModel.accounts.all[index]
+        this.name.value = current.name
+        this.institution.value = current.institution
+        this.onSave = { viewModel.accounts.update(index, name.value, institution.value) }
     }
 
     private fun close() {
@@ -62,12 +64,9 @@ class CategoryRuleDialog(
     @Composable
     override fun Content() {
         if (isOpen) {
-            CategoryRuleDialogComposable(
-                pattern = pattern,
-                category = category,
-                categories = if (viewModel.rules.currentScreenIsIncome)
-                    viewModel.categories.incomeTargets else
-                    viewModel.categories.expenseTargets,
+            AccountDialogComposable(
+                name = name,
+                institution = institution,
                 onCancel = ::onCancel,
                 onOk = ::onOk,
             )
@@ -77,10 +76,9 @@ class CategoryRuleDialog(
 
 
 @Composable
-private fun CategoryRuleDialogComposable(
-    pattern: MutableState<String>,
-    category: MutableState<Category>,
-    categories: List<Category>,
+private fun AccountDialogComposable(
+    name: MutableState<String>,
+    institution: MutableState<Institution>,
     onCancel: () -> Unit = { },
     onOk: () -> Unit = { },
 ) {
@@ -89,9 +87,9 @@ private fun CategoryRuleDialogComposable(
         onOk = onOk,
     ) {
         OutlinedTextField(
-            value = pattern.value,
+            value = name.value,
             label = { Text("Pattern") },
-            onValueChange = { pattern.value = it },
+            onValueChange = { name.value = it },
             singleLine = true,
             placeholder = {
                 Box(
@@ -107,13 +105,11 @@ private fun CategoryRuleDialogComposable(
                 .height(65.dp)
         )
 
-        CategorySelector(
-            selection = category.value,
-            options = categories,
-            onSelection = { category.value = it ?: Category.None },
-            modifier = Modifier
-                .padding(bottom = 6.dp)
-                .textFieldBorder(label = "Category")
+        DropdownSelector(
+            currentValue = institution.value,
+            allValues = allInstitutions,
+            label = "Institution",
+            onSelection = { institution.value = it },
         )
     }
 }
@@ -123,10 +119,9 @@ private fun CategoryRuleDialogComposable(
 @Composable
 private fun Preview() {
     LibraSheetTheme {
-        CategoryRuleDialogComposable(
-            pattern = remember { mutableStateOf("PYPAL") },
-            category = previewCategory2,
-            categories = previewIncomeCategories2,
+        AccountDialogComposable(
+            name = remember { mutableStateOf("Robinhood") },
+            institution = remember { mutableStateOf(Institution.BANK_OF_AMERICA) },
         )
     }
 }

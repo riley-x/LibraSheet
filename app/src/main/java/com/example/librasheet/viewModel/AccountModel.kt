@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
+import com.example.librasheet.data.Institution
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.rangeBetween
 import com.example.librasheet.ui.theme.randomColor
@@ -42,21 +43,24 @@ class AccountModel(
 
 
     @Callback
-    fun rename(index: Int, name: String) {
-        if (name == all[index].name) return
-        all[index] = all[index].copy(name = name)
+    fun update(index: Int, name: String, institution: Institution) {
+        if (name == all[index].name && institution == all[index].institution) return
+        all[index] = all[index].copy(
+            name = name,
+            institution = institution,
+        )
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             dao.update(all[index])
         }
     }
 
     @Callback
-    fun add(name: String) {
+    fun add(name: String, institution: Institution) {
         val accountWithoutKey = Account(
             name = name,
             color = randomColor(),
             listIndex = all.size,
-            // TODO institute
+            institution = institution,
         )
         viewModel.viewModelScope.launch {
             // TODO loading indicator

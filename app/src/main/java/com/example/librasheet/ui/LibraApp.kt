@@ -22,6 +22,7 @@ import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
+import com.example.librasheet.ui.settings.dialogs.AccountDialog
 import com.example.librasheet.ui.settings.dialogs.CategoryRuleDialog
 import com.example.librasheet.ui.transaction.AllocationDialog
 import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
@@ -95,31 +96,13 @@ fun LibraApp(
 
 
     /** Dialogs **/
+    val accountDialog = remember { AccountDialog(viewModel) }
     val filterTransactionDialog = remember { FilterTransactionDialogHolder(viewModel) }
     val reimbursementDialog = remember { ReimbursementDialog() }
     val allocationDialog = remember { AllocationDialog(viewModel) }
     val categoryRuleDialog = remember { CategoryRuleDialog(viewModel) }
 
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
-
-    var openAddAccountDialog by remember { mutableStateOf(false) }
-    fun onAddAccount() { openAddAccountDialog = true }
-    fun addAccount(account: String) {
-        openAddAccountDialog = false
-        if (account.isNotBlank()) {
-            viewModel.accounts.add(account)
-        }
-    }
-
-    var changeAccountNameIndex by remember { mutableStateOf(-1) }
-    fun onChangeAccountName(index: Int) { changeAccountNameIndex = index }
-    fun changeAccountName(newName: String) {
-        if (newName.isNotBlank()) {
-            viewModel.accounts.rename(changeAccountNameIndex, newName)
-        }
-        changeAccountNameIndex = -1
-    }
-
 
     fun dialogCallback(key: MutableState<CategoryId>, result: String, function: (CategoryId) -> String) {
         dialogErrorMessage = if (result.isNotBlank()) function(key.value) else ""
@@ -306,8 +289,8 @@ fun LibraApp(
                     EditAccountsScreen(
                         accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
-                        onAddAccount = ::onAddAccount,
-                        onChangeName = ::onChangeAccountName,
+                        onAddAccount = accountDialog::openNew,
+                        onChangeName = accountDialog::openEdit,
                         onChangeColor = ::toSettingsColorSelector,
                         onReorder = viewModel.accounts::reorder,
                         modifier = Modifier.padding(innerPadding),
@@ -347,24 +330,7 @@ fun LibraApp(
             }
         }
 
-        if (openAddAccountDialog) {
-            TextFieldDialog(
-                title = "Add Account",
-                placeholder = "Account name",
-                errorMessage = dialogErrorMessage,
-                onDismiss = ::addAccount
-            )
-        }
-        if (changeAccountNameIndex >= 0) {
-            val currentName = viewModel.accounts.all[changeAccountNameIndex].name
-            TextFieldDialog(
-                title = "Rename $currentName",
-                initialText = currentName,
-                placeholder = "New name",
-                errorMessage = dialogErrorMessage,
-                onDismiss = ::changeAccountName
-            )
-        }
+
         if (openAddCategoryDialog.value.isValid) {
             TextFieldDialog(
                 title = "Add to " + openAddCategoryDialog.value.fullDisplayName,
@@ -415,6 +381,7 @@ fun LibraApp(
             )
         }
 
+        accountDialog.Content()
         filterTransactionDialog.Content()
         reimbursementDialog.Content()
         allocationDialog.Content()

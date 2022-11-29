@@ -13,6 +13,10 @@ import com.example.librasheet.ui.graphing.PieChartValue
 
 const val accountTable = "account"
 
+
+/**
+ * @param csvPattern Save any user-defined csv pattern template, if [institution] is not set.
+ */
 @Immutable
 @Entity(
     tableName = accountTable

@@ -21,7 +21,7 @@ import com.example.librasheet.viewModel.preview.previewAccounts
 
 
 private enum class AccountOptions(override val displayName: String): HasDisplayName {
-    RENAME("Rename"),
+    EDIT("Edit"),
     COLOR("Change Color"),
     DELETE("Delete"),
 }
@@ -67,7 +67,7 @@ fun EditAccountsScreen(
                             Text(account.name, modifier = Modifier.weight(10f))
                             DropdownOptions(options = accountOptions) {
                                 when (it) {
-                                    AccountOptions.RENAME -> onChangeName(index)
+                                    AccountOptions.EDIT -> onChangeName(index)
                                     AccountOptions.COLOR -> onChangeColor("account_" + account.name)
                                     AccountOptions.DELETE -> onDelete(index)
                                 }
