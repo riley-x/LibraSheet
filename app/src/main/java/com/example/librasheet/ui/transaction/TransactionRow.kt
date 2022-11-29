@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,10 +53,13 @@ fun TransactionRow(
             horizontalAlignment = Alignment.End
         ) {
             Text(
-                text = formatDollar(transaction.value),
+                text = formatDollar(transaction.valueAfterReimbursements),
                 color =
                     if (transaction.value < 0) MaterialTheme.colors.error
                     else MaterialTheme.colors.primary,
+                fontStyle =
+                    if (transaction.value != transaction.valueAfterReimbursements) FontStyle.Italic
+                    else FontStyle.Normal,
             )
             Text(
                 text = formatDateIntSimple(transaction.date),
