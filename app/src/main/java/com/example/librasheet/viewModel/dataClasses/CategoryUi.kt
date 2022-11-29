@@ -23,9 +23,9 @@ data class CategoryUi(
         get() = id.name
 }
 
-fun Category.toUi(values: Map<Long, Long>, multiplier: Float = 1f): CategoryUi {
+fun Category.toUi(values: Map<Long, Float>, multiplier: Float = 1f): CategoryUi {
     val subs = subCategories.map { it.toUi(values, multiplier) }
-    val value = multiplier * values.getOrDefault(key, 0L).toFloatDollar() + subs.sumOf { it.value.toDouble() }.toFloat()
+    val value = multiplier * values.getOrDefault(key, 0f) + subs.sumOf { it.value.toDouble() }.toFloat()
     return CategoryUi(
         category = this,
         key = key,

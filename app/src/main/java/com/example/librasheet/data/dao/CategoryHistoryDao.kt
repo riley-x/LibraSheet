@@ -38,20 +38,15 @@ interface CategoryHistoryDao {
     @Query("SELECT date, SUM(value) as value FROM $categoryHistoryTable WHERE categoryKey != $ignoreKey GROUP BY date ORDER BY date")
     fun getNetIncome(): List<TimeSeries>
 
-    @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
-    @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
-            "SELECT categoryKey, date, SUM(value) as sums " +
-            "FROM $categoryHistoryTable WHERE date >= :startDate AND date <= :endDate GROUP BY categoryKey, date" +
-            ") GROUP BY categoryKey")
-    fun getAverages(startDate: Int, endDate: Int): Map<Long, Long>
-
-    /** The current month might not be complete yet, and if so the returned average is misleading. **/
-    @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
-    @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
-            "SELECT categoryKey, date, SUM(value) as sums " +
-            "FROM $categoryHistoryTable GROUP BY categoryKey, date" +
-            ") GROUP BY categoryKey")
-    fun getAverages(): Map<Long, Long>
+    /** Don't use these average functions. If a category is 0 for a month, it'll not have an entry,
+     * and the average will be inaccurate.
+     */
+//    @MapInfo(keyColumn = "categoryKey", valueColumn = "average")
+//    @Query("SELECT categoryKey, AVG(sums) as average FROM (" +
+//            "SELECT categoryKey, date, SUM(value) as sums " +
+//            "FROM $categoryHistoryTable WHERE date >= :startDate AND date <= :endDate GROUP BY categoryKey, date" +
+//            ") GROUP BY categoryKey")
+//    fun getAverages(startDate: Int, endDate: Int): Map<Long, Long>
 
     @MapInfo(keyColumn = "categoryKey", valueColumn = "sums")
     @Query("SELECT categoryKey, SUM(value) as sums " +
@@ -67,4 +62,12 @@ interface CategoryHistoryDao {
     @Query("SELECT categoryKey, SUM(value) as sums " +
             "FROM $categoryHistoryTable WHERE date >= :startDate GROUP BY categoryKey")
     fun getTotals(startDate: Int): Map<Long, Long>
+
+    @MapInfo(keyColumn = "categoryKey", valueColumn = "sums")
+    @Query("SELECT categoryKey, SUM(value) as sums " +
+            "FROM $categoryHistoryTable WHERE date >= :startDate AND date <= :endDate GROUP BY categoryKey")
+    fun getTotals(startDate: Int, endDate: Int): Map<Long, Long>
+
+    @Query("SELECT MIN(date) FROM $categoryHistoryTable")
+    fun getEarliestDate(): Int
 }

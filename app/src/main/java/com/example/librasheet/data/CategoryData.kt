@@ -46,13 +46,14 @@ class CategoryData(
 
     /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie
      * charts and display lists. **/
-    var currentMonth = emptyMap<Long, Long>()
-    var yearAverage = emptyMap<Long, Long>()
-    var allAverage = emptyMap<Long, Long>()
+    var maxMonths = 1 // used for averages. Excludes the current month
+    var currentMonth = emptyMap<Long, Float>()
+    var yearAverage = emptyMap<Long, Float>()
+    var allAverage = emptyMap<Long, Float>()
 
-    var yearTotal = emptyMap<Long, Long>()
-    var fiveYearTotal = emptyMap<Long, Long>()
-    var allTotal = emptyMap<Long, Long>()
+    var yearTotal = emptyMap<Long, Float>()
+    var fiveYearTotal = emptyMap<Long, Float>()
+    var allTotal = emptyMap<Long, Float>()
 
 
     private fun MutableList<Job>.launchIO(fn: suspend CoroutineScope.() -> Unit) =
@@ -108,29 +109,28 @@ class CategoryData(
 
         /** Averages **/
         jobs.launchIO {
-            currentMonth = historyDao.getDate(thisMonthEnd(today))
+            currentMonth = historyDao.getDate(thisMonthEnd(today)).mapValues { it.value.toFloatDollar() }
             Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
-            yearAverage = historyDao.getAverages(lastYearEnd, lastMonthEnd)
-            Log.d("Libra/CategoryData/load", "yearAverage=$yearAverage")
-        }
-        jobs.launchIO {
-            allAverage = historyDao.getAverages(0, lastMonthEnd)
-            Log.d("Libra/CategoryData/load", "allAverage=$allAverage")
+            val earliest = historyDao.getEarliestDate()
+            maxMonths = maxOf(1, monthDiff(today, earliest))
+
+            yearAverage = historyDao.getTotals(lastYearEnd, lastMonthEnd).mapValues { it.value.toFloatDollar() / minOf(maxMonths, 12) }
+            allAverage = historyDao.getTotals(0, lastMonthEnd).mapValues { it.value.toFloatDollar() / maxMonths }
         }
 
         /** Totals **/
         jobs.launchIO {
-            yearTotal = historyDao.getTotals(lastYearEnd)
+            yearTotal = historyDao.getTotals(lastYearEnd).mapValues { it.value.toFloatDollar() }
             Log.d("Libra/CategoryData/load", "yearTotal=$yearTotal")
         }
         jobs.launchIO {
-            fiveYearTotal = historyDao.getTotals(lastMonthEnd.addYears(-5))
+            fiveYearTotal = historyDao.getTotals(lastMonthEnd.addYears(-5)).mapValues { it.value.toFloatDollar() }
             Log.d("Libra/CategoryData/load", "fiveYearTotal=$fiveYearTotal")
         }
         jobs.launchIO {
-            allTotal = historyDao.getTotals(0)
+            allTotal = historyDao.getTotals(0).mapValues { it.value.toFloatDollar() }
             Log.d("Libra/CategoryData/load", "allTotal=$allTotal")
         }
 

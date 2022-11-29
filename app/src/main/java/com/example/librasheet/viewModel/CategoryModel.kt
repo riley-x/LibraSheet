@@ -89,12 +89,12 @@ class CategoryModel(
 
     private fun loadIncome() {
         income.clear()
-        val amounts = emptyMap<Long, Long>()
+        val amounts = emptyMap<Long, Float>()
         income.addAll(data.income.subCategories.map { it.toUi(amounts) })
     }
     private fun loadExpense() {
         expense.clear()
-        val amounts = emptyMap<Long, Long>()
+        val amounts = emptyMap<Long, Float>()
         expense.addAll(data.expense.subCategories.map { it.toUi(amounts) })
     }
 

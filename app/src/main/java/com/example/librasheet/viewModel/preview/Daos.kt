@@ -78,14 +78,6 @@ internal class FakeHistoryDao: CategoryHistoryDao {
         TODO("Not yet implemented")
     }
 
-    override fun getAverages(startDate: Int, endDate: Int): Map<Long, Long> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAverages(): Map<Long, Long> {
-        TODO("Not yet implemented")
-    }
-
     override fun getDate(date: Int): Map<Long, Long> {
         TODO("Not yet implemented")
     }
@@ -95,6 +87,14 @@ internal class FakeHistoryDao: CategoryHistoryDao {
     }
 
     override fun getTotals(startDate: Int): Map<Long, Long> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTotals(startDate: Int, endDate: Int): Map<Long, Long> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getEarliestDate(): Int {
         TODO("Not yet implemented")
     }
 }

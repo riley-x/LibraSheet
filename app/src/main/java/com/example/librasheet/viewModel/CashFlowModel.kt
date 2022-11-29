@@ -73,11 +73,11 @@ class CashFlowModel (
         }
     }
 
-    private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Long>) {
+    private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Float>) {
         target.clear()
         target.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
 
-        val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0L).toFloatDollar()
+        val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0f)
         if (parentValue > 0f) {
             target.add(
                 CategoryUi(

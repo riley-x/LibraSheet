@@ -25,7 +25,11 @@ fun thisMonthEnd(date: Int): Int {
     return if (month == 12) getIntDate(year + 1, 1, 0)
     else getIntDate(year, month + 1, 0)
 }
-
+fun monthDiff(end: Int, start: Int): Int {
+    val years = getYear(end) - getYear(start)
+    val months = getMonth(end) - getMonth(start)
+    return years * 12 + months
+}
 
 fun Date.toIntDate(): Int {
     val cal = Calendar.getInstance()
