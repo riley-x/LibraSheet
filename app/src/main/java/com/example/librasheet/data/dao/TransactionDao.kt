@@ -177,46 +177,52 @@ interface TransactionDao {
 
     /** Value should always be positive **/
     @Transaction
-    fun addAllocation(t: TransactionEntity, allocation: Allocation): TransactionEntity {
+    fun addAllocation(t: TransactionEntity, allocation: Allocation) {
         Log.d("Libra/TransactionDao/addAllocation", "t: $t")
         Log.d("Libra/TransactionDao/addAllocation", "a: $allocation")
-        val isIncome = t.value > 0
 
-        val newTransaction = t.copy(
-            valueAfterReimbursements = t.valueAfterReimbursements - (if (isIncome) 1 else -1) * allocation.value
-        )
-        update(newTransaction, t)
         insert(allocation)
+        if (t.accountKey <= 0) return
 
-        if (t.accountKey > 0) updateCategoryHistory(
+        val value = if (t.value > 0) allocation.value else -allocation.value
+        val date = thisMonthEnd(t.date)
+        updateCategoryHistory(
+            account = t.accountKey,
+            category = t.categoryKey,
+            date = date,
+            value = -value
+        )
+        updateCategoryHistory(
             account = t.accountKey,
             category = allocation.categoryKey,
-            date = thisMonthEnd(t.date),
-            value = (if (isIncome) 1 else -1) * allocation.value
+            date = date,
+            value = value
         )
-        return newTransaction
     }
 
     /** Value should always be positive **/
     @Transaction
-    fun removeAllocation(t: TransactionEntity, allocation: Allocation): TransactionEntity {
+    fun removeAllocation(t: TransactionEntity, allocation: Allocation) {
         Log.d("Libra/TransactionDao/removeAllocation", "t: $t")
         Log.d("Libra/TransactionDao/removeAllocation", "a: $allocation")
-        val isIncome = t.value > 0
 
-        val newTransaction = t.copy(
-            valueAfterReimbursements = t.valueAfterReimbursements + (if (isIncome) 1 else -1) * allocation.value
-        )
-        update(newTransaction, t)
         delete(allocation)
+        if (t.accountKey <= 0) return
 
-        if (t.accountKey > 0) updateCategoryHistory(
+        val value = if (t.value > 0) allocation.value else -allocation.value
+        val date = thisMonthEnd(t.date)
+        updateCategoryHistory(
+            account = t.accountKey,
+            category = t.categoryKey,
+            date = date,
+            value = value
+        )
+        updateCategoryHistory(
             account = t.accountKey,
             category = allocation.categoryKey,
-            date = thisMonthEnd(t.date),
-            value = (if (isIncome) -1 else 1) * allocation.value
+            date = date,
+            value = -value
         )
-        return newTransaction
     }
 
 
@@ -229,9 +235,7 @@ interface TransactionDao {
             trans = addReimbursement(trans, it.transaction, it.value).first
         }
         t.allocations.forEach {
-            trans = addAllocation(trans, it.copy(
-                transactionKey = key
-            ))
+            addAllocation(trans, it.copy(transactionKey = key))
         }
     }
 
@@ -239,7 +243,7 @@ interface TransactionDao {
     fun undo(t: TransactionWithDetails) {
         var trans = t.transaction
         t.allocations.forEach {
-            trans = removeAllocation(trans, it)
+            removeAllocation(trans, it)
         }
         t.reimbursements.forEach {
             trans = deleteReimbursement(trans, it.transaction, it.value).first
