@@ -32,8 +32,13 @@ class TransactionModel(
     @SuppressLint("SimpleDateFormat")
     private val formatter = SimpleDateFormat("MM-dd-yy").apply { isLenient = false }
 
+    /** Full list **/
     val displayList = mutableStateListOf<TransactionEntity>()
     val filter = mutableStateOf(defaultFilter)
+
+    /** Reimbursement **/
+    val reimbFilter = mutableStateOf(defaultFilter)
+    val reimbList = mutableStateListOf<TransactionEntity>()
 
     /** Edit/details screen **/
     val detailAccount = mutableStateOf<Account?>(null)
@@ -108,8 +113,20 @@ class TransactionModel(
     }
 
     @Callback
+    fun filterReimb(newFilter: TransactionFilters) {
+        if (newFilter == reimbFilter.value) return
+        reimbFilter.value = newFilter
+        loadReimb()
+    }
+
+    @Callback
     fun initList() {
         if (displayList.isEmpty()) load()
+    }
+
+    @Callback
+    fun initReimb() {
+        if (reimbList.isEmpty()) loadReimb()
     }
 
     fun load() {
@@ -122,6 +139,19 @@ class TransactionModel(
             }
             displayList.clear()
             displayList.addAll(list)
+        }
+    }
+
+    fun loadReimb() {
+        viewModel.viewModelScope.launch {
+            val filter = reimbFilter.value
+            val list = withContext(Dispatchers.IO) {
+                val list = dao.get(filter)
+                list.matchCategories(viewModel.categories.data.all)
+                return@withContext list
+            }
+            reimbList.clear()
+            reimbList.addAll(list)
         }
     }
 
@@ -221,7 +251,6 @@ class TransactionModel(
     fun deleteAllocation(index: Int) {
         allocations.removeAt(index)
     }
-
 }
 
 

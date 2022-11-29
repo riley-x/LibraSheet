@@ -22,10 +22,10 @@ fun NavGraphBuilder.transactionScreens(
 
     fun toDetail(t: TransactionEntity = TransactionEntity()) {
         state.loadDetail(t)
-        navController.navigateSingleTop(TransactionDetailDestination.route(route!!))
+        navController.navigate(TransactionDetailDestination.route(route!!))
     }
     fun onAddReimbursement() {
-        state.initList()
+        state.initReimb()
         navController.navigateSingleTop(TransactionReimburseDestination.route(route!!))
     }
     fun onSelectReimbursement(t: TransactionEntity) {
@@ -51,6 +51,12 @@ fun NavGraphBuilder.transactionScreens(
             state.editAllocation(i, name, value, category)
         }
     }
+    fun openFilter() {
+        filterDialog.open(state.filter.value, state::filter)
+    }
+    fun openReimbFilter() {
+        filterDialog.open(state.reimbFilter.value, state::filterReimb)
+    }
 
     composable(route = TransactionAllDestination.route(route!!)) {
         TransactionListScreen(
@@ -58,7 +64,7 @@ fun NavGraphBuilder.transactionScreens(
             transactions = state.displayList,
             accounts = viewModel.accounts.all,
             onBack = navController::popBackStack,
-            onFilter = if (isSettings) filterDialog::openSettings else filterDialog::openBalance,
+            onFilter = ::openFilter,
             onTransactionClick = ::toDetail,
             modifier = androidx.compose.ui.Modifier.padding(innerPadding),
         )
@@ -94,11 +100,11 @@ fun NavGraphBuilder.transactionScreens(
     composable(route = TransactionReimburseDestination.route(route!!)) {
         TransactionListScreen(
             title = "Select Reimb.",
-            filter = state.filter,
-            transactions = state.displayList,
+            filter = state.reimbFilter,
+            transactions = state.reimbList,
             accounts = viewModel.accounts.all,
             onBack = navController::popBackStack,
-            onFilter = if (isSettings) filterDialog::openSettings else filterDialog::openBalance,
+            onFilter = ::openReimbFilter,
             onTransactionClick = ::onSelectReimbursement,
             modifier = androidx.compose.ui.Modifier.padding(innerPadding),
         )

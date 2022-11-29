@@ -31,19 +31,13 @@ class FilterTransactionDialogHolder(
     private val viewModel: LibraViewModel,
 ): DialogHolder {
     override var isOpen by mutableStateOf(false)
-    private var isSettings = false
-    private var currentFilters = mutableStateOf(TransactionFilters())
+    private var initialFilters = TransactionFilters()
+    private var onSave: (TransactionFilters) -> Unit = { }
 
-    fun openSettings() {
+    fun open(initial: TransactionFilters, onSave: (TransactionFilters) -> Unit) {
         isOpen = true
-        isSettings = true
-        currentFilters = viewModel.transactionsSettings.filter
-    }
-
-    fun openBalance() {
-        isOpen = true
-        isSettings = false
-        currentFilters = viewModel.transactionsBalance.filter
+        initialFilters = initial
+        this.onSave = onSave
     }
 
     fun cancel() {
@@ -52,15 +46,14 @@ class FilterTransactionDialogHolder(
 
     fun save(filters: TransactionFilters) {
         isOpen = false
-        if (isSettings) viewModel.transactionsSettings.filter(filters)
-        else viewModel.transactionsBalance.filter(filters)
+        onSave(filters)
     }
 
     @Composable
     override fun Content() {
         if (isOpen) {
             FilterTransactionDialog(
-                filters = currentFilters,
+                initialFilters = initialFilters,
                 accounts = viewModel.accounts.all,
                 categories = viewModel.categories.allFilters,
                 onCancel = ::cancel,
@@ -74,7 +67,7 @@ class FilterTransactionDialogHolder(
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun FilterTransactionDialog(
-    filters: State<TransactionFilters>,
+    initialFilters: TransactionFilters,
     accounts: SnapshotStateList<Account>,
     categories: SnapshotStateList<Category>,
     modifier: Modifier = Modifier,
@@ -82,16 +75,16 @@ fun FilterTransactionDialog(
     onSave: (TransactionFilters) -> Unit = { },
 ) {
     var startDate by remember {
-        mutableStateOf(filters.value.startDate?.let { formatDateIntSimple(it, "-") } ?: "")
+        mutableStateOf(initialFilters.startDate?.let { formatDateIntSimple(it, "-") } ?: "")
     }
     var endDate by remember {
-        mutableStateOf(filters.value.endDate?.let { formatDateIntSimple(it, "-") } ?: "")
+        mutableStateOf(initialFilters.endDate?.let { formatDateIntSimple(it, "-") } ?: "")
     }
     var account by remember {
-        mutableStateOf(accounts.find { it.key == filters.value.account })
+        mutableStateOf(accounts.find { it.key == initialFilters.account })
     }
-    var category by remember { mutableStateOf(filters.value.category) }
-    var limit by remember { mutableStateOf(filters.value.limit?.toString() ?: "") }
+    var category by remember { mutableStateOf(initialFilters.category) }
+    var limit by remember { mutableStateOf(initialFilters.limit?.toString() ?: "") }
 
     val formatter = remember {
         val x = SimpleDateFormat("MM-dd-yy")
@@ -174,7 +167,7 @@ fun FilterTransactionDialog(
 private fun Preview() {
     LibraSheetTheme {
         FilterTransactionDialog(
-            filters = previewTransactionFilters,
+            initialFilters = previewTransactionFilters.value,
             categories = previewIncomeCategories2,
             accounts = previewAccounts,
         )
