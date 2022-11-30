@@ -37,9 +37,9 @@ fun AccountSelector(
 
         Text(
             text = it?.name ?: "None",
-            fontStyle = if (selection != null) FontStyle.Normal else FontStyle.Italic,
+            fontStyle = if (it != null) FontStyle.Normal else FontStyle.Italic,
             color = MaterialTheme.colors.onSurface.copy(
-                alpha = if (selection != null) ContentAlpha.high else ContentAlpha.medium,
+                alpha = if (it != null) ContentAlpha.high else ContentAlpha.medium,
             )
         )
     }
