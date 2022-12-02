@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--See https://developer.android.com/guide/topics/ui/accessibility/service#service-config-->
+
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/accessibility_service_description"
     android:accessibilityEventTypes="typeAllMask"
-    android:accessibilityFlags="flagDefault"
+    android:accessibilityFlags="flagDefault|flagReportViewIds"
     android:accessibilityFeedbackType="feedbackSpoken"
     android:notificationTimeout="100"
     android:canRetrieveWindowContent="true"
     android:settingsActivity="com.example.android.accessibility.ServiceSettingsActivity"
     />
-<!--    android:packageNames="com.example.android.apis"-->
+<!-- For some reason specifying eventTypes=typeWindowContentChanged doesn't show all changes?
+  And setting typeViewScrolled makes source=null. But with allMask scrolling shows typeWindowContentChanged
+  events with valid source.
+ -->
+    <!--    android:accessibilityEventTypes="typeViewScrolled|typeViewSelected|typeViewFocused|typeWindowContentChanged|typeWindowStateChanged"-->
+    <!--    android:accessibilityEventTypes="typeAllMask"-->
+    <!--    android:packageNames="com.infonow.bofa"-->
