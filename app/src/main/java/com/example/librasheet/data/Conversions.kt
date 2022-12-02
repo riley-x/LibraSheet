@@ -58,12 +58,21 @@ fun Int.toCalendar() =
     GregorianCalendar(getYear(this), getMonth(this) - 1, getDay(this)) // Named arguments are not allowed for non-Kotlin functions
 fun Int.toTimestamp() = toCalendar().time
 
+/** Warning float precision is pretty bad! Is double sufficient? **/
 fun Float.toLongDollar() : Long {
-    return (this * 10000f).roundToLong()
+    val dollars = this.toLong()
+    val fraction = ((this - dollars) * 10000).roundToLong()
+    return dollars * 10000 + fraction
+}
+
+fun Double.toLongDollar() : Long {
+    val dollars = this.toLong()
+    val fraction = ((this - dollars) * 10000).roundToLong()
+    return dollars * 10000 + fraction
 }
 
 fun Long.toFloatDollar() : Float {
-    return (this / 10000f)
+    return (this / 10000) + (this % 10000) / 10000f
 }
 
 fun rangeBetween(a: Int, b: Int) = if (a < b) IntRange(a, b) else IntRange(b, a)

@@ -13,7 +13,6 @@ import com.example.librasheet.ui.components.format1Decimal
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
-import com.example.librasheet.viewModel.preview.testHistory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

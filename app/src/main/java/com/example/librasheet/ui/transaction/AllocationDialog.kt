@@ -62,7 +62,7 @@ class AllocationDialog(
     fun onClose(cancelled: Boolean) {
         if (cancelled) { clear() }
         else {
-            val valueLong = value.value.toFloatOrNull()?.toLongDollar()
+            val valueLong = value.value.toDoubleOrNull()?.toLongDollar()
             if (valueLong == null) {
                 errorMessage = "Couldn't parse value"
             } else if (valueLong < 0) {

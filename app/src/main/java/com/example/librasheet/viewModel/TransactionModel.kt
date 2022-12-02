@@ -58,11 +58,11 @@ class TransactionModel(
     private var oldReimbursements = listOf<ReimbursementWithValue>()
     private var oldAllocations = listOf<Allocation>()
 
-    fun isIncome() = (detailValue.value.toFloatOrNull() ?: 0f) > 0f
+    fun isIncome() = (detailValue.value.toDoubleOrNull() ?: 0.0) > 0
 
     private fun createTransaction(): TransactionEntity? {
         val dateInt = formatter.parseOrNull(detailDate.value)?.toIntDate()
-        val valueLong = detailValue.value.toFloatOrNull()?.toLongDollar()
+        val valueLong = detailValue.value.toDoubleOrNull()?.toLongDollar()
 
         dateError.value = dateInt == null
         valueError.value = valueLong == null
@@ -198,7 +198,7 @@ class TransactionModel(
     @Callback
     fun addReimbursement(t: TransactionEntity) {
         val targetValue = abs(t.valueAfterReimbursements)
-        val currentValue = detailValue.value.toFloatOrNull()?.toLongDollar()?.absoluteValue
+        val currentValue = detailValue.value.toDoubleOrNull()?.toLongDollar()?.absoluteValue
         reimbursements.add(
             ReimbursementWithValue(
                 transaction = t,

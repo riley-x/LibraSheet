@@ -173,7 +173,7 @@ class BaseCsvModel(
 
         val date = parser.dateFormat.parseOrNull(line[parser.dateIndex])?.toIntDate() ?: return null
         val name = parser.nameFields.joinToString { line[it] }
-        var value = line[parser.valueIndex].replace(valueRegex, "").toFloatOrNull() ?: return null
+        var value = line[parser.valueIndex].replace(valueRegex, "").toDoubleOrNull() ?: return null
         if (parser.invert) value = -value
 
         // TODO document

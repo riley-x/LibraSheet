@@ -31,7 +31,7 @@ class ReimbursementDialog: DialogHolder {
     fun onDismiss(input: String) {
         if (input.isEmpty()) { clear() }
         else {
-            val valueLong = input.toFloatOrNull()?.toLongDollar()
+            val valueLong = input.toDoubleOrNull()?.toLongDollar()
             if (valueLong == null) {
                 errorMessage = "Couldn't parse value"
             } else if (valueLong < 0) {
