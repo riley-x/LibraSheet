@@ -59,18 +59,13 @@ fun Int.toCalendar() =
 fun Int.toTimestamp() = toCalendar().time
 
 /** Warning float precision is pretty bad! Is double sufficient? **/
-fun Float.toLongDollar() : Long {
-    val dollars = this.toLong()
-    val fraction = ((this - dollars) * 10000).roundToLong()
-    return dollars * 10000 + fraction
-}
-
 fun Double.toLongDollar() : Long {
     val dollars = this.toLong()
     val fraction = ((this - dollars) * 10000).roundToLong()
     return dollars * 10000 + fraction
 }
 
+/** TODO Warning float precision is pretty bad! Is double sufficient? **/
 fun Long.toFloatDollar() : Float {
     return (this / 10000) + (this % 10000) / 10000f
 }

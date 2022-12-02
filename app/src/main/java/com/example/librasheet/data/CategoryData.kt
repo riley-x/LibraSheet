@@ -104,17 +104,19 @@ class CategoryData(
     fun loadValues(): List<Job> {
         val jobs = mutableListOf<Job>()
         val today = Calendar.getInstance().toIntDate()
+        val thisMonth = thisMonthEnd(today)
         val lastMonthEnd = today.setDay(0)
         val lastYearEnd = lastMonthEnd.addYears(-1)
 
         /** Averages **/
         jobs.launchIO {
-            currentMonth = historyDao.getDate(thisMonthEnd(today)).mapValues { it.value.toFloatDollar() }
+            currentMonth = historyDao.getDate(thisMonth).mapValues { it.value.toFloatDollar() }
             Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
             val earliest = historyDao.getEarliestDate()
-            maxMonths = maxOf(1, monthDiff(today, earliest))
+            maxMonths = maxOf(1, monthDiff(thisMonth, earliest))
+            Log.d("Libra/CategoryData/load", "maxMonths=$maxMonths thisMonth=$thisMonth earliest=$earliest")
 
             yearAverage = historyDao.getTotals(lastYearEnd, lastMonthEnd).mapValues { it.value.toFloatDollar() / minOf(maxMonths, 12) }
             allAverage = historyDao.getTotals(0, lastMonthEnd).mapValues { it.value.toFloatDollar() / maxMonths }
