@@ -37,7 +37,7 @@
         </provider>
         <service android:name=".screenReader.ScreenReader"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:label="LibraReader"
+            android:label="Libra Sheet screen parser"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
