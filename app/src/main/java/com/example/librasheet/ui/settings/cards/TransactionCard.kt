@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.screenReader.ScreenReader
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
 
@@ -16,6 +17,7 @@ fun TransactionCard(
     modifier: Modifier = Modifier,
     toAddTransaction: () -> Unit = { },
     toAddCSV: () -> Unit = { },
+    toScreenReader: () -> Unit = { },
     toAllTransactions: () -> Unit = { },
 ) {
     Card(
@@ -28,6 +30,8 @@ fun TransactionCard(
             ClickableRow("Add Manual", toAddTransaction)
             CardRowDivider()
             ClickableRow("Add CSV", toAddCSV)
+            CardRowDivider()
+            ClickableRow("Screen Reader (${ScreenReader.cache.size})", toScreenReader)
             CardRowDivider()
             ClickableRow("See All", toAllTransactions)
         }

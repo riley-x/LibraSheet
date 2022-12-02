@@ -8,6 +8,9 @@ import android.view.accessibility.AccessibilityNodeInfo
 
 class ScreenReader : AccessibilityService() {
 
+    companion object {
+        val cache = mutableSetOf<ParsedTransaction>()
+    }
 
     override fun onInterrupt() {}
 

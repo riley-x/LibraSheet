@@ -7,7 +7,6 @@ import android.view.accessibility.AccessibilityNodeInfo
 
 
 object BofaReader {
-    val cache = mutableSetOf<ParsedTransaction>()
 
     /**
      * When loading an account detail page, the typeWindowStateChanged=32 event is triggered
@@ -78,7 +77,7 @@ object BofaReader {
         if (rightInfo.childCount < 1) return
         val value = rightInfo.getChild(0).text
 
-        cache.add(ParsedTransaction(
+        ScreenReader.cache.add(ParsedTransaction(
             date = date.toString(),
             name = name.toString(),
             value = value.toString(),

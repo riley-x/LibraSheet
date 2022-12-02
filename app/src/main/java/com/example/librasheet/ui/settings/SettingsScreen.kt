@@ -22,6 +22,7 @@ fun SettingsScreen(
     toCategoryRules: (income: Boolean) -> Unit = { },
     toAddTransaction: () -> Unit = { },
     toAddCSV: () -> Unit = { },
+    toScreenReader: () -> Unit = { },
     toAllTransactions: () -> Unit = { },
     onBackupDatabase: () -> Unit = { },
 ) {
@@ -48,6 +49,7 @@ fun SettingsScreen(
                 TransactionCard(
                     toAddTransaction = toAddTransaction,
                     toAddCSV = toAddCSV,
+                    toScreenReader = toScreenReader,
                     toAllTransactions = toAllTransactions,
                     modifier = Modifier.padding(10.dp)
                 )
