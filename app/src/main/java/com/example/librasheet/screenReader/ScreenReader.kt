@@ -20,7 +20,9 @@ class ScreenReader : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        event?.apply {
+        if (event == null) return
+
+        event.apply {
             Log.v(
                 "Libra/ScreenReader/onAccessibilityEvent",
                 "type = ${eventType}, class = ${className}, " +
@@ -29,45 +31,17 @@ class ScreenReader : AccessibilityService() {
             )
         }
 
-        if (event?.packageName != "com.infonow.bofa") return
+        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
 
-        /**
-         * Specifically for BofA,
-         * when loading an account detail page, the typeWindowStateChanged=32 event is triggered
-         * but it has null source, probably because the data is still loading. Scrolling even after
-         * data is loaded only triggers typeViewScrolled=4096 with null source. But if you turn the
-         * phone screen off and on again, these all now have valid source, and additionally events
-         * typeWindowContentChanged=2048 are also triggered when scrolling.
-         *
-         * Somehow, if you access this property, after the screen is done loading, the
-         * sources appear and the 2048 events are triggered too.
-         *
-         * But in the see all transactions screen, we get everything loaded without gimmicks.
-         */
-//        val node = rootInActiveWindow
-
-        if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
-
-        val node = event.source ?: return
-
-        if (node.viewIdResourceName != "com.infonow.bofa:id/recent_transactions") return
-        Log.v("Libra/ScreenReader/parseBofA", "childCount = ${node.childCount}")
-
-        for (j in 0 until node.childCount) {
-            val t = node.getChild(j)
-            if (t.viewIdResourceName == "com.infonow.bofa:id/transaction_row_layout") {
-                parseBofATransaction(t)
-            }
+        when(event.packageName) {
+            "com.infonow.bofa" -> parseBofa(event)
         }
 
 
-
+//        val node = rootInActiveWindow
 //        Log.v("Libra/ScreenReader", "${node == null}")
 //        node?.let { printAllViews(it, maxDepth = 1) }
 //        printAllViews(event.source, maxDepth = 1)
-
-
-//                parseBofA(event.source)
     }
 
 
@@ -84,28 +58,64 @@ class ScreenReader : AccessibilityService() {
         }
     }
 
-    private fun parseBofA(nodeInfo: AccessibilityNodeInfo?) {
+    /**
+     * When loading an account detail page, the typeWindowStateChanged=32 event is triggered
+     * but it has null source, probably because the data is still loading. Scrolling even after
+     * data is loaded only triggers typeViewScrolled=4096 with null source. But if you turn the
+     * phone screen off and on again, these all now have valid source, and additionally events
+     * typeWindowContentChanged=2048 are also triggered when scrolling.
+     *
+     * Alternatively, merely accessing this.rootInActiveWindow, the sources appear and the 2048
+     * events are triggered too. But make sure this happens before catching event.eventType.
+     * Probably triggering some side effect in the initial 4096 event after switching to the
+     * account detail screen.
+     *
+     * But in the see all transactions screen, we get everything loaded without gimmicks. The
+     * top level node in event.source is the list of visible transactions, with class
+     * androidx.recyclerview.widget.RecyclerView
+     */
+    private fun parseBofa(event: AccessibilityEvent) {
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+            event.className == "androidx.recyclerview.widget.RecyclerView"
+        ) {
+            val node = event.source
+            if (node?.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
+                parseBofaRecentTransactions(node)
+            }
+        }
+    }
+
+
+    /** This is for the source when scrolling the account detail screen. But this page is gimmicky
+     * as noted above.
+     */
+    private fun parseBofaAccountDetailScreen(nodeInfo: AccessibilityNodeInfo?) {
         if (nodeInfo == null) return
         if (nodeInfo.childCount < 1) return
 
         val scrollContainer = nodeInfo.getChild(0)
         Log.v("Libra/ScreenReader/parseBofA", "${System.identityHashCode(scrollContainer)}")
         for (i in 0 until scrollContainer.childCount) {
-            val transactionList = scrollContainer.getChild(i)
-            if (transactionList.viewIdResourceName != "com.infonow.bofa:id/recent_transactions") continue
-            Log.v("Libra/ScreenReader/parseBofA", "childCount = ${transactionList.childCount}")
-
-            for (j in 0 until transactionList.childCount) {
-                val t = transactionList.getChild(j)
-                if (t.viewIdResourceName == "com.infonow.bofa:id/transaction_row_layout") {
-                    parseBofATransaction(t)
-                }
+            val c = scrollContainer.getChild(i)
+            if (c.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
+                parseBofaRecentTransactions(c)
+                return
             }
-            return
         }
     }
 
-    private fun parseBofATransaction(row: AccessibilityNodeInfo) {
+    private fun parseBofaRecentTransactions(list: AccessibilityNodeInfo) {
+        Log.v("Libra/ScreenReader/parseBofA", "childCount = ${list.childCount}")
+
+        for (j in 0 until list.childCount) {
+            val t = list.getChild(j)
+            if (t.viewIdResourceName == "com.infonow.bofa:id/transaction_row_layout") {
+                parseBofaTransactionRowLayout(t)
+            }
+        }
+    }
+
+    private fun parseBofaTransactionRowLayout(row: AccessibilityNodeInfo) {
         if (row.childCount < 2) return
 
         val leftInfo = row.getChild(0)
