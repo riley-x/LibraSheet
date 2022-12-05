@@ -51,8 +51,8 @@ fun NavGraphBuilder.transactionScreens(
         )
     }
 
-    composable(route = TransactionDetailDestination.route(route!!)) {
-        val modelKey = it.arguments?.getString(TransactionDetailDestination.argName) ?: ""
+    composable(route = TransactionDetailDestination.route(route!!)) { backStack ->
+        val modelKey = backStack.arguments?.getString(TransactionDetailDestination.argName) ?: ""
         val detail = remember(modelKey) { viewModel.transactionDetails[modelKey] ?: TransactionDetailModel() }
         fun onAddReimbursement() {
             state.initReimb()
