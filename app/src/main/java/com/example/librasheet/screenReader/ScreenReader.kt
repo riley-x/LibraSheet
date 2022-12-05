@@ -7,6 +7,8 @@ import android.view.accessibility.AccessibilityNodeInfo
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import com.example.librasheet.data.LibraDatabase
+import kotlinx.coroutines.*
 
 
 class ScreenReader : AccessibilityService() {
@@ -34,10 +36,28 @@ class ScreenReader : AccessibilityService() {
         }
     }
 
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(job)
+    val database: LibraDatabase by lazy { LibraDatabase.getDatabase(this) }
+    var accountDates = mutableMapOf<String, Int>()
+
+    internal fun getLatestDate(account: String?): Int {
+        if (accountDates.isEmpty()) return 0
+        var date: Int? = null
+        if (account != null) date = accountDates.get(account)
+        if (date == null) date = accountDates.minOf { it.value }
+        return date
+    }
+
     override fun onInterrupt() {}
 
     override fun onServiceConnected() {
-        Log.d("Libra/ScreenReader", "onServiceConnected")
+        scope.launch {
+            accountDates = withContext(Dispatchers.IO) {
+                database.transactionDao().getLastDates().toMutableMap()
+            }
+            Log.d("Libra/ScreenReader/onServiceConnected", "$accountDates")
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -56,7 +76,8 @@ class ScreenReader : AccessibilityService() {
 
         when(event.packageName) {
             "com.infonow.bofa" -> BofaReader.parse(this, event)
-        }
+            else -> null
+        }?.let { add(it.first, it.second) }
 
 //        val node = rootInActiveWindow
 //        Log.v("Libra/ScreenReader", "${node == null}")

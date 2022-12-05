@@ -1,9 +1,13 @@
 package com.example.librasheet.screenReader
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-
+import com.example.librasheet.data.toIntDate
+import com.example.librasheet.data.toLongDollar
+import com.example.librasheet.ui.components.parseOrNull
+import java.text.SimpleDateFormat
 
 
 object BofaReader {
@@ -46,19 +50,21 @@ object BofaReader {
      *  {1} parseAccountName
      *  {2} parseBofaRecentTransactions, event.source in 2048 events
      */
-    fun parse(reader: ScreenReader, event: AccessibilityEvent) {
+    fun parse(reader: ScreenReader, event: AccessibilityEvent): Pair<String, List<ParsedTransaction>>? {
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
             event.className == "androidx.recyclerview.widget.RecyclerView"
         ) {
             val node = event.source
             if (node?.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
-                val transactions = parseBofaRecentTransactions(node)
                 val account = parseAccountName(reader.rootInActiveWindow) ?: "Unknown"
-                ScreenReader.add(account, transactions)
+                val lastDate = reader.getLatestDate(account)
+                val transactions = parseBofaRecentTransactions(node, lastDate)
+                return Pair(account, transactions)
             }
 //            printAllViews(reader.rootInActiveWindow, maxDepth = 2)
 //            printAllViews(node)
         }
+        return null
     }
 
 
@@ -74,7 +80,7 @@ object BofaReader {
         for (i in 0 until scrollContainer.childCount) {
             val c = scrollContainer.getChild(i)
             if (c.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
-                parseBofaRecentTransactions(c)
+                parseBofaRecentTransactions(c, 0)
                 return
             }
         }
@@ -109,18 +115,21 @@ object BofaReader {
      *      .[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
      *      .(etc)
      */
-    private fun parseBofaRecentTransactions(list: AccessibilityNodeInfo): MutableList<ParsedTransaction> {
+    private fun parseBofaRecentTransactions(list: AccessibilityNodeInfo, latestDate: Int): MutableList<ParsedTransaction> {
         Log.v("Libra/ScreenReader/parseBofA", "childCount = ${list.childCount}")
 
         val out = mutableListOf<ParsedTransaction>()
         for (j in 0 until list.childCount) {
             val t = list.getChild(j) ?: continue
             if (t.viewIdResourceName == "com.infonow.bofa:id/transaction_row_layout") {
-                parseBofaTransactionRowLayout(t)?.let { out.add(it) }
+                parseBofaTransactionRowLayout(t, latestDate)?.let { out.add(it) }
             }
         }
         return out
     }
+
+    @SuppressLint("SimpleDateFormat")
+    private val formatter = SimpleDateFormat("MMM dd, yyyy").apply { isLenient = false }
 
     /**
      *      [null] [null] <-- com.infonow.bofa:id/transaction_row_layout
@@ -131,7 +140,7 @@ object BofaReader {
      *      ..[$38.95] [null] <-- null (amount)
      *      ..[$360.90] [null] <-- null (balance)
      */
-    private fun parseBofaTransactionRowLayout(row: AccessibilityNodeInfo): ParsedTransaction? {
+    private fun parseBofaTransactionRowLayout(row: AccessibilityNodeInfo, latestDate: Int): ParsedTransaction? {
         if (row.childCount < 2) return null
 
         val leftInfo = row.getChild(0) ?: return null
@@ -139,16 +148,26 @@ object BofaReader {
         val date = leftInfo.getChild(0)?.text ?: return null
         val name = leftInfo.getChild(1)?.text ?: return null
 
+        if (date == "Pending") return null
+        val dateInt = formatter.parseOrNull(date.toString())?.toIntDate() ?: return null
+        if (dateInt < latestDate) return null
+
         val rightInfo = row.getChild(1) ?: return null
         if (rightInfo.childCount < 1) return null
         val value = rightInfo.getChild(0)?.text ?: return null
 
         Log.v("Libra/BofaReader/parseBofaTransactionRowLayout", "date=$date name=$name value=$value")
-        if (date == "Pending") return null
+
+
+        val valueDouble = value.toString()
+            .replace(",", "")
+            .replace("$", "")
+            .toDoubleOrNull()?.toLongDollar() ?: return null
+
         return ParsedTransaction(
-            date = date.toString(),
+            date = dateInt,
             name = name.toString(),
-            value = value.toString(),
+            value = valueDouble,
         )
     }
 }

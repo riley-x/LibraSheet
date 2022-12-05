@@ -1,8 +1,8 @@
 package com.example.librasheet.screenReader
 
 data class ParsedTransaction(
-    val date: String,
+    val date: Int,
     val name: String,
-    val value: String,
+    val value: Long,
 )
 

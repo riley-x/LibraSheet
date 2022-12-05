@@ -15,6 +15,11 @@ interface TransactionDao {
     @Insert fun insert(t: TransactionEntity): Long
     @Delete fun delete(t: TransactionEntity)
 
+    @MapInfo(keyColumn = "name", valueColumn = "date")
+    @Query("SELECT $accountTable.name as name, MAX(date) as date FROM $transactionTable " +
+            "INNER JOIN $accountTable ON $transactionTable.accountKey=$accountTable.`key` GROUP BY accountKey")
+    fun getLastDates(): Map<String, Int>
+
     @Query("UPDATE $accountTable SET balance = balance + :value WHERE `key` = :account")
     fun updateBalance(account: Long, value: Long)
 
