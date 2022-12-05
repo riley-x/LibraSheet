@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 data class ScreenReaderAccountState(
     val account: Account?,
     val parsedAccountName: String,
-    val transactions: List<TransactionEntity>,
+    val transactions: List<TransactionWithDetails>,
     val inverted: Boolean,
 )
 
@@ -28,6 +28,7 @@ class ScreenReaderModel(
     val viewModel: LibraViewModel,
 ) {
     private val ruleDao = viewModel.application.database.ruleDao()
+    private val transactionDao = viewModel.application.database.transactionDao()
     private val rootCategory = viewModel.categories.data.all
 
     val data = mutableStateListOf<ScreenReaderAccountState>()
@@ -42,7 +43,7 @@ class ScreenReaderModel(
             val incomeRules = incomeRulesDeferred.await()
             val expenseRules = expenseRulesDeferred.await()
 
-            val accountStates = withContext(Dispatchers.Main) {
+            val accountStates = withContext(Dispatchers.IO) {
 
                 val categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
                 val accountStates = mutableListOf<ScreenReaderAccountState>()
@@ -69,11 +70,13 @@ class ScreenReaderModel(
     ): ScreenReaderAccountState {
         val account = viewModel.accounts.all.find { it.name == accountName }
         val inverted = account?.institution?.invertScreenReader ?: false
-        val transactions = mutableListOf<TransactionEntity>()
+        val transactions = mutableListOf<TransactionWithDetails>()
 
         for (parsedTransaction in parsed) {
             val value = if (inverted) -parsedTransaction.value else parsedTransaction.value
-            // TODO duplicate removal
+
+            // Rough duplicate protection
+            if (transactionDao.count(account?.key, parsedTransaction.date, value) > 0) continue
 
             val rules = if (value > 0) incomeRules else expenseRules
             val rule = rules.find { it.pattern in parsedTransaction.name }
@@ -85,16 +88,16 @@ class ScreenReaderModel(
                 value = value,
                 category = category,
                 categoryKey = category.key,
-                // TODO account key on save
+                // we update account key on save
             )
-            transactions.add(t)
+            transactions.add(TransactionWithDetails(t))
         }
 
         return ScreenReaderAccountState(
             parsedAccountName = if (account == null) accountName else "",
             account = account,
             inverted = inverted,
-            transactions = transactions,
+            transactions = transactions.sortedByDescending { it.transaction.date },
         )
     }
 
@@ -111,18 +114,33 @@ class ScreenReaderModel(
         viewModel.transactionDetails.add(
             TransactionDetailModel { new, old ->
                 val newList = data[iAccount].transactions.toMutableList()
-                newList[iTransaction] = new.transaction // TODO change to with details
+                newList[iTransaction] = new
                 data[iAccount] = data[iAccount].copy(transactions = newList)
                 true
             }
         )
         viewModel.transactionDetails.last().load(
             account = data[iAccount].account,
-            t = TransactionWithDetails(
-                transaction = data[iAccount].transactions[iTransaction],
-                reimbursements = emptyList(),
-                allocations = emptyList(),
-            )
+            t = data[iAccount].transactions[iTransaction],
         )
+    }
+
+    @Callback
+    fun save() {
+        viewModel.viewModelScope.launch {
+            val cachedData = data.toList()
+            withContext(Dispatchers.IO) {
+                cachedData.forEach { state ->
+                    state.transactions.forEach { t ->
+                        val withAccount = t.copy(
+                            transaction = t.transaction.copy(accountKey = state.account?.key ?: 0)
+                        )
+                        transactionDao.add(withAccount)
+                    }
+                }
+            }
+            clear()
+            viewModel.updateDependencies(dependency = Dependency.TRANSACTION)
+        }
     }
 }

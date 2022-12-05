@@ -342,7 +342,7 @@ fun LibraApp(
                         onBack = navController::popBackStack,
                         onAccountSelection = viewModel.screenReader::setAccount,
                         onInvertValues = { _, _ -> },
-                        onClickTransaction = { _, _ -> },
+                        onClickTransaction = ::toScreenReaderDetail,
                         onClear = viewModel.screenReader::clear,
                         onSave = { },
                         modifier = Modifier.padding(innerPadding),

@@ -2,6 +2,7 @@ package com.example.librasheet.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -21,7 +22,6 @@ fun NavGraphBuilder.transactionScreens(
 ) {
     val isSettings = route == SettingsTab.graph
     val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
-    val detail = viewModel.transactionDetails.lastOrNull() ?: TransactionDetailModel()
 
     fun toDetail(t: TransactionEntity = TransactionEntity()) {
         state.loadDetail(t)
@@ -101,6 +101,7 @@ fun NavGraphBuilder.transactionScreens(
     }
 
     composable(route = TransactionDetailDestinationRefactored.route(route!!)) {
+        val detail = remember { viewModel.transactionDetails.lastOrNull() ?: TransactionDetailModel() }
         TransactionDetailScreen(
             account = detail.account,
             category = detail.category,

@@ -2,7 +2,9 @@ package com.example.librasheet.viewModel.preview
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import com.example.librasheet.data.dao.TransactionFilters
+import com.example.librasheet.data.dao.TransactionWithDetails
 import com.example.librasheet.data.entity.Allocation
 import com.example.librasheet.data.entity.ReimbursementWithValue
 import com.example.librasheet.data.entity.TransactionEntity
@@ -45,6 +47,14 @@ val previewTransactions = mutableStateListOf(
         accountKey = 1,
     ),
 )
+
+val previewTransactionWithDetails = previewTransactions.map {
+    TransactionWithDetails(
+        transaction = it,
+        reimbursements = emptyList(),
+        allocations = emptyList(),
+    )
+}.toMutableStateList()
 
 val previewTransaction = mutableStateOf(previewTransactions[0])
 

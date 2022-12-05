@@ -15,6 +15,16 @@ interface TransactionDao {
     @Insert fun insert(t: TransactionEntity): Long
     @Delete fun delete(t: TransactionEntity)
 
+    @Query("SELECT COUNT(*) FROM $transactionTable WHERE date = :date AND value = :value")
+    fun count(date: Int, value: Long): Long
+
+    @Query("SELECT COUNT(*) FROM $transactionTable WHERE accountKey = :account AND date = :date AND value = :value")
+    fun _count(account: Long, date: Int, value: Long): Long
+
+    fun count(account: Long?, date: Int, value: Long) =
+        if (account == null) count(date, value)
+        else _count(account, date, value)
+
     @MapInfo(keyColumn = "name", valueColumn = "date")
     @Query("SELECT $accountTable.name as name, MAX(date) as date FROM $transactionTable " +
             "INNER JOIN $accountTable ON $transactionTable.accountKey=$accountTable.`key` GROUP BY accountKey")
@@ -318,6 +328,6 @@ fun getTransactionFilteredQuery(filter: TransactionFilters): SimpleSQLiteQuery {
 @Immutable
 data class TransactionWithDetails(
     val transaction: TransactionEntity,
-    val reimbursements: List<ReimbursementWithValue>,
-    val allocations: List<Allocation>
+    val reimbursements: List<ReimbursementWithValue> = emptyList(),
+    val allocations: List<Allocation> = emptyList(),
 )

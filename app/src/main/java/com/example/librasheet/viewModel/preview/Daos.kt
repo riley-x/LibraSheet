@@ -158,6 +158,14 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
+    override fun count(date: Int, value: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun _count(account: Long, date: Int, value: Long): Long {
+        TODO("Not yet implemented")
+    }
+
     override fun getLastDates(): Map<String, Int> {
         TODO("Not yet implemented")
     }

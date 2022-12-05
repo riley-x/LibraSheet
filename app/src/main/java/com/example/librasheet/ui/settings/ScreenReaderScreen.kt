@@ -24,6 +24,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.ui.transaction.TransactionRow
 import com.example.librasheet.viewModel.ScreenReaderAccountState
 import com.example.librasheet.viewModel.preview.previewAccounts
+import com.example.librasheet.viewModel.preview.previewTransactionWithDetails
 import com.example.librasheet.viewModel.preview.previewTransactions
 
 
@@ -75,7 +76,7 @@ fun ScreenReaderScreen(
                         }
 
                         TransactionRow(
-                            transaction = t,
+                            transaction = t.transaction,
                             modifier = Modifier.clickable { onClickTransaction(iAccount, iTransaction) }
                         )
                     }
@@ -164,13 +165,13 @@ private fun Preview() {
         ScreenReaderAccountState(
             account = previewAccounts[0],
             parsedAccountName = "",
-            transactions = previewTransactions,
+            transactions = previewTransactionWithDetails,
             inverted = false,
         ),
         ScreenReaderAccountState(
             account = null,
             parsedAccountName = "x1234",
-            transactions = previewTransactions,
+            transactions = previewTransactionWithDetails,
             inverted = true,
         ),
     ) }
