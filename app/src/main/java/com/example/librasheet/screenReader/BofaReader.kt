@@ -77,10 +77,11 @@ object BofaReader {
         if (rightInfo.childCount < 1) return
         val value = rightInfo.getChild(0).text
 
-        ScreenReader.cache.add(ParsedTransaction(
+        val t = ParsedTransaction(
             date = date.toString(),
             name = name.toString(),
             value = value.toString(),
-        ))
+        )
+        ScreenReader.add(t)
     }
 }

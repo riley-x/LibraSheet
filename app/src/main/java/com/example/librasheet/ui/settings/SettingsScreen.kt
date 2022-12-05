@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.librasheet.screenReader.ScreenReader
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.settings.cards.AccountCard
 import com.example.librasheet.ui.settings.cards.BackupDatabaseCard
@@ -17,6 +18,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
+    screenReaderSize: Int = ScreenReader.list.size, // this needs to be here to fix the preview
     toEditAccounts: () -> Unit = { },
     toEditCategories: () -> Unit = { },
     toCategoryRules: (income: Boolean) -> Unit = { },
@@ -51,6 +53,7 @@ fun SettingsScreen(
                     toAddCSV = toAddCSV,
                     toScreenReader = toScreenReader,
                     toAllTransactions = toAllTransactions,
+                    screenReaderSize = screenReaderSize,
                     modifier = Modifier.padding(10.dp)
                 )
             }
@@ -76,6 +79,7 @@ private fun Preview() {
     LibraSheetTheme {
         Surface {
             SettingsScreen(
+                screenReaderSize = 13, // this needs to be here to fix the preview
             )
         }
     }

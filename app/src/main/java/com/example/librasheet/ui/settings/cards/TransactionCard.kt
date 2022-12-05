@@ -15,6 +15,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 @Composable
 fun TransactionCard(
     modifier: Modifier = Modifier,
+    screenReaderSize: Int = ScreenReader.list.size, // this needs to be here to fix the preview
     toAddTransaction: () -> Unit = { },
     toAddCSV: () -> Unit = { },
     toScreenReader: () -> Unit = { },
@@ -31,7 +32,7 @@ fun TransactionCard(
             CardRowDivider()
             ClickableRow("Add CSV", toAddCSV)
             CardRowDivider()
-            ClickableRow("Screen Reader (${ScreenReader.cache.size})", toScreenReader)
+            ClickableRow("Screen Reader ($screenReaderSize)", toScreenReader)
             CardRowDivider()
             ClickableRow("See All", toAllTransactions)
         }
@@ -43,7 +44,9 @@ fun TransactionCard(
 private fun Preview() {
     LibraSheetTheme {
         Surface {
-            TransactionCard()
+            TransactionCard(
+                screenReaderSize = 13, // this needs to be here to fix the preview
+            )
         }
     }
 }

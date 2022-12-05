@@ -4,12 +4,18 @@ import android.accessibilityservice.AccessibilityService
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.compose.runtime.mutableStateListOf
 
 
 class ScreenReader : AccessibilityService() {
 
     companion object {
         val cache = mutableSetOf<ParsedTransaction>()
+        val list = mutableStateListOf<ParsedTransaction>()
+
+        fun add(t: ParsedTransaction) {
+            if (cache.add(t)) list.add(t)
+        }
     }
 
     override fun onInterrupt() {}
