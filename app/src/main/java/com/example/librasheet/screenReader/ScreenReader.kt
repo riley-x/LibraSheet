@@ -34,6 +34,11 @@ class ScreenReader : AccessibilityService() {
                 }
             }
         }
+
+        fun reset() {
+            cache.clear()
+            nItems.value = 0
+        }
     }
 
     private val job = SupervisorJob()

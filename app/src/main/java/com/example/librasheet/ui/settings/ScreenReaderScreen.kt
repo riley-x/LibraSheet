@@ -25,16 +25,9 @@ import com.example.librasheet.ui.components.libraRowHorizontalPadding
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.ui.transaction.TransactionRow
+import com.example.librasheet.viewModel.preview.ScreenReaderAccountState
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewTransactions
-
-
-@Immutable
-data class ScreenReaderAccountState(
-    val account: Account,
-    val transactions: List<TransactionEntity>,
-    val inverted: Boolean,
-)
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -69,9 +62,8 @@ fun ScreenReaderScreen(
 
                 stickyHeader {
                     ScreenReaderAccountHeader(
-                        account = it.account,
+                        state = it,
                         accounts = accounts,
-                        invertedValues = it.inverted,
                         onAccountSelection = { onAccountSelection(iAccount, it) },
                         onInvertValues = { onInvertValues(iAccount, it) }
                     )
@@ -120,9 +112,8 @@ fun ScreenReaderScreen(
 
 @Composable
 fun ScreenReaderAccountHeader(
-    account: Account,
+    state: ScreenReaderAccountState,
     accounts: SnapshotStateList<Account>,
-    invertedValues: Boolean,
     modifier: Modifier = Modifier,
     onAccountSelection: (Account?) -> Unit = { },
     onInvertValues: (Boolean) -> Unit = { },
@@ -137,12 +128,13 @@ fun ScreenReaderAccountHeader(
                 modifier = Modifier.weight(10f)
             ) {
                 Text(
-                    text = "Account",
+                    text = if (state.parsedAccountName.isNotEmpty()) "Account: ${state.parsedAccountName}" else "Account",
                     style = MaterialTheme.typography.body2,
+                    maxLines = 1,
                 )
 
                 AccountSelector(
-                    selection = account,
+                    selection = state.account,
                     options = accounts,
                     onSelection = onAccountSelection,
                 )
@@ -157,7 +149,7 @@ fun ScreenReaderAccountHeader(
                 )
 
                 Checkbox(
-                    checked = invertedValues,
+                    checked = state.inverted,
                     onCheckedChange = onInvertValues,
                 )
             }
@@ -170,24 +162,17 @@ fun ScreenReaderAccountHeader(
 
 @Preview
 @Composable
-private fun PreviewHeader() {
-    LibraSheetTheme {
-        ScreenReaderAccountHeader(account = previewAccounts[0], accounts = previewAccounts, invertedValues = true)
-    }
-}
-
-
-@Preview
-@Composable
 private fun Preview() {
     val t = remember { mutableStateListOf(
         ScreenReaderAccountState(
             account = previewAccounts[0],
+            parsedAccountName = "",
             transactions = previewTransactions,
             inverted = false,
         ),
         ScreenReaderAccountState(
-            account = previewAccounts[1],
+            account = null,
+            parsedAccountName = "x1234",
             transactions = previewTransactions,
             inverted = true,
         ),

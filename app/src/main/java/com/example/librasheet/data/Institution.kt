@@ -7,31 +7,37 @@ enum class Institution(
     override val displayName: String,
     val csvPattern: String,
     val dateFormat: String,
+    val invertScreenReader: Boolean,
 ): HasDisplayName {
     BANK_OF_AMERICA(
         displayName = "Bank of America",
         csvPattern = "date,name,value",
-        dateFormat = "MM/dd/yyyy"
+        dateFormat = "MM/dd/yyyy",
+        invertScreenReader = false,
     ),
     BANK_OF_AMERICA_CREDIT_CARD(
         displayName = "Bank of America (Credit Cards)",
         csvPattern = "date,,name,,value",
-        dateFormat = "MM/dd/yyyy"
+        dateFormat = "MM/dd/yyyy",
+        invertScreenReader = true,
     ),
     VENMO(
         displayName = "Venmo",
         csvPattern = ",,date,,Complete,name,name,name,value,,,,,,Venmo balance",
-        dateFormat = "yyyy-MM-dd"
+        dateFormat = "yyyy-MM-dd",
+        invertScreenReader = false,
     ),
     CHASE(
         displayName = "Chase",
         csvPattern = "date,,name,,,value,",
-        dateFormat = "MM/dd/yyyy"
+        dateFormat = "MM/dd/yyyy",
+        invertScreenReader = false,
     ),
     UNKNOWN(
         displayName = "Unknown",
         csvPattern = "date,name,value",
-        dateFormat = "MM/dd/yyyy"
+        dateFormat = "MM/dd/yyyy",
+        invertScreenReader = false,
     ),
 }
 
