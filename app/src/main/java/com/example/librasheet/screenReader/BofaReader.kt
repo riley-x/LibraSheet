@@ -25,7 +25,8 @@ object BofaReader {
      * androidx.recyclerview.widget.RecyclerView
      *
      * reader.rootInActiveWindow (credit card screen transaction details screen):
-     *      [null] [null] <-- null (root)
+     *
+     *      [null] [null] <-- null
      *
      *  {1} .[null] [SpicaHeader] <-- com.infonow.bofa:id/header_container
      *      ..[null] [Go back to previous screen] <-- com.infonow.bofa:id/__boa_header_left_button_click_area
@@ -61,15 +62,15 @@ object BofaReader {
     }
 
 
-    /** This is for the source when scrolling the account detail screen. But this page is gimmicky
-     * as noted above.
+    /** This is for the event.source when scrolling the account detail screen. But this page is
+     * gimmicky as noted above.
      */
-    private fun parseBofaAccountDetailScreen(nodeInfo: AccessibilityNodeInfo?) {
+    private fun parseAccountDetailScreen(nodeInfo: AccessibilityNodeInfo?) {
         if (nodeInfo == null) return
         if (nodeInfo.childCount < 1) return
 
         val scrollContainer = nodeInfo.getChild(0)
-        Log.v("Libra/ScreenReader/parseBofA", "${System.identityHashCode(scrollContainer)}")
+        Log.v("Libra/BofaReader/parseAccountDetailScreen", "${System.identityHashCode(scrollContainer)}")
         for (i in 0 until scrollContainer.childCount) {
             val c = scrollContainer.getChild(i)
             if (c.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
@@ -80,39 +81,40 @@ object BofaReader {
     }
 
     /**
-     *  {1} .[null] [SpicaHeader] <-- com.infonow.bofa:id/header_container
-     *      ..[null] [Go back to previous screen] <-- com.infonow.bofa:id/__boa_header_left_button_click_area
-     *      ..[null] [Products cart with 0 items. Button] <-- com.infonow.bofa:id/rl_shopping_cart
-     *      ..[null] [null] <-- com.infonow.bofa:id/__boa_header_help_image_button_click_area
-     *      ...[null] [Erica. There are 4 notifications.] <-- com.infonow.bofa:id/button_erica_icon_container
+     *      [null] [SpicaHeader] <-- com.infonow.bofa:id/header_container
+     *      .[null] [Go back to previous screen] <-- com.infonow.bofa:id/__boa_header_left_button_click_area
+     *      .[null] [Products cart with 0 items. Button] <-- com.infonow.bofa:id/rl_shopping_cart
+     *      .[null] [null] <-- com.infonow.bofa:id/__boa_header_help_image_button_click_area
+     *      ..[null] [Erica. There are 4 notifications.] <-- com.infonow.bofa:id/button_erica_icon_container
      */
     private fun parseAccountName(root: AccessibilityNodeInfo?): String? {
         if (root == null) return null
         if (root.childCount < 1) return null
 
-        val headerContainer = root.getChild(0)
+        val headerContainer = root.getChild(0) ?: return null
         if (headerContainer.childCount < 2) return null
 
-        val accountName = headerContainer.getChild(1)
+        val accountName = headerContainer.getChild(1) ?: return null
         if (accountName.viewIdResourceName != "com.infonow.bofa:id/__boa_header_tv_headerText") {
             Log.d("Libra/BofaReader/parseAccountName", "Mismatch resource name: ${accountName.viewIdResourceName}")
             return null
         }
+        Log.d("Libra/BofaReader/parseAccountName", "${accountName.text}")
         return accountName.text?.toString()
     }
 
     /**
-     *  {2} .[null] [null] <-- com.infonow.bofa:id/recent_transactions
-     *      ..[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
-     *      ..[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
-     *      ..(etc)
+     *      [null] [null] <-- com.infonow.bofa:id/recent_transactions
+     *      .[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
+     *      .[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
+     *      .(etc)
      */
     private fun parseBofaRecentTransactions(list: AccessibilityNodeInfo): MutableList<ParsedTransaction> {
         Log.v("Libra/ScreenReader/parseBofA", "childCount = ${list.childCount}")
 
         val out = mutableListOf<ParsedTransaction>()
         for (j in 0 until list.childCount) {
-            val t = list.getChild(j)
+            val t = list.getChild(j) ?: continue
             if (t.viewIdResourceName == "com.infonow.bofa:id/transaction_row_layout") {
                 parseBofaTransactionRowLayout(t)?.let { out.add(it) }
             }
@@ -121,27 +123,28 @@ object BofaReader {
     }
 
     /**
-     *      ..[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
-     *      ...[null] [<info with lots of whitespace>] <-- com.infonow.bofa:id/recent_transaction_left_text_nocheck
-     *      ....[Pending or Dec 1, 2022] [null] <-- null
-     *      ....[PAYPAL *UBER] [null] <-- null
-     *      ...[null] [<info with lots of whitespace>] <-- com.infonow.bofa:id/recent_transaction_right_text_nocheck
-     *      ....[$38.95] [null] <-- null (amount)
-     *      ....[$360.90] [null] <-- null (balance)
+     *      [null] [null] <-- com.infonow.bofa:id/transaction_row_layout
+     *      .[null] [<info with lots of whitespace>] <-- com.infonow.bofa:id/recent_transaction_left_text_nocheck
+     *      ..[Pending or Dec 1, 2022] [null] <-- null
+     *      ..[PAYPAL *UBER] [null] <-- null
+     *      .[null] [<info with lots of whitespace>] <-- com.infonow.bofa:id/recent_transaction_right_text_nocheck
+     *      ..[$38.95] [null] <-- null (amount)
+     *      ..[$360.90] [null] <-- null (balance)
      */
     private fun parseBofaTransactionRowLayout(row: AccessibilityNodeInfo): ParsedTransaction? {
         if (row.childCount < 2) return null
 
-        val leftInfo = row.getChild(0)
+        val leftInfo = row.getChild(0) ?: return null
         if (leftInfo.childCount < 2) return null
-        val date = leftInfo.getChild(0).text
-        val name = leftInfo.getChild(1).text
+        val date = leftInfo.getChild(0)?.text ?: return null
+        val name = leftInfo.getChild(1)?.text ?: return null
 
-        val rightInfo = row.getChild(1)
+        val rightInfo = row.getChild(1) ?: return null
         if (rightInfo.childCount < 1) return null
-        val value = rightInfo.getChild(0).text
+        val value = rightInfo.getChild(0)?.text ?: return null
 
         Log.v("Libra/BofaReader/parseBofaTransactionRowLayout", "date=$date name=$name value=$value")
+        if (date == "Pending") return null
         return ParsedTransaction(
             date = date.toString(),
             name = name.toString(),

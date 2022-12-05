@@ -12,11 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 class ScreenReader : AccessibilityService() {
 
     companion object {
-        val cache = mutableMapOf<String, MutableList<ParsedTransaction>>()
+        val cache = mutableMapOf<String, MutableSet<ParsedTransaction>>()
         val nItems = mutableStateOf(0)
 
         fun add(account: String, t: ParsedTransaction) {
-            val x = cache.getOrPut(account) { mutableListOf() }
+            val x = cache.getOrPut(account) { mutableSetOf() }
             if (x.add(t)) {
                 x.add(t)
                 nItems.value += 1
@@ -24,7 +24,7 @@ class ScreenReader : AccessibilityService() {
         }
 
         fun add(account: String, transactions: List<ParsedTransaction>) {
-            val x = cache.getOrPut(account) { mutableListOf() }
+            val x = cache.getOrPut(account) { mutableSetOf() }
             transactions.forEach {
                 if (x.add(it)) {
                     x.add(it)
