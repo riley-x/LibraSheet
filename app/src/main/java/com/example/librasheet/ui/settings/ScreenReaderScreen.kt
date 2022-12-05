@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.components.HeaderBar
@@ -46,6 +47,8 @@ fun ScreenReaderScreen(
     onAccountSelection: (Int, Account?) -> Unit = { _, _ -> },
     onInvertValues: (Int, Boolean) -> Unit = { _, _ -> },
     onClickTransaction: (iAccount: Int, iTransaction: Int) -> Unit = { _, _ -> },
+    onClear: () -> Unit = { },
+    onSave: () -> Unit = { },
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -90,6 +93,27 @@ fun ScreenReaderScreen(
                 }
             }
         }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth().padding(bottom= 4.dp),
+        ) {
+            Button(
+                onClick = onClear,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.error,
+                ),
+                modifier = Modifier.width(80.dp)
+            ) {
+                Text("Clear", fontSize = 18.sp)
+            }
+            Button(
+                onClick = onSave,
+                modifier = Modifier.width(80.dp)
+            ) {
+                Text("Save", fontSize = 18.sp)
+            }
+        }
     }
 }
 
@@ -114,7 +138,7 @@ fun ScreenReaderAccountHeader(
             ) {
                 Text(
                     text = "Account",
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.body2,
                 )
 
                 AccountSelector(
@@ -124,10 +148,12 @@ fun ScreenReaderAccountHeader(
                 )
             }
 
-            Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
                     text = "Invert",
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.body2,
                 )
 
                 Checkbox(
