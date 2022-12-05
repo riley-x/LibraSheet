@@ -9,8 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.transaction.*
-import com.example.librasheet.viewModel.LibraViewModel
-import com.example.librasheet.viewModel.TransactionDetailModel
+import com.example.librasheet.viewModel.*
 
 fun NavGraphBuilder.transactionScreens(
     viewModel: LibraViewModel,
@@ -22,37 +21,16 @@ fun NavGraphBuilder.transactionScreens(
 ) {
     val isSettings = route == SettingsTab.graph
     val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
+    var reimbursementCallback: (TransactionEntity) -> Unit = { }
 
     fun toDetail(t: TransactionEntity = TransactionEntity()) {
-        state.loadDetail(t)
-        navController.navigate(TransactionDetailDestination.route(route!!))
-    }
-    fun onAddReimbursement() {
-        state.initReimb()
-        navController.navigateSingleTop(TransactionReimburseDestination.route(route!!))
+        val modelKey = if (isSettings) SettingsTransactionKeyBase else BalanceTransactionKeyBase
+        state.loadDetail(t, modelKey)
+        navController.navigate(TransactionDetailDestination.argRoute(route!!, modelKey))
     }
     fun onSelectReimbursement(t: TransactionEntity) {
         navController.popBackStack()
-        state.addReimbursement(t)
-    }
-    fun onChangeReimbursementValue(index: Int) {
-        reimbursementDialog.open {
-            state.changeReimbursementValue(index, it)
-        }
-    }
-    fun onAddAllocation() {
-        allocationDialog.open(
-            isIncome = state.isIncome(),
-            onSave = state::addAllocation,
-        )
-    }
-    fun onEditAllocation(i: Int) {
-        allocationDialog.open(
-            isIncome = state.isIncome(),
-            allocation = state.allocations[i],
-        ) { name, value, category ->
-            state.editAllocation(i, name, value, category)
-        }
+        reimbursementCallback(t)
     }
     fun openFilter() {
         filterDialog.open(state.filter.value, state::filter)
@@ -74,34 +52,33 @@ fun NavGraphBuilder.transactionScreens(
     }
 
     composable(route = TransactionDetailDestination.route(route!!)) {
-        TransactionDetailScreen(
-            account = state.detailAccount,
-            category = state.detailCategory,
-            name = state.detailName,
-            date = state.detailDate,
-            value = state.detailValue,
-            dateError = state.dateError,
-            valueError = state.valueError,
-            reimbursements = state.reimbursements,
-            allocations = state.allocations,
-            accounts = viewModel.accounts.all,
-            incomeCategories = viewModel.categories.incomeTargets,
-            expenseCategories = viewModel.categories.expenseTargets,
-            onBack = navController::popBackStack,
-            onSave = state::save,
-            onAddReimbursement = ::onAddReimbursement,
-            onDeleteReimbursement = state::deleteReimbursement,
-            onChangeReimbursementValue = ::onChangeReimbursementValue,
-            onAddAllocation = ::onAddAllocation,
-            onEditAllocation = ::onEditAllocation,
-            onDeleteAllocation = state::deleteAllocation,
-            onReorderAllocation = state::reorderAllocation,
-            bottomPadding = innerPadding.calculateBottomPadding(),
-        )
-    }
+        val modelKey = it.arguments?.getString(TransactionDetailDestination.argName) ?: ""
+        val detail = remember(modelKey) { viewModel.transactionDetails[modelKey] ?: TransactionDetailModel() }
+        fun onAddReimbursement() {
+            state.initReimb()
+            reimbursementCallback = detail::addReimbursement
+            navController.navigateSingleTop(TransactionReimburseDestination.route(route!!))
+        }
+        fun onChangeReimbursementValue(index: Int) {
+            reimbursementDialog.open {
+                detail.changeReimbursementValue(index, it)
+            }
+        }
+        fun onAddAllocation() {
+            allocationDialog.open(
+                isIncome = detail.isIncome(),
+                onSave = detail::addAllocation,
+            )
+        }
+        fun onEditAllocation(i: Int) {
+            allocationDialog.open(
+                isIncome = detail.isIncome(),
+                allocation = detail.allocations[i],
+            ) { name, value, category ->
+                detail.editAllocation(i, name, value, category)
+            }
+        }
 
-    composable(route = TransactionDetailDestinationRefactored.route(route!!)) {
-        val detail = remember { viewModel.transactionDetails.lastOrNull() ?: TransactionDetailModel() }
         TransactionDetailScreen(
             account = detail.account,
             category = detail.category,
@@ -117,11 +94,11 @@ fun NavGraphBuilder.transactionScreens(
             expenseCategories = viewModel.categories.expenseTargets,
             onBack = navController::popBackStack,
             onSave = detail::save,
-//            onAddReimbursement = ::onAddReimbursement,
-//            onDeleteReimbursement = state::deleteReimbursement,
-//            onChangeReimbursementValue = ::onChangeReimbursementValue,
-//            onAddAllocation = ::onAddAllocation,
-//            onEditAllocation = ::onEditAllocation,
+            onAddReimbursement = ::onAddReimbursement,
+            onDeleteReimbursement = detail::deleteReimbursement,
+            onChangeReimbursementValue = ::onChangeReimbursementValue,
+            onAddAllocation = ::onAddAllocation,
+            onEditAllocation = ::onEditAllocation,
             onDeleteAllocation = detail::deleteAllocation,
             onReorderAllocation = detail::reorderAllocation,
             bottomPadding = innerPadding.calculateBottomPadding(),

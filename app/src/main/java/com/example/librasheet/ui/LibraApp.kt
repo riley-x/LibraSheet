@@ -27,7 +27,9 @@ import com.example.librasheet.ui.settings.dialogs.CategoryRuleDialog
 import com.example.librasheet.ui.transaction.AllocationDialog
 import com.example.librasheet.ui.transaction.FilterTransactionDialogHolder
 import com.example.librasheet.ui.transaction.ReimbursementDialog
+import com.example.librasheet.viewModel.BalanceTransactionKeyBase
 import com.example.librasheet.viewModel.LibraViewModel
+import com.example.librasheet.viewModel.SettingsTransactionKeyBase
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 
 
@@ -72,12 +74,12 @@ fun LibraApp(
         navController.navigate(TransactionAllDestination.route(SettingsTab.graph))
     }
     fun toSettingsTransactionDetail(t: TransactionEntity = TransactionEntity()) {
-        viewModel.transactionsSettings.loadDetail(t)
-        navController.navigateSingleTop(TransactionDetailDestination.route(SettingsTab.graph))
+        viewModel.transactionsSettings.loadDetail(t, SettingsTransactionKeyBase)
+        navController.navigateSingleTop(TransactionDetailDestination.argRoute(SettingsTab.graph, SettingsTransactionKeyBase))
     }
     fun toBalanceTransactionDetail(t: TransactionEntity) {
-        viewModel.transactionsBalance.loadDetail(t)
-        navController.navigateSingleTop(TransactionDetailDestination.route(BalanceTab.graph))
+        viewModel.transactionsBalance.loadDetail(t, BalanceTransactionKeyBase)
+        navController.navigateSingleTop(TransactionDetailDestination.argRoute(BalanceTab.graph, BalanceTransactionKeyBase))
     }
     fun toEditAccountsScreen() = navController.navigateSingleTop(EditAccountsDestination.route)
     fun toCategoriesScreen() = navController.navigateSingleTop(CategoriesDestination.route)
@@ -91,7 +93,7 @@ fun LibraApp(
     }
     fun toScreenReaderDetail(iAccount: Int, iTransaction: Int) {
         viewModel.screenReader.loadDetail(iAccount, iTransaction)
-        navController.navigateSingleTop(TransactionDetailDestinationRefactored.route(SettingsTab.graph))
+        navController.navigateSingleTop(TransactionDetailDestination.argRoute(SettingsTab.graph, SettingsTransactionKeyBase))
     }
     fun onSaveColor(spec: String, color: Color) {
         viewModel.saveColor(spec, color)

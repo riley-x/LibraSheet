@@ -96,14 +96,6 @@ object BadCsvDestination {
 object ScreenReaderDestination {
     const val route = "screen_reader"
 }
-object TransactionDetailDestination {
-    private const val routeBase = "transaction_details"
-    fun route(graph: String) = "${routeBase}_${graph}"
-}
-object TransactionDetailDestinationRefactored {
-    private const val routeBase = "transaction_details_new"
-    fun route(graph: String) = "${routeBase}_${graph}"
-}
 object TransactionAllDestination {
     private const val routeBase = "transaction_all"
     fun route(graph: String) = "${routeBase}_${graph}"
@@ -146,5 +138,12 @@ object CategoryDetailDestination: DestinationStringArg() {
     )
 }
 
+object TransactionDetailDestination: DestinationStringArg() {
+    override val routeBase = "transaction_details"
+    override val argName = "detailModelKey"
+    override val arguments = listOf(
+        navArgument(argName) { type = NavType.StringType }
+    )
+}
 
 

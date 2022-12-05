@@ -22,8 +22,6 @@ data class ScreenReaderAccountState(
     val inverted: Boolean,
 )
 
-
-
 class ScreenReaderModel(
     val viewModel: LibraViewModel,
 ) {
@@ -111,18 +109,17 @@ class ScreenReaderModel(
 
     @Callback
     fun loadDetail(iAccount: Int, iTransaction: Int) {
-        viewModel.transactionDetails.add(
-            TransactionDetailModel { new, old ->
-                val newList = data[iAccount].transactions.toMutableList()
-                newList[iTransaction] = new
-                data[iAccount] = data[iAccount].copy(transactions = newList)
-                true
-            }
-        )
-        viewModel.transactionDetails.last().load(
+        val model = TransactionDetailModel { new, old ->
+            val newList = data[iAccount].transactions.toMutableList()
+            newList[iTransaction] = new
+            data[iAccount] = data[iAccount].copy(transactions = newList)
+            true
+        }
+        model.load(
             account = data[iAccount].account,
             t = data[iAccount].transactions[iTransaction],
         )
+        viewModel.transactionDetails[SettingsTransactionKeyBase] = model
     }
 
     @Callback

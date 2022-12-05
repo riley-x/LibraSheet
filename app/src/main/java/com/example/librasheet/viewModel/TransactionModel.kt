@@ -20,6 +20,10 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
+/** For the map of transaction details in the view model **/
+const val SettingsTransactionKeyBase = "settings"
+const val BalanceTransactionKeyBase = "balance"
+
 
 @Stable
 class TransactionModel(
@@ -30,9 +34,6 @@ class TransactionModel(
         limit = 100
     )
 
-    @SuppressLint("SimpleDateFormat")
-    private val formatter = SimpleDateFormat("MM-dd-yy").apply { isLenient = false }
-
     /** Full list **/
     val displayList = mutableStateListOf<TransactionEntity>()
     val filter = mutableStateOf(defaultFilter)
@@ -40,71 +41,6 @@ class TransactionModel(
     /** Reimbursement **/
     val reimbFilter = mutableStateOf(defaultFilter)
     val reimbList = mutableStateListOf<TransactionEntity>()
-
-    /** Edit/details screen **/
-    val detailAccount = mutableStateOf<Account?>(null)
-    val detailCategory = mutableStateOf<Category?>(null)
-    val detailName = mutableStateOf("")
-    val detailDate = mutableStateOf("")
-    val detailValue = mutableStateOf("")
-    val reimbursements = mutableStateListOf<ReimbursementWithValue>()
-    val allocations = mutableStateListOf<Allocation>()
-
-    val dateError = mutableStateOf(false)
-    val valueError = mutableStateOf(false)
-
-    /** Old edit/details **/
-    private var oldDetail = TransactionEntity()
-    private var oldReimbursements = listOf<ReimbursementWithValue>()
-    private var oldAllocations = listOf<Allocation>()
-
-    fun isIncome() = (detailValue.value.toDoubleOrNull() ?: 0.0) > 0
-
-    private fun createTransaction(): TransactionEntity? {
-        val dateInt = formatter.parseOrNull(detailDate.value)?.toIntDate()
-        val valueLong = detailValue.value.toDoubleOrNull()?.toLongDollar()
-
-        dateError.value = dateInt == null
-        valueError.value = valueLong == null
-        if (dateError.value || valueError.value) return null
-
-        return TransactionEntity(
-            key = oldDetail.key,
-            name = detailName.value,
-            date = dateInt ?: 0,
-            value = valueLong ?: 0L,
-            category = detailCategory.value ?: Category.None,
-            categoryKey = detailCategory.value?.key ?: 0,
-            accountKey = detailAccount.value?.key ?: 0,
-        )
-    }
-
-
-
-    @Callback
-    fun save(): Boolean {
-        val t = createTransaction() ?: return false
-
-        // Copy old values before they get changed by the ui
-        val old = TransactionWithDetails(
-            transaction = oldDetail,
-            reimbursements = oldReimbursements,
-            allocations = oldAllocations,
-        )
-        val new = TransactionWithDetails(
-            transaction = t,
-            reimbursements = reimbursements.toList(),
-            allocations = allocations.toList()
-        )
-        viewModel.viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                if (old.transaction.key > 0) dao.update(new, old)
-                else dao.add(new)
-            }
-            viewModel.updateDependencies(Dependency.TRANSACTION)
-        }
-        return true
-    }
 
     @Callback
     fun filter(newFilter: TransactionFilters) {
@@ -156,20 +92,23 @@ class TransactionModel(
         }
     }
 
+    fun save(new: TransactionWithDetails, old: TransactionWithDetails): Boolean {
+        viewModel.viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                if (old.transaction.key > 0) dao.update(new, old)
+                else dao.add(new)
+            }
+            viewModel.updateDependencies(Dependency.TRANSACTION)
+        }
+        return true
+    }
+
+
     @Callback
-    fun loadDetail(t: TransactionEntity) {
-        oldDetail = t
-        dateError.value = false
-        valueError.value = false
+    fun loadDetail(t: TransactionEntity, keyBase: String) {
+        val model = TransactionDetailModel(onSave = ::save)
+        viewModel.transactionDetails[keyBase] = model
 
-        detailAccount.value = viewModel.accounts.all.find(t.accountKey)
-        detailCategory.value = viewModel.categories.data.all.find(t.categoryKey)
-        detailName.value = t.name
-        detailDate.value = formatDateIntSimple(t.date, "-")
-        detailValue.value = if (t.value == 0L) "" else t.value.toFloatDollar().toString()
-
-        reimbursements.clear() // should clear before the launch so previous detail's allocations don't show
-        allocations.clear()
         viewModel.viewModelScope.launch {
             val (reimbs, allocs) = withContext(Dispatchers.IO) {
                 val (reimbs, allocs) = dao.getDetails(t)
@@ -185,74 +124,15 @@ class TransactionModel(
 
                 return@withContext Pair(reimbs, allocs)
             }
-            oldReimbursements = reimbs
-            oldAllocations = allocs
-            reimbursements.addAll(reimbs)
-            allocations.addAll(allocs)
-        }
-    }
-
-    /**
-     * Note these only apply to the ui state. The actual database action happens on save.
-     */
-    @Callback
-    fun addReimbursement(t: TransactionEntity) {
-        val targetValue = abs(t.valueAfterReimbursements)
-        val currentValue = detailValue.value.toDoubleOrNull()?.toLongDollar()?.absoluteValue
-        reimbursements.add(
-            ReimbursementWithValue(
-                transaction = t,
-                value = if (currentValue != null) minOf(targetValue, currentValue) else targetValue
+            model.load(
+                account = viewModel.accounts.all.find(t.accountKey),
+                t = TransactionWithDetails(
+                    transaction = t,
+                    reimbursements = reimbs,
+                    allocations = allocs,
+                )
             )
-        )
-    }
-
-    @Callback
-    fun deleteReimbursement(index: Int) {
-        reimbursements.removeAt(index)
-    }
-
-    @Callback
-    fun changeReimbursementValue(index: Int, value: Long) {
-        if (index !in reimbursements.indices) return
-        reimbursements[index] = reimbursements[index].copy(
-            value = value
-        )
-    }
-
-    @Callback
-    fun addAllocation(name: String, value: Long, category: Category?) {
-        allocations.add(
-            Allocation(
-                key = 0,
-                name = name,
-                transactionKey = oldDetail.key,
-                categoryKey = category?.key ?: 0,
-                value = value,
-                listIndex = allocations.size, // TODO edit listIndexes on save
-            ).also { it.category = category ?: Category.None }
-        )
-    }
-    @Callback
-    fun editAllocation(i: Int, name: String, value: Long, category: Category?) {
-        allocations[i] = Allocation(
-            key = 0,
-            name = name,
-            transactionKey = oldDetail.key,
-            categoryKey = category?.key ?: 0,
-            value = value,
-            listIndex = i, // TODO edit listIndexes on save
-        ).also { it.category = category ?: Category.None }
-    }
-    @Callback
-    fun reorderAllocation(start: Int, end: Int) {
-        if (start !in allocations.indices || end !in allocations.indices) return
-        allocations.add(end, allocations.removeAt(start))
-        // TODO database
-    }
-    @Callback
-    fun deleteAllocation(index: Int) {
-        allocations.removeAt(index)
+        }
     }
 }
 
