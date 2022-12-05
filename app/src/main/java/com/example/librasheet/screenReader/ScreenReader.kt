@@ -81,6 +81,7 @@ class ScreenReader : AccessibilityService() {
 
         when(event.packageName) {
             "com.infonow.bofa" -> BofaReader.parse(this, event)
+            "com.chase.sig.android" -> ChaseReader.parse(this, event)
             else -> null
         }?.let { add(it.first, it.second) }
 
@@ -113,3 +114,8 @@ internal fun printAllViews(nodeInfo: AccessibilityNodeInfo?, depth: Int = 0, max
     }
 }
 
+
+fun AccessibilityNodeInfo.child(i: Int): AccessibilityNodeInfo? {
+    if (childCount <= i) return null
+    return getChild(i)
+}

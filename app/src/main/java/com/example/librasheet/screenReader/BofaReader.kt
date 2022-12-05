@@ -58,7 +58,7 @@ object BofaReader {
             if (node?.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
                 val account = parseAccountName(reader.rootInActiveWindow) ?: "Unknown"
                 val lastDate = reader.getLatestDate(account)
-                val transactions = parseBofaRecentTransactions(node, lastDate)
+                val transactions = parseRecentTransactions(node, lastDate)
                 return Pair(account, transactions)
             }
 //            printAllViews(reader.rootInActiveWindow, maxDepth = 2)
@@ -80,7 +80,7 @@ object BofaReader {
         for (i in 0 until scrollContainer.childCount) {
             val c = scrollContainer.getChild(i)
             if (c.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
-                parseBofaRecentTransactions(c, 0)
+                parseRecentTransactions(c, 0)
                 return
             }
         }
@@ -115,14 +115,14 @@ object BofaReader {
      *      .[null] [null] <-- com.infonow.bofa:id/transaction_row_layout
      *      .(etc)
      */
-    private fun parseBofaRecentTransactions(list: AccessibilityNodeInfo, latestDate: Int): MutableList<ParsedTransaction> {
+    private fun parseRecentTransactions(list: AccessibilityNodeInfo, latestDate: Int): MutableList<ParsedTransaction> {
         Log.v("Libra/ScreenReader/parseBofA", "childCount = ${list.childCount}")
 
         val out = mutableListOf<ParsedTransaction>()
         for (j in 0 until list.childCount) {
             val t = list.getChild(j) ?: continue
             if (t.viewIdResourceName == "com.infonow.bofa:id/transaction_row_layout") {
-                parseBofaTransactionRowLayout(t, latestDate)?.let { out.add(it) }
+                parseTransactionRowLayout(t, latestDate)?.let { out.add(it) }
             }
         }
         return out
@@ -140,7 +140,7 @@ object BofaReader {
      *      ..[$38.95] [null] <-- null (amount)
      *      ..[$360.90] [null] <-- null (balance)
      */
-    private fun parseBofaTransactionRowLayout(row: AccessibilityNodeInfo, latestDate: Int): ParsedTransaction? {
+    private fun parseTransactionRowLayout(row: AccessibilityNodeInfo, latestDate: Int): ParsedTransaction? {
         if (row.childCount < 2) return null
 
         val leftInfo = row.getChild(0) ?: return null
