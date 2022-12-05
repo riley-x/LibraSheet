@@ -126,6 +126,44 @@ class ScreenReaderModel(
     }
 
     @Callback
+    fun invert(iAccount: Int, newValue: Boolean) {
+        viewModel.viewModelScope.launch {
+            val incomeRulesDeferred = async(Dispatchers.IO) { ruleDao.getIncomeRules() }
+            val expenseRulesDeferred = async(Dispatchers.IO) { ruleDao.getExpenseRules() }
+            val categoryMapDeferred = async(Dispatchers.Main) { rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore } }
+            val incomeRules = incomeRulesDeferred.await()
+            val expenseRules = expenseRulesDeferred.await()
+            val categoryMap = categoryMapDeferred.await()
+
+            val transactions = withContext(Dispatchers.Main) {
+                val transactions = mutableListOf<TransactionWithDetails>()
+                for (t in data[iAccount].transactions) {
+                    val value = -t.transaction.value
+
+                    val rules = if (value > 0) incomeRules else expenseRules
+                    val rule = rules.find { it.pattern in t.transaction.name }
+                    val category = rule?.let { categoryMap.getOrDefault(it.categoryKey, null) }
+                        ?: Category.None
+
+                    transactions.add(t.copy(
+                        transaction = t.transaction.copy(
+                            value = value,
+                            valueAfterReimbursements = -t.transaction.valueAfterReimbursements,
+                            categoryKey = category.key,
+                        ).also { it.category = category }
+                    ))
+                }
+                transactions
+            }
+
+            data[iAccount] = data[iAccount].copy(
+                transactions = transactions,
+                inverted = newValue,
+            )
+        }
+    }
+
+    @Callback
     fun save() {
         viewModel.viewModelScope.launch {
             val cachedData = data.toList()

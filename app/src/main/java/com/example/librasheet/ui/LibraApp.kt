@@ -101,6 +101,10 @@ fun LibraApp(
         viewModel.csv.save()
         navController.popBackStack()
     }
+    fun onSaveScreenReader() {
+        viewModel.screenReader.save()
+        navController.popBackStack()
+    }
 
 
     /** Dialogs **/
@@ -341,10 +345,10 @@ fun LibraApp(
                         accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
                         onAccountSelection = viewModel.screenReader::setAccount,
-                        onInvertValues = { _, _ -> },
+                        onInvertValues = viewModel.screenReader::invert,
                         onClickTransaction = ::toScreenReaderDetail,
                         onClear = viewModel.screenReader::clear,
-                        onSave = { },
+                        onSave = ::onSaveScreenReader,
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
