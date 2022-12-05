@@ -36,6 +36,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val transactionsSettings = TransactionModel(this)
     val transactionsBalance = TransactionModel(this)
     val csv = BaseCsvModel(this)
+    val screenReader = ScreenReaderModel(this)
 
     suspend fun startup() {
 

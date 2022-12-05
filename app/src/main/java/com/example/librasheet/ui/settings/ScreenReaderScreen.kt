@@ -7,25 +7,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.librasheet.data.entity.Account
-import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.RowDivider
 import com.example.librasheet.ui.components.libraRowHorizontalPadding
 import com.example.librasheet.ui.components.selectors.AccountSelector
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.ui.transaction.TransactionRow
-import com.example.librasheet.viewModel.preview.ScreenReaderAccountState
+import com.example.librasheet.viewModel.ScreenReaderAccountState
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewTransactions
 
