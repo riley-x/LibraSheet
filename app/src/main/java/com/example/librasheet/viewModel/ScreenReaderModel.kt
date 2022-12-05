@@ -32,6 +32,9 @@ class ScreenReaderModel(
     val data = mutableStateListOf<ScreenReaderAccountState>()
 
     fun load() {
+        if (ScreenReader.nItems.value == 0) return
+
+        // TODO loading indicator
         viewModel.viewModelScope.launch {
             val incomeRulesDeferred = async(Dispatchers.IO) { ruleDao.getIncomeRules() }
             val expenseRulesDeferred = async(Dispatchers.IO) { ruleDao.getExpenseRules() }
@@ -51,7 +54,7 @@ class ScreenReaderModel(
                 accountStates
             }
 
-            data.clear()
+            data.clear() // TODO should append not clear
             data.addAll(accountStates)
         }
     }

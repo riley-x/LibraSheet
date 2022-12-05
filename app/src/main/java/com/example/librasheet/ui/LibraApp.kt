@@ -85,6 +85,10 @@ fun LibraApp(
         viewModel.rules.setScreen(income)
         navController.navigateSingleTop(RulesDestination.route)
     }
+    fun toScreenReaderScreen() {
+        viewModel.screenReader.load()
+        navController.navigateSingleTop(ScreenReaderDestination.route)
+    }
     fun onSaveColor(spec: String, color: Color) {
         viewModel.saveColor(spec, color)
         navController.popBackStack()
@@ -265,6 +269,7 @@ fun LibraApp(
                         toCategoryRules = ::toRulesScreen,
                         toAddTransaction = ::toSettingsTransactionDetail,
                         toAddCSV = ::toAddCsv,
+                        toScreenReader = ::toScreenReaderScreen,
                         toAllTransactions = ::toSettingsAllTransactions,
                         onBackupDatabase = ::backupDatabase,
                         modifier = Modifier.padding(innerPadding),
@@ -323,6 +328,19 @@ fun LibraApp(
                     BadCsvScreen(
                         lines = viewModel.csv.badLines,
                         onBack = navController::popBackStack,
+                        modifier = Modifier.padding(innerPadding),
+                    )
+                }
+                composable(route = ScreenReaderDestination.route) {
+                    ScreenReaderScreen(
+                        transactions = viewModel.screenReader.data,
+                        accounts = viewModel.accounts.all,
+                        onBack = navController::popBackStack,
+                        onAccountSelection = { _, _ -> },
+                        onInvertValues = { _, _ -> },
+                        onClickTransaction = { _, _ -> },
+                        onClear = { },
+                        onSave = { },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
