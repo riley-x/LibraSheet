@@ -148,16 +148,15 @@ object BofaReader {
         val date = leftInfo.getChild(0)?.text ?: return null
         val name = leftInfo.getChild(1)?.text ?: return null
 
-        if (date == "Pending") return null
-        val dateInt = formatter.parseOrNull(date.toString())?.toIntDate() ?: return null
-        if (dateInt < latestDate) return null
-
         val rightInfo = row.getChild(1) ?: return null
         if (rightInfo.childCount < 1) return null
         val value = rightInfo.getChild(0)?.text ?: return null
 
         Log.v("Libra/BofaReader/parseBofaTransactionRowLayout", "date=$date name=$name value=$value")
 
+        if (date == "Pending") return null
+        val dateInt = formatter.parseOrNull(date.toString())?.toIntDate() ?: return null
+        if (dateInt < latestDate) return null
 
         val valueDouble = value.toString()
             .replace(",", "")
