@@ -14,8 +14,8 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 
 @Composable
 fun TransactionCard(
+    screenReaderSize: Int, // this needs to be here to fix the preview
     modifier: Modifier = Modifier,
-    screenReaderSize: Int = ScreenReader.list.size, // this needs to be here to fix the preview
     toAddTransaction: () -> Unit = { },
     toAddCSV: () -> Unit = { },
     toScreenReader: () -> Unit = { },

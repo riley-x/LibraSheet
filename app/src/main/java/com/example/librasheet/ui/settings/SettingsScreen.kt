@@ -18,7 +18,7 @@ import com.example.librasheet.ui.theme.LibraSheetTheme
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    screenReaderSize: Int = ScreenReader.list.size, // this needs to be here to fix the preview
+    screenReaderSize: Int = ScreenReader.nItems.value, // this needs to be here to fix the preview
     toEditAccounts: () -> Unit = { },
     toEditCategories: () -> Unit = { },
     toCategoryRules: (income: Boolean) -> Unit = { },
