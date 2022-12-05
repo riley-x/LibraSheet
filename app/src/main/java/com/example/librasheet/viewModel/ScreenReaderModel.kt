@@ -29,6 +29,7 @@ class ScreenReaderModel(
     private val transactionDao = viewModel.application.database.transactionDao()
     private val rootCategory = viewModel.categories.data.all
 
+    var savedParsed: List<Pair<String, MutableSet<ParsedTransaction>>> = emptyList()
     val data = mutableStateListOf<ScreenReaderAccountState>()
 
     fun load() {
@@ -46,11 +47,10 @@ class ScreenReaderModel(
                 val categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
                 val accountStates = mutableListOf<ScreenReaderAccountState>()
 
-                ScreenReader.cache.mapTo(accountStates) { (accountName, transactions) ->
+                savedParsed = ScreenReader.cache.toList()
+                savedParsed.mapTo(accountStates) { (accountName, transactions) ->
                     createAccountState(accountName, transactions, categoryMap, incomeRules, expenseRules)
                 }
-                ScreenReader.reset()
-
                 accountStates
             }
 
@@ -59,17 +59,17 @@ class ScreenReaderModel(
         }
     }
 
+
     private fun createAccountState(
         accountName: String,
         parsed: Set<ParsedTransaction>,
         categoryMap: MutableMap<Long, Category>,
         incomeRules: List<CategoryRule>,
-        expenseRules: List<CategoryRule>
+        expenseRules: List<CategoryRule>,
+        account: Account? = viewModel.accounts.all.find { it.name == accountName },
+        inverted: Boolean = account?.institution?.invertScreenReader ?: false,
     ): ScreenReaderAccountState {
-        val account = viewModel.accounts.all.find { it.name == accountName }
-        val inverted = account?.institution?.invertScreenReader ?: false
         val transactions = mutableListOf<TransactionWithDetails>()
-
         for (parsedTransaction in parsed) {
             val value = if (inverted) -parsedTransaction.value else parsedTransaction.value
 
@@ -105,7 +105,10 @@ class ScreenReaderModel(
     }
 
     @Callback
-    fun clear() = data.clear()
+    fun clear() {
+        ScreenReader.reset()
+        data.clear()
+    }
 
     @Callback
     fun loadDetail(iAccount: Int, iTransaction: Int) {
@@ -127,36 +130,22 @@ class ScreenReaderModel(
         viewModel.viewModelScope.launch {
             val incomeRulesDeferred = async(Dispatchers.IO) { ruleDao.getIncomeRules() }
             val expenseRulesDeferred = async(Dispatchers.IO) { ruleDao.getExpenseRules() }
-            val categoryMapDeferred = async(Dispatchers.Main) { rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore } }
             val incomeRules = incomeRulesDeferred.await()
             val expenseRules = expenseRulesDeferred.await()
-            val categoryMap = categoryMapDeferred.await()
 
-            val transactions = withContext(Dispatchers.Main) {
-                val transactions = mutableListOf<TransactionWithDetails>()
-                for (t in data[iAccount].transactions) {
-                    val value = -t.transaction.value
-
-                    val rules = if (value > 0) incomeRules else expenseRules
-                    val rule = rules.find { it.pattern in t.transaction.name }
-                    val category = rule?.let { categoryMap.getOrDefault(it.categoryKey, null) }
-                        ?: Category.None
-
-                    transactions.add(t.copy(
-                        transaction = t.transaction.copy(
-                            value = value,
-                            valueAfterReimbursements = -t.transaction.valueAfterReimbursements,
-                            categoryKey = category.key,
-                        ).also { it.category = category }
-                    ))
-                }
-                transactions
+            val accountState = withContext(Dispatchers.IO) {
+                val categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
+                createAccountState(
+                    accountName = data[iAccount].parsedAccountName,
+                    account = data[iAccount].account,
+                    inverted = newValue,
+                    parsed = savedParsed[iAccount].second,
+                    categoryMap = categoryMap,
+                    incomeRules = incomeRules,
+                    expenseRules = expenseRules,
+                )
             }
-
-            data[iAccount] = data[iAccount].copy(
-                transactions = transactions,
-                inverted = newValue,
-            )
+            data[iAccount] = accountState
         }
     }
 
