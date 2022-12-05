@@ -89,6 +89,10 @@ fun LibraApp(
         viewModel.screenReader.load()
         navController.navigateSingleTop(ScreenReaderDestination.route)
     }
+    fun toScreenReaderDetail(iAccount: Int, iTransaction: Int) {
+        viewModel.screenReader.loadDetail(iAccount, iTransaction)
+        navController.navigateSingleTop(TransactionDetailDestinationRefactored.route(SettingsTab.graph))
+    }
     fun onSaveColor(spec: String, color: Color) {
         viewModel.saveColor(spec, color)
         navController.popBackStack()
@@ -336,10 +340,10 @@ fun LibraApp(
                         transactions = viewModel.screenReader.data,
                         accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
-                        onAccountSelection = { _, _ -> },
+                        onAccountSelection = viewModel.screenReader::setAccount,
                         onInvertValues = { _, _ -> },
                         onClickTransaction = { _, _ -> },
-                        onClear = { },
+                        onClear = viewModel.screenReader::clear,
                         onSave = { },
                         modifier = Modifier.padding(innerPadding),
                     )

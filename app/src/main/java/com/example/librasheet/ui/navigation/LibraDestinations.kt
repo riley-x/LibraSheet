@@ -100,6 +100,10 @@ object TransactionDetailDestination {
     private const val routeBase = "transaction_details"
     fun route(graph: String) = "${routeBase}_${graph}"
 }
+object TransactionDetailDestinationRefactored {
+    private const val routeBase = "transaction_details_new"
+    fun route(graph: String) = "${routeBase}_${graph}"
+}
 object TransactionAllDestination {
     private const val routeBase = "transaction_all"
     fun route(graph: String) = "${routeBase}_${graph}"

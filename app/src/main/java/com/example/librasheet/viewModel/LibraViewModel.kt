@@ -38,6 +38,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val csv = BaseCsvModel(this)
     val screenReader = ScreenReaderModel(this)
 
+    val transactionDetails = mutableListOf<TransactionDetailModel>()
+
     suspend fun startup() {
 
 

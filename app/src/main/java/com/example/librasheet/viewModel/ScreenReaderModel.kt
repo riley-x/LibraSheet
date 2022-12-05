@@ -3,6 +3,7 @@ package com.example.librasheet.viewModel
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
+import com.example.librasheet.data.dao.TransactionWithDetails
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.entity.ignoreKey
 import com.example.librasheet.screenReader.ParsedTransaction
@@ -94,6 +95,34 @@ class ScreenReaderModel(
             account = account,
             inverted = inverted,
             transactions = transactions,
+        )
+    }
+
+    @Callback
+    fun setAccount(i: Int, account: Account?) {
+        data[i] = data[i].copy(account = account)
+    }
+
+    @Callback
+    fun clear() = data.clear()
+
+    @Callback
+    fun loadDetail(iAccount: Int, iTransaction: Int) {
+        viewModel.transactionDetails.add(
+            TransactionDetailModel { new, old ->
+                val newList = data[iAccount].transactions.toMutableList()
+                newList[iTransaction] = new.transaction // TODO change to with details
+                data[iAccount] = data[iAccount].copy(transactions = newList)
+                true
+            }
+        )
+        viewModel.transactionDetails.last().load(
+            account = data[iAccount].account,
+            t = TransactionWithDetails(
+                transaction = data[iAccount].transactions[iTransaction],
+                reimbursements = emptyList(),
+                allocations = emptyList(),
+            )
         )
     }
 }

@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.ui.transaction.*
 import com.example.librasheet.viewModel.LibraViewModel
+import com.example.librasheet.viewModel.TransactionDetailModel
 
 fun NavGraphBuilder.transactionScreens(
     viewModel: LibraViewModel,
@@ -20,6 +21,7 @@ fun NavGraphBuilder.transactionScreens(
 ) {
     val isSettings = route == SettingsTab.graph
     val state = if (isSettings) viewModel.transactionsSettings else viewModel.transactionsBalance
+    val detail = viewModel.transactionDetails.lastOrNull() ?: TransactionDetailModel()
 
     fun toDetail(t: TransactionEntity = TransactionEntity()) {
         state.loadDetail(t)
@@ -94,6 +96,33 @@ fun NavGraphBuilder.transactionScreens(
             onEditAllocation = ::onEditAllocation,
             onDeleteAllocation = state::deleteAllocation,
             onReorderAllocation = state::reorderAllocation,
+            bottomPadding = innerPadding.calculateBottomPadding(),
+        )
+    }
+
+    composable(route = TransactionDetailDestinationRefactored.route(route!!)) {
+        TransactionDetailScreen(
+            account = detail.account,
+            category = detail.category,
+            name = detail.name,
+            date = detail.date,
+            value = detail.value,
+            dateError = detail.dateError,
+            valueError = detail.valueError,
+            reimbursements = detail.reimbursements,
+            allocations = detail.allocations,
+            accounts = viewModel.accounts.all,
+            incomeCategories = viewModel.categories.incomeTargets,
+            expenseCategories = viewModel.categories.expenseTargets,
+            onBack = navController::popBackStack,
+            onSave = detail::save,
+//            onAddReimbursement = ::onAddReimbursement,
+//            onDeleteReimbursement = state::deleteReimbursement,
+//            onChangeReimbursementValue = ::onChangeReimbursementValue,
+//            onAddAllocation = ::onAddAllocation,
+//            onEditAllocation = ::onEditAllocation,
+            onDeleteAllocation = detail::deleteAllocation,
+            onReorderAllocation = detail::reorderAllocation,
             bottomPadding = innerPadding.calculateBottomPadding(),
         )
     }
