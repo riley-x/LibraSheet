@@ -28,6 +28,9 @@ object ChaseReader {
      *      .....[Pending] [null] <-- com.chase.sig.android:id/
      *
      * Credit card all transactions screen, 2048 event.source
+     *
+     * Warning! When scrolling fast, the date headers / transactions may come out-of-sync.
+     *
      *      [null] [null] <-- null
      *
      *      ~~~ Header ~~~
@@ -108,13 +111,12 @@ object ChaseReader {
             val tabHost = node.child(1) ?: return null
             val tabContent = tabHost.child(1)?.child(0) ?: return null
             val transactionsNode = tabContent.child(1) ?: return null
+//            printAllViews(transactionsNode)
 
             val account = parseAccountName(header) ?: "Unknown"
             val lastDate = reader.getLatestDate(account)
             val transactions = parseTransactions(transactionsNode, lastDate)
             return Pair(account, transactions)
-//            printAllViews(reader.rootInActiveWindow, maxDepth = 2)
-//            printAllViews(node)
         }
         return null
     }
@@ -183,8 +185,10 @@ object ChaseReader {
         for (i in 0 until transactions.childCount) {
             /** Iterate through the depth-5 nodes until we find a date header **/
             val node = transactions.getChild(i) ?: continue
+
             val newDate = parseDateHeader(node)
             if (newDate != null) {
+                if (newDate < latestDate) break
                 date = newDate
                 continue
             }
@@ -192,7 +196,7 @@ object ChaseReader {
 
             val (name, value) = parseTransaction(node) ?: continue
             out.add(ParsedTransaction(date = date, name = name, value = value))
-            Log.v("Libra/ChaseReader/parseTransactions", "date=$date name=$name value=$value")
+            Log.v("Libra/ChaseReader/parseTransactions", "i=$i date=$date name=$name value=$value")
         }
         return out
     }
@@ -217,30 +221,34 @@ object ChaseReader {
      *      [null] [null] <-- null
      *
      *      .[null] [null] <-- null
-     *      ..[Split with Zelle®] [null] <-- null
+     *      ..[Split with Zelle®] [null] <-- null                       << this doesn't always appear, so can't use indices >>
      *
      *      .[null] [null] <-- null
      *      ..[SQ *SAKE BAR DECIBEL] [null] <-- com.chase.sig.android:id/merchant_name
      *      ..[Food & drink] [null] <-- com.chase.sig.android:id/
-     *      ..[null] [null] <-- com.chase.sig.android:id/              << this only appears when "Pay over time" is shown, so can't use indices >>
+     *      ..[null] [null] <-- com.chase.sig.android:id/               << this doesn't always appear, so can't use indices >>
      *      ...[Pay over time] [null] <-- com.chase.sig.android:id/
      *      ..[$107.92] [$107.92] <-- com.chase.sig.android:id/trans_amount
      */
     private fun parseTransaction(node: AccessibilityNodeInfo?): Pair<String, Long>? {
+        if (node == null) return null
         var name: String? = null
         var amount: Long? = null
 
-        val dataNode = node?.child(1) ?: return null
-        if (dataNode.childCount < 3) return null
-        for (i in 0 until dataNode.childCount) {
-            val c = dataNode.getChild(i) ?: return null
-            if (c.viewIdResourceName == "com.chase.sig.android:id/merchant_name") {
-                name = c.text.toString()
-            } else if (c.viewIdResourceName == "com.chase.sig.android:id/trans_amount") {
-                amount = c.text.toString()
-                    .replace(",", "")
-                    .replace("$", "")
-                    .toDoubleOrNull()?.toLongDollar() ?: return null
+        for (j in 0 until node.childCount) {
+            val dataNode = node.getChild(j) ?: continue
+            if (dataNode.childCount < 3) continue
+
+            for (i in 0 until dataNode.childCount) {
+                val c = dataNode.getChild(i) ?: return null
+                if (c.viewIdResourceName == "com.chase.sig.android:id/merchant_name") {
+                    name = c.text.toString()
+                } else if (c.viewIdResourceName == "com.chase.sig.android:id/trans_amount") {
+                    amount = c.text.toString()
+                        .replace(",", "")
+                        .replace("$", "")
+                        .toDoubleOrNull()?.toLongDollar() ?: return null
+                }
             }
         }
 

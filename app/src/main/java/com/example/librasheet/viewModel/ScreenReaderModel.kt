@@ -33,7 +33,8 @@ class ScreenReaderModel(
     val data = mutableStateListOf<ScreenReaderAccountState>()
 
     fun load() {
-        if (ScreenReader.nItems.value == 0) return
+        if (ScreenReader.nItems.value == 0 ) return
+        if (data.isNotEmpty()) return
 
         // TODO loading indicator
         viewModel.viewModelScope.launch {
