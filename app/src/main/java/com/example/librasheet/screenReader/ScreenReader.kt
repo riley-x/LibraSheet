@@ -9,6 +9,9 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import com.example.librasheet.data.LibraDatabase
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flowOf
 
 
 class ScreenReader : AccessibilityService() {
@@ -26,6 +29,7 @@ class ScreenReader : AccessibilityService() {
         }
 
         fun add(account: String, transactions: List<ParsedTransaction>) {
+            Log.d("Libra/ScreenReader/add", "$account $transactions")
             val x = cache.getOrPut(account) { mutableSetOf() }
             transactions.forEach {
                 if (x.add(it)) {
@@ -43,6 +47,14 @@ class ScreenReader : AccessibilityService() {
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job)
+
+    /**
+     * A MutableStateFlow<AccessibilityEvent?>(null) sometimes doesn't work, all the fields of the
+     * event are sometimes null when it's collected. Also weird error "java.lang.IllegalStateException:
+     * Cannot perform this action on a sealed instance." FATAL EXCEPTION: main when trying to print event.source
+     */
+    private val flow = MutableStateFlow<Pair<String, List<ParsedTransaction>>?>(null)
+
     val database: LibraDatabase by lazy { LibraDatabase.getDatabase(this) }
     var accountDates = mutableMapOf<String, Int>()
 
@@ -56,12 +68,16 @@ class ScreenReader : AccessibilityService() {
 
     override fun onInterrupt() {}
 
+    @OptIn(FlowPreview::class)
     override fun onServiceConnected() {
         scope.launch {
             accountDates = withContext(Dispatchers.IO) {
                 database.transactionDao().getLastDates().toMutableMap()
             }
             Log.d("Libra/ScreenReader/onServiceConnected", "$accountDates")
+
+            flow.debounce(200)
+                .collect { it?.let { add(it.first, it.second) } }
         }
     }
 
@@ -77,13 +93,14 @@ class ScreenReader : AccessibilityService() {
             )
         }
 
-        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
+            && event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
 
-        when(event.packageName) {
+        flow.value = when(event.packageName) {
             "com.infonow.bofa" -> BofaReader.parse(this, event)
             "com.chase.sig.android" -> ChaseReader.parse(this, event)
             else -> null
-        }?.let { add(it.first, it.second) }
+        }
 
 //        val node = rootInActiveWindow
 //        Log.v("Libra/ScreenReader", "${node == null}")
