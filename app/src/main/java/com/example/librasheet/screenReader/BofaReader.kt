@@ -159,8 +159,7 @@ object BofaReader {
         if (dateInt < latestDate) return null
 
         val valueDouble = value.toString()
-            .replace(",", "")
-            .replace("$", "")
+            .filter { ",$".indexOf(it) == -1 }
             .toDoubleOrNull()?.toLongDollar() ?: return null
 
         return ParsedTransaction(

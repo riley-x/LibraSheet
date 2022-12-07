@@ -245,8 +245,7 @@ object ChaseReader {
                     name = c.text.toString()
                 } else if (c.viewIdResourceName == "com.chase.sig.android:id/trans_amount") {
                     amount = c.text.toString()
-                        .replace(",", "")
-                        .replace("$", "")
+                        .filter { ",$".indexOf(it) == -1 }
                         .toDoubleOrNull()?.toLongDollar() ?: return null
                 }
             }

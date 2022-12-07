@@ -99,6 +99,7 @@ class ScreenReader : AccessibilityService() {
         flow.value = when(event.packageName) {
             "com.infonow.bofa" -> BofaReader.parse(this, event)
             "com.chase.sig.android" -> ChaseReader.parse(this, event)
+            "com.venmo" -> VenmoReader.parse(this, event)
             else -> null
         }
 
@@ -122,7 +123,7 @@ internal fun printAllViews(nodeInfo: AccessibilityNodeInfo?, depth: Int = 0, max
     if (nodeInfo == null) return
     if (maxDepth >= 0 && depth > maxDepth) return
 
-    var log = ".".repeat(depth)
+    var log = "$depth".padEnd(2 + depth * 2, ' ')
     log += "[${nodeInfo.text}] [${nodeInfo.contentDescription}] <-- ${nodeInfo.viewIdResourceName}"
     Log.v("Libra/ScreenReader/printAllViews", replaceNonPrintableCharacters(log))
 
