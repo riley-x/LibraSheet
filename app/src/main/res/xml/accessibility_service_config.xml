@@ -10,6 +10,7 @@
     android:notificationTimeout="100"
     android:canRetrieveWindowContent="true"
     android:settingsActivity="com.example.android.accessibility.ServiceSettingsActivity"
+    android:packageNames="com.infonow.bofa,com.chase.sig.android,com.venmo"
     />
 <!-- For some reason specifying eventTypes=typeWindowContentChanged doesn't show all changes?
   And setting typeViewScrolled makes source=null. But with allMask scrolling shows typeWindowContentChanged
@@ -17,4 +18,3 @@
  -->
     <!--    android:accessibilityEventTypes="typeViewScrolled|typeViewSelected|typeViewFocused|typeWindowContentChanged|typeWindowStateChanged"-->
     <!--    android:accessibilityEventTypes="typeAllMask"-->
-    <!--    android:packageNames="com.infonow.bofa"-->
