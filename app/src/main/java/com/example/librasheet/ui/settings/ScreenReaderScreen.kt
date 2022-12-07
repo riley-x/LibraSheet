@@ -2,16 +2,29 @@ package com.example.librasheet.ui.settings
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,6 +39,21 @@ import com.example.librasheet.viewModel.ScreenReaderAccountState
 import com.example.librasheet.viewModel.preview.previewAccounts
 import com.example.librasheet.viewModel.preview.previewTransactionWithDetails
 import com.example.librasheet.viewModel.preview.previewTransactions
+
+val supportedApps = buildAnnotatedString {
+    withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+        append("Bank of America: ")
+    }
+    append("navigate to the \"All transactions\" page for any account.\n\n")
+    withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+        append("Chase: ")
+    }
+    append("navigate to the \"See all transactions\" page for any account.\n\n")
+    withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+        append("Venmo: ")
+    }
+    append("navigate to the \"Me\" tab, select the magnifying glass, and select applicable filters\n")
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -50,58 +78,100 @@ fun ScreenReaderScreen(
             onBack = onBack,
         )
 
-        LazyColumn(
-            modifier = Modifier.weight(10f)
-        ) {
-            transactions.forEachIndexed { iAccount, it ->
-                if (iAccount > 0) item {
-                    Spacer(Modifier.height(40.dp))
-                }
-
-                stickyHeader {
-                    ScreenReaderAccountHeader(
-                        state = it,
-                        accounts = accounts,
-                        onAccountSelection = { onAccountSelection(iAccount, it) },
-                        onInvertValues = { onInvertValues(iAccount, it) }
+        if (transactions.isEmpty()) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
+                    textAlign = TextAlign.Justify,
+                    text = "Libra Sheet can automatically record transactions from your banking apps. " +
+                            "Whenever you view your transactions inside another app, Libra Sheet will parse them as you scroll. " +
+                            "Return to this screen to edit and save the parsed transactions. " +
+                            "Currently the supported apps are:\n",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp, end = 20.dp)
+                ) {
+                    Text(
+                        color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
+                        text = supportedApps,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
+                Text(
+                    color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
+                    textAlign = TextAlign.Justify,
+                    text = "Note that you must enable this service via the Android settings menu in " +
+                            "\"Accessibility -> Installed services\".",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                )
+                // TODO add button to open settings?
+                //  https://stackoverflow.com/questions/10061154/how-to-programmatically-enable-disable-accessibility-service-in-android
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.weight(10f)
+            ) {
+                transactions.forEachIndexed { iAccount, it ->
+                    if (iAccount > 0) item {
+                        Spacer(Modifier.height(40.dp))
+                    }
 
-                itemsIndexed(it.transactions) { iTransaction, t ->
-                    Column {
-                        if (iTransaction > 0) {
-                            RowDivider()
-                        } else {
-                            Spacer(Modifier.height(4.dp))
-                        }
-
-                        TransactionRow(
-                            transaction = t.transaction,
-                            modifier = Modifier.clickable { onClickTransaction(iAccount, iTransaction) }
+                    stickyHeader {
+                        ScreenReaderAccountHeader(
+                            state = it,
+                            accounts = accounts,
+                            onAccountSelection = { onAccountSelection(iAccount, it) },
+                            onInvertValues = { onInvertValues(iAccount, it) }
                         )
+                    }
+
+                    itemsIndexed(it.transactions) { iTransaction, t ->
+                        Column {
+                            if (iTransaction > 0) {
+                                RowDivider()
+                            } else {
+                                Spacer(Modifier.height(4.dp))
+                            }
+
+                            TransactionRow(
+                                transaction = t.transaction,
+                                modifier = Modifier.clickable { onClickTransaction(iAccount, iTransaction) }
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth().padding(bottom= 4.dp),
-        ) {
-            Button(
-                onClick = onClear,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.error,
-                ),
-                modifier = Modifier.width(80.dp)
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
             ) {
-                Text("Clear", fontSize = 18.sp)
-            }
-            Button(
-                onClick = onSave,
-                modifier = Modifier.width(80.dp)
-            ) {
-                Text("Save", fontSize = 18.sp)
+                Button(
+                    onClick = onClear,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.error,
+                    ),
+                    modifier = Modifier.width(80.dp)
+                ) {
+                    Text("Clear", fontSize = 18.sp)
+                }
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.width(80.dp)
+                ) {
+                    Text("Save", fontSize = 18.sp)
+                }
             }
         }
     }
@@ -152,6 +222,17 @@ fun ScreenReaderAccountHeader(
                 )
             }
 
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewMessage() {
+    val t = remember { mutableStateListOf<ScreenReaderAccountState>() }
+    LibraSheetTheme {
+        Surface {
+            ScreenReaderScreen(transactions = t, accounts = previewAccounts)
         }
     }
 }

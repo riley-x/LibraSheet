@@ -111,7 +111,7 @@ fun ReimbursementRow(
                 text = formatDollar(r.value),
             )
             Text(
-                text = "Total: " + formatDollar(r.transaction.value),
+                text = formatDollar(r.transaction.value),
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
                 style = MaterialTheme.typography.body2,
             )
