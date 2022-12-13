@@ -52,7 +52,7 @@ val supportedApps = buildAnnotatedString {
     withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
         append("Venmo: ")
     }
-    append("navigate to the \"Me\" tab, select the magnifying glass, and select applicable filters\n")
+    append("navigate to the \"Me\" tab, select the magnifying glass, and select \"Filter -> By payment method -> Venmo balance\"\n")
 }
 
 
