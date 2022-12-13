@@ -32,10 +32,13 @@ fun CategoryRow(
     onExpand: (Boolean) -> Unit = { expanded.targetState = it },
     content: @Composable RowScope.(CategoryUi) -> Unit = { },
     subRow: @Composable ColumnScope.(Int, CategoryUi) -> Unit = { index, cat ->
+        val lastIndex =
+            if (filterZeros) category.subCategories.lastIndex
+            else category.subCategories.indexOfLast { it.value > 0 }
         CategorySubRow(
             category = cat,
             indicatorColor = category.color.copy(alpha = 0.5f),
-            last = index == category.subCategories.lastIndex,
+            last = index == lastIndex,
         ) {
             content(cat)
         }
