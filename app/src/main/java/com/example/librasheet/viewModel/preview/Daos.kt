@@ -182,6 +182,10 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
+    override fun addToReimbursementValue(transactionKey: Long, value: Long) {
+        TODO("Not yet implemented")
+    }
+
     override fun updateCategoryHistory(account: Long, category: Long, date: Int, value: Long) {
         TODO("Not yet implemented")
     }

@@ -33,6 +33,9 @@ interface TransactionDao {
     @Query("UPDATE $accountTable SET balance = balance + :value WHERE `key` = :account")
     fun updateBalance(account: Long, value: Long)
 
+    @Query("UPDATE $transactionTable SET valueAfterReimbursements = valueAfterReimbursements + :value WHERE `key` = :transactionKey")
+    fun addToReimbursementValue(transactionKey: Long, value: Long)
+
     /** Don't use this function, use instead [updateCategoryHistory] **/
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addCategoryEntry(categoryHistory: CategoryHistory)
@@ -90,6 +93,18 @@ interface TransactionDao {
         add(new)
     }
 
+    /**
+     * Assumes [t] exists in the database already.
+     */
+    @Transaction
+    fun addReimbursementValue(t: TransactionEntity, value: Long) {
+        Log.d("Libra/TransactionDao/addReimbursementValue", "$t $value")
+        if (t.accountKey <= 0) return
+        val categoryKey = if (t.categoryKey != 0L) t.categoryKey else if (t.value > 0) incomeKey else expenseKey
+        updateCategoryHistory(t.accountKey, categoryKey, thisMonthEnd(t.date), value)
+        addToReimbursementValue(t.key, value)
+    }
+
     @RawQuery
     fun get(q: SimpleSQLiteQuery): List<TransactionEntity>
 
@@ -123,7 +138,7 @@ interface TransactionDao {
 
     /** Value should always be positive **/
     @Transaction
-    fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long): Pair<TransactionEntity, TransactionEntity> {
+    fun addReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
         Log.d("Libra/TransactionDao/addReimbursement", "1: $t1")
         Log.d("Libra/TransactionDao/addReimbursement", "2: $t2")
         val expense = if (t1.value > 0) t2 else t1
@@ -134,30 +149,20 @@ interface TransactionDao {
             incomeId = income.key,
             value = value
         )
-        val newIncome = income.copy(
-            valueAfterReimbursements = income.valueAfterReimbursements - value
-        )
-        val newExpense = expense.copy(
-            valueAfterReimbursements = expense.valueAfterReimbursements + value
-        )
         insert(reimbursement)
-        update(newIncome, income)
-        update(newExpense, expense)
+        addReimbursementValue(income, -value)
+        addReimbursementValue(expense, value)
 
         /** Need to also log difference to "Ignore category" for balance history total **/
         if (income.accountKey != expense.accountKey) {
             updateCategoryHistory(income.accountKey, ignoreKey, thisMonthEnd(income.date), value)
             updateCategoryHistory(expense.accountKey, ignoreKey, thisMonthEnd(expense.date), -value)
         }
-
-        val new1 = if (t1.value > 0) newIncome else newExpense
-        val new2 = if (t1.value > 0) newExpense else newIncome
-        return Pair(new1, new2)
     }
 
     /** Value should always be positive **/
     @Transaction
-    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long): Pair<TransactionEntity, TransactionEntity> {
+    fun deleteReimbursement(t1: TransactionEntity, t2: TransactionEntity, value: Long) {
         Log.d("Libra/TransactionDao/deleteReimbursement", "1: $t1")
         Log.d("Libra/TransactionDao/deleteReimbursement", "2: $t2")
         val expense = if (t1.value > 0) t2 else t1
@@ -168,25 +173,15 @@ interface TransactionDao {
             incomeId = income.key,
             value = 0
         )
-        val newIncome = income.copy(
-            valueAfterReimbursements = income.valueAfterReimbursements + value
-        )
-        val newExpense = expense.copy(
-            valueAfterReimbursements = expense.valueAfterReimbursements - value
-        )
+        addReimbursementValue(income, value)
+        addReimbursementValue(expense, -value)
         delete(reimbursement)
-        update(newIncome, income)
-        update(newExpense, expense)
 
         /** Need to also log difference to "Ignore category" for balance history total **/
         if (income.accountKey != expense.accountKey) {
             updateCategoryHistory(income.accountKey, ignoreKey, thisMonthEnd(income.date), -value)
             updateCategoryHistory(expense.accountKey, ignoreKey, thisMonthEnd(expense.date), value)
         }
-
-        val new1 = if (t1.value > 0) newIncome else newExpense
-        val new2 = if (t1.value > 0) newExpense else newIncome
-        return Pair(new1, new2)
     }
 
 
@@ -242,26 +237,27 @@ interface TransactionDao {
 
 
     @Transaction
-    fun add(t: TransactionWithDetails) {
-        val key = add(t.transaction)
-        Log.d("Libra/TransactionDao/add", "oldKey=${t.transaction.key} newKey=$key")
-        var trans = t.transaction.copy(key = key)
-        t.reimbursements.forEach {
-            trans = addReimbursement(trans, it.transaction, it.value).first
+    fun add(transaction: TransactionWithDetails) {
+        val key = add(transaction.transaction)
+        Log.d("Libra/TransactionDao/add", "oldKey=${transaction.transaction.key} newKey=$key")
+
+        val t = transaction.transaction.copy(key = key)
+        transaction.reimbursements.forEach {
+            addReimbursement(t, it.transaction, it.value)
         }
-        t.allocations.forEach {
-            addAllocation(trans, it.copy(transactionKey = key))
+        transaction.allocations.forEach {
+            addAllocation(t, it.copy(transactionKey = key))
         }
     }
 
     @Transaction
     fun undo(t: TransactionWithDetails) {
-        var trans = t.transaction
+        val trans = t.transaction
         t.allocations.forEach {
             removeAllocation(trans, it)
         }
         t.reimbursements.forEach {
-            trans = deleteReimbursement(trans, it.transaction, it.value).first
+            deleteReimbursement(trans, it.transaction, it.value)
         }
         undo(trans)
     }
