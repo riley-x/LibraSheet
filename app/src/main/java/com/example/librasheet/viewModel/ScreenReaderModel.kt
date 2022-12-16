@@ -29,12 +29,14 @@ class ScreenReaderModel(
     private val transactionDao = viewModel.application.database.transactionDao()
     private val rootCategory = viewModel.categories.data.all
 
-    var savedParsed: List<Pair<String, MutableSet<ParsedTransaction>>> = emptyList()
+    val savedParsed = mutableMapOf<String, MutableSet<ParsedTransaction>>()
     val data = mutableStateListOf<ScreenReaderAccountState>()
+    private var lastLoadScreenReaderNItems = 0
 
     fun load() {
-        if (ScreenReader.nItems.value == 0 ) return
-        if (data.isNotEmpty()) return
+        if (ScreenReader.nItems.value == 0) return
+        if (ScreenReader.nItems.value <= lastLoadScreenReaderNItems) return
+        lastLoadScreenReaderNItems = ScreenReader.nItems.value
 
         // TODO loading indicator
         viewModel.viewModelScope.launch {
@@ -48,14 +50,16 @@ class ScreenReaderModel(
                 val categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
                 val accountStates = mutableListOf<ScreenReaderAccountState>()
 
-                savedParsed = ScreenReader.cache.toList()
+                ScreenReader.cache.forEach { (account, set) ->
+                    savedParsed.getOrPut(account) { mutableSetOf() }.addAll(set)
+                }
                 savedParsed.mapTo(accountStates) { (accountName, transactions) ->
                     createAccountState(accountName, transactions, categoryMap, incomeRules, expenseRules)
                 }
                 accountStates
             }
 
-            data.clear() // TODO should append not clear
+            data.clear()
             data.addAll(accountStates)
         }
     }
@@ -108,6 +112,7 @@ class ScreenReaderModel(
     @Callback
     fun clear() {
         ScreenReader.reset()
+        savedParsed.clear()
         data.clear()
     }
 
@@ -140,7 +145,7 @@ class ScreenReaderModel(
                     accountName = data[iAccount].parsedAccountName,
                     account = data[iAccount].account,
                     inverted = newValue,
-                    parsed = savedParsed[iAccount].second,
+                    parsed = savedParsed.toList()[iAccount].second,
                     categoryMap = categoryMap,
                     incomeRules = incomeRules,
                     expenseRules = expenseRules,
