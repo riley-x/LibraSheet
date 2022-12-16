@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.categories
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Column
@@ -33,7 +34,7 @@ fun CategoryRow(
     content: @Composable RowScope.(CategoryUi) -> Unit = { },
     subRow: @Composable ColumnScope.(Int, CategoryUi) -> Unit = { index, cat ->
         val lastIndex =
-            if (filterZeros) category.subCategories.lastIndex
+            if (!filterZeros) category.subCategories.lastIndex
             else category.subCategories.indexOfLast { it.value > 0 }
         CategorySubRow(
             category = cat,

@@ -35,7 +35,9 @@ fun CategoryDragRow(
      * category row can be different if they're expanded. So it doesn't make sense to have
      * fixed dividers like in the EditAccountScreen. **/
     val dividerColor = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
-    val lastSubIndex = category.subCategories.indexOfLast { it.value > 0 }
+    val lastSubIndex =
+        if (filterZeros) category.subCategories.indexOfLast { it.value > 0 }
+        else category.subCategories.lastIndex
 
     DragToReorderTarget(
         index = index,
