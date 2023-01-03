@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.LibraApplication
+import com.example.librasheet.data.createMonthList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -40,10 +41,17 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
     val transactionDetails = mutableMapOf<String, TransactionDetailModel>()
 
+    val months = mutableListOf<Int>()
+
     suspend fun startup() {
-
-
         Log.d("Libra/LibraViewModel/startup", "Startup")
+        val newMonths = withContext(Dispatchers.IO) {
+            createMonthList(application.database.transactionDao().getEarliestDate())
+        }
+        months.clear()
+        months.addAll(newMonths)
+        Log.d("Libra/LibraViewModel/startup", "Months: $months")
+
         viewModelScope.launch {
             accounts.load().join()
             balanceGraphs.loadHistory(accounts.all)

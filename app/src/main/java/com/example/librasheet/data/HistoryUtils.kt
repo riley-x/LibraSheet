@@ -1,5 +1,6 @@
 package com.example.librasheet.data
 
+import android.icu.util.Calendar
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.example.librasheet.ui.graphing.StackedLineGraphValue
@@ -24,9 +25,30 @@ interface Series {
 }
 
 
+/**
+ * Creates a list of calendar months between [startDate] and the current date. The months are encoded
+ * as int dates with the day set to 0 to indicate the last date of the previous month. For example,
+ * 2022-12-00 corresponds to Nov 2022.
+ *
+ * @param [startDate] should be a month end in the format above.
+ */
+fun createMonthList(startDate: Int): MutableList<Int> {
+    val end = thisMonthEnd(Calendar.getInstance().toIntDate())
+    val out = mutableListOf<Int>()
+
+    var it = startDate
+    while (it <= end) {
+        out.add(it)
+        it = incrementMonthEnd(it)
+    }
+    return out
+}
+
+
 /** This takes a list of account history, assumed in increasing date order, and folds it into a
  * map accountKey -> balances. The balances of each account will be zero padded so they all have the
- * same length. **/
+ * same length.
+ **/
 fun List<HistoryEntry>.alignDates(
     cumulativeSum: Boolean = true
 ): Pair<MutableList<Int>, MutableMap<Long, MutableList<Long>>> {

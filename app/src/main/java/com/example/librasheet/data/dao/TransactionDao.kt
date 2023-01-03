@@ -25,6 +25,9 @@ interface TransactionDao {
         if (account == null) count(date, value)
         else _count(account, date, value)
 
+    @Query("SELECT MIN(date) FROM $transactionTable")
+    fun getEarliestDate(): Int
+
     @MapInfo(keyColumn = "name", valueColumn = "date")
     @Query("SELECT $accountTable.name as name, MAX(date) as date FROM $transactionTable " +
             "INNER JOIN $accountTable ON $transactionTable.accountKey=$accountTable.`key` GROUP BY accountKey")

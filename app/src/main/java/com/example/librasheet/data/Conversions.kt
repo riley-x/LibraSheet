@@ -25,6 +25,19 @@ fun thisMonthEnd(date: Int): Int {
     return if (month == 12) getIntDate(year + 1, 1, 0)
     else getIntDate(year, month + 1, 0)
 }
+
+/**
+ * Assuming [monthYear] is a date in the format YYYYMM00, returns the next month in the same format.
+ * The months are encoded as int dates with the day set to 0 to indicate the last date of the
+ * previous month. For example, 20221200 corresponds to Nov 2022.
+ */
+fun incrementMonthEnd(monthYear: Int): Int {
+    val month = getMonth(monthYear)
+    val year = getYear(monthYear)
+    return if (month == 12) getIntDate(year + 1, 1, 0)
+    else getIntDate(year, month + 1, 0)
+}
+
 fun monthDiff(end: Int, start: Int): Int {
     val years = getYear(end) - getYear(start)
     val months = getMonth(end) - getMonth(start)

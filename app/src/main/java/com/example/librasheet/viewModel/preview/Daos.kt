@@ -166,6 +166,10 @@ internal class FakeTransactionDao: TransactionDao {
         TODO("Not yet implemented")
     }
 
+    override fun getEarliestDate(): Int {
+        TODO("Not yet implemented")
+    }
+
     override fun getLastDates(): Map<String, Int> {
         TODO("Not yet implemented")
     }
