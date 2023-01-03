@@ -41,12 +41,12 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
     val transactionDetails = mutableMapOf<String, TransactionDetailModel>()
 
-    val months = mutableListOf<Int>()
+    internal val months = mutableListOf<Int>()
 
     suspend fun startup() {
         Log.d("Libra/LibraViewModel/startup", "Startup")
         val newMonths = withContext(Dispatchers.IO) {
-            createMonthList(application.database.transactionDao().getEarliestDate())
+            createMonthList(application.database.categoryHistoryDao().getEarliestDate())
         }
         months.clear()
         months.addAll(newMonths)

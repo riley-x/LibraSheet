@@ -86,6 +86,62 @@ fun List<HistoryEntry>.alignDates(
 }
 
 /**
+ * As above but with a custom date set. Will throw an error if a date in [this] is not present in
+ * [dates].
+ */
+fun List<HistoryEntry>.alignDates(
+    dates: List<Int>,
+    cumulativeSum: Boolean = true
+): MutableMap<Long, MutableList<Long>> {
+    /** Outputs **/
+    val balances = mutableMapOf<Long, MutableList<Long>>()
+    if (isEmpty()) return balances
+
+    /** Aggregators. We assume the list is in date order, so same dates should be next to each other.
+     * Collect values until we find a new date, at which point we update the former date. **/
+    var currentDateIt = 0 // This also is the size of each list in [balances]
+    val currentValues = mutableMapOf<Long, Long>()
+    fun update() {
+        balances.forEach { (account, list) ->
+            var value = currentValues.getOrDefault(account, 0L)
+            if (cumulativeSum) value += list.lastOrNull() ?: 0
+            list.add(value)
+        }
+        currentValues.clear()
+        currentDateIt += 1
+    }
+
+    /** Main loop **/
+    forEach {
+        fun getCurrentDate(): Int {
+            val date = dates.getOrNull(currentDateIt) ?: throw RuntimeException("alignDates() out of dates at entry $it")
+            if (date > it.date) throw RuntimeException("alignDates() mismatched date $date at entry $it")
+            return date
+        }
+
+        /** Update intermediate dates until we reach the date of the current entry. **/
+        var currentDate = getCurrentDate()
+        while (currentDate < it.date) {
+            update()
+            currentDate = getCurrentDate()
+        }
+
+        /** Log balance for this date. Don't push back here, wait for date change. **/
+        if (it.seriesKey !in balances) {
+            balances[it.seriesKey] = List(currentDateIt) { 0L }.toMutableList()
+        }
+        currentValues[it.seriesKey] = it.value
+    }
+
+    /** Update remaining dates if [this] doesn't contain them **/
+    while (currentDateIt < dates.size) {
+        update()
+    }
+
+    return balances
+}
+
+/**
  * Gets a list of values that can be passed to the stacked line graph. [this] should be a map as
  * returned by [alignDates]. This function will skip any series that have negative values (after
  * application of [multiplier]).
