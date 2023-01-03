@@ -85,13 +85,12 @@ class CategoryData(
     }
 
     /** Category history. This relies on the categories to be loaded first. **/
-    fun loadHistory(): List<Job> {
+    fun loadHistory(months: List<Int>): List<Job> {
         val jobs = mutableListOf<Job>()
 
         jobs.launchIO {
-            val res = historyDao.getAll().alignDates(cumulativeSum = false)
-            historyDates = res.first
-            history = res.second
+            historyDates = months.toMutableList()
+            history = historyDao.getAll().alignDates(dates = months, cumulativeSum = false)
             /** Sum subCategories into parents. **/
             income.sumChildren(history)
             expense.sumChildren(history)

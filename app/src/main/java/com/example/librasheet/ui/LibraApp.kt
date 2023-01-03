@@ -62,7 +62,7 @@ fun LibraApp(
         }
     }
     fun toAccountDetails(account: Account) {
-        viewModel.accountDetail.load(account.key)
+        viewModel.accountDetail.load(months = viewModel.months, account = account.key)
         navController.navigate(AccountDestination.route)
     }
     fun toBalanceColorSelector(spec: String) = navController.navigateSingleTop(ColorDestination.argRoute(BalanceTab.graph, spec))

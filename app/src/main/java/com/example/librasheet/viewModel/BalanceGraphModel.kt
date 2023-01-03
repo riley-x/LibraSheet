@@ -55,7 +55,7 @@ class BalanceGraphModel(
     fun loadHistory(accounts: List<Account>, months: List<Int>) = viewModel.viewModelScope.launch {
         historyDateInts = months
         history = withContext(Dispatchers.IO) {
-            accountDao.getHistory().alignDates(months, cumulativeSum = true)
+            accountDao.getHistory().alignDates(dates = months, cumulativeSum = true)
         }
         Log.d("Libra/BalanceGraphModel/loadHistory", "${historyDateInts.takeLast(10)}")
         Log.d("Libra/BalanceGraphModel/loadHistory", "${history}")

@@ -50,7 +50,7 @@ fun createMonthList(startDate: Int): MutableList<Int> {
  * same length.
  **/
 fun List<HistoryEntry>.alignDates(
-    cumulativeSum: Boolean = true
+    cumulativeSum: Boolean = false
 ): Pair<MutableList<Int>, MutableMap<Long, MutableList<Long>>> {
     /** Outputs **/
     val dates = mutableListOf<Int>()
@@ -94,6 +94,7 @@ fun List<HistoryEntry>.alignDates(
 fun List<HistoryEntry>.alignDates(
     dates: List<Int>,
     cumulativeSum: Boolean = false,
+    useLast: Boolean = false,
 ): MutableMap<Long, MutableList<Long>> {
     /** Outputs **/
     val balances = mutableMapOf<Long, MutableList<Long>>()
@@ -105,7 +106,7 @@ fun List<HistoryEntry>.alignDates(
     val currentValues = mutableMapOf<Long, Long>()
     fun update() {
         balances.forEach { (account, list) ->
-            var value = currentValues.getOrDefault(account, 0L)
+            var value = currentValues.getOrDefault(account, if (useLast && list.isNotEmpty()) list.last() else 0L)
             if (cumulativeSum) value += list.lastOrNull() ?: 0
             list.add(value)
         }
@@ -116,7 +117,7 @@ fun List<HistoryEntry>.alignDates(
     /** Main loop **/
     forEach {
         fun getCurrentDate(): Int {
-            val date = dates.getOrNull(currentDateIt) ?: throw RuntimeException("alignDates() out of dates at entry $it")
+            val date = dates.getOrNull(currentDateIt) ?: throw RuntimeException("alignDates() out-of-bounds ($currentDateIt : $dates), at entry $it")
             if (date > it.date) throw RuntimeException("alignDates() mismatched date $date at entry $it")
             return date
         }

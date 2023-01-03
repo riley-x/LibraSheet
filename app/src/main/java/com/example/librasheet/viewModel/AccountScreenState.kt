@@ -3,13 +3,11 @@ package com.example.librasheet.viewModel
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import com.example.librasheet.data.alignDates
 import com.example.librasheet.data.dao.AccountDao
 import com.example.librasheet.data.dao.CategoryHistoryDao
 import com.example.librasheet.data.dao.TransactionDao
 import com.example.librasheet.data.dao.TransactionFilters
-import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
 import com.example.librasheet.data.toFloatDollar
@@ -31,6 +29,7 @@ class AccountScreenState(
     private val graphYPad = 0.1f
     private val graphTicksX = 4
     private val graphTicksY = 6
+    private var cachedDates = listOf<Int>()
 
     val account = mutableStateOf(0L) // Remember, no storing pointers to accounts!
     val balance = DiscreteGraphState()
@@ -39,16 +38,17 @@ class AccountScreenState(
     val incomeDates = mutableStateListOf<String>()
     val historyDates = mutableStateListOf<String>()
 
-    fun load(account: Long = this.account.value) {
+    fun load(months: List<Int>, account: Long = this.account.value) {
+        cachedDates = months
         this.account.value = account
-        loadIncome()
-        loadHistory()
+        loadIncome(months)
+        loadHistory(months)
         loadTransactions()
     }
 
-    fun loadIncome() = scope.launch {
-        val (dates, flows) = withContext(Dispatchers.IO) {
-            categoryHistoryDao.getIncomeAndExpense(account.value).alignDates(false)
+    fun loadIncome(dates: List<Int>) = scope.launch {
+        val flows = withContext(Dispatchers.IO) {
+            categoryHistoryDao.getIncomeAndExpense(account.value).alignDates(dates = dates, cumulativeSum = false)
         }
         val income = flows[0] ?: return@launch
         val expense = flows[1] ?: return@launch
@@ -89,29 +89,27 @@ class AccountScreenState(
     }
 
 
-    fun loadHistory() = scope.launch {
-        // TODO replace this with a data class, shared with balance screen
+    // TODO replace this with a data class, shared with balance screen
+    fun loadHistory(dates: List<Int>) = scope.launch {
+        historyDates.clear()
+        dates.mapTo(historyDates) { formatDateInt(it, "MMM yyyy") }
         val history = withContext(Dispatchers.IO) {
-            accountDao.getHistory(account.value)
+            accountDao.getHistory(account.value).alignDates(dates = dates, cumulativeSum = true)[account.value]
+                ?: emptyList()
         }
 
-        historyDates.clear()
-        history.mapTo(historyDates) { formatDateInt(it.date, "MMM yyyy") }
-
-        var last = 0f
         var minY = 0f
         var maxY = 0f
         balance.values.clear()
         history.forEach {
-            val x = last + it.value.toFloatDollar()
+            val x = it.toFloatDollar()
             balance.values.add(x)
-            last = x
             if (x < minY) minY = x
             if (x > maxY) maxY = x
         }
 
-        val ticksX = autoXTicksDiscrete(history.size, graphTicksX) {
-            formatDateInt(history[it].date, "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
+        val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) {
+            formatDateInt(dates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
         }
         val pad = (if (maxY == minY) maxY else (maxY - minY)) * graphYPad
         balance.axes.value = AxesState(
