@@ -1,17 +1,10 @@
 package com.example.librasheet.data.dao
 
-import androidx.compose.runtime.Immutable
 import androidx.room.*
-import com.example.librasheet.data.HistoryEntry
 import com.example.librasheet.data.HistoryEntryBase
+import com.example.librasheet.data.TimeSeries
 import com.example.librasheet.data.entity.*
 
-
-@Immutable
-data class TimeSeries (
-    val date: Int,
-    val value: Long,
-)
 
 @Dao
 interface CategoryHistoryDao {

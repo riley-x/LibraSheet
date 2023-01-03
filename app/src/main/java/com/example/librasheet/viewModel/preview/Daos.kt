@@ -3,6 +3,7 @@ package com.example.librasheet.viewModel.preview
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.example.librasheet.data.HistoryEntryBase
+import com.example.librasheet.data.TimeSeries
 import com.example.librasheet.data.dao.*
 import com.example.librasheet.data.entity.*
 import kotlinx.coroutines.CoroutineScope

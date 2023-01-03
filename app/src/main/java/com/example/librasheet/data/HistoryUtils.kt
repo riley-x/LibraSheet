@@ -88,10 +88,12 @@ fun List<HistoryEntry>.alignDates(
 /**
  * As above but with a custom date set. Will throw an error if a date in [this] is not present in
  * [dates].
+ *
+ * @param dates should be in increasing order
  */
 fun List<HistoryEntry>.alignDates(
     dates: List<Int>,
-    cumulativeSum: Boolean = true
+    cumulativeSum: Boolean = false,
 ): MutableMap<Long, MutableList<Long>> {
     /** Outputs **/
     val balances = mutableMapOf<Long, MutableList<Long>>()

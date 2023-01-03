@@ -41,7 +41,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
     val transactionDetails = mutableMapOf<String, TransactionDetailModel>()
 
-    internal val months = mutableListOf<Int>()
+    private val months = mutableListOf<Int>()
 
     suspend fun startup() {
         Log.d("Libra/LibraViewModel/startup", "Startup")
@@ -54,9 +54,9 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
         viewModelScope.launch {
             accounts.load().join()
-            balanceGraphs.loadHistory(accounts.all)
+            balanceGraphs.loadHistory(accounts.all, months)
         }
-        balanceGraphs.loadIncome()
+        balanceGraphs.loadIncome(months)
         viewModelScope.launch {
             (categories.data.loadCategories() + categories.data.loadValues()).joinAll()
             categories.loadUi()
@@ -83,8 +83,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
                 expenseScreen.load()
                 incomeDetail.load()
                 expenseDetail.load()
-                balanceGraphs.loadIncome()
-                balanceGraphs.loadHistory(accounts.all)
+                balanceGraphs.loadIncome(months)
+                balanceGraphs.loadHistory(accounts.all, months)
                 accountDetail.load()
                 transactionsSettings.load()
                 transactionsBalance.load()

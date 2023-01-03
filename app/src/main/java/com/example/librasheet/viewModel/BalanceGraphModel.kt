@@ -5,11 +5,10 @@ import androidx.annotation.MainThread
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.alignDates
-import com.example.librasheet.data.dao.TimeSeries
+import com.example.librasheet.data.TimeSeries
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.stackedLineGraphValues
 import com.example.librasheet.data.toFloatDollar
-import com.example.librasheet.ui.components.format1Decimal
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
@@ -42,10 +41,10 @@ class BalanceGraphModel(
     val incomeDates = mutableStateListOf<String>()
     val historyDates = mutableStateListOf<String>()
 
-    fun loadIncome() = viewModel.viewModelScope.launch {
+    fun loadIncome(months: List<Int>) = viewModel.viewModelScope.launch {
         netIncome = withContext(Dispatchers.IO) {
-            categoryHistoryDao.getNetIncome()
-        }.toMutableList()
+            categoryHistoryDao.getNetIncome().alignDates(months)
+        }
         Log.d("Libra/BalanceGraphModel/loadIncome", "${netIncome.takeLast(10)}")
         incomeDates.clear()
         netIncome.mapTo(incomeDates) { formatDateInt(it.date, "MMM yyyy") }
@@ -53,12 +52,11 @@ class BalanceGraphModel(
     }
 
 
-    fun loadHistory(accounts: List<Account>) = viewModel.viewModelScope.launch {
-        val res = withContext(Dispatchers.IO) {
-            accountDao.getHistory().alignDates()
+    fun loadHistory(accounts: List<Account>, months: List<Int>) = viewModel.viewModelScope.launch {
+        historyDateInts = months
+        history = withContext(Dispatchers.IO) {
+            accountDao.getHistory().alignDates(months, cumulativeSum = true)
         }
-        historyDateInts = res.first
-        history = res.second
         Log.d("Libra/BalanceGraphModel/loadHistory", "${historyDateInts.takeLast(10)}")
         Log.d("Libra/BalanceGraphModel/loadHistory", "${history}")
 
