@@ -254,20 +254,13 @@ fun LibraApp(
 
             navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
                 composable(route = IncomeTab.route) {
-                    cashFlow(model = viewModel.incomeScreen, isIncome = true, isDetail = false, navController, viewModel, innerPadding)()
-                }
-                composable(route = CategoryDetailDestination.route(IncomeTab.graph), arguments = CategoryDetailDestination.arguments) {
-                    cashFlow(model = viewModel.incomeDetail, isIncome = true, isDetail = true, navController, viewModel, innerPadding)()
-                    // val category = (it.arguments?.getString(CategoryDetailDestination.argName) ?: "").toCategoryId()
+                    cashFlow(model = viewModel.incomeScreen, navController, viewModel, innerPadding)()
                 }
             }
 
             navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
                 composable(route = SpendingTab.route) {
-                    cashFlow(model = viewModel.expenseScreen, isIncome = false, isDetail = false, navController, viewModel, innerPadding)()
-                }
-                composable(route = CategoryDetailDestination.route(SpendingTab.graph), arguments = CategoryDetailDestination.arguments) {
-                    cashFlow(model = viewModel.expenseDetail, isIncome = false, isDetail = true, navController, viewModel, innerPadding)()
+                    cashFlow(model = viewModel.expenseScreen, navController, viewModel, innerPadding)()
                 }
             }
 

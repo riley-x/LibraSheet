@@ -31,7 +31,6 @@ private val tabs = ImmutableList(listOf("Monthly Averages", "Totals"))
 fun CashFlowScreen(
     state: CashFlowModel,
     modifier: Modifier = Modifier,
-    headerBackArrow: Boolean = false,
     onBack: () -> Unit = { },
     onCategoryClick: (CategoryUi) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
@@ -43,7 +42,7 @@ fun CashFlowScreen(
     ) {
         HeaderBar(
             title = state.parentCategory.id.name,
-            backArrow = headerBackArrow,
+            backArrow = !state.parentCategory.id.isSuper,
             onBack = onBack,
             modifier = Modifier.zIndex(1f),
         ) {

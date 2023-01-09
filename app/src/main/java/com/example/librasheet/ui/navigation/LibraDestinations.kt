@@ -130,14 +130,6 @@ object ColorDestination: DestinationStringArg() {
     )
 }
 
-object CategoryDetailDestination: DestinationStringArg() {
-    override val routeBase = "category_details"
-    override val argName = "categoryId"
-    override val arguments = listOf(
-        navArgument(argName) { type = NavType.StringType }
-    )
-}
-
 object TransactionDetailDestination: DestinationStringArg() {
     override val routeBase = "transaction_details"
     override val argName = "detailModelKey"

@@ -21,8 +21,6 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
     val incomeScreen = CashFlowModel(viewModelScope, categories.data, true)
     val expenseScreen = CashFlowModel(viewModelScope, categories.data, false)
-    val incomeDetail = CashFlowModel(viewModelScope, categories.data, true)
-    val expenseDetail = CashFlowModel(viewModelScope, categories.data, false)
     val accountDetail = AccountScreenState(
         categories.data.all,
         viewModelScope,
@@ -81,8 +79,6 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
                 accounts.load().join()
                 incomeScreen.load()
                 expenseScreen.load()
-                incomeDetail.load()
-                expenseDetail.load()
                 balanceGraphs.loadIncome(months)
                 balanceGraphs.loadHistory(accounts.all, months)
                 accountDetail.load(months)
