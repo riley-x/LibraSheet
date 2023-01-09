@@ -12,12 +12,24 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.librasheet.R
+import com.example.librasheet.data.entity.CategoryId
+import com.example.librasheet.data.entity.expenseName
+import com.example.librasheet.data.entity.incomeName
 
 interface LibraTab {
     val icon: @Composable () -> Unit
     val route: String // route of tab's home screen
     val graph: String // route of tab's graph
 }
+interface CashFlowTab : LibraTab {
+    val routeBase: String
+    val argName: String
+    val arguments: List<NamedNavArgument>
+    val routeWithArgs: String // this is used when declaring the destination
+    val defaultArg: String
+    fun route(categoryId: CategoryId) = "${routeBase}/${categoryId.fullName}"
+}
+
 
 // The custom svgs have no padding, whereas the Material icons do
 fun Modifier.bottomNavImageVector() : Modifier = size(30.dp)
@@ -36,7 +48,7 @@ object BalanceTab : LibraTab {
     override val graph = "balance_graph"
 }
 
-object IncomeTab : LibraTab {
+object IncomeTab : CashFlowTab {
     override val icon = @Composable {
         Icon(
             painter = painterResource(R.drawable.ic_dollar_in),
@@ -44,11 +56,22 @@ object IncomeTab : LibraTab {
             modifier = Modifier.bottomNavPainter(),
         )
     }
-    override val route = "income"
+    override val argName = "categoryId"
+    override val routeBase = "income_tab"
+    override val routeWithArgs = "${routeBase}/{${argName}}"
+    override val route = "$routeBase/$incomeName" // default route of tab
     override val graph = "income_graph"
+    override val defaultArg = incomeName
+
+    override val arguments = listOf(
+        navArgument(argName) {
+            type = NavType.StringType
+            defaultValue = defaultArg
+        }
+    )
 }
 
-object SpendingTab : LibraTab {
+object SpendingTab : CashFlowTab {
     override val icon = @Composable {
         Icon(
             painter = painterResource(R.drawable.ic_dollar_out),
@@ -56,8 +79,19 @@ object SpendingTab : LibraTab {
             modifier = Modifier.bottomNavPainter(),
         )
     }
-    override val route = "spending"
-    override val graph = "spending_graph"
+    override val argName = "categoryId"
+    override val routeBase = "expense_tab"
+    override val routeWithArgs = "${routeBase}/{${argName}}"
+    override val route = "$routeBase/$expenseName" // default route of tab
+    override val graph = "expense_graph"
+    override val defaultArg = expenseName
+
+    override val arguments = listOf(
+        navArgument(IncomeTab.argName) {
+            type = NavType.StringType
+            defaultValue = defaultArg
+        }
+    )
 }
 
 object SettingsTab : LibraTab {

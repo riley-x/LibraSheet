@@ -1,5 +1,6 @@
 package com.example.librasheet.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -50,15 +51,13 @@ fun LibraApp(
     val currentTab = libraTabs.find { it.isActive() == true } ?: libraTabs[0]
 
     fun onTabSelected(tab: LibraTab) {
-        if (tab.route != currentDestination?.route) {
-            if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
-                navController.navigateToTab(
-                    tab.route,
-                    shouldSaveState = false
-                )
-            } else {
-                navController.navigateToTab(tab.graph)
-            }
+        if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
+            navController.navigateToTab(
+                tab.route,
+                shouldSaveState = false
+            )
+        } else {
+            navController.navigateToTab(tab.graph)
         }
     }
     fun toAccountDetails(account: Account) {
@@ -252,17 +251,8 @@ fun LibraApp(
                 transactions()
             }
 
-            navigation(startDestination = IncomeTab.route, route = IncomeTab.graph) {
-                composable(route = IncomeTab.route) {
-                    cashFlow(model = viewModel.incomeScreen, navController, viewModel, innerPadding)()
-                }
-            }
-
-            navigation(startDestination = SpendingTab.route, route = SpendingTab.graph) {
-                composable(route = SpendingTab.route) {
-                    cashFlow(model = viewModel.expenseScreen, navController, viewModel, innerPadding)()
-                }
-            }
+            cashFlow(IncomeTab, viewModel.incomeScreen, navController, viewModel, innerPadding)
+            cashFlow(SpendingTab, viewModel.expenseScreen, navController, viewModel, innerPadding)
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {

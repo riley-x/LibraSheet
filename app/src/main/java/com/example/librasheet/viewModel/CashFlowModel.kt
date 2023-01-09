@@ -54,6 +54,12 @@ class CashFlowModel (
      * it inside the LazyColumn::items. Index with the full category name. **/
     val isExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
+    fun load(categoryId: CategoryId) {
+        if (parentCategory.id == categoryId) return
+        load(data.find(categoryId).first)
+    }
+
+
     fun load(category: Category = parentCategory) {
         parentCategory = category
 
