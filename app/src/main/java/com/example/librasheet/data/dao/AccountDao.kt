@@ -22,9 +22,13 @@ interface AccountDao {
         checkpoint(SimpleSQLiteQuery("pragma wal_checkpoint(full)"));
     }
 
-    @Query("SELECT accountKey as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable GROUP BY date, accountKey ORDER BY date")
+    @Query("SELECT accountKey as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable " +
+            "WHERE value != 0 " +
+            "GROUP BY date, accountKey ORDER BY date")
     fun getHistory(): List<HistoryEntryBase>
 
-    @Query("SELECT accountKey as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable WHERE accountKey = :key GROUP BY date ORDER BY date")
+    @Query("SELECT accountKey as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable " +
+            "WHERE accountKey = :key AND value != 0 " +
+            "GROUP BY date ORDER BY date")
     fun getHistory(key: Long): List<HistoryEntryBase>
 }

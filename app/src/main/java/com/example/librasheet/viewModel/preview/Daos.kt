@@ -59,18 +59,6 @@ internal class FakeHistoryDao: CategoryHistoryDao {
         TODO("Not yet implemented")
     }
 
-    override fun getIncome(account: Long): List<TimeSeries> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getExpense(account: Long): List<TimeSeries> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getNetIncome(account: Long): List<TimeSeries> {
-        TODO("Not yet implemented")
-    }
-
     override fun getNetIncome(): List<TimeSeries> {
         TODO("Not yet implemented")
     }
