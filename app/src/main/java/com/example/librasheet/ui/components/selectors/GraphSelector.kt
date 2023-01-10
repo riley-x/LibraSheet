@@ -37,7 +37,7 @@ fun GraphSelector(
      * which direction to move (which CAN'T be figured out with just the indices when there are exactly
      * two tabs). However, the hoisted states don't need to care about it. **/
     val wasFromDialRight = remember { mutableStateOf(true) }
-    val swipeableState = rememberSwipeableState(0,
+    val swipeableState = rememberSwipeableState(selectedTab.value,
         animationSpec = spring(
             stiffness = Spring.StiffnessMediumLow,
             visibilityThreshold = 5f,

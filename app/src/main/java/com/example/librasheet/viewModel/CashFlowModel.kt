@@ -98,7 +98,7 @@ class CashFlowModel (
     }
 
 
-    fun loadPie() {
+    private fun loadPie() {
         val amounts = when(pieRange.value) {
             CategoryTimeRange.ONE_MONTH -> data.currentMonth
             CategoryTimeRange.ONE_YEAR -> data.yearAverage
@@ -107,7 +107,7 @@ class CashFlowModel (
         loadUiList(pie, amounts)
     }
 
-    fun loadCategoryList() {
+    private fun loadCategoryList() {
         when (tab.value) {
             0 -> {
                 categoryList.clear()
@@ -125,7 +125,7 @@ class CashFlowModel (
     }
 
 
-    suspend fun loadFullHistory() {
+    private suspend fun loadFullHistory() {
         fullDates = data.historyDates.map {
             formatDateInt(it, "MMM yyyy")
         }

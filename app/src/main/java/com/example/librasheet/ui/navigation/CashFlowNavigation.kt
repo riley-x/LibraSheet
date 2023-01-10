@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import com.example.librasheet.ui.components.recomposeHighlighter
 import com.example.librasheet.viewModel.CashFlowModel
 import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
+import kotlinx.coroutines.delay
 
 fun NavGraphBuilder.cashFlow(
     tab: CashFlowTab,
@@ -29,11 +31,11 @@ fun NavGraphBuilder.cashFlow(
         composable(route = tab.routeWithArgs, arguments = tab.arguments) {
             val categoryId = it.arguments?.getString(tab.argName) ?: tab.defaultArg
             LaunchedEffect(categoryId) {
+                delay(50)
                 model.load(categoryId.toCategoryId())
             }
 
             fun load(it: CategoryUi) {
-                model.load(it.category)
                 navController.navigate(tab.route(it.category.id))
             }
             CashFlowScreen(
