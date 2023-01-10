@@ -33,6 +33,7 @@ fun autoYTicksWithOrder(minY: Float, maxY: Float, maxDivisions: Int, nCenter: In
 
     /** Create the tick list by starting from the nearest integer step **/
     val start = ceil(minY / step).roundToInt()
+    // TODO replace with check on minY and maxY, not step.
     val order =
         if (step >= 20_000_000) 1_000_000
         else if (step >= 20_000) 1_000

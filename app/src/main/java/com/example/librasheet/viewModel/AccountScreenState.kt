@@ -97,10 +97,11 @@ class AccountScreenState(
             accountDao.getHistory(account.value).alignDates(dates = dates, cumulativeSum = true)[account.value]
                 ?: emptyList()
         }
-
-        var minY = 0f
-        var maxY = 0f
         balance.values.clear()
+        if (history.isEmpty()) return@launch
+
+        var minY = history.first().toFloatDollar()
+        var maxY = minY
         history.forEach {
             val x = it.toFloatDollar()
             balance.values.add(x)
@@ -117,8 +118,8 @@ class AccountScreenState(
             ticksX = ticksX,
             minY = minY - pad,
             maxY = maxY + pad,
-            minX = -0.5f,
-            maxX = history.size - 0.5f,
+            minX = 0f,
+            maxX = history.lastIndex.toFloat(),
         )
     }
 
