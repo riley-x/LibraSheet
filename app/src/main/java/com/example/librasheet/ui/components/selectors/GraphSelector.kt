@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SwipeableState
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,14 +38,17 @@ fun GraphSelector(
      * which direction to move (which CAN'T be figured out with just the indices when there are exactly
      * two tabs). However, the hoisted states don't need to care about it. **/
     val wasFromDialRight = remember { mutableStateOf(true) }
-    val swipeableState = rememberSwipeableState(selectedTab.value,
+
+    /** We also don't use rememberSwipeableState since we want the state to reset to
+     * selectedTab.value if the graph leaves composition. **/
+    val swipeableState = remember { SwipeableState(selectedTab.value,
         animationSpec = spring(
             stiffness = Spring.StiffnessMediumLow,
             visibilityThreshold = 5f,
             // spring starts fast but ends slowly. This makes the animation short circuit a little
             // at the end, which speeds up the transition of the graphic.
         )
-    )
+    ) }
 
     Column {
         AnimatedContent(
