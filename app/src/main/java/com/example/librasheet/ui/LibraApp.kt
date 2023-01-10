@@ -51,13 +51,21 @@ fun LibraApp(
     val currentTab = libraTabs.find { it.isActive() == true } ?: libraTabs[0]
 
     fun onTabSelected(tab: LibraTab) {
-        if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
-            navController.navigateToTab(
-                tab.route,
-                shouldSaveState = false
-            )
+        Log.w("Libra", "${tab.route} ${currentDestination?.route}")
+        val isCurrentDestination = if (tab is CashFlowTab) {
+            currentBackStack?.arguments?.getString(tab.argName) == tab.defaultArg
         } else {
-            navController.navigateToTab(tab.graph)
+            currentDestination?.route == tab.route
+        }
+        if (!isCurrentDestination) {
+            if (tab.route == currentTab.route) { // Return to tab home, clear the tab's back stack
+                navController.navigateToTab(
+                    tab.route,
+                    shouldSaveState = false
+                )
+            } else {
+                navController.navigateToTab(tab.graph)
+            }
         }
     }
     fun toAccountDetails(account: Account) {
