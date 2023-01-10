@@ -57,9 +57,9 @@ fun DialSelector(
      * appear. **/
     var swipeWidth by rememberSaveable { mutableStateOf(1000f) }
 
-    /** I think it's necessary that the initial state has anchor 0f, or else an animation will trigger
-     * when the composable is first loaded. Also important to save the swipeWidth above, and set it
-     * to something big so the side text doesn't display. **/
+    /** TODO If the initial state isn't at index 0, when swipeWidth is set in onGloballyPositioned,
+     *   the anchors change and that causes the swipeable to animate from its current offset (set using
+     *   the placeholder value of swipeWidth, e.g. 1000f) to the new anchor value (e.g. 864f). **/
     val anchors = remember(swipeWidth) {
         (-1..labels.items.size).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
     }
