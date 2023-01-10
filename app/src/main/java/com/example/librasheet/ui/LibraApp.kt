@@ -51,8 +51,8 @@ fun LibraApp(
     val currentTab = libraTabs.find { it.isActive() == true } ?: libraTabs[0]
 
     fun onTabSelected(tab: LibraTab) {
-        Log.w("Libra", "${tab.route} ${currentDestination?.route}")
         val isCurrentDestination = if (tab is CashFlowTab) {
+            currentDestination?.route == tab.routeWithArgs &&
             currentBackStack?.arguments?.getString(tab.argName) == tab.defaultArg
         } else {
             currentDestination?.route == tab.route
