@@ -7,7 +7,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.stackedLineGraphValues
-import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
@@ -19,7 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-object CashFlowRanges {
+object CashFlowCommonState {
     /** Current tab being displayed (pie + averages, history + totals). **/
     val tab = mutableStateOf(0)
     val pieRange = mutableStateOf(CategoryTimeRange.ONE_YEAR)
@@ -50,9 +49,9 @@ class CashFlowModel (
 
     /** Cached state values. We want all cash flow models to be in-sync on the below state values,
      * but we load them lazily. **/
-    private var currentTab = CashFlowRanges.tab.value
-    private var currentPieRange = CashFlowRanges.pieRange.value
-    private var currentHistoryRange = CashFlowRanges.historyRange.value
+    private var currentTab = CashFlowCommonState.tab.value
+    private var currentPieRange = CashFlowCommonState.pieRange.value
+    private var currentHistoryRange = CashFlowCommonState.historyRange.value
 
     /** List of categories with values displayed below the graphic. **/
     val categoryList = mutableStateListOf<CategoryUi>()
@@ -100,9 +99,9 @@ class CashFlowModel (
      * We want all the cash flow screens to have the same tab and range, but we load lazily.
      */
     fun resyncState() {
-        if (currentPieRange != CashFlowRanges.pieRange.value) loadPie()
-        if (currentHistoryRange != CashFlowRanges.historyRange.value) loadHistory()
-        if (currentTab != CashFlowRanges.tab.value) loadCategoryList() // this needs to happen after pie/history loaded
+        if (currentPieRange != CashFlowCommonState.pieRange.value) loadPie()
+        if (currentHistoryRange != CashFlowCommonState.historyRange.value) loadHistory()
+        if (currentTab != CashFlowCommonState.tab.value) loadCategoryList() // this needs to happen after pie/history loaded
     }
 
     private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Float>) {
@@ -125,7 +124,7 @@ class CashFlowModel (
 
 
     private fun loadPie() {
-        currentPieRange = CashFlowRanges.pieRange.value
+        currentPieRange = CashFlowCommonState.pieRange.value
         val amounts = when(currentPieRange) {
             CategoryTimeRange.ONE_MONTH -> data.currentMonth
             CategoryTimeRange.ONE_YEAR -> data.yearAverage
@@ -135,7 +134,7 @@ class CashFlowModel (
     }
 
     private fun loadCategoryList() {
-        currentTab = CashFlowRanges.tab.value
+        currentTab = CashFlowCommonState.tab.value
         when (currentTab) {
             0 -> {
                 categoryList.clear()
@@ -175,7 +174,7 @@ class CashFlowModel (
     private fun <T> List<T>.takeLastOrAll(n: Int) = if (n >= 0) takeLast(n) else this
 
     private fun loadHistory() {
-        currentHistoryRange = CashFlowRanges.historyRange.value
+        currentHistoryRange = CashFlowCommonState.historyRange.value
         if (fullHistory.isEmpty()) return
 
         val n = when (currentHistoryRange) {
@@ -216,24 +215,24 @@ class CashFlowModel (
 
     @Callback
     fun setPieRange(range: CategoryTimeRange) {
-        if (CashFlowRanges.pieRange.value == range) return
-        CashFlowRanges.pieRange.value = range
+        if (CashFlowCommonState.pieRange.value == range) return
+        CashFlowCommonState.pieRange.value = range
         loadPie()
         loadCategoryList()
     }
 
     @Callback
     fun setHistoryRange(range: HistoryTimeRange) {
-        if (CashFlowRanges.historyRange.value == range) return
-        CashFlowRanges.historyRange.value = range
+        if (CashFlowCommonState.historyRange.value == range) return
+        CashFlowCommonState.historyRange.value = range
         loadHistory()
         loadCategoryList()
     }
 
     @Callback
     fun changeTab(tab: Int) { // TODO replace with enum
-        if (CashFlowRanges.tab.value == tab) return
-        CashFlowRanges.tab.value = tab
+        if (CashFlowCommonState.tab.value == tab) return
+        CashFlowCommonState.tab.value = tab
         loadCategoryList()
     }
 }

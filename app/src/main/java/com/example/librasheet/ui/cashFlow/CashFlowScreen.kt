@@ -19,7 +19,7 @@ import com.example.librasheet.ui.components.HeaderBar
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CashFlowModel
-import com.example.librasheet.viewModel.CashFlowRanges
+import com.example.librasheet.viewModel.CashFlowCommonState
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewCashFlowModel
@@ -55,13 +55,13 @@ fun CashFlowScreen(
             LazyColumn {
                 item("graphic") {
                     CashFlowGraphic(
-                        selectedTab = CashFlowRanges.tab,
+                        selectedTab = CashFlowCommonState.tab,
                         tabs = tabs,
                         categories = state.pie,
                         history = state.history,
                         historyDates = state.dates,
-                        categoryTimeRange = CashFlowRanges.pieRange,
-                        historyTimeRange = CashFlowRanges.historyRange,
+                        categoryTimeRange = CashFlowCommonState.pieRange,
+                        historyTimeRange = CashFlowCommonState.historyRange,
                         updateHoverText = { hoverText = it },
                         onCategoryTimeRange = state::setPieRange,
                         onHistoryTimeRange = state::setHistoryRange,
