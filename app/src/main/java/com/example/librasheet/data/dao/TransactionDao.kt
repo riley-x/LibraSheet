@@ -71,7 +71,7 @@ interface TransactionDao {
         if (t.accountKey <= 0) return newKey
 
         updateBalance(t.accountKey, t.value)
-        updateCategoryHistory(t.accountKey, t.categoryKey, thisMonthEnd(t.date), t.valueAfterReimbursements)
+        updateCategoryHistory(t.accountKey, t.categoryKey, thisMonthEnd(t.date), t.value)
         return newKey
     }
 
@@ -87,7 +87,7 @@ interface TransactionDao {
 
         if (t.accountKey <= 0) return
         updateBalance(t.accountKey, -t.value)
-        updateCategoryHistory(t.accountKey, t.categoryKey, thisMonthEnd(t.date), -t.valueAfterReimbursements)
+        updateCategoryHistory(t.accountKey, t.categoryKey, thisMonthEnd(t.date), -t.value)
     }
 
     @Transaction

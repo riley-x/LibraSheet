@@ -12,6 +12,12 @@ const val transactionFields = "t.`key`, t.name, t.date, t.accountKey, t.category
 
 /**
  * Make sure not to mix up names with SQL/Room Transaction.
+ *
+ * @param valueAfterReimbursements is a cached calculation of the remaining value attributable to
+ * this transaction after subtracting out reimbursements. It should only be used for UI display and
+ * not trusted for database calculations, since i.e. adding reimbursements from two transactions into
+ * the same target transaction will cause an update conflict. On the database side, increment
+ * operations should be used instead.
  */
 @Immutable
 @Entity(
