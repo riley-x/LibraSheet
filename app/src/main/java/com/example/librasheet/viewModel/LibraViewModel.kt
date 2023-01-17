@@ -39,8 +39,12 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val transactionDetails = mutableMapOf<String, TransactionDetailModel>()
 
     private val cashFlowModels = mutableMapOf<String, CashFlowModel>()
-    fun getCashFlowModel(categoryId: String) = cashFlowModels.getOrPut(categoryId) {
-        CashFlowModel(viewModelScope, categories.data, categoryId.toCategoryId())
+    fun getCashFlowModel(categoryId: String): CashFlowModel {
+        val model = cashFlowModels.getOrPut(categoryId) {
+            CashFlowModel(viewModelScope, categories.data, categoryId.toCategoryId())
+        }
+        model.resyncState()
+        return model
     }
 
     val months = mutableListOf<Int>()

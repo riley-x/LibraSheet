@@ -18,6 +18,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
+object CashFlowRanges {
+    /** Current tab being displayed (pie + averages, history + totals). **/
+    val tab = mutableStateOf(0)
+    val pieRange = mutableStateOf(CategoryTimeRange.ONE_YEAR)
+    val historyRange = mutableStateOf(HistoryTimeRange.ONE_YEAR)
+}
+
+
 /**
  * This class contains the UI state for one cash flow screen, which shows the details of a single
  * parent category and its subcategories. The data is loaded for the given `categoryId` on
@@ -39,8 +48,11 @@ class CashFlowModel (
     private val graphTicksX = 4
     private val graphTicksY = 6
 
-    /** Current tab being displayed (pie + averages, history + totals). **/
-    val tab = mutableStateOf(0)
+    /** Cached state values. We want all cash flow models to be in-sync on the below state values,
+     * but we load them lazily. **/
+    private var currentTab = CashFlowRanges.tab.value
+    private var currentPieRange = CashFlowRanges.pieRange.value
+    private var currentHistoryRange = CashFlowRanges.historyRange.value
 
     /** List of categories with values displayed below the graphic. **/
     val categoryList = mutableStateListOf<CategoryUi>()
@@ -48,7 +60,6 @@ class CashFlowModel (
     /** Pie chart. This needs to have a separate list because the cash flow screen animates between
      * the tabs, in which case both the pie and the totals list are shown concurrently. **/
     val pie = mutableStateListOf<CategoryUi>()
-    val pieRange = mutableStateOf(CategoryTimeRange.ONE_YEAR)
 
     /** History graph **/
     private var fullHistory = listOf<StackedLineGraphValue>()
@@ -56,7 +67,6 @@ class CashFlowModel (
 
     val history = StackedLineGraphState()
     val dates = mutableStateListOf<String>()
-    val historyRange = mutableStateOf(HistoryTimeRange.ONE_YEAR)
 
     /** Expanded state of each row. This is needed here since lots of bugs occur if you try to put
      * it inside the LazyColumn::items. Index with the full category name. **/
@@ -86,6 +96,15 @@ class CashFlowModel (
         }
     }
 
+    /**
+     * We want all the cash flow screens to have the same tab and range, but we load lazily.
+     */
+    fun resyncState() {
+        if (currentPieRange != CashFlowRanges.pieRange.value) loadPie()
+        if (currentHistoryRange != CashFlowRanges.historyRange.value) loadHistory()
+        if (currentTab != CashFlowRanges.tab.value) loadCategoryList() // this needs to happen after pie/history loaded
+    }
+
     private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Float>) {
         target.clear()
         target.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
@@ -106,7 +125,8 @@ class CashFlowModel (
 
 
     private fun loadPie() {
-        val amounts = when(pieRange.value) {
+        currentPieRange = CashFlowRanges.pieRange.value
+        val amounts = when(currentPieRange) {
             CategoryTimeRange.ONE_MONTH -> data.currentMonth
             CategoryTimeRange.ONE_YEAR -> data.yearAverage
             CategoryTimeRange.ALL -> data.allAverage
@@ -115,13 +135,14 @@ class CashFlowModel (
     }
 
     private fun loadCategoryList() {
-        when (tab.value) {
+        currentTab = CashFlowRanges.tab.value
+        when (currentTab) {
             0 -> {
                 categoryList.clear()
                 categoryList.addAll(pie)
             }
             1 -> {
-                val amounts = when(historyRange.value) {
+                val amounts = when(currentHistoryRange) {
                     HistoryTimeRange.ONE_YEAR -> data.yearTotal
                     HistoryTimeRange.FIVE_YEARS -> data.fiveYearTotal
                     HistoryTimeRange.ALL -> data.allTotal
@@ -154,9 +175,10 @@ class CashFlowModel (
     private fun <T> List<T>.takeLastOrAll(n: Int) = if (n >= 0) takeLast(n) else this
 
     private fun loadHistory() {
+        currentHistoryRange = CashFlowRanges.historyRange.value
         if (fullHistory.isEmpty()) return
 
-        val n = when (historyRange.value) {
+        val n = when (currentHistoryRange) {
             HistoryTimeRange.ONE_YEAR -> 12
             HistoryTimeRange.FIVE_YEARS -> 60
             HistoryTimeRange.ALL -> -1
@@ -194,24 +216,24 @@ class CashFlowModel (
 
     @Callback
     fun setPieRange(range: CategoryTimeRange) {
-        if (pieRange.value == range) return
-        pieRange.value = range
+        if (CashFlowRanges.pieRange.value == range) return
+        CashFlowRanges.pieRange.value = range
         loadPie()
         loadCategoryList()
     }
 
     @Callback
     fun setHistoryRange(range: HistoryTimeRange) {
-        if (historyRange.value == range) return
-        historyRange.value = range
+        if (CashFlowRanges.historyRange.value == range) return
+        CashFlowRanges.historyRange.value = range
         loadHistory()
         loadCategoryList()
     }
 
     @Callback
     fun changeTab(tab: Int) { // TODO replace with enum
-        if (this.tab.value == tab) return
-        this.tab.value = tab
+        if (CashFlowRanges.tab.value == tab) return
+        CashFlowRanges.tab.value = tab
         loadCategoryList()
     }
 }
