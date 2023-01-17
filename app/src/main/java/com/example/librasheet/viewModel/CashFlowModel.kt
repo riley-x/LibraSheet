@@ -60,7 +60,8 @@ class CashFlowModel (
     }
 
 
-    fun load(category: Category = parentCategory) {
+    private fun load(category: Category = parentCategory) {
+        Log.d("Libra/CashFlowModel/load", "category=${category.id}")
         parentCategory = category
 
         if (parentCategory.key == 0L) {

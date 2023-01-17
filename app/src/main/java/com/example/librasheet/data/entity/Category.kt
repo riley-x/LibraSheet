@@ -13,6 +13,9 @@ const val expenseName = "Expense"
 const val categoryPathSeparator = "_" // Note this needs to match what is used by the ColorScreen
 const val displaySeparator = " > "
 
+val incomeId = CategoryId(incomeName)
+val expenseId = CategoryId(expenseName)
+
 
 internal const val incomeKey = -1L
 internal const val expenseKey = -2L

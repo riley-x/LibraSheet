@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.LibraApplication
 import com.example.librasheet.data.createMonthList
+import com.example.librasheet.data.entity.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -19,8 +20,6 @@ import java.io.File
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
-    val incomeScreen = CashFlowModel(viewModelScope, categories.data, true)
-    val expenseScreen = CashFlowModel(viewModelScope, categories.data, false)
     val accountDetail = AccountScreenState(
         categories.data.all,
         viewModelScope,
@@ -38,6 +37,14 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val screenReader = ScreenReaderModel(this)
 
     val transactionDetails = mutableMapOf<String, TransactionDetailModel>()
+
+    private val cashFlowModels = mutableMapOf<String, CashFlowModel>()
+    fun getCashFlowModel(categoryId: String) = cashFlowModels.getOrPut(categoryId) {
+        val id = categoryId.toCategoryId()
+        val model = CashFlowModel(viewModelScope, categories.data, id.superName == incomeName)
+        model.load(id)
+        model
+    }
 
     val months = mutableListOf<Int>()
 
@@ -59,8 +66,6 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             (categories.data.loadCategories() + categories.data.loadValues()).joinAll()
             categories.loadUi()
             categories.data.loadHistory(months).joinAll()
-            incomeScreen.load(categories.data.income)
-            expenseScreen.load(categories.data.expense)
         }
     }
 
@@ -71,14 +76,12 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
             }
             Dependency.CATEGORY -> viewModelScope.launch {
                 categories.loadUi()
-                incomeScreen.load()
-                expenseScreen.load()
+                cashFlowModels.clear()
             }
             Dependency.TRANSACTION -> viewModelScope.launch {
                 (categories.data.loadHistory(months) + categories.data.loadValues()).joinAll()
                 accounts.load().join()
-                incomeScreen.load()
-                expenseScreen.load()
+                cashFlowModels.clear()
                 balanceGraphs.loadIncome(months)
                 balanceGraphs.loadHistory(accounts.all, months)
                 accountDetail.load(months)

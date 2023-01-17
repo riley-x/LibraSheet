@@ -267,8 +267,8 @@ fun LibraApp(
                 transactions()
             }
 
-            cashFlow(IncomeTab, viewModel.incomeScreen, navController, viewModel, innerPadding)
-            cashFlow(SpendingTab, viewModel.expenseScreen, navController, viewModel, innerPadding)
+            cashFlow(IncomeTab, navController, viewModel, innerPadding)
+            cashFlow(SpendingTab, navController, viewModel, innerPadding)
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {
