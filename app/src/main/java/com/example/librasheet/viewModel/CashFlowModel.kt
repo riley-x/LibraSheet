@@ -19,22 +19,30 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * This class contains the UI state for one cash flow screen.
+ * This class contains the UI state for one cash flow screen, which shows the details of a single
+ * parent category and its subcategories. The data is loaded for the given `categoryId` on
+ * construction of the class.
+ *
+ * @param categoryId parent category that this model handles
+ * @param loadOnInit set false for previews
  */
 class CashFlowModel (
     private val scope: CoroutineScope,
     private val data: CategoryData,
-    private val isIncome: Boolean,
+    categoryId: CategoryId,
+    loadOnInit: Boolean = true,
 ) {
     var parentCategory by mutableStateOf(Category.None)
-    private val multiplier = if (isIncome) 1f else -1f
+    private val multiplier = if (categoryId.superName == incomeName) 1f else -1f
 
     private val graphYPad = 0.1f
     private val graphTicksX = 4
     private val graphTicksY = 6
 
-    /** List of categories displayed below the graphic **/
+    /** Current tab being displayed (pie + averages, history + totals). **/
     val tab = mutableStateOf(0)
+
+    /** List of categories with values displayed below the graphic. **/
     val categoryList = mutableStateListOf<CategoryUi>()
 
     /** Pie chart. This needs to have a separate list because the cash flow screen animates between
@@ -54,11 +62,9 @@ class CashFlowModel (
      * it inside the LazyColumn::items. Index with the full category name. **/
     val isExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
-    fun load(categoryId: CategoryId) {
-        if (parentCategory.id == categoryId) return
-        load(data.find(categoryId).first)
+    init {
+        if (loadOnInit) load(data.find(categoryId).first)
     }
-
 
     private fun load(category: Category = parentCategory) {
         Log.d("Libra/CashFlowModel/load", "category=${category.id}")
@@ -185,8 +191,6 @@ class CashFlowModel (
 
         Log.d("Libra/CashFlowModel/loadHistory", "$order $maxY")
     }
-
-
 
     @Callback
     fun setPieRange(range: CategoryTimeRange) {
