@@ -1,6 +1,7 @@
 package com.example.librasheet.ui
 
-import android.util.Log
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -10,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
@@ -115,6 +118,11 @@ fun LibraApp(
         navController.popBackStack()
     }
 
+
+    fun toAccessibilitySettings() {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        startActivity(context, intent, null)
+    }
 
     /** Dialogs **/
     val accountDialog = remember { AccountDialog(viewModel) }
@@ -337,6 +345,7 @@ fun LibraApp(
                         transactions = viewModel.screenReader.data,
                         accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
+                        toAccessibilitySettings = ::toAccessibilitySettings,
                         onAccountSelection = viewModel.screenReader::setAccount,
                         onInvertValues = viewModel.screenReader::invert,
                         onClickTransaction = ::toScreenReaderDetail,

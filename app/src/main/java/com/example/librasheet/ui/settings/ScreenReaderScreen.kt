@@ -63,6 +63,7 @@ fun ScreenReaderScreen(
     accounts: SnapshotStateList<Account>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit = { },
+    toAccessibilitySettings: () -> Unit = { },
     onAccountSelection: (Int, Account?) -> Unit = { _, _ -> },
     onInvertValues: (Int, Boolean) -> Unit = { _, _ -> },
     onClickTransaction: (iAccount: Int, iTransaction: Int) -> Unit = { _, _ -> },
@@ -113,8 +114,13 @@ fun ScreenReaderScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
                 )
-                // TODO add button to open settings?
-                //  https://stackoverflow.com/questions/10061154/how-to-programmatically-enable-disable-accessibility-service-in-android
+
+                Button(
+                    onClick = toAccessibilitySettings,
+                    modifier = Modifier.width(200.dp).align(Alignment.CenterHorizontally).padding(top = 20.dp)
+                ) {
+                    Text("Go To Settings", fontSize = 18.sp)
+                }
             }
         } else {
             LazyColumn(
