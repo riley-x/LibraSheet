@@ -29,14 +29,13 @@ class ScreenReaderModel(
     private val transactionDao = viewModel.application.database.transactionDao()
     private val rootCategory = viewModel.categories.data.all
 
-    val savedParsed = mutableMapOf<String, MutableSet<ParsedTransaction>>()
     val data = mutableStateListOf<ScreenReaderAccountState>()
-    private var lastLoadScreenReaderNItems = 0
+    private var lastScreenReaderLoadTime = 0L
 
     fun load() {
         if (ScreenReader.nItems.value == 0) return
-        if (ScreenReader.nItems.value <= lastLoadScreenReaderNItems) return
-        lastLoadScreenReaderNItems = ScreenReader.nItems.value
+        if (ScreenReader.lastLoadTime <= lastScreenReaderLoadTime) return
+        lastScreenReaderLoadTime = ScreenReader.lastLoadTime
 
         // TODO loading indicator
         viewModel.viewModelScope.launch {
@@ -46,17 +45,10 @@ class ScreenReaderModel(
             val expenseRules = expenseRulesDeferred.await()
 
             val accountStates = withContext(Dispatchers.IO) {
-
                 val categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
-                val accountStates = mutableListOf<ScreenReaderAccountState>()
-
-                ScreenReader.cache.forEach { (account, set) ->
-                    savedParsed.getOrPut(account) { mutableSetOf() }.addAll(set)
-                }
-                savedParsed.mapTo(accountStates) { (accountName, transactions) ->
+                ScreenReader.cache.map { (accountName, transactions) ->
                     createAccountState(accountName, transactions, categoryMap, incomeRules, expenseRules)
                 }
-                accountStates
             }
 
             data.clear()
@@ -97,7 +89,7 @@ class ScreenReaderModel(
         }
 
         return ScreenReaderAccountState(
-            parsedAccountName = if (account == null) accountName else "",
+            parsedAccountName = accountName,
             account = account,
             inverted = inverted,
             transactions = transactions.sortedByDescending { it.transaction.date },
@@ -112,7 +104,6 @@ class ScreenReaderModel(
     @Callback
     fun clear() {
         ScreenReader.reset()
-        savedParsed.clear()
         data.clear()
     }
 
@@ -131,6 +122,11 @@ class ScreenReaderModel(
         viewModel.transactionDetails[SettingsTransactionKeyBase] = model
     }
 
+    /**
+     * Invert the values for an account. This is needed i.e. for credit cards that list expenses as
+     * positive numbers and payments as negative numbers. When the invert button is pressed, we need
+     * to recalculate the transactions for the entire account.
+     */
     @Callback
     fun invert(iAccount: Int, newValue: Boolean) {
         viewModel.viewModelScope.launch {
@@ -141,11 +137,12 @@ class ScreenReaderModel(
 
             val accountState = withContext(Dispatchers.IO) {
                 val categoryMap = rootCategory.getKeyMap().also { it[ignoreKey] = Category.Ignore }
+                val parsedAccountName = data[iAccount].parsedAccountName
                 createAccountState(
-                    accountName = data[iAccount].parsedAccountName,
+                    accountName = parsedAccountName,
                     account = data[iAccount].account,
                     inverted = newValue,
-                    parsed = savedParsed.toList()[iAccount].second,
+                    parsed = ScreenReader.cache[parsedAccountName] ?: emptySet(),
                     categoryMap = categoryMap,
                     incomeRules = incomeRules,
                     expenseRules = expenseRules,

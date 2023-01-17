@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOf
+import java.util.*
 
 
 class ScreenReader : AccessibilityService() {
@@ -19,11 +20,12 @@ class ScreenReader : AccessibilityService() {
     companion object {
         val cache = mutableMapOf<String, MutableSet<ParsedTransaction>>()
         val nItems = mutableStateOf(0)
+        var lastLoadTime = 0L
 
         fun add(account: String, t: ParsedTransaction) {
             val x = cache.getOrPut(account) { mutableSetOf() }
             if (x.add(t)) {
-                x.add(t)
+                lastLoadTime = Calendar.getInstance().timeInMillis
                 nItems.value += 1
             }
         }
@@ -33,7 +35,7 @@ class ScreenReader : AccessibilityService() {
             val x = cache.getOrPut(account) { mutableSetOf() }
             transactions.forEach {
                 if (x.add(it)) {
-                    x.add(it)
+                    lastLoadTime = Calendar.getInstance().timeInMillis
                     nItems.value += 1
                 }
             }
@@ -61,7 +63,7 @@ class ScreenReader : AccessibilityService() {
     internal fun getLatestDate(account: String?): Int {
         if (accountDates.isEmpty()) return 0
         var date: Int? = null
-        if (account != null) date = accountDates.get(account)
+        if (account != null) date = accountDates[account]
         if (date == null) date = accountDates.minOf { it.value }
         return date
     }
