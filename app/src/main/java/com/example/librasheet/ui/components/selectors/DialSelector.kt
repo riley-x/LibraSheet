@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
  * TODO this bugs out when you try to scroll super fast, and gets stuck on -1 or size. Maybe a
  * DisposableEffect would be better?
  *
- * @param swipeableState Should have an initial value of 0.
+ * @param swipeableState Should have an initial value of 0, see TODO below.
  * @param onSelection Is a callback triggered everytime the currentValue of [swipeableState] changes
  * (i.e. after the animation is completed), and also everytime the left/right buttons are pressed.
  * Also, when loop = true, the LaunchedEffect will call onSelection again with loop = false, so users
@@ -55,11 +55,12 @@ fun DialSelector(
 
     /** This needs to be a big value so that when loading the first time the neighboring labels don't
      * appear. **/
-    var swipeWidth by rememberSaveable { mutableStateOf(1000f) }
+    var swipeWidth by rememberSaveable { mutableStateOf(864f) }
 
     /** TODO If the initial state isn't at index 0, when swipeWidth is set in onGloballyPositioned,
      *   the anchors change and that causes the swipeable to animate from its current offset (set using
-     *   the placeholder value of swipeWidth, e.g. 1000f) to the new anchor value (e.g. 864f). **/
+     *   the placeholder value of swipeWidth, e.g. 1000f) to the new anchor value (e.g. 864f).
+     *   This is done in SwipeableState.processNewAnchors **/
     val anchors = remember(swipeWidth) {
         (-1..labels.items.size).associateBy(keySelector = { it * swipeWidth }, valueTransform = { it })
     }
