@@ -50,8 +50,8 @@ class AccountScreenState(
         val flows = withContext(Dispatchers.IO) {
             categoryHistoryDao.getIncomeAndExpense(account.value).alignDates(dates = dates, cumulativeSum = false)
         }
-        val income = flows[0] ?: return@launch
-        val expense = flows[1] ?: return@launch
+        val income = flows[0] ?: List(dates.size) { 0L }
+        val expense = flows[1] ?: List(dates.size) { 0L }
         Log.d("Libra/AccountScreenState/loadIncome", "dates=${dates.takeLast(10)}")
         Log.d("Libra/AccountScreenState/loadIncome", "income=${income.takeLast(10)}")
         Log.d("Libra/AccountScreenState/loadIncome", "expense=${expense.takeLast(10)}")
