@@ -16,6 +16,7 @@ const val accountTable = "account"
 
 /**
  * @param csvPattern Save any user-defined csv pattern template, if [institution] is not set.
+ * @param screenReaderAlias Name of account when parsed by the screen reader.
  */
 @Immutable
 @Entity(
@@ -26,6 +27,7 @@ data class Account(
     @NonNull override val name: String,
     val institution: Institution,
     @NonNull @ColumnInfo(defaultValue = "") val csvPattern: String,
+    @NonNull @ColumnInfo(defaultValue = "") val screenReaderAlias: String,
     val colorLong: Long,
     val listIndex: Int,
     val balance: Long,
@@ -41,6 +43,7 @@ data class Account(
         name: String,
         institution: Institution,
         csvPattern: String,
+        screenReaderAlias: String,
         colorLong: Long,
         listIndex: Int,
     ) : this(
@@ -48,6 +51,7 @@ data class Account(
         name = name,
         institution = institution,
         csvPattern = csvPattern,
+        screenReaderAlias = screenReaderAlias,
         colorLong = colorLong,
         listIndex = listIndex,
         balance = 0,
@@ -59,6 +63,7 @@ data class Account(
         color: Color,
         institution: Institution = Institution.UNKNOWN,
         csvPattern: String = "",
+        screenReaderAlias: String = "",
         key: Long = 0,
         listIndex: Int = -1,
         balance: Long = 0,
@@ -67,6 +72,7 @@ data class Account(
         name = name,
         institution = institution,
         csvPattern = csvPattern,
+        screenReaderAlias = screenReaderAlias,
         colorLong = color.value.toLong(),
         listIndex = listIndex,
         balance = balance,
