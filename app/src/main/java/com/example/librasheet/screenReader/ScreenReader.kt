@@ -21,6 +21,7 @@ class ScreenReader : AccessibilityService() {
         val cache = mutableMapOf<String, MutableSet<ParsedTransaction>>()
         val nItems = mutableStateOf(0)
         var lastLoadTime = 0L
+        const val unknownAccountName = "Unknown"
 
         fun add(account: String, t: ParsedTransaction) {
             val x = cache.getOrPut(account) { mutableSetOf() }

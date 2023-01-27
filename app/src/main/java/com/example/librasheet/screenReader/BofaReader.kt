@@ -56,7 +56,7 @@ object BofaReader {
         ) {
             val node = event.source
             if (node?.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
-                val account = parseAccountName(reader.rootInActiveWindow) ?: "Unknown"
+                val account = parseAccountName(reader.rootInActiveWindow) ?: ScreenReader.unknownAccountName
                 val lastDate = reader.getLatestDate(account)
                 val transactions = parseRecentTransactions(node, lastDate)
                 return Pair(account, transactions)

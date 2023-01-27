@@ -120,7 +120,7 @@ object ChaseReader {
             val transactionsNode = tabContent.child(1)?.child(0) ?: return null
 //            printAllViews(transactionsNode)
 
-            val account = parseAccountName(header) ?: "Unknown"
+            val account = parseAccountName(header) ?: ScreenReader.unknownAccountName
             val lastDate = reader.getLatestDate(account)
             val transactions = parseTransactions(transactionsNode, lastDate)
             return Pair(account, transactions)

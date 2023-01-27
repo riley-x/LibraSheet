@@ -27,6 +27,7 @@ class ScreenReaderModel(
 ) {
     private val ruleDao = viewModel.application.database.ruleDao()
     private val transactionDao = viewModel.application.database.transactionDao()
+    private val accountDao = viewModel.application.database.accountDao()
     private val rootCategory = viewModel.categories.data.all
 
     val data = mutableStateListOf<ScreenReaderAccountState>()
@@ -63,7 +64,7 @@ class ScreenReaderModel(
         categoryMap: MutableMap<Long, Category>,
         incomeRules: List<CategoryRule>,
         expenseRules: List<CategoryRule>,
-        account: Account? = viewModel.accounts.all.find { it.name == accountName },
+        account: Account? = viewModel.accounts.all.find { it.name == accountName || it.screenReaderAlias == accountName },
         inverted: Boolean = account?.institution?.invertScreenReader ?: false,
     ): ScreenReaderAccountState {
         val transactions = mutableListOf<TransactionWithDetails>()
@@ -163,6 +164,14 @@ class ScreenReaderModel(
                             transaction = t.transaction.copy(accountKey = state.account?.key ?: 0)
                         )
                         transactionDao.add(withAccount)
+                    }
+                    if (state.account != null &&
+                        state.parsedAccountName != ScreenReader.unknownAccountName &&
+                        state.parsedAccountName != state.account.screenReaderAlias
+                    ) {
+                        accountDao.update(state.account.copy(
+                            screenReaderAlias = state.parsedAccountName
+                        ))
                     }
                 }
             }
