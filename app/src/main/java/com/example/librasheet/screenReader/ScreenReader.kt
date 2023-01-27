@@ -78,7 +78,7 @@ class ScreenReader : AccessibilityService() {
             }
             Log.d("Libra/ScreenReader/onServiceConnected", "$accountDates")
 
-            flow.debounce(200)
+            flow.debounce(300)
                 .collect { it?.let { add(it.first, it.second) } }
         }
     }
