@@ -27,11 +27,11 @@ enum class Institution(
         dateFormat = "yyyy-MM-dd",
         invertScreenReader = false,
     ),
-    CHASE(
-        displayName = "Chase",
+    CHASE_CREDIT_CARD(
+        displayName = "Chase (Credit Cards)",
         csvPattern = "date,,name,,,value,",
         dateFormat = "MM/dd/yyyy",
-        invertScreenReader = false,
+        invertScreenReader = true,
     ),
     UNKNOWN(
         displayName = "Unknown",

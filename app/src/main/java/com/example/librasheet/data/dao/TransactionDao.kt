@@ -29,7 +29,7 @@ interface TransactionDao {
     fun getEarliestDate(): Int
 
     @MapInfo(keyColumn = "name", valueColumn = "date")
-    @Query("SELECT $accountTable.name as name, MAX(date) as date FROM $transactionTable " +
+    @Query("SELECT $accountTable.screenReaderAlias as name, MAX(date) as date FROM $transactionTable " +
             "INNER JOIN $accountTable ON $transactionTable.accountKey=$accountTable.`key` GROUP BY accountKey")
     fun getLastDates(): Map<String, Int>
 

@@ -63,7 +63,7 @@ data class Account(
         color: Color,
         institution: Institution = Institution.UNKNOWN,
         csvPattern: String = "",
-        screenReaderAlias: String = "",
+        screenReaderAlias: String = name,
         key: Long = 0,
         listIndex: Int = -1,
         balance: Long = 0,
