@@ -169,9 +169,7 @@ class ScreenReaderModel(
                         state.parsedAccountName != ScreenReader.unknownAccountName &&
                         state.parsedAccountName != state.account.screenReaderAlias
                     ) {
-                        accountDao.update(state.account.copy(
-                            screenReaderAlias = state.parsedAccountName
-                        ))
+                        accountDao.updateAlias(state.account.key, state.parsedAccountName)
                     }
                 }
             }

@@ -102,6 +102,10 @@ internal class FakeAccountDao: AccountDao {
         TODO("Not yet implemented")
     }
 
+    override fun updateAlias(key: Long, alias: String) {
+        TODO("Not yet implemented")
+    }
+
     override fun getAccounts(): List<Account> {
         TODO("Not yet implemented")
     }

@@ -13,6 +13,9 @@ interface AccountDao {
     @Update fun update(account: Account)
     @Update fun update(accounts: List<Account>)
 
+    @Query("UPDATE $accountTable SET screenReaderAlias = :alias WHERE `key` = :key")
+    fun updateAlias(key: Long, alias: String)
+
     @Query("SELECT * FROM $accountTable ORDER BY listIndex")
     fun getAccounts(): List<Account>
 
