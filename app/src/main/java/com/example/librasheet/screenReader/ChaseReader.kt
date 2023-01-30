@@ -36,7 +36,8 @@ object ChaseReader {
      *
      *      ~~~ Tab content ~~~
      *      2     [null] [null] <-- com.chase.sig.android:id/
-     *      3       [null] [null] <-- null
+     *      3       [null] [null] <-- null  # for some reason this doesn't always appear, in which
+     *                                      # case the level of everything below is shifted one less
      *      4         [null] [null] <-- com.chase.sig.android:id/
      *
      *      ~~~ Search ~~~
@@ -112,13 +113,13 @@ object ChaseReader {
             event.className == "android.view.ViewGroup"
         ) {
             val node = event.source ?: return null
+            printAllViews(node)
 
             if (!isAllTransactionsScreen(node)) return null
             val header = node.child(0) ?: return null
             val tabHost = node.child(1) ?: return null
-            val tabContent = tabHost.child(1)?.child(0)?.child(0) ?: return null
+            val tabContent = getTabContentFromHost(tabHost) ?: return null
             val transactionsNode = tabContent.child(1)?.child(0) ?: return null
-//            printAllViews(transactionsNode)
 
             val account = parseAccountName(header) ?: ScreenReader.unknownAccountName
             val lastDate = reader.getLatestDate(account)
@@ -167,6 +168,24 @@ object ChaseReader {
     private fun parseAccountName(header: AccessibilityNodeInfo): String? {
         val account = header.child(1) ?: return null
         return account.text.toString()
+    }
+
+    /**
+     *      ~~~ Tab host ~~~
+     *      1   [null] [null] <-- null
+     *
+     *      ~~~ Tab selector ~~~
+     *      2     [null] [null] <-- com.chase.sig.android:id/
+     *
+     *      ~~~ Tab content ~~~
+     *      2     [null] [null] <-- com.chase.sig.android:id/
+     *      3       [null] [null] <-- null  # for some reason this doesn't always appear, in which
+     *                                      # case the level of everything below is shifted one less
+     *      4         [null] [null] <-- com.chase.sig.android:id/
+     */
+    private fun getTabContentFromHost(tabHost: AccessibilityNodeInfo): AccessibilityNodeInfo? {
+        val depth3 = tabHost.child(1)?.child(0) ?: return null
+        return if (depth3.viewIdResourceName == null) depth3.child(0) else depth3
     }
 
     /**
