@@ -46,7 +46,7 @@ class AccountScreenState(
         loadTransactions()
     }
 
-    fun loadIncome(dates: List<Int>) = scope.launch {
+    private fun loadIncome(dates: List<Int>) = scope.launch {
         val flows = withContext(Dispatchers.IO) {
             categoryHistoryDao.getIncomeAndExpense(account.value).alignDates(dates = dates, cumulativeSum = false)
         }
