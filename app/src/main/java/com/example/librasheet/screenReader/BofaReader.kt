@@ -51,18 +51,22 @@ object BofaReader {
      *  {2} parseBofaRecentTransactions, event.source in 2048 events
      */
     fun parse(reader: ScreenReader, event: AccessibilityEvent): Pair<String, List<ParsedTransaction>>? {
-        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
-            event.className == "androidx.recyclerview.widget.RecyclerView"
-        ) {
-            val node = event.source
-            if (node?.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
-                val account = parseAccountName(reader.rootInActiveWindow) ?: ScreenReader.unknownAccountName
-                val lastDate = reader.getLatestDate(account)
-                val transactions = parseRecentTransactions(node, lastDate)
-                return Pair(account, transactions)
-            }
-//            printAllViews(reader.rootInActiveWindow, maxDepth = 2)
-//            printAllViews(node)
+        val root = reader.rootInActiveWindow // this has to be accessed here for the source to be loaded, see above
+        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return null
+        return when (event.className) {
+            "androidx.recyclerview.widget.RecyclerView" -> parseTransactionDetailsScreen(reader, event)
+            "android.widget.ScrollView" -> parseAccountDetailsScreen(reader, event)
+            else -> null
+        }
+    }
+
+    private fun parseTransactionDetailsScreen(reader: ScreenReader, event: AccessibilityEvent): Pair<String, MutableList<ParsedTransaction>>? {
+        val node = event.source ?: return null
+        if (node.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
+            val account = parseTransactionDetailsAccountName(reader.rootInActiveWindow) ?: ScreenReader.unknownAccountName
+            val lastDate = reader.getLatestDate(account)
+            val transactions = parseRecentTransactions(node, lastDate)
+            return Pair(account, transactions)
         }
         return null
     }
@@ -71,42 +75,64 @@ object BofaReader {
     /** This is for the event.source when scrolling the account detail screen. But this page is
      * gimmicky as noted above.
      */
-    private fun parseAccountDetailScreen(nodeInfo: AccessibilityNodeInfo?) {
-        if (nodeInfo == null) return
-        if (nodeInfo.childCount < 1) return
+    private fun parseAccountDetailsScreen(reader: ScreenReader, event: AccessibilityEvent): Pair<String, MutableList<ParsedTransaction>>? {
+        val nodeInfo = event.source ?: return null
+        if (nodeInfo.childCount < 1) return null
 
         val scrollContainer = nodeInfo.getChild(0)
-        Log.v("Libra/BofaReader/parseAccountDetailScreen", "${System.identityHashCode(scrollContainer)}")
         for (i in 0 until scrollContainer.childCount) {
             val c = scrollContainer.getChild(i)
             if (c.viewIdResourceName == "com.infonow.bofa:id/recent_transactions") {
-                parseRecentTransactions(c, 0)
-                return
+                val account = parseAccountDetailsAccountName(reader.rootInActiveWindow) ?: ScreenReader.unknownAccountName
+                val lastDate = reader.getLatestDate(account)
+                val transactions = parseRecentTransactions(c, lastDate)
+                return Pair(account, transactions)
             }
         }
+        return null
     }
 
     /**
-     *      [null] [SpicaHeader] <-- com.infonow.bofa:id/header_container
-     *      .[null] [Go back to previous screen] <-- com.infonow.bofa:id/__boa_header_left_button_click_area
-     *      .[null] [Products cart with 0 items. Button] <-- com.infonow.bofa:id/rl_shopping_cart
-     *      .[null] [null] <-- com.infonow.bofa:id/__boa_header_help_image_button_click_area
-     *      ..[null] [Erica. There are 4 notifications.] <-- com.infonow.bofa:id/button_erica_icon_container
+     *
      */
-    private fun parseAccountName(root: AccessibilityNodeInfo?): String? {
-        if (root == null) return null
-        if (root.childCount < 1) return null
-
-        val headerContainer = root.getChild(0) ?: return null
-        if (headerContainer.childCount < 2) return null
-
-        val accountName = headerContainer.getChild(1) ?: return null
+    private fun parseTransactionDetailsAccountName(root: AccessibilityNodeInfo?): String? {
+        val accountName = root?.child(0)?.child(1) ?: return null
         if (accountName.viewIdResourceName != "com.infonow.bofa:id/__boa_header_tv_headerText") {
-            Log.d("Libra/BofaReader/parseAccountName", "Mismatch resource name: ${accountName.viewIdResourceName}")
+            Log.d("Libra/BofaReader/parseTransactionDetailsAccountName", "Mismatch resource name: ${accountName.viewIdResourceName}")
             return null
         }
-        Log.d("Libra/BofaReader/parseAccountName", "${accountName.text}")
+        Log.d("Libra/BofaReader/parseTransactionDetailsAccountName", "${accountName.text}")
         return accountName.text?.toString()
+    }
+
+    /**
+     * Bank accounts:
+     *     0 [null] [null] <-- null
+     *     1   [null] [Header] <-- com.infonow.bofa:id/header_container
+     *     2     ...
+     *     1   [null] [How can we help?] <-- com.infonow.bofa:id/search_bar_clickable_area
+     *     1   [null] [Erica. There are 4 notifications.] <-- com.infonow.bofa:id/button_erica_icon_container
+     *     1   [null] [null] <-- null
+     *     2     [null] [null] <-- com.infonow.bofa:id/debit_nestedscroll_container
+     *     3       [null] [Virgo, ] <-- com.infonow.bofa:id/account_name
+     *     4         [Virgo] [null] <-- null
+     *
+     * Credit card:
+     *     0 [null] [null] <-- null
+     *     1   [null] [Header] <-- com.infonow.bofa:id/header_container
+     *     2     ...
+     *     1   [null] [How can we help?] <-- com.infonow.bofa:id/search_bar_clickable_area
+     *     1   [null] [Erica. There are 4 notifications.] <-- com.infonow.bofa:id/button_erica_icon_container
+     *     1   [null] [null] <-- null
+     *     2     [null] [null] <-- com.infonow.bofa:id/credit_account_nestedscroll_view
+     *     3       [Spica] [null] <-- null
+     */
+    private fun parseAccountDetailsAccountName(root: AccessibilityNodeInfo?): String? {
+        val level3Node = root?.child(3)?.child(0)?.child(0) ?: return null
+        val accountNameNode =
+            if (level3Node.viewIdResourceName == "com.infonow.bofa:id/account_name") level3Node.child(0)
+            else level3Node
+        return accountNameNode?.text?.toString()
     }
 
     /**

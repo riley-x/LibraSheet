@@ -24,6 +24,7 @@ class ScreenReader : AccessibilityService() {
         const val unknownAccountName = "Unknown"
 
         fun add(account: String, t: ParsedTransaction) {
+            Log.d("Libra/ScreenReader/add", "$account $t")
             val x = cache.getOrPut(account) { mutableSetOf() }
             if (x.add(t)) {
                 lastLoadTime = Calendar.getInstance().timeInMillis
@@ -96,14 +97,13 @@ class ScreenReader : AccessibilityService() {
             )
         }
 
-        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-            && event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
-
-        flow.value = when(event.packageName) {
+        when(event.packageName) {
             "com.infonow.bofa" -> BofaReader.parse(this, event)
             "com.chase.sig.android" -> ChaseReader.parse(this, event)
             "com.venmo" -> VenmoReader.parse(this, event)
             else -> null
+        }?.let {
+            flow.value = it
         }
 
 //        val node = rootInActiveWindow
