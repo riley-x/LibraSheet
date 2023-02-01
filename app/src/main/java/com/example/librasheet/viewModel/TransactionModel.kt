@@ -136,6 +136,12 @@ class TransactionModel(
     }
 }
 
+fun List<TransactionEntity>.matchAccounts(accounts: List<Account>) {
+    val keyMap = accounts.getKeyMap()
+    forEach {
+        it.accountName = keyMap[it.accountKey]?.name ?: ""
+    }
+}
 
 fun List<TransactionEntity>.matchCategories(parentCategory: Category) {
     val keyMap = parentCategory.getKeyMap()

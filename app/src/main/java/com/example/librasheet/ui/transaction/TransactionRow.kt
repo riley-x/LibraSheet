@@ -43,7 +43,7 @@ fun TransactionRow(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = transaction.category.id.name,
+                text = "${transaction.category.id.name}, ${transaction.accountName}",
                 style = MaterialTheme.typography.body2,
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
                 maxLines = 1,

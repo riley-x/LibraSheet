@@ -81,3 +81,5 @@ data class Account(
 
 
 fun List<Account>.find(key: Long?) = if (key == null) null else find { it.key == key }
+
+fun List<Account>.getKeyMap() = associateBy { it.key }

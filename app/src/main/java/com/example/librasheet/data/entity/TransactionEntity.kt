@@ -18,6 +18,8 @@ const val transactionFields = "t.`key`, t.name, t.date, t.accountKey, t.category
  * not trusted for database calculations, since i.e. adding reimbursements from two transactions into
  * the same target transaction will cause an update conflict. On the database side, increment
  * operations should be used instead.
+ *
+ * @property accountName is just used for display on transaction rows
  */
 @Immutable
 @Entity(
@@ -33,12 +35,14 @@ data class TransactionEntity(
     val valueAfterReimbursements: Long,
 ) {
     @Ignore var category = Category.None
+    @Ignore var accountName: String = ""
 
     constructor(
         name: String = "",
         date: Int = 0,
         value: Long = 0,
         category: Category = Category.None,
+        accountName: String = "",
         key: Long = 0,
         valueAfterReimbursements: Long = value,
         accountKey: Long = 0,
@@ -53,5 +57,6 @@ data class TransactionEntity(
         categoryKey = categoryKey,
     ) {
         this.category = category
+        this.accountName = accountName
     }
 }
