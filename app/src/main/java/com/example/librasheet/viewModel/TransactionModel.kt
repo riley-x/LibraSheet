@@ -71,6 +71,7 @@ class TransactionModel(
             val filter = filter.value
             val list = withContext(Dispatchers.IO) {
                 val list = dao.get(filter)
+                list.matchAccounts(viewModel.accounts.all)
                 list.matchCategories(viewModel.categories.data.all)
                 return@withContext list
             }
@@ -84,6 +85,7 @@ class TransactionModel(
             val filter = reimbFilter.value
             val list = withContext(Dispatchers.IO) {
                 val list = dao.get(filter)
+                list.matchAccounts(viewModel.accounts.all)
                 list.matchCategories(viewModel.categories.data.all)
                 return@withContext list
             }

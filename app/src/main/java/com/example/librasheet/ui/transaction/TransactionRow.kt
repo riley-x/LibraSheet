@@ -47,6 +47,7 @@ fun TransactionRow(
                 style = MaterialTheme.typography.body2,
                 color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         Column(

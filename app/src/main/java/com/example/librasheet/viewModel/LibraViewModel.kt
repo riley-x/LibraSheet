@@ -20,14 +20,7 @@ import java.io.File
 
 class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     val categories = CategoryModel(this)
-    val accountDetail = AccountScreenState(
-        categories.data.all,
-        viewModelScope,
-        application.database.accountDao(),
-        application.database.categoryHistoryDao(),
-        application.database.transactionDao()
-    )
-
+    val accountDetail = AccountScreenModel(this)
     val rules = RuleModel(this)
     val accounts = AccountModel(this)
     val balanceGraphs = BalanceGraphModel(this)

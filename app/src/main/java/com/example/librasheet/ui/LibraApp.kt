@@ -255,7 +255,7 @@ fun LibraApp(
                 }
                 composable(route = AccountDestination.route) {
                     AccountScreen(
-                        state = viewModel.accountDetail,
+                        state = viewModel.accountDetail.state,
                         accounts = viewModel.accounts.all,
                         onBack = navController::popBackStack,
                         onClickColor = ::toBalanceColorSelector,
