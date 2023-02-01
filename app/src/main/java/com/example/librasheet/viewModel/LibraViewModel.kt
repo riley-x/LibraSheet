@@ -79,6 +79,8 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
                 balanceGraphs.loadIncome(months)
                 balanceGraphs.loadHistory(accounts.all, months)
                 accountDetail.load(months)
+                transactionsSettings.clearReimb()
+                transactionsBalance.clearReimb()
                 transactionsSettings.load()
                 transactionsBalance.load()
             }

@@ -66,6 +66,11 @@ class TransactionModel(
         if (reimbList.isEmpty()) loadReimb()
     }
 
+    fun clearReimb() {
+        reimbFilter.value = defaultFilter
+        reimbList.clear()
+    }
+
     fun load() {
         viewModel.viewModelScope.launch {
             val filter = filter.value
