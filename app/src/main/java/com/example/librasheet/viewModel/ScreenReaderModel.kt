@@ -84,6 +84,7 @@ class ScreenReaderModel(
                 value = value,
                 category = category,
                 categoryKey = category.key,
+                accountName = account?.name ?: accountName,
                 // we update account key on save
             )
             transactions.add(TransactionWithDetails(t))
