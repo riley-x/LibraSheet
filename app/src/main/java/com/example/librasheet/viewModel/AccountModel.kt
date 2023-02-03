@@ -8,10 +8,12 @@ import com.example.librasheet.data.Institution
 import com.example.librasheet.data.entity.*
 import com.example.librasheet.data.rangeBetween
 import com.example.librasheet.ui.theme.randomColor
-import com.example.librasheet.viewModel.preview.*
 import kotlinx.coroutines.*
 
 
+const val dragGroupAll = "all"
+const val dragGroupAssets = "assets"
+const val dragGroupLiabilities = "liabilities"
 
 class AccountModel(
     private val viewModel: LibraViewModel,
@@ -71,20 +73,35 @@ class AccountModel(
     }
 
     @Callback
-    fun reorder(startIndex: Int, endIndex: Int) {
+    fun reorder(group: String, startIndex: Int, endIndex: Int) {
         if (startIndex == endIndex) return
-        all.add(endIndex, all.removeAt(startIndex))
 
+        /** Reorder the state lists to reflect UI change immediately **/
+        val list = when (group) {
+            dragGroupAssets -> assets
+            dragGroupLiabilities -> liabilities
+            else -> all
+        }
+        var startIndexAll = startIndex
+        var endIndexAll = endIndex
+        if (list != all) {
+            startIndexAll = all.indexOf(list[startIndex])
+            endIndexAll = all.indexOf(list[endIndex])
+            all.add(endIndexAll, all.removeAt(startIndexAll))
+        }
+        list.add(endIndex, list.removeAt(startIndex))
+
+        /** Update the database and other dependencies **/
         val staleEntities = mutableListOf<Account>()
-        for (i in rangeBetween(startIndex, endIndex)) {
+        for (i in rangeBetween(startIndexAll, endIndexAll)) {
             all[i] = all[i].copy(listIndex = i)
             staleEntities.add(all[i])
         }
 
         viewModel.viewModelScope.launch(Dispatchers.IO) {
             dao.update(staleEntities)
+            viewModel.updateDependencies(Dependency.ACCOUNT_REORDER)
         }
-        viewModel.updateDependencies(Dependency.ACCOUNT_REORDER)
     }
 
     @Callback

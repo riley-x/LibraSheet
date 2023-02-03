@@ -66,6 +66,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     internal fun updateDependencies(dependency: Dependency) {
         when (dependency) {
             Dependency.ACCOUNT_REORDER, Dependency.ACCOUNT_COLOR -> viewModelScope.launch {
+                accounts.load()
                 balanceGraphs.calculateHistoryGraph(accounts.all) // this could be optimized for color changing but whatever
             }
             Dependency.CATEGORY -> viewModelScope.launch {

@@ -17,6 +17,7 @@ import com.example.librasheet.ui.components.selectors.DropdownOptions
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
+import com.example.librasheet.viewModel.dragGroupAll
 import com.example.librasheet.viewModel.preview.previewAccounts
 
 
@@ -37,7 +38,7 @@ fun EditAccountsScreen(
     onChangeName: (Int) -> Unit = { },
     onChangeColor: (String) -> Unit = { },
     onDelete: (Int) -> Unit = { },
-    onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
+    onReorder: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
     Column(modifier) {
         HeaderBar(
@@ -59,7 +60,8 @@ fun EditAccountsScreen(
 
                     DragToReorderTarget(
                         index = index,
-                        onDragEnd = { _, start, end -> onReorder(start, end) },
+                        group = dragGroupAll,
+                        onDragEnd = onReorder,
                     ) {
                         ColorCodedRow(
                             color = account.color,

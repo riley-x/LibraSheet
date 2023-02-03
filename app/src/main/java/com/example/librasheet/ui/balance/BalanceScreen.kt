@@ -19,6 +19,8 @@ import com.example.librasheet.ui.components.*
 import com.example.librasheet.ui.components.selectors.GraphSelector
 import com.example.librasheet.ui.graphing.*
 import com.example.librasheet.ui.theme.LibraSheetTheme
+import com.example.librasheet.viewModel.dragGroupAssets
+import com.example.librasheet.viewModel.dragGroupLiabilities
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
@@ -36,7 +38,7 @@ fun BalanceScreen(
     incomeDates: SnapshotStateList<String>,
     modifier: Modifier = Modifier,
     onAccountClick: (Account) -> Unit = { },
-    onReorder: (startIndex: Int, endIndex: Int) -> Unit = { _, _ -> },
+    onReorder: (group: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
 ) {
     val selectedTab = rememberSaveable { mutableStateOf(0) }
     var hoverText by remember { mutableStateOf("") }
@@ -93,8 +95,8 @@ fun BalanceScreen(
 
                     DragToReorderTarget(
                         index = account.listIndex,
-                        group = "assets",
-                        onDragEnd = { _, start, end -> onReorder(start, end) },
+                        group = dragGroupAssets,
+                        onDragEnd = onReorder,
                     ) {
                         BalanceRow(
                             account = account,
@@ -118,8 +120,8 @@ fun BalanceScreen(
 
                     DragToReorderTarget(
                         index = account.listIndex,
-                        group = "liabilities",
-                        onDragEnd = { _, start, end -> onReorder(start, end) },
+                        group = dragGroupLiabilities,
+                        onDragEnd = onReorder,
                     ) {
                         BalanceRow(
                             account = account,
