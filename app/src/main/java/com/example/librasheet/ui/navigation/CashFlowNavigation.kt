@@ -2,6 +2,7 @@ package com.example.librasheet.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -21,6 +22,7 @@ fun NavGraphBuilder.cashFlow(
         composable(route = tab.routeWithArgs, arguments = tab.arguments) {
             val categoryId = it.arguments?.getString(tab.argName) ?: tab.defaultArg
             val model = viewModel.getCashFlowModel(categoryId)
+            LaunchedEffect(Unit) { model.resyncState() }
             fun toCategory(it: CategoryUi) = navController.navigate(tab.route(it.category.id))
             CashFlowScreen(
                 state = model,

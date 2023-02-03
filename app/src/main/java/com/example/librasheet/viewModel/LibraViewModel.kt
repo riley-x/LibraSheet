@@ -36,7 +36,6 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
         val model = cashFlowModels.getOrPut(categoryId) {
             CashFlowModel(viewModelScope, categories.data, categoryId.toCategoryId())
         }
-        model.resyncState()
         return model
     }
 

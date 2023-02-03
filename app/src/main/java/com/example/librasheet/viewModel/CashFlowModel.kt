@@ -99,9 +99,20 @@ class CashFlowModel (
      * We want all the cash flow screens to have the same tab and range, but we load lazily.
      */
     fun resyncState() {
-        if (currentPieRange != CashFlowCommonState.pieRange.value) loadPie()
-        if (currentHistoryRange != CashFlowCommonState.historyRange.value) loadHistory()
-        if (currentTab != CashFlowCommonState.tab.value) loadCategoryList() // this needs to happen after pie/history loaded
+        Log.d("Libra/CashFlowModel/resyncState", "${parentCategory.id}" +
+                " $currentPieRange-${CashFlowCommonState.pieRange.value}" +
+                " $currentHistoryRange-${CashFlowCommonState.historyRange.value}" +
+                " $currentTab-${CashFlowCommonState.tab.value}")
+        var reloadList = false
+        if (currentPieRange != CashFlowCommonState.pieRange.value) {
+            loadPie()
+            reloadList = true
+        }
+        if (currentHistoryRange != CashFlowCommonState.historyRange.value) {
+            loadHistory()
+            reloadList = true
+        }
+        if (reloadList || currentTab != CashFlowCommonState.tab.value) loadCategoryList() // this needs to happen after pie/history loaded
     }
 
     private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Float>) {
