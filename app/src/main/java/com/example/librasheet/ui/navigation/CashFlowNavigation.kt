@@ -28,7 +28,7 @@ fun NavGraphBuilder.cashFlow(
                 state = model,
                 onBack = navController::popBackStack,
                 onCategoryClick = ::toCategory,
-                onReorder = viewModel.categories::reorder,
+                onReorder = model::reorder,
                 modifier = Modifier.padding(innerPadding)
             )
         }

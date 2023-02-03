@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.annotation.MainThread
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
@@ -31,7 +32,12 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 
     val transactionDetails = mutableMapOf<String, TransactionDetailModel>()
 
-    private val cashFlowModels = mutableMapOf<String, CashFlowModel>()
+    /**
+     * We want multiple different models so that navigation between them is smooth. If you tried using
+     * only one model and loaded everytime you navigate, you'd get a flicker since the navigation
+     * component cross-fades between the two screens.
+     */
+    private val cashFlowModels = mutableStateMapOf<String, CashFlowModel>()
     fun getCashFlowModel(categoryId: String): CashFlowModel {
         val model = cashFlowModels.getOrPut(categoryId) {
             CashFlowModel(viewModelScope, categories.data, categoryId.toCategoryId())

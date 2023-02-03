@@ -246,4 +246,12 @@ class CashFlowModel (
         CashFlowCommonState.tab.value = tab
         loadCategoryList()
     }
+
+    @Callback
+    fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
+//        viewModel.categories.reorder()
+        if (parentId == parentCategory.id.fullName)
+            categoryList.add(endIndex, categoryList.removeAt(startIndex))
+        // TODO database, subcats
+    }
 }

@@ -203,6 +203,7 @@ fun DragToReorderTarget(
                             else if (dragScope.affectedIndices.first() < index) dragScope.affectedIndices.min()
                             else dragScope.affectedIndices.max()
                         Log.d("Libra/DragToReorder", "drag end: $group $index $endIndex")
+                        Log.d("Libra/DragToReorder", "${dragScope.affectedIndices}")
                         onDragEnd(group, index, endIndex)
                         dragScope.reset()
                     },
