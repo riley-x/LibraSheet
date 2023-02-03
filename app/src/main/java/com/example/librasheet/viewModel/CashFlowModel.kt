@@ -140,6 +140,7 @@ class CashFlowModel (
             CategoryTimeRange.ONE_MONTH -> data.currentMonth
             CategoryTimeRange.ONE_YEAR -> data.yearAverage
             CategoryTimeRange.ALL -> data.allAverage
+            CategoryTimeRange.CUSTOM -> data.allAverage // TODO
         }
         loadUiList(pie, amounts)
     }
@@ -156,6 +157,7 @@ class CashFlowModel (
                     HistoryTimeRange.ONE_YEAR -> data.yearTotal
                     HistoryTimeRange.FIVE_YEARS -> data.fiveYearTotal
                     HistoryTimeRange.ALL -> data.allTotal
+                    HistoryTimeRange.CUSTOM -> data.allTotal // TODO
                 }
                 loadUiList(categoryList, amounts)
             }
@@ -192,6 +194,7 @@ class CashFlowModel (
             HistoryTimeRange.ONE_YEAR -> 12
             HistoryTimeRange.FIVE_YEARS -> 60
             HistoryTimeRange.ALL -> -1
+            HistoryTimeRange.CUSTOM -> -1 // TODO
         }
 
         dates.clear()
