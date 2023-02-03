@@ -94,7 +94,7 @@ fun BalanceScreen(
                     if (index > 0) RowDivider(Modifier.zIndex(1f))
 
                     DragToReorderTarget(
-                        index = account.listIndex,
+                        index = index,
                         group = dragGroupAssets,
                         onDragEnd = onReorder,
                     ) {
@@ -119,7 +119,7 @@ fun BalanceScreen(
                     if (index > 0) RowDivider(Modifier.zIndex(1f))
 
                     DragToReorderTarget(
-                        index = account.listIndex,
+                        index = index,
                         group = dragGroupLiabilities,
                         onDragEnd = onReorder,
                     ) {
