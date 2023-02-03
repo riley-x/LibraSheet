@@ -2,14 +2,8 @@ package com.example.librasheet.ui.components.selectors
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +16,7 @@ import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.categoryTimeRanges
 import com.example.librasheet.viewModel.dataClasses.HasDisplayName
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
+import com.example.librasheet.viewModel.dataClasses.NameOrIcon
 
 @Composable
 fun <T: HasDisplayName> ButtonGroup(
@@ -31,7 +26,7 @@ fun <T: HasDisplayName> ButtonGroup(
     onSelection: (T) -> Unit = { },
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier,
     ) {
         for (option in options.items) {
@@ -41,11 +36,43 @@ fun <T: HasDisplayName> ButtonGroup(
                 text = option.displayName,
                 enabled = enabled,
                 onSelection = { onSelection(option) },
-                modifier = Modifier.weight(10f)
             )
         }
     }
 }
+
+@Composable
+fun <T: NameOrIcon> TextOrIconButtons(
+    options: ImmutableList<T>,
+    currentSelection: State<T>, // must pass State here for derivedStateOf below
+    modifier: Modifier = Modifier,
+    onSelection: (T) -> Unit = { },
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier,
+    ) {
+        for (option in options.items) {
+            // enabled would be recalculated for each button, but only 2 of them need to recompose
+            val enabled by remember { derivedStateOf { option == currentSelection.value } }
+            if (option.icon != null) {
+                Icon(
+                    imageVector = option.icon!!,
+                    contentDescription = null,
+                    tint = if (enabled) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled),
+                    modifier = Modifier.clickable { onSelection(option) }
+                )
+            } else {
+                CustomTextButton(
+                    text = option.displayName,
+                    enabled = enabled,
+                    onSelection = { onSelection(option) },
+                )
+            }
+        }
+    }
+}
+
 
 /**
  * The normal TextButton has too much padding.
@@ -99,7 +126,24 @@ private fun Preview() {
             ButtonGroup(
                 options = categoryTimeRanges,
                 currentSelection = cur,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
 }
+
+@Preview
+@Composable
+private fun PreviewIcon() {
+    val cur = remember { mutableStateOf(CategoryTimeRange.ONE_MONTH) }
+    LibraSheetTheme {
+        Surface {
+            TextOrIconButtons(
+                options = categoryTimeRanges,
+                currentSelection = cur,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.example.librasheet.ui.components.selectors.ButtonGroup
 import com.example.librasheet.ui.components.selectors.GraphSelector
 import com.example.librasheet.ui.components.formatDollar
+import com.example.librasheet.ui.components.selectors.TextOrIconButtons
 import com.example.librasheet.ui.graphing.PieChartFiltered
 import com.example.librasheet.ui.graphing.StackedLineGraph
 import com.example.librasheet.ui.graphing.StackedLineGraphState
@@ -56,7 +57,7 @@ fun CashFlowGraphic(
                         .padding(start = 30.dp, end = 30.dp)
                         .fillMaxWidth()
                 )
-                ButtonGroup(
+                TextOrIconButtons(
                     options = categoryTimeRanges,
                     currentSelection = categoryTimeRange,
                     onSelection = onCategoryTimeRange,
@@ -77,7 +78,7 @@ fun CashFlowGraphic(
                     else ""
                     updateHoverText(hoverText)
                 }
-                ButtonGroup(
+                TextOrIconButtons(
                     options = historyTimeRanges,
                     currentSelection = historyTimeRange,
                     onSelection = onHistoryTimeRange,
