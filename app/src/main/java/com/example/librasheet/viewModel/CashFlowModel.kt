@@ -6,7 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.entity.*
+import com.example.librasheet.data.monthDiff
 import com.example.librasheet.data.stackedLineGraphValues
+import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
@@ -57,12 +59,10 @@ class CashFlowModel (
     private var currentCustomRangeStart = 0
     private var currentCustomRangeEnd = 0
 
-    /** List of categories with values displayed below the graphic. **/
-    val categoryList = mutableStateListOf<CategoryUi>()
-
-    /** Pie chart. This needs to have a separate list because the cash flow screen animates between
-     * the tabs, in which case both the pie and the totals list are shown concurrently. **/
+    /** List of categories with totals displayed below the graphic. The averages list doubles as the
+     * values used for the pie chart **/
     val pie = mutableStateListOf<CategoryUi>()
+    val categoryTotals = mutableStateListOf<CategoryUi>()
 
     /** History graph **/
     private var fullHistory = listOf<StackedLineGraphValue>()
@@ -89,13 +89,10 @@ class CashFlowModel (
             fullDates = emptyList()
             history.values.clear()
             dates.clear()
-        } else {
+        } else scope.launch {
             loadPie()
-            loadCategoryList()
-            scope.launch {
-                loadFullHistory()
-                loadHistory()
-            }
+            loadFullHistory()
+            loadHistory()
         }
     }
 
@@ -107,19 +104,15 @@ class CashFlowModel (
                 " $currentPieRange-${CashFlowCommonState.pieRange.value}" +
                 " $currentHistoryRange-${CashFlowCommonState.historyRange.value}" +
                 " $currentTab-${CashFlowCommonState.tab.value}")
-        var reloadList = false
         val customChanged = CashFlowCommonState.pieRange.value == CategoryTimeRange.CUSTOM
                 && (currentCustomRangeStart != CashFlowCommonState.customRangeStart.value
                 || currentCustomRangeEnd != CashFlowCommonState.customRangeEnd.value)
         if (customChanged || currentPieRange != CashFlowCommonState.pieRange.value) {
             loadPie()
-            reloadList = true
         }
         if (customChanged || currentHistoryRange != CashFlowCommonState.historyRange.value) {
             loadHistory()
-            reloadList = true
         }
-        if (reloadList || currentTab != CashFlowCommonState.tab.value) loadCategoryList() // this needs to happen after pie/history loaded
     }
 
     private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Float>) {
@@ -143,31 +136,39 @@ class CashFlowModel (
 
     private fun loadPie() {
         currentPieRange = CashFlowCommonState.pieRange.value
-        val amounts = when(currentPieRange) {
-            CategoryTimeRange.ONE_MONTH -> data.currentMonth
-            CategoryTimeRange.ONE_YEAR -> data.yearAverage
-            CategoryTimeRange.ALL -> data.allAverage
-            CategoryTimeRange.CUSTOM -> data.allAverage // TODO
+        scope.launch {
+            val amounts = when (currentPieRange) {
+                CategoryTimeRange.ONE_MONTH -> data.currentMonth
+                CategoryTimeRange.ONE_YEAR -> data.yearAverage
+                CategoryTimeRange.ALL -> data.allAverage
+                CategoryTimeRange.CUSTOM -> {
+                    currentCustomRangeStart = CashFlowCommonState.customRangeStart.value
+                    currentCustomRangeEnd = CashFlowCommonState.customRangeEnd.value
+                    withContext(Dispatchers.IO) {
+                        data.historyDao.getAverages(currentCustomRangeStart, currentCustomRangeEnd)
+                    }
+                }
+            }
+            loadUiList(pie, amounts)
         }
-        loadUiList(pie, amounts)
     }
 
-    private fun loadCategoryList() {
-        currentTab = CashFlowCommonState.tab.value
-        when (currentTab) {
-            0 -> {
-                categoryList.clear()
-                categoryList.addAll(pie)
-            }
-            1 -> {
-                val amounts = when(currentHistoryRange) {
-                    HistoryTimeRange.ONE_YEAR -> data.yearTotal
-                    HistoryTimeRange.FIVE_YEARS -> data.fiveYearTotal
-                    HistoryTimeRange.ALL -> data.allTotal
-                    HistoryTimeRange.CUSTOM -> data.allTotal // TODO
+    private fun loadTotalsList() {
+        scope.launch {
+            val amounts = when(currentHistoryRange) {
+                HistoryTimeRange.ONE_YEAR -> data.yearTotal
+                HistoryTimeRange.FIVE_YEARS -> data.fiveYearTotal
+                HistoryTimeRange.ALL -> data.allTotal
+                HistoryTimeRange.CUSTOM -> {
+                    currentCustomRangeStart = CashFlowCommonState.customRangeStart.value
+                    currentCustomRangeEnd = CashFlowCommonState.customRangeEnd.value
+                    withContext(Dispatchers.IO) {
+                        data.historyDao.getTotals(currentCustomRangeStart, currentCustomRangeEnd)
+                            .mapValues { it.value.toFloatDollar() }
+                    }
                 }
-                loadUiList(categoryList, amounts)
             }
+            loadUiList(categoryTotals, amounts)
         }
     }
 
@@ -190,31 +191,57 @@ class CashFlowModel (
         Log.d("Libra/CashFlowModel/loadFullHistory", "$fullHistory")
     }
 
+    private fun getCustomRangeIndices(): Pair<Int, Int> {
+        var startIndex = -1
+        for ((index, date) in data.historyDates.withIndex()) {
+            if (date == currentCustomRangeStart) startIndex = index
+            else if (date == currentCustomRangeEnd) return Pair(startIndex, index + 1)
+        }
+        return Pair(0, 0)
+    }
 
-    private fun <T> List<T>.takeLastOrAll(n: Int) = if (n >= 0) takeLast(n) else this
+    private fun <T> List<T>.safeSublist(start: Int, end: Int): List<T> {
+        var newStart = start
+        if (start < 0) newStart = 0
+        if (start >= size) return emptyList()
+
+        var newEnd = end
+        if (end > size) newEnd = size
+        if (end <= 0) return emptyList()
+
+        if (newEnd < newStart) return emptyList()
+        return subList(newStart, newEnd)
+    }
 
     private fun loadHistory() {
         currentHistoryRange = CashFlowCommonState.historyRange.value
+        loadTotalsList()
         if (fullHistory.isEmpty()) return
 
-        val n = when (currentHistoryRange) {
-            HistoryTimeRange.ONE_YEAR -> 12
-            HistoryTimeRange.FIVE_YEARS -> 60
-            HistoryTimeRange.ALL -> -1
-            HistoryTimeRange.CUSTOM -> -1 // TODO
+        val range = when (currentHistoryRange) {
+            HistoryTimeRange.ONE_YEAR -> Pair(fullDates.size - 12, fullDates.size)
+            HistoryTimeRange.FIVE_YEARS -> Pair(fullDates.size - 60, fullDates.size)
+            HistoryTimeRange.ALL -> Pair(0, fullDates.size)
+            HistoryTimeRange.CUSTOM -> {
+                currentCustomRangeStart = CashFlowCommonState.customRangeStart.value
+                currentCustomRangeEnd = CashFlowCommonState.customRangeEnd.value
+                getCustomRangeIndices()
+            }
         }
 
+        val intDates = data.historyDates.safeSublist(range.first, range.second)
+        if (intDates.size < 2) return
+
         dates.clear()
-        dates.addAll(fullDates.takeLastOrAll(n))
-        val intDates = data.historyDates.takeLastOrAll(n)
+        dates.addAll(fullDates.safeSublist(range.first, range.second))
 
         history.values.clear()
         fullHistory.mapTo(history.values) {
-            it.copy(second = it.second.takeLastOrAll(n))
+            it.copy(second = it.second.safeSublist(range.first, range.second))
         }
 
         // We only need to look at [0] because that's the top stack
-        val maxY = history.values[0].second.max()
+        val maxY = history.values[0].second.maxOrNull() ?: return
         val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) {
             formatDateInt(intDates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
         }
@@ -239,7 +266,6 @@ class CashFlowModel (
         if (range != CategoryTimeRange.CUSTOM && CashFlowCommonState.pieRange.value == range) return
         CashFlowCommonState.pieRange.value = range
         loadPie()
-        loadCategoryList()
     }
 
     @Callback
@@ -247,21 +273,20 @@ class CashFlowModel (
         if (range != HistoryTimeRange.CUSTOM && CashFlowCommonState.historyRange.value == range) return
         CashFlowCommonState.historyRange.value = range
         loadHistory()
-        loadCategoryList()
     }
 
     @Callback
     fun changeTab(tab: Int) { // TODO replace with enum
-        if (CashFlowCommonState.tab.value == tab) return
         CashFlowCommonState.tab.value = tab
-        loadCategoryList()
     }
 
     @Callback
     fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
 //        viewModel.categories.reorder()
-        if (parentId == parentCategory.id.fullName)
-            categoryList.add(endIndex, categoryList.removeAt(startIndex))
+        if (parentId == parentCategory.id.fullName) {
+            categoryTotals.add(endIndex, categoryTotals.removeAt(startIndex))
+            pie.add(endIndex, pie.removeAt(startIndex))
+        }
         // TODO database, subcats
     }
 }

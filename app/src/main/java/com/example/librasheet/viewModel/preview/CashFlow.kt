@@ -16,7 +16,7 @@ val previewCashFlowModel = CashFlowModel(
     loadOnInit = false,
 ).also {
     it.parentCategory = previewIncomeCategories2[0]
-    it.categoryList.addAll(previewIncomeCategories)
+    it.categoryTotals.addAll(previewIncomeCategories)
     it.pie.addAll(previewIncomeCategories)
     it.history.values.addAll(previewStackedLineGraph)
     it.history.axes.value = previewStackedLineGraphAxes.value

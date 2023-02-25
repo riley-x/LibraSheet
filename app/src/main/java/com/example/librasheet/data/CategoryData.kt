@@ -12,7 +12,7 @@ import java.util.*
 class CategoryData(
     private val scope: CoroutineScope,
     private val dao: CategoryDao,
-    private val historyDao: CategoryHistoryDao,
+    val historyDao: CategoryHistoryDao,
 ) {
     private var lastRowId = 0L
 

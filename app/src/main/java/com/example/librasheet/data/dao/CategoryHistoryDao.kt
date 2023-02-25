@@ -4,6 +4,8 @@ import androidx.room.*
 import com.example.librasheet.data.HistoryEntryBase
 import com.example.librasheet.data.TimeSeries
 import com.example.librasheet.data.entity.*
+import com.example.librasheet.data.monthDiff
+import com.example.librasheet.data.toFloatDollar
 
 
 @Dao
@@ -70,6 +72,9 @@ interface CategoryHistoryDao {
             "FROM $categoryHistoryTable WHERE date >= :startDate AND date <= :endDate AND value != 0 " +
             "GROUP BY categoryKey")
     fun getTotals(startDate: Int, endDate: Int): Map<Long, Long>
+
+    fun getAverages(startDate: Int, endDate: Int): Map<Long, Float> =
+        getTotals(startDate, endDate).mapValues { it.value.toFloatDollar() / (monthDiff(endDate, startDate) + 1) }
 
     @Query("SELECT MIN(date) FROM $categoryHistoryTable WHERE value != 0")
     fun getEarliestDate(): Int

@@ -73,11 +73,12 @@ fun CashFlowScreen(
                     )
                 }
 
-                val startIndex = state.categoryList.indexOfFirst { it.value > 0 }
+                val categoryList = if (CashFlowCommonState.tab.value == 0) state.pie else state.categoryTotals
+                val startIndex = categoryList.indexOfFirst { it.value > 0 }
                 /** Warning the lazy column must be keyed with the index. Keying the lazy column like
                  * `key = { _, it -> it.id.fullName }` messes up the passed index into DragToReorderTarget,
                  * which won't be reset. **/
-                itemsIndexed(state.categoryList) { index, category ->
+                itemsIndexed(categoryList) { index, category ->
                     if (category.value > 0) {
                         CategoryDragRow(
                             category = category,
