@@ -39,7 +39,7 @@ object CashFlowCommonState {
         } else {
             val start = formatDateInt(customRangeStart.value, "MMM ''yy")
             val end = formatDateInt(customRangeEnd.value, "MMM ''yy")
-            "$start\n$end"
+            "From: $start\nTo: $end"
         }
     }
 }

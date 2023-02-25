@@ -180,13 +180,13 @@ fun StackedLineGraph(
         fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
             if (state.values.isEmpty()) return
             if (state.values.first().second.isEmpty()) return
-            if (isHover) {
-                hoverLoc.value =
-                    MathUtils.clamp(x.roundToInt(), 0, state.values.first().second.lastIndex)
-            } else {
-                hoverLoc.value = -1
+            val newValue = if (isHover) {
+                MathUtils.clamp(x.roundToInt(), 0, state.values.first().second.lastIndex)
+            } else -1
+            if (hoverLoc.value != newValue) {
+                hoverLoc.value = newValue
+                onHover(isHover, hoverLoc.value)
             }
-            onHover(isHover, hoverLoc.value)
         }
         Graph(
             axesState = state.axes,

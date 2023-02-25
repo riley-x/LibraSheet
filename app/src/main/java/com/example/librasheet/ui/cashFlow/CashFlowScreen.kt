@@ -1,5 +1,6 @@
 package com.example.librasheet.ui.cashFlow
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,12 +42,9 @@ fun CashFlowScreen(
     onPieTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
-    val defaultText = CashFlowCommonState.customRangeDescription()
-    var hoverText by remember(defaultText) { mutableStateOf(defaultText) }
-
-    fun updateHoverText(newText: String) {
-        hoverText = newText.ifEmpty { CashFlowCommonState.customRangeDescription() }
-    }
+    val defaultText by remember { derivedStateOf { CashFlowCommonState.customRangeDescription() } }
+    var hoverText by remember { mutableStateOf("") }
+    fun updateHoverText(newText: String) { hoverText = newText }
 
     Column(
         modifier = modifier
@@ -58,7 +56,7 @@ fun CashFlowScreen(
             modifier = Modifier.zIndex(1f),
         ) {
             Spacer(Modifier.weight(10f))
-            Text(hoverText, textAlign = TextAlign.End)
+            Text(hoverText.ifEmpty { defaultText }, textAlign = TextAlign.End)
         }
 
         DragHost {
