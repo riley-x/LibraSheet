@@ -1,91 +1,109 @@
 package com.example.librasheet.ui.dialogs
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.librasheet.data.*
-import com.example.librasheet.data.entity.Allocation
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.ui.components.selectors.CategorySelector
-import com.example.librasheet.ui.components.textFields.textFieldBorder
+import com.example.librasheet.data.getYearAndMonthFromMonthEnd
+import com.example.librasheet.data.thisMonthEnd
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.LibraViewModel
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
-import com.example.librasheet.viewModel.preview.previewCategory2
-import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
-//class TimeRangeDialog(
-//    private val viewModel: LibraViewModel,
-//): DialogHolder {
-//    override var isOpen by mutableStateOf(false)
-//        private set
-//
-//    private var isIncome = false
-//    private var errorMessage by mutableStateOf("")
-//    private var name = mutableStateOf("")
-//    private var value = mutableStateOf("")
-//    private var category = mutableStateOf(Category.None)
-//
-//    private var onSave: ((String, Long, Category?) -> Unit)? = null
-//
-//    fun open(
-//        isIncome: Boolean,
-//        allocation: Allocation? = null,
-//        onSave: (String, Long, Category?) -> Unit
-//    ) {
-//        isOpen = true
-//        name.value = allocation?.name ?: ""
-//        value.value = allocation?.value?.toFloatDollar()?.toString() ?: ""
-//        category.value = allocation?.category ?: Category.None
-//        this.isIncome = isIncome
-//        this.onSave = onSave
-//    }
-//
-//    fun clear() {
-//        isOpen = false
-//        errorMessage = ""
-//    }
-//
-//    fun onClose(cancelled: Boolean) {
-//        if (cancelled) { clear() }
-//        else {
-//            val valueLong = value.value.toDoubleOrNull()?.toLongDollar()
-//            if (valueLong == null) {
-//                errorMessage = "Couldn't parse value"
-//            } else if (valueLong < 0) {
-//                errorMessage = "Value should be positive"
-//            } else {
-//                onSave?.invoke(name.value, valueLong, category.value)
-//                clear()
-//            }
-//        }
-//    }
-//
-//    @Composable
-//    override fun Content() {
-//        if (isOpen) {
-//            AllocationDialogComposable(
-//                name = name,
-//                value = value,
-//                category = category,
-//                categories = if (isIncome) viewModel.categories.incomeTargets else viewModel.categories.expenseTargets,
-//                onClose = ::onClose,
-//            )
-//        }
-//    }
-//}
+class TimeRangeDialog: DialogHolder {
+    override var isOpen by mutableStateOf(false)
+        private set
+
+    private var startYear = 0
+    private var startMonth = 0
+    private var endYear = 0
+    private var endMonth = 0
+    private var selectionStartYear = mutableStateOf(0)
+    private var selectionStartMonth = mutableStateOf(0)
+    private var selectionEndYear = mutableStateOf(0)
+    private var selectionEndMonth = mutableStateOf(0)
+
+    private var onSave: ((selectionStart: Int, selectionEnd: Int) -> Unit)? = null
+
+    fun open(
+        start: Int,
+        end: Int,
+        onSave: (selectionStart: Int, selectionEnd: Int) -> Unit
+    ) {
+        isOpen = true
+        this.onSave = onSave
+
+        val s = getYearAndMonthFromMonthEnd(start)
+        startYear = s.first
+        startMonth = s.second
+
+        val e = getYearAndMonthFromMonthEnd(end)
+        endYear = e.first
+        endMonth = e.second
+    }
+
+    fun clear() {
+        isOpen = false
+        selectionStartYear.value = 0
+        selectionStartMonth.value = 0
+        selectionEndYear.value = 0
+        selectionEndMonth.value = 0
+    }
+
+    private fun onSelected(year: Int, month: Int) {
+        if (selectionEndYear.value != 0 || selectionStartYear.value == 0) {
+            selectionStartYear.value = year
+            selectionStartMonth.value = month
+            selectionEndYear.value = 0
+            selectionEndMonth.value = 0
+        } else {
+            selectionEndYear.value = year
+            selectionEndMonth.value = month
+        }
+    }
+
+    fun onClose(cancelled: Boolean) {
+        if (cancelled) { clear() }
+        else {
+            if (selectionStartYear.value != 0 && selectionEndYear.value != 0) {
+                val start = thisMonthEnd(selectionStartYear.value, selectionStartMonth.value)
+                val end = thisMonthEnd(selectionEndYear.value, selectionEndMonth.value)
+                onSave?.invoke(start, end)
+            }
+            clear()
+        }
+    }
+
+    @Composable
+    override fun Content() {
+        if (isOpen) {
+            TimeRangeDialogComposable(
+                startYear = startYear,
+                startMonth = startMonth,
+                endYear = endYear,
+                endMonth = endMonth,
+                selectionStartYear = selectionStartYear.value,
+                selectionStartMonth = selectionStartMonth.value,
+                selectionEndYear = selectionEndYear.value,
+                selectionEndMonth = selectionEndMonth.value,
+                onClose = ::onClose,
+                onSelected = ::onSelected,
+            )
+        }
+    }
+}
 
 
 private val months = ImmutableList(listOf(
@@ -107,6 +125,7 @@ private fun TimeRangeDialogComposable(
     selectionEndYear: Int, // inclusive!
     selectionEndMonth: Int, // inclusive!
     onClose: (cancelled: Boolean) -> Unit = { },
+    onSelected: (year: Int, month: Int) -> Unit = { _, _ -> },
 ) {
     val start = startYear * 100 + startMonth
     val end = endYear * 100 + endMonth
@@ -132,8 +151,8 @@ private fun TimeRangeDialogComposable(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     for (col in 0 until monthsPerRow) {
-                        val month = row * monthsPerRow + col
-                        val cur = year * 100 + month + 1
+                        val month = row * monthsPerRow + col + 1 // 1-index here, but remember to 0-index in arrays
+                        val cur = year * 100 + month
                         val valid = cur in start..end
                         val selected = cur == selectionStart || cur == selectionEnd
                         val highlighted = !selected && cur in selectionStart..selectionEnd
@@ -142,14 +161,14 @@ private fun TimeRangeDialogComposable(
                             shape = MaterialTheme.shapes.small,
                             color = if (selected) MaterialTheme.colors.primary else Color.Unspecified,
                             modifier = Modifier
-                                .clickable(valid) { }
+                                .clickable(valid) { onSelected(year, month) }
                         ) {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp)
                             ) {
                                 Text(
-                                    text = months.items[month],
+                                    text = months.items[month - 1],
                                     style = MaterialTheme.typography.subtitle2,
                                     color = if (highlighted) MaterialTheme.colors.primary
                                         else if (!valid) MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)

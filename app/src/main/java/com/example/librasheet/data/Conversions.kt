@@ -22,6 +22,10 @@ fun Int.addYears(years: Int) = this + years * 1_00_00
 fun thisMonthEnd(date: Int): Int {
     val month = getMonth(date)
     val year = getYear(date)
+    return thisMonthEnd(year, month)
+}
+
+fun thisMonthEnd(year: Int, month: Int): Int {
     return if (month == 12) getIntDate(year + 1, 1, 0)
     else getIntDate(year, month + 1, 0)
 }
