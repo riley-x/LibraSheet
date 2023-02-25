@@ -163,12 +163,14 @@ fun StackedLineGraph(
     modifier: Modifier = Modifier,
     onHover: (isHover: Boolean, loc: Int) -> Unit = { _, _ -> },
 ) {
-    if (state.values.isEmpty()) {
+    if (state.values.isEmpty() || state.values.first().second.isEmpty()) {
         NoDataError(modifier)
     } else {
         val hoverLoc = remember { mutableStateOf(-1) }
         val showHover by remember { derivedStateOf { hoverLoc.value >= 0 } }
-        val graph = stackedLineGraphDrawer(values = state.values)
+        val graph = if (state.values.first().second.size == 1) // when there's exactly one element, draw a bar graph instead
+            stackedBarGraphDrawer(values = state.values)
+            else stackedLineGraphDrawer(values = state.values)
         val graphHover = stackedLineGraphHover(
             values = state.values,
             hoverLoc = hoverLoc,
@@ -177,6 +179,7 @@ fun StackedLineGraph(
 
         fun onHoverInner(isHover: Boolean, x: Float, y: Float) {
             if (state.values.isEmpty()) return
+            if (state.values.first().second.isEmpty()) return
             if (isHover) {
                 hoverLoc.value =
                     MathUtils.clamp(x.roundToInt(), 0, state.values.first().second.lastIndex)

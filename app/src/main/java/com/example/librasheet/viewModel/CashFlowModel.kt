@@ -64,7 +64,7 @@ class CashFlowModel (
     val pie = mutableStateListOf<CategoryUi>()
     val categoryTotals = mutableStateListOf<CategoryUi>()
 
-    /** History graph **/
+    /** History graph. We cache the full history below and create the graph state by slicing **/
     private var fullHistory = listOf<StackedLineGraphValue>()
     private var fullDates = listOf<String>()
 
@@ -195,7 +195,8 @@ class CashFlowModel (
         var startIndex = -1
         for ((index, date) in data.historyDates.withIndex()) {
             if (date == currentCustomRangeStart) startIndex = index
-            else if (date == currentCustomRangeEnd) return Pair(startIndex, index + 1)
+            if (date == currentCustomRangeEnd) return Pair(startIndex, index + 1)
+                // make sure there's no else if here, since could have end == start
         }
         return Pair(0, 0)
     }
@@ -228,9 +229,8 @@ class CashFlowModel (
                 getCustomRangeIndices()
             }
         }
-
         val intDates = data.historyDates.safeSublist(range.first, range.second)
-        if (intDates.size < 2) return
+        Log.d("Libra/CashFlowModel/loadHistory", "range: $range, intDates: $intDates")
 
         dates.clear()
         dates.addAll(fullDates.safeSublist(range.first, range.second))
@@ -241,6 +241,7 @@ class CashFlowModel (
         }
 
         // We only need to look at [0] because that's the top stack
+        val onlyOneEntry = history.values[0].second.size == 1
         val maxY = history.values[0].second.maxOrNull() ?: return
         val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) {
             formatDateInt(intDates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
@@ -251,8 +252,8 @@ class CashFlowModel (
             ticksX = ticksX,
             minY = 0f,
             maxY = maxY + maxY * graphYPad,
-            minX = 0f,
-            maxX = dates.lastIndex.toFloat(),
+            minX = if (onlyOneEntry) -0.5f else 0f,
+            maxX = if (onlyOneEntry) 0.5f else dates.lastIndex.toFloat(),
         )
 
         history.axes.value = axes
