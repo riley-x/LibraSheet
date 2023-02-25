@@ -23,6 +23,8 @@ object CashFlowCommonState {
     val tab = mutableStateOf(0)
     val pieRange = mutableStateOf(CategoryTimeRange.ONE_YEAR)
     val historyRange = mutableStateOf(HistoryTimeRange.ONE_YEAR)
+    val customRangeStart = mutableStateOf(0)
+    val customRangeEnd = mutableStateOf(0)
 }
 
 
@@ -52,6 +54,8 @@ class CashFlowModel (
     private var currentTab = CashFlowCommonState.tab.value
     private var currentPieRange = CashFlowCommonState.pieRange.value
     private var currentHistoryRange = CashFlowCommonState.historyRange.value
+    private var currentCustomRangeStart = 0
+    private var currentCustomRangeEnd = 0
 
     /** List of categories with values displayed below the graphic. **/
     val categoryList = mutableStateListOf<CategoryUi>()
@@ -104,11 +108,14 @@ class CashFlowModel (
                 " $currentHistoryRange-${CashFlowCommonState.historyRange.value}" +
                 " $currentTab-${CashFlowCommonState.tab.value}")
         var reloadList = false
-        if (currentPieRange != CashFlowCommonState.pieRange.value) {
+        val customChanged = CashFlowCommonState.pieRange.value == CategoryTimeRange.CUSTOM
+                && (currentCustomRangeStart != CashFlowCommonState.customRangeStart.value
+                || currentCustomRangeEnd != CashFlowCommonState.customRangeEnd.value)
+        if (customChanged || currentPieRange != CashFlowCommonState.pieRange.value) {
             loadPie()
             reloadList = true
         }
-        if (currentHistoryRange != CashFlowCommonState.historyRange.value) {
+        if (customChanged || currentHistoryRange != CashFlowCommonState.historyRange.value) {
             loadHistory()
             reloadList = true
         }
@@ -229,7 +236,7 @@ class CashFlowModel (
 
     @Callback
     fun setPieRange(range: CategoryTimeRange) {
-        if (CashFlowCommonState.pieRange.value == range) return
+        if (range != CategoryTimeRange.CUSTOM && CashFlowCommonState.pieRange.value == range) return
         CashFlowCommonState.pieRange.value = range
         loadPie()
         loadCategoryList()
@@ -237,7 +244,7 @@ class CashFlowModel (
 
     @Callback
     fun setHistoryRange(range: HistoryTimeRange) {
-        if (CashFlowCommonState.historyRange.value == range) return
+        if (range != HistoryTimeRange.CUSTOM && CashFlowCommonState.historyRange.value == range) return
         CashFlowCommonState.historyRange.value = range
         loadHistory()
         loadCategoryList()

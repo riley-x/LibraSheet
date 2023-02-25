@@ -40,6 +40,8 @@ class TimeRangeDialog: DialogHolder {
     fun open(
         start: Int,
         end: Int,
+        selectionStart: Int,
+        selectionEnd: Int,
         onSave: (selectionStart: Int, selectionEnd: Int) -> Unit
     ) {
         isOpen = true
@@ -52,6 +54,14 @@ class TimeRangeDialog: DialogHolder {
         val e = getYearAndMonthFromMonthEnd(end)
         endYear = e.first
         endMonth = e.second
+
+        val ss = getYearAndMonthFromMonthEnd(selectionStart)
+        selectionStartYear.value = ss.first
+        selectionStartMonth.value = ss.second
+
+        val se = getYearAndMonthFromMonthEnd(selectionEnd)
+        selectionEndYear.value = se.first
+        selectionEndMonth.value = se.second
     }
 
     fun clear() {
@@ -63,11 +73,19 @@ class TimeRangeDialog: DialogHolder {
     }
 
     private fun onSelected(year: Int, month: Int) {
+        val newSelection = year * 100 + month
+        val selectionStart = selectionStartYear.value * 100 + selectionStartMonth.value
+
         if (selectionEndYear.value != 0 || selectionStartYear.value == 0) {
             selectionStartYear.value = year
             selectionStartMonth.value = month
             selectionEndYear.value = 0
             selectionEndMonth.value = 0
+        } else if (newSelection < selectionStart) {
+            selectionEndYear.value = selectionStartYear.value
+            selectionEndMonth.value = selectionStartMonth.value
+            selectionStartYear.value = year
+            selectionStartMonth.value = month
         } else {
             selectionEndYear.value = year
             selectionEndMonth.value = month
@@ -77,9 +95,11 @@ class TimeRangeDialog: DialogHolder {
     fun onClose(cancelled: Boolean) {
         if (cancelled) { clear() }
         else {
-            if (selectionStartYear.value != 0 && selectionEndYear.value != 0) {
+            if (selectionStartYear.value != 0) {
                 val start = thisMonthEnd(selectionStartYear.value, selectionStartMonth.value)
-                val end = thisMonthEnd(selectionEndYear.value, selectionEndMonth.value)
+                val end = if (selectionEndYear.value != 0)
+                    thisMonthEnd(selectionEndYear.value, selectionEndMonth.value)
+                    else start
                 onSave?.invoke(start, end)
             }
             clear()

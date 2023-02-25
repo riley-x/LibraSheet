@@ -9,6 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
+import com.example.librasheet.ui.dialogs.TimeRangeDialog
+import com.example.librasheet.viewModel.CashFlowCommonState
 import com.example.librasheet.viewModel.CategoryTimeRange
 import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.LibraViewModel
@@ -18,6 +20,7 @@ fun NavGraphBuilder.cashFlow(
     tab: CashFlowTab,
     navController: NavHostController,
     viewModel: LibraViewModel,
+    timeRangeDialog: TimeRangeDialog,
     innerPadding: PaddingValues,
 ) {
     navigation(startDestination = tab.routeWithArgs, route = tab.graph) {
@@ -26,15 +29,31 @@ fun NavGraphBuilder.cashFlow(
             val model = viewModel.getCashFlowModel(categoryId)
             LaunchedEffect(Unit) { model.resyncState() }
 
-            fun onPieTimeRange(range: CategoryTimeRange) {
-                if (range == CategoryTimeRange.CUSTOM) {
+            fun onSaveCustomTimeRange(start: Int, end: Int) {
+                CashFlowCommonState.customRangeStart.value = start
+                CashFlowCommonState.customRangeEnd.value = end
+                model.setPieRange(CategoryTimeRange.CUSTOM)
+                model.setHistoryRange(HistoryTimeRange.CUSTOM)
+            }
 
-                } else model.setPieRange(range)
+            fun openTimeRangeDialog() {
+                if (viewModel.months.isNotEmpty())
+                    timeRangeDialog.open(
+                        viewModel.months.first(),
+                        viewModel.months.last(),
+                        CashFlowCommonState.customRangeStart.value,
+                        CashFlowCommonState.customRangeEnd.value,
+                        ::onSaveCustomTimeRange
+                    )
+            }
+
+            fun onPieTimeRange(range: CategoryTimeRange) {
+                if (range == CategoryTimeRange.CUSTOM) openTimeRangeDialog()
+                else model.setPieRange(range)
             }
             fun onHistoryTimeRange(range: HistoryTimeRange) {
-                if (range == HistoryTimeRange.CUSTOM) {
-
-                } else model.setHistoryRange(range)
+                if (range == HistoryTimeRange.CUSTOM) openTimeRangeDialog()
+                else model.setHistoryRange(range)
             }
             fun toCategory(it: CategoryUi) = navController.navigate(tab.route(it.category.id))
 

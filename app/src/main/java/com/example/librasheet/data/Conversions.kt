@@ -31,6 +31,7 @@ fun thisMonthEnd(year: Int, month: Int): Int {
 }
 
 fun getYearAndMonthFromMonthEnd(date: Int): Pair<Int, Int> {
+    if (date == 0) return Pair(0, 0)
     val month = getMonth(date)
     val year = getYear(date)
     return if (month == 1) Pair(year - 1, 12)

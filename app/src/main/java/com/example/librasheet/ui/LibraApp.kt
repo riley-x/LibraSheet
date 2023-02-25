@@ -24,6 +24,7 @@ import com.example.librasheet.ui.colorSelector.ColorSelectorScreen
 import com.example.librasheet.ui.dialogs.ConfirmationDialog
 import com.example.librasheet.ui.dialogs.SelectorDialog
 import com.example.librasheet.ui.dialogs.TextFieldDialog
+import com.example.librasheet.ui.dialogs.TimeRangeDialog
 import com.example.librasheet.ui.navigation.*
 import com.example.librasheet.ui.settings.*
 import com.example.librasheet.ui.settings.dialogs.AccountDialog
@@ -130,6 +131,8 @@ fun LibraApp(
     val reimbursementDialog = remember { ReimbursementDialog() }
     val allocationDialog = remember { AllocationDialog(viewModel) }
     val categoryRuleDialog = remember { CategoryRuleDialog(viewModel) }
+    val timeRangeDialog = remember { TimeRangeDialog() }
+
 
     var dialogErrorMessage by remember { mutableStateOf("") } // this is reused across all dialogs
 
@@ -267,8 +270,8 @@ fun LibraApp(
                 transactions()
             }
 
-            cashFlow(IncomeTab, navController, viewModel, innerPadding)
-            cashFlow(SpendingTab, navController, viewModel, innerPadding)
+            cashFlow(IncomeTab, navController, viewModel, timeRangeDialog, innerPadding)
+            cashFlow(SpendingTab, navController, viewModel, timeRangeDialog, innerPadding)
 
             navigation(startDestination = SettingsTab.route, route = SettingsTab.graph) {
                 composable(route = SettingsTab.route) {
@@ -415,5 +418,6 @@ fun LibraApp(
         reimbursementDialog.Content()
         allocationDialog.Content()
         categoryRuleDialog.Content()
+        timeRangeDialog.Content()
     }
 }
