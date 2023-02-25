@@ -27,6 +27,21 @@ object CashFlowCommonState {
     val historyRange = mutableStateOf(HistoryTimeRange.ONE_YEAR)
     val customRangeStart = mutableStateOf(0)
     val customRangeEnd = mutableStateOf(0)
+
+    fun isCustom() =
+        (tab.value == 0 && pieRange.value == CategoryTimeRange.CUSTOM) ||
+        (tab.value == 1 && historyRange.value == HistoryTimeRange.CUSTOM)
+
+    fun customRangeDescription(): String {
+        return if (!isCustom()) ""
+        else if (customRangeStart.value == customRangeEnd.value) {
+            formatDateInt(customRangeStart.value, "MMM yyyy")
+        } else {
+            val start = formatDateInt(customRangeStart.value, "MMM ''yy")
+            val end = formatDateInt(customRangeEnd.value, "MMM ''yy")
+            "$start\n$end"
+        }
+    }
 }
 
 

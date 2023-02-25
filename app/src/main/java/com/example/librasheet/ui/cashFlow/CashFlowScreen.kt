@@ -16,6 +16,7 @@ import com.example.librasheet.data.entity.ignoreKey
 import com.example.librasheet.ui.categories.CategoryDragRow
 import com.example.librasheet.ui.components.DragHost
 import com.example.librasheet.ui.components.HeaderBar
+import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CashFlowModel
@@ -40,7 +41,12 @@ fun CashFlowScreen(
     onPieTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
-    var hoverText by remember { mutableStateOf("") }
+    val defaultText = CashFlowCommonState.customRangeDescription()
+    var hoverText by remember(defaultText) { mutableStateOf(defaultText) }
+
+    fun updateHoverText(newText: String) {
+        hoverText = newText.ifEmpty { CashFlowCommonState.customRangeDescription() }
+    }
 
     Column(
         modifier = modifier
@@ -66,7 +72,7 @@ fun CashFlowScreen(
                         historyDates = state.dates,
                         categoryTimeRange = CashFlowCommonState.pieRange,
                         historyTimeRange = CashFlowCommonState.historyRange,
-                        updateHoverText = { hoverText = it },
+                        updateHoverText = ::updateHoverText,
                         onCategoryTimeRange = onPieTimeRange,
                         onHistoryTimeRange = onHistoryTimeRange,
                         onSelection = state::changeTab,
