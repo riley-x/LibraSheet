@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.entity.Category
-import com.example.librasheet.ui.components.DialogHolder
+import com.example.librasheet.ui.dialogs.DialogHolder
 import com.example.librasheet.ui.components.selectors.CategorySelector
 import com.example.librasheet.ui.components.textFields.textFieldBorder
 import com.example.librasheet.ui.dialogs.Dialog

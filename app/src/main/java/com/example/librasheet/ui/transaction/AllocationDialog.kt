@@ -14,16 +14,12 @@ import com.example.librasheet.data.entity.Allocation
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.toFloatDollar
 import com.example.librasheet.data.toLongDollar
-import com.example.librasheet.ui.components.DialogHolder
+import com.example.librasheet.ui.dialogs.DialogHolder
 import com.example.librasheet.ui.components.selectors.CategorySelector
-import com.example.librasheet.ui.components.selectors.DropdownSelector
 import com.example.librasheet.ui.components.textFields.textFieldBorder
 import com.example.librasheet.ui.dialogs.Dialog
-import com.example.librasheet.ui.dialogs.TextFieldDialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.CategoryModel
 import com.example.librasheet.viewModel.LibraViewModel
-import com.example.librasheet.viewModel.preview.previewCategory
 import com.example.librasheet.viewModel.preview.previewCategory2
 import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 

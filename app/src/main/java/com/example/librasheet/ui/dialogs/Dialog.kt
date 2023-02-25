@@ -1,7 +1,10 @@
 package com.example.librasheet.ui.dialogs
 
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -18,6 +21,7 @@ fun Dialog(
     errorMessage: String = "",
     cancelText: String = "Cancel",
     okText: String = "Ok",
+    scrollable: Boolean = false,
     onCancel: () -> Unit = { },
     onOk: () -> Unit = { },
     content: @Composable ColumnScope.() -> Unit = { },
@@ -35,7 +39,9 @@ fun Dialog(
                 LocalContentAlpha provides ContentAlpha.high,
                 LocalTextStyle provides MaterialTheme.typography.body1,
             ) {
-                Column {
+                Column(
+                    modifier = if (scrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier
+                ) {
                     Text(text = title)
                     content()
                     if (errorMessage.isNotEmpty()) {

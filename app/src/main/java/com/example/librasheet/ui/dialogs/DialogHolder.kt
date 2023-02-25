@@ -1,4 +1,4 @@
-package com.example.librasheet.ui.components
+package com.example.librasheet.ui.dialogs
 
 import androidx.compose.runtime.Composable
 

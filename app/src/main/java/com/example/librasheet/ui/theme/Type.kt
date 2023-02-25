@@ -50,13 +50,14 @@ val Typography = Typography(
     ),
     h4 = TextStyle(
         fontWeight = FontWeight.W500,
-        fontSize = 16.sp,
+        fontSize = 22.sp,
         letterSpacing = 0.5.sp,
         fontFamily = Roboto,
     ),
     h5 = TextStyle(
         fontWeight = FontWeight.W500,
-        fontSize = 22.sp,
+        fontSize = 18.sp,
+        letterSpacing = 1.sp,
         fontFamily = Roboto,
     ),
     h6 = TextStyle(

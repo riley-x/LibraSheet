@@ -26,6 +26,13 @@ fun thisMonthEnd(date: Int): Int {
     else getIntDate(year, month + 1, 0)
 }
 
+fun getYearAndMonthFromMonthEnd(date: Int): Pair<Int, Int> {
+    val month = getMonth(date)
+    val year = getYear(date)
+    return if (month == 1) Pair(year - 1, 12)
+    else Pair(year, month - 1)
+}
+
 /**
  * Assuming [monthYear] is a date in the format YYYYMM00, returns the next month in the same format.
  * The months are encoded as int dates with the day set to 0 to indicate the last date of the

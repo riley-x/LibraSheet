@@ -4,12 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.toLongDollar
-import com.example.librasheet.ui.components.DialogHolder
+import com.example.librasheet.ui.dialogs.DialogHolder
 import com.example.librasheet.ui.dialogs.TextFieldDialog
-import com.example.librasheet.viewModel.LibraViewModel
-import com.example.librasheet.viewModel.TransactionModel
 
 class ReimbursementDialog: DialogHolder {
     override var isOpen by mutableStateOf(false)

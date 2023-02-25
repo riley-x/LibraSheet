@@ -20,6 +20,8 @@ import com.example.librasheet.ui.components.formatDollar
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.CashFlowModel
 import com.example.librasheet.viewModel.CashFlowCommonState
+import com.example.librasheet.viewModel.CategoryTimeRange
+import com.example.librasheet.viewModel.HistoryTimeRange
 import com.example.librasheet.viewModel.dataClasses.CategoryUi
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.previewCashFlowModel
@@ -35,6 +37,8 @@ fun CashFlowScreen(
     onBack: () -> Unit = { },
     onCategoryClick: (CategoryUi) -> Unit = { },
     onReorder: (parentId: String, startIndex: Int, endIndex: Int) -> Unit = { _, _, _ -> },
+    onPieTimeRange: (CategoryTimeRange) -> Unit = { },
+    onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
     var hoverText by remember { mutableStateOf("") }
 
@@ -63,8 +67,8 @@ fun CashFlowScreen(
                         categoryTimeRange = CashFlowCommonState.pieRange,
                         historyTimeRange = CashFlowCommonState.historyRange,
                         updateHoverText = { hoverText = it },
-                        onCategoryTimeRange = state::setPieRange,
-                        onHistoryTimeRange = state::setHistoryRange,
+                        onCategoryTimeRange = onPieTimeRange,
+                        onHistoryTimeRange = onHistoryTimeRange,
                         onSelection = state::changeTab,
                     )
                 }

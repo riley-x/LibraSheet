@@ -11,7 +11,7 @@ import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.toIntDate
-import com.example.librasheet.ui.components.DialogHolder
+import com.example.librasheet.ui.dialogs.DialogHolder
 import com.example.librasheet.ui.components.textFields.DateTextField
 import com.example.librasheet.ui.components.formatDateIntSimple
 import com.example.librasheet.ui.components.parseOrNull

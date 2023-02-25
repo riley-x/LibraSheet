@@ -10,16 +10,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.Institution
 import com.example.librasheet.data.allInstitutions
-import com.example.librasheet.data.entity.Category
-import com.example.librasheet.ui.components.DialogHolder
-import com.example.librasheet.ui.components.selectors.CategorySelector
+import com.example.librasheet.ui.dialogs.DialogHolder
 import com.example.librasheet.ui.components.selectors.DropdownSelector
-import com.example.librasheet.ui.components.textFields.textFieldBorder
 import com.example.librasheet.ui.dialogs.Dialog
 import com.example.librasheet.ui.theme.LibraSheetTheme
 import com.example.librasheet.viewModel.LibraViewModel
-import com.example.librasheet.viewModel.preview.previewCategory2
-import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
 class AccountDialog(
     private val viewModel: LibraViewModel,
