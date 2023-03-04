@@ -83,9 +83,7 @@ class AccountScreenModel(
             state.incomeDates.add(formatDateInt(dates[i], "MMM yyyy"))
         }
 
-        val ticksX = autoXTicksDiscrete(income.size, graphTicksX) {
-            formatDateInt(dates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
-        }
+        val ticksX = autoMonthTicks(dates.first(), dates.last(), graphTicksX)
         val pad = (if (maxY == minY) maxY else (maxY - minY)) * graphYPad
         state.netIncome.axes.value = AxesState(
             ticksY = autoYTicks(minY, maxY, graphTicksY),
@@ -118,9 +116,7 @@ class AccountScreenModel(
             if (x > maxY) maxY = x
         }
 
-        val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) {
-            formatDateInt(dates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
-        }
+        val ticksX = autoMonthTicks(dates.first(), dates.last(), graphTicksX)
         val pad = (if (maxY == minY) maxY else (maxY - minY)) * graphYPad
         state.balance.axes.value = AxesState(
             ticksY = autoYTicks(minY, maxY, graphTicksY),

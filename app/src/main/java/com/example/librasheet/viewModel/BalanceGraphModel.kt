@@ -82,9 +82,7 @@ class BalanceGraphModel(
                 if (value > maxY) maxY = value
             }
 
-            val ticksX = autoXTicksDiscrete(values.size, graphTicksX) {
-                formatDateInt(netIncome[it].date, "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
-            }
+            val ticksX = autoMonthTicks(netIncome.first().date, netIncome.last().date, graphTicksX)
             val pad = (if (maxY == minY) maxY else (maxY - minY)) * graphYPad
             val axes = AxesState(
                 ticksY = autoYTicks(minY, maxY, graphTicksY),
@@ -114,9 +112,7 @@ class BalanceGraphModel(
             val (values, _, maxY) = history.stackedLineGraphValues(accounts)
 
             /** Create axes **/
-            val ticksX = autoXTicksDiscrete(historyDateInts.size, graphTicksX) {
-                formatDateInt(historyDateInts[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
-            }
+            val ticksX = autoMonthTicks(historyDateInts.first(), historyDateInts.last(), graphTicksX)
             val (ticksY, order) = autoYTicksWithOrder(0f, maxY, graphTicksY)
             val axes = AxesState(
                 ticksY = ticksY,
