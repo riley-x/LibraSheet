@@ -30,6 +30,17 @@ fun thisMonthEnd(year: Int, month: Int): Int {
     else getIntDate(year, month + 1, 0)
 }
 
+fun getMonthFromMonthEnd(date: Int): Int {
+    if (date == 0) return 0
+    val month = getMonth(date)
+    return if (month == 1) 12 else month - 1
+}
+fun getYearFromMonthEnd(date: Int): Int {
+    if (date == 0) return 0
+    val month = getMonth(date)
+    val year = getYear(date)
+    return if (month == 1) year - 1 else year
+}
 fun getYearAndMonthFromMonthEnd(date: Int): Pair<Int, Int> {
     if (date == 0) return Pair(0, 0)
     val month = getMonth(date)
@@ -39,15 +50,15 @@ fun getYearAndMonthFromMonthEnd(date: Int): Pair<Int, Int> {
 }
 
 /**
- * Assuming [monthYear] is a date in the format YYYYMM00, returns the next month in the same format.
+ * Assuming [monthYear] is a date in the format YYYYMM00, returns the next [n]th month in the same format.
  * The months are encoded as int dates with the day set to 0 to indicate the last date of the
  * previous month. For example, 20221200 corresponds to Nov 2022.
  */
-fun incrementMonthEnd(monthYear: Int): Int {
-    val month = getMonth(monthYear)
-    val year = getYear(monthYear)
-    return if (month == 12) getIntDate(year + 1, 1, 0)
-    else getIntDate(year, month + 1, 0)
+fun incrementMonthEnd(monthYear: Int, n: Int = 1): Int {
+    val year = getYear(monthYear) + n / 12
+    val month = getMonth(monthYear) + n % 12
+    return if (month > 12) getIntDate(year + 1, month - 12, 0)
+    else getIntDate(year, month, 0)
 }
 
 fun monthDiff(end: Int, start: Int): Int {

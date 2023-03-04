@@ -246,6 +246,7 @@ class CashFlowModel (
         }
         val intDates = data.historyDates.safeSublist(range.first, range.second)
         Log.d("Libra/CashFlowModel/loadHistory", "range: $range, intDates: $intDates")
+        if (intDates.isEmpty()) return
 
         dates.clear()
         dates.addAll(fullDates.safeSublist(range.first, range.second))
@@ -258,9 +259,7 @@ class CashFlowModel (
         // We only need to look at [0] because that's the top stack
         val onlyOneEntry = history.values[0].second.size == 1
         val maxY = history.values[0].second.maxOrNull() ?: return
-        val ticksX = autoXTicksDiscrete(dates.size, graphTicksX) {
-            formatDateInt(intDates[it], "MMM ''yy") // single quote escapes the date formatters, so need '' to place a literal quote
-        }
+        val ticksX = autoMonthTicks(intDates.first(), intDates.last(), graphTicksX)
         val (ticksY, order) = autoYTicksWithOrder(0f, maxY, graphTicksY)
         val axes = AxesState(
             ticksY = ticksY,
