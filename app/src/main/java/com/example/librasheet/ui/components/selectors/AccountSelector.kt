@@ -15,9 +15,7 @@ import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.isValid
 import com.example.librasheet.ui.components.ColorIndicator
 import com.example.librasheet.ui.theme.LibraSheetTheme
-import com.example.librasheet.viewModel.preview.previewAccount
 import com.example.librasheet.viewModel.preview.previewAccounts
-import com.example.librasheet.viewModel.preview.previewIncomeCategories2
 
 
 @Composable

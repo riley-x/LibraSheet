@@ -155,27 +155,6 @@ val previewExpense = mutableStateListOf(
     -410.2f
 )
 
-val previewNetIncome = List(previewExpense.size) {
-    previewIncome[it] + previewExpense[it]
-}.toMutableStateList()
-
-val previewNetIncomeAxes = mutableStateOf(AxesState(
-    minX = -0.75f,
-    maxX = previewNetIncome.lastIndex + 0.5f,
-    minY = -2000f,
-    maxY = 2000f,
-    ticksY = List(7) {
-        val value = -1500f + it * 500f
-        NamedValue(value, "$value")
-    },
-    ticksX = List(3) { NamedValue(value = 1f + 2f * it, name = "$it/$it/$it") }
-))
-
-
-val previewBarState = DiscreteGraphState(
-    values = previewNetIncome,
-    axes = previewNetIncomeAxes,
-)
 
 val previewNetIncomeState = NetIncomeGraphState(
     values1 = previewIncome,

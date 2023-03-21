@@ -146,7 +146,7 @@ private fun Preview() {
         Surface {
             BalanceScreen(
                 accounts = previewAccounts,
-                liabilities = previewAccounts,
+                liabilities = previewAccountsLiabilities,
                 history = previewStackedLineGraphState,
                 historyDates = previewEmptyStringList,
                 incomeDates = previewEmptyStringList,
