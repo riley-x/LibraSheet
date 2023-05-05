@@ -140,13 +140,13 @@ object ChaseReader {
      */
     private fun parseTransactions(transactions: AccessibilityNodeInfo, latestDate: Int): MutableList<ParsedTransaction> {
         val out = mutableListOf<ParsedTransaction>()
-        printAllViews(transactions)
 
+        /** Iterate through the depth-5 nodes **/
         var date: Int? = null
         for (i in 0 until transactions.childCount) {
-            /** Iterate through the depth-5 nodes until we find a date header **/
             val node = transactions.getChild(i) ?: continue
 
+            /** Check if node is a date header **/
             val newDate = parseDateHeader(node)
             if (newDate != null) {
                 Log.v("LibraSheet/ChaseReader/parseTransactions", "i=$i date=$newDate")
@@ -158,8 +158,9 @@ object ChaseReader {
                 date = newDate
                 continue
             }
-            if (date == null) continue
 
+            /** Check if node is a transaction **/
+            if (date == null) continue // can't save transaction without a known date
             val (name, value) = parseTransaction(node) ?: continue
             out.add(ParsedTransaction(date = date, name = name, value = value))
             Log.v("Libra/ChaseReader/parseTransactions", "i=$i date=$date name=$name value=$value")
