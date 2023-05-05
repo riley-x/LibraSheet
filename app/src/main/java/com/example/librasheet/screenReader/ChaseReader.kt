@@ -12,9 +12,11 @@ import java.text.SimpleDateFormat
 object ChaseReader {
 
     /**
-     * Credit card all transactions screen, 2048 event.source, 2023-01-27 version 4.380
+     * Credit card all transactions screen, 2048 event.source, 2023-05-04 version 4.411
      *
      * Warning! When scrolling fast, the date headers / transactions may come out-of-sync.
+     *
+     * type = 2048, class = android.view.ViewGroup, package = com.chase.sig.android
      *
      *      0 [null] [null] <-- null
      *
@@ -24,139 +26,84 @@ object ChaseReader {
      *      2     [CREDIT CARD (...5940)] [null] <-- null
      *      2     [null] [Profile & Settings icon, new alerts available] <-- null
      *
-     *      ~~~ Tab host ~~~
+     *      ~~~ Content ~~~
      *      1   [null] [null] <-- null
-     *
-     *      ~~~ Tab selector ~~~
-     *      2     [null] [null] <-- com.chase.sig.android:id/  
-     *      3       [null] [All transactions] <-- null         
-     *      4         [All transactions] [null] <-- null       
-     *      3       [null] [Spending summary] <-- null         
-     *      4         [Spending summary] [null] <-- null       
-     *
-     *      ~~~ Tab content ~~~
      *      2     [null] [null] <-- com.chase.sig.android:id/
-     *      3       [null] [null] <-- null  # for some reason this doesn't always appear, in which
-     *                                      # case the level of everything below is shifted one less
-     *      4         [null] [null] <-- com.chase.sig.android:id/
      *
      *      ~~~ Search ~~~
-     *      5           [null] [null] <-- com.chase.sig.android:id/
-     *      6             [null] [null] <-- com.chase.sig.android:id/
-     *      7               [null] [Search button] <-- com.chase.sig.android:id/
-     *      7               [Search or filter] [null] <-- com.chase.sig.android:id/
+     *      3       [null] [null] <-- com.chase.sig.android:id/
+     *      4         [null] [null] <-- com.chase.sig.android:id/
+     *      5           [null] [Search button] <-- com.chase.sig.android:id/
+     *      5           [Search or filter] [null] <-- com.chase.sig.android:id/
      *
      *      ~~~ Transactions ~~~
-     *      5           [null] [null] <-- com.chase.sig.android:id/
-     *      6             [null] [null] <-- null
+     *      3       [null] [null] <-- com.chase.sig.android:id/
+     *      4         [null] [null] <-- null
      *
-     *      Types of entries at level 7:
+     *      Types of entries at level 5:
      *          1. Pending header with total amount pending
-     *          2. Period summary drop down header + data (user must click to open to load data)
-     *          3. Date header
-     *          4. Transaction
+     *          2. Period summary drop down header
+     *          3. Period summary drop down data (user must click to open to load data)
+     *          4. Date header
+     *          5. Transaction
      *
      *      ~~~ Pending ~~~
-     *      7               [null] [null] <-- null
-     *      8                 [Pending (1)] [PendingHeader1] <-- com.chase.sig.android:id/
-     *      8                 [null] [Info] <-- com.chase.sig.android:id/
-     *      8                 [$12.96] [null] <-- com.chase.sig.android:id/
+     *      5           [null] [null] <-- null
+     *      6             [Pending (2)] [PendingHeader2] <-- com.chase.sig.android:id/
+     *      6             [null] [Info] <-- com.chase.sig.android:id/
+     *      6             [$22.73] [null] <-- com.chase.sig.android:id/
      *
      *      ~~~ Pending transaction ~~~
-     *      7               [null] [null] <-- null
-     *      8                 [null] [null] <-- null
-     *      9                   [Split with Zelle®] [null] <-- null
-     *      8                 [null] [null] <-- null
-     *      9                   [TST* 20th Street Piz] [null] <-- com.chase.sig.android:id/merchant_name
-     *      9                   [Jan 26, 2023] [null] <-- com.chase.sig.android:id/
-     *      9                   [$12.96] [$12.96] <-- com.chase.sig.android:id/trans_amount
+     *      5           [null] [null] <-- null
+     *      6             [null] [null] <-- null
+     *      7               [Split with Zelle®] [null] <-- null
+     *      6             [null] [null] <-- null
+     *      7               [SWEETGREEN RITTENHOU] [null] <-- com.chase.sig.android:id/merchant_name
+     *      7               [May 04, 2023] [null] <-- com.chase.sig.android:id/
+     *      7               [$13.45] [$13.45] <-- com.chase.sig.android:id/trans_amount
      *
      *      ~~~ Activity header ~~~
-     *      7               [null] [null] <-- null
-     *      8                 [null] [null] <-- com.chase.sig.android:id/
-     *      9                   [null] [null] <-- com.chase.sig.android:id/
-     *      10                    [Activity since January 12, 2023] [Activity since January 12, 2023 shows content below  Button] <-- com.chase.sig.android:id/
-     *
-     *      ~~~ Activity data ~~~
-     *      7               [null] [null] <-- null
-     *      8                 [null] [null] <-- com.chase.sig.android:id/
-     *      9                   [Last statement balance] [null] <-- com.chase.sig.android:id/
-     *      9                   [$148.40] [null] <-- com.chase.sig.android:id/
-     *      8                 [null] [null] <-- com.chase.sig.android:id/
-     *      9                   [Payments] [null] <-- null
-     *      9                   [$0.00] [$0.00] <-- com.chase.sig.android:id/
-     *      8                 [null] [null] <-- com.chase.sig.android:id/
-     *      9                   [Purchases] [null] <-- null
-     *      9                   [+$725.15] [$725.15] <-- com.chase.sig.android:id/
-     *      8                 [null] [null] <-- com.chase.sig.android:id/
-     *      9                   [Fees charged] [null] <-- null
-     *      9                   [$0.00] [$0.00] <-- com.chase.sig.android:id/
-     *      8                 [null] [null] <-- com.chase.sig.android:id/
-     *      9                   [Current balance] [null] <-- com.chase.sig.android:id/
-     *      9                   [$873.55] [null] <-- com.chase.sig.android:id/
+     *      5           [null] [null] <-- null
+     *      6             [null] [null] <-- com.chase.sig.android:id/
+     *      7               [null] [null] <-- com.chase.sig.android:id/
+     *      8                 [Activity since April 12, 2023] [Activity since April 12, 2023 shows content below  Button] <-- com.chase.sig.android:id/
      *
      *      ~~~ Date header ~~~
-     *      7               [null] [null] <-- null
-     *      8                 [Jan 25, 2023] [Jan 25, 2023Header] <-- com.chase.sig.android:id/
+     *      5           [null] [null] <-- null
+     *      6             [May 01, 2023] [May 01, 2023Header] <-- com.chase.sig.android:id/
      *
      *      ~~~ Transaction ~~~
-     *      7               [null] [null] <-- null
-     *      8                 [null] [null] <-- null
-     *      9                   [Split with Zelle®] [null] <-- null
-     *      8                 [null] [null] <-- null
-     *      9                   [TST* BAO NINE- RITTENH] [null] <-- com.chase.sig.android:id/merchant_name
-     *      9                   [Food & drink] [null] <-- com.chase.sig.android:id/
-     *      9                   [$10.48] [$10.48] <-- com.chase.sig.android:id/trans_amount
+     *      5           [null] [null] <-- null
+     *      6             [null] [null] <-- null
+     *      7               [Split with Zelle®] [null] <-- null
+     *      6             [null] [null] <-- null
+     *      7               [PLAYA BOWLS - PHILLY] [null] <-- com.chase.sig.android:id/merchant_name
+     *      7               [Food & drink] [null] <-- com.chase.sig.android:id/
+     *      7               [$12.85] [$12.85] <-- com.chase.sig.android:id/trans_amount
      */
     fun parse(reader: ScreenReader, event: AccessibilityEvent): Pair<String, List<ParsedTransaction>>? {
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
             event.className == "android.view.ViewGroup"
         ) {
             val node = event.source ?: return null
-            printAllViews(node)
+//            printAllViews(node)
 
-            if (!isAllTransactionsScreen(node)) return null
             val header = node.child(0) ?: return null
-            val tabHost = node.child(1) ?: return null
-            val tabContent = getTabContentFromHost(tabHost) ?: return null
-            val transactionsNode = tabContent.child(1)?.child(0) ?: return null
+            val content = node.child(1) ?: return null
+            val transactionsNode = content.child(0)?.child(1)?.child(0) ?: return null
 
             val account = parseAccountName(header) ?: ScreenReader.unknownAccountName
+            Log.d("LibraSheet/ChaseReader/parse", "account: $account")
+
             val lastDate = reader.getLatestDate(account)
             val transactions = parseTransactions(transactionsNode, lastDate)
+            Log.d("LibraSheet/ChaseReader/parse", "transactions: ${transactions.size}")
+
+            if (transactions.isEmpty()) return null
             return Pair(account, transactions)
         }
         return null
     }
-
-
-    /** Look for the tab selector saying "All transactions"
-     *
-     *      0 [null] [null] <-- null
-     *
-     *      ~~~ Header ~~~
-     *      1   [null] [null] <-- com.chase.sig.android:id/
-     *      2     [null] [Navigate up] <-- null
-     *      2     [CREDIT CARD (...5940)] [null] <-- null
-     *      2     [null] [Profile & Settings icon, new alerts available] <-- null
-     *
-     *      ~~~ Tab host ~~~
-     *      1   [null] [null] <-- null
-     *
-     *      ~~~ Tab selector ~~~
-     *      2     [null] [null] <-- com.chase.sig.android:id/
-     *      3       [null] [All transactions] <-- null
-     *      4         [All transactions] [null] <-- null
-     *      3       [null] [Spending summary] <-- null
-     *      4         [Spending summary] [null] <-- null
-     */
-    private fun isAllTransactionsScreen(root: AccessibilityNodeInfo?): Boolean {
-        if (root == null) return false
-        val tabSelector = root.child(1)?.child(0) ?: return false
-        val allTransactions = tabSelector.child(0) ?: return false
-        return allTransactions.contentDescription == "All transactions"
-    }
-
 
     /**
      *      ~~~ Header ~~~
@@ -170,23 +117,6 @@ object ChaseReader {
         return account.text.toString()
     }
 
-    /**
-     *      ~~~ Tab host ~~~
-     *      1   [null] [null] <-- null
-     *
-     *      ~~~ Tab selector ~~~
-     *      2     [null] [null] <-- com.chase.sig.android:id/
-     *
-     *      ~~~ Tab content ~~~
-     *      2     [null] [null] <-- com.chase.sig.android:id/
-     *      3       [null] [null] <-- null  # for some reason this doesn't always appear, in which
-     *                                      # case the level of everything below is shifted one less
-     *      4         [null] [null] <-- com.chase.sig.android:id/
-     */
-    private fun getTabContentFromHost(tabHost: AccessibilityNodeInfo): AccessibilityNodeInfo? {
-        val depth3 = tabHost.child(1)?.child(0) ?: return null
-        return if (depth3.viewIdResourceName == null) depth3.child(0) else depth3
-    }
 
     /**
      *      ~~~ Transactions ~~~
@@ -210,6 +140,7 @@ object ChaseReader {
      */
     private fun parseTransactions(transactions: AccessibilityNodeInfo, latestDate: Int): MutableList<ParsedTransaction> {
         val out = mutableListOf<ParsedTransaction>()
+        printAllViews(transactions)
 
         var date: Int? = null
         for (i in 0 until transactions.childCount) {
@@ -218,6 +149,7 @@ object ChaseReader {
 
             val newDate = parseDateHeader(node)
             if (newDate != null) {
+                Log.v("LibraSheet/ChaseReader/parseTransactions", "i=$i date=$newDate")
                 if (newDate < latestDate) break
                 if (date != null && newDate > date) break
                     // failsafe, sometimes even with debouncing the date header has the wrong date
