@@ -34,11 +34,11 @@ import com.example.librasheet.viewModel.preview.previewAccounts
 import java.lang.Math.toDegrees
 
 /** 1.8 degrees or 0.5% **/
-private const val DividerLengthInDegrees = 1.8f
+private const val DividerLengthInDegrees = 1.8
 
 interface PieChartValue {
     val name: String
-    val value: Float
+    val value: Double
     val color: Color
 }
 
@@ -49,10 +49,10 @@ fun <T: PieChartValue> PieChart(
     modifier: Modifier = Modifier,
     stroke: Dp = 30.dp,
 ) {
-    val total = values.sumOf { it.value.toDouble() }.toFloat()
-    val angles = FloatArray(values.size + 1) // first entry is 0, last entry is 360
+    val total = values.sumOf { it.value }
+    val angles = DoubleArray(values.size + 1) // first entry is 0, last entry is 360
     for (index in values.indices) {
-        angles[index + 1] = angles[index] + 360f * values[index].value / total
+        angles[index + 1] = angles[index] + 360.0 * values[index].value / total
     }
 
     var boxSize by remember { mutableStateOf(IntSize(0, 0)) }
@@ -101,15 +101,15 @@ fun <T: PieChartValue> PieChart(
                 halfSize.height - innerRadius
             )
             val size = Size(innerRadius * 2, innerRadius * 2)
-            var startAngle = -90f
-            val totalAngle = 360f
+            var startAngle = -90.0
+            val totalAngle = 360.0
             values.forEachIndexed { index, account ->
                 val sweep = totalAngle * account.value / total
-                val divider = minOf(DividerLengthInDegrees, sweep * 0.2f)
+                val divider = minOf(DividerLengthInDegrees, sweep * 0.2)
                 drawArc(
                     color = account.color,
-                    startAngle = startAngle + divider / 2,
-                    sweepAngle = sweep - divider,
+                    startAngle = (startAngle + divider / 2).toFloat(),
+                    sweepAngle = (sweep - divider).toFloat(),
                     topLeft = topLeft,
                     size = size,
                     useCenter = false,

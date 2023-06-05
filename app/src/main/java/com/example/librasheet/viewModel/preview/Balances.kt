@@ -57,15 +57,15 @@ val previewGraphLabels = ImmutableList(listOf("Pie Chart", "History"))
 val previewStackedLineGraph = mutableStateListOf(
     Pair(
         Color(0xFF004940),
-        listOf(21310,21035,22053,21684,23589,25104,26251,24521,24708.17).map { it.toFloat() }
+        listOf(21310,21035,22053,21684,23589,25104,26251,24521,24708.17).map { it.toDouble() }
     ),
     Pair(
         Color(0xFF047770),
-        listOf(17343,17253,17453,17523,17902,17693,18021,18263,18690.79).map { it.toFloat() }
+        listOf(17343,17253,17453,17523,17902,17693,18021,18263,18690.79).map { it.toDouble() }
     ),
     Pair(
         Color(0xFF04B97F),
-        listOf(2_032.96,2_572.96,2_532.96,2_448.93,2_360.9,2_074.89,2_020.68,2_330.68,2_345.01).map { it.toFloat() }
+        listOf(2_032.96,2_572.96,2_532.96,2_448.93,2_360.9,2_074.89,2_020.68,2_330.68,2_345.01)
     ),
 )
 
@@ -74,7 +74,7 @@ private val graphYPad = 0.1f
 private val graphTicksX = 4
 private val graphTicksY = 6
 private val lastIndex = previewStackedLineGraph[0].second.lastIndex
-private val maxY = previewStackedLineGraph[0].second.max()
+private val maxY = previewStackedLineGraph[0].second.max().toFloat()
 private val startDate = 20220900
 private val ticksX = autoMonthTicks(startDate, incrementMonthEnd(startDate, lastIndex), graphTicksX)
 private val ticksY = autoYTicksWithOrder(0f, maxY, graphTicksY)
@@ -96,8 +96,8 @@ val previewStackedLineGraphState = StackedLineGraphState(
 val previewNetIncome = List(lastIndex) {
     previewStackedLineGraph[0].second[it + 1] - previewStackedLineGraph[0].second[it]
 }.toMutableStateList()
-private val minIncome = previewNetIncome.min()
-private val maxIncome = previewNetIncome.max()
+private val minIncome = previewNetIncome.min().toFloat()
+private val maxIncome = previewNetIncome.max().toFloat()
 private val pad = (maxIncome - minIncome) * graphYPad
 val previewNetIncomeAxes = mutableStateOf(AxesState(
     ticksY = autoYTicks(minIncome, maxIncome, graphTicksY),

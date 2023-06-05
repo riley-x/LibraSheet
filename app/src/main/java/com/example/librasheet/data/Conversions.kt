@@ -101,9 +101,9 @@ fun Double.toLongDollar() : Long {
     return dollars * 10000 + fraction
 }
 
-/** TODO Warning float precision is pretty bad! Is double sufficient? **/
-fun Long.toFloatDollar() : Float {
-    return (this / 10000) + (this % 10000) / 10000f
+/** Is double sufficient? **/
+fun Long.toDoubleDollar() : Double {
+    return (this / 10000) + (this % 10000) / 10000.0
 }
 
 fun rangeBetween(a: Int, b: Int) = if (a < b) IntRange(a, b) else IntRange(b, a)

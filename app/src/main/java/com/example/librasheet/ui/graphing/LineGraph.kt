@@ -28,14 +28,14 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun lineGraphDrawer(
-    values: SnapshotStateList<Float>,
+    values: SnapshotStateList<Double>,
     color: Color = MaterialTheme.colors.onSurface,
     size: Float = with(LocalDensity.current) { 2.dp.toPx() },
 ): DrawScope.(GrapherInputs) -> Unit {
     return fun DrawScope.(grapherInputs: GrapherInputs) {
         fun loc(i: Int) = Offset(
             x = grapherInputs.userToPxX(i.toFloat()),
-            y = grapherInputs.userToPxY(values[i])
+            y = grapherInputs.userToPxY(values[i].toFloat())
         )
 
         val path = Path().apply {

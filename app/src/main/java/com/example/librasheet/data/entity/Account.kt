@@ -8,7 +8,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.librasheet.data.Institution
 import com.example.librasheet.data.Series
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.ui.graphing.PieChartValue
 
 const val accountTable = "account"
@@ -34,8 +34,8 @@ data class Account(
 ): PieChartValue, Series {
     override val color: Color
         get() = Color(value = colorLong.toULong())
-    override val value: Float
-        get() = balance.toFloatDollar()
+    override val value: Double
+        get() = balance.toDoubleDollar()
 
     /** Room constructor **/
     constructor(

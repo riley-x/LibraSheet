@@ -46,7 +46,7 @@ fun CategoryRow(
     },
 ) {
     val hasExpanded =
-        if (filterZeros) category.subCategories.any { it.value != 0f }
+        if (filterZeros) category.subCategories.any { it.value != 0.0 }
         else category.subCategories.isNotEmpty()
 
     Surface(modifier) {
@@ -75,7 +75,7 @@ fun CategoryRow(
                 ) {
                     Column {
                         category.subCategories.forEachIndexed { index, cat ->
-                            if (!filterZeros || cat.value != 0f) {
+                            if (!filterZeros || cat.value != 0.0) {
                                 subRow(index, cat)
                                 // It's important that the index passed here is the full list's index
                                 // for reordering!

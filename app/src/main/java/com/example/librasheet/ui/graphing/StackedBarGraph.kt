@@ -45,7 +45,7 @@ fun stackedBarGraphDrawer(
         values.forEach { (color, series) ->
             series.forEachIndexed { index, value ->
                 val x = it.userToPxX(index.toFloat())
-                val y = it.userToPxY(value)
+                val y = it.userToPxY(value.toFloat())
                 drawRect(
                     color = color,
                     topLeft = Offset(x - width / 2, y),

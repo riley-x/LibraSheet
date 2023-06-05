@@ -11,5 +11,5 @@ fun Path.lineTo(offset: Offset) = lineTo(offset.x, offset.y)
 
 data class DiscreteGraphState(
     val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
-    val values: SnapshotStateList<Float> = mutableStateListOf(),
+    val values: SnapshotStateList<Double> = mutableStateListOf(),
 )

@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.example.librasheet.data.dao.TransactionWithDetails
 import com.example.librasheet.data.entity.*
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.data.toIntDate
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.components.formatDateIntSimple
@@ -48,7 +48,7 @@ class TransactionDetailModel(
         category.value = t.transaction.category
         name.value = t.transaction.name
         date.value = formatDateIntSimple(t.transaction.date, "-")
-        value.value = if (t.transaction.value == 0L) "" else t.transaction.value.toFloatDollar().toString()
+        value.value = if (t.transaction.value == 0L) "" else t.transaction.value.toDoubleDollar().toString()
 
         reimbursements.clear()
         reimbursements.addAll(t.reimbursements)

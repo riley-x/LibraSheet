@@ -18,9 +18,9 @@ import kotlin.math.roundToInt
 
 data class NetIncomeGraphState(
     val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
-    val values1: SnapshotStateList<Float> = mutableStateListOf(),
-    val values2: SnapshotStateList<Float> = mutableStateListOf(),
-    val valuesNet: SnapshotStateList<Float> = mutableStateListOf(),
+    val values1: SnapshotStateList<Double> = mutableStateListOf(),
+    val values2: SnapshotStateList<Double> = mutableStateListOf(),
+    val valuesNet: SnapshotStateList<Double> = mutableStateListOf(),
 )
 
 /**

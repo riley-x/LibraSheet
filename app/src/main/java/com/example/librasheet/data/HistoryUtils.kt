@@ -157,21 +157,21 @@ fun Map<Long, List<Long>>.stackedLineGraphValues(
     series: List<Series>,
     multiplier: Float = 1f,
     lastSeriesIsTotal: Boolean = false,
-): Triple<List<StackedLineGraphValue>, Float, Float> {
-    var minY = 0f
-    var maxY = 0f
-    val allValues: MutableList<Pair<Color, List<Float>>> = mutableListOf()
+): Triple<List<StackedLineGraphValue>, Double, Double> {
+    var minY = 0.0
+    var maxY = 0.0
+    val allValues: MutableList<Pair<Color, List<Double>>> = mutableListOf()
 
-    var lastValues: List<Float>? = null
+    var lastValues: List<Double>? = null
     series@ for (line in series) {
         val balances = this[line.key] ?: continue
         if (lastSeriesIsTotal && line == series.last()) lastValues = null
 
-        val values = mutableListOf<Float>()
+        val values = mutableListOf<Double>()
         for ((index, balance) in balances.withIndex()) {
-            var value = multiplier * balance.toFloatDollar()
+            var value = multiplier * balance.toDoubleDollar()
             if (value < 0) continue@series
-            value += (lastValues?.getOrNull(index) ?: 0f)
+            value += (lastValues?.getOrNull(index) ?: 0.0)
             values.add(value)
             if (value < minY) minY = value
             if (value > maxY) maxY = value

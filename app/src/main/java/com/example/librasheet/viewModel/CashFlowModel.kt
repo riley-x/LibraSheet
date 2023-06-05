@@ -6,9 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.librasheet.data.CategoryData
 import com.example.librasheet.data.entity.*
-import com.example.librasheet.data.monthDiff
 import com.example.librasheet.data.stackedLineGraphValues
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
@@ -130,11 +129,11 @@ class CashFlowModel (
         }
     }
 
-    private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Float>) {
+    private fun loadUiList(target: SnapshotStateList<CategoryUi>, amounts: Map<Long, Double>) {
         target.clear()
         target.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
 
-        val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0f)
+        val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0.0)
         if (parentValue > 0f) {
             target.add(
                 CategoryUi(
@@ -179,7 +178,7 @@ class CashFlowModel (
                     currentCustomRangeEnd = CashFlowCommonState.customRangeEnd.value
                     withContext(Dispatchers.IO) {
                         data.historyDao.getTotals(currentCustomRangeStart, currentCustomRangeEnd)
-                            .mapValues { it.value.toFloatDollar() }
+                            .mapValues { it.value.toDoubleDollar() }
                     }
                 }
             }
@@ -258,7 +257,7 @@ class CashFlowModel (
 
         // We only need to look at [0] because that's the top stack
         val onlyOneEntry = history.values[0].second.size == 1
-        val maxY = history.values[0].second.maxOrNull() ?: return
+        val maxY = history.values[0].second.maxOrNull()?.toFloat() ?: return
         val ticksX = autoMonthTicks(intDates.first(), intDates.last(), graphTicksX)
         val (ticksY, order) = autoYTicksWithOrder(0f, maxY, graphTicksY)
         val axes = AxesState(

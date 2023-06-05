@@ -7,16 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.alignDates
-import com.example.librasheet.data.dao.AccountDao
-import com.example.librasheet.data.dao.CategoryHistoryDao
-import com.example.librasheet.data.dao.TransactionDao
 import com.example.librasheet.data.dao.TransactionFilters
-import com.example.librasheet.data.entity.Category
 import com.example.librasheet.data.entity.TransactionEntity
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.graphing.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,10 +68,10 @@ class AccountScreenModel(
         var minY = 0f
         var maxY = 0f
         for (i in income.indices) {
-            val inc = income[i].toFloatDollar()
-            val exp = expense[i].toFloatDollar()
-            if (exp < minY) minY = exp
-            if (inc > maxY) maxY = inc
+            val inc = income[i].toDoubleDollar()
+            val exp = expense[i].toDoubleDollar()
+            if (exp < minY) minY = exp.toFloat()
+            if (inc > maxY) maxY = inc.toFloat()
             state.netIncome.values1.add(inc)
             state.netIncome.values2.add(exp)
             state.netIncome.valuesNet.add(inc + exp)
@@ -107,13 +102,13 @@ class AccountScreenModel(
         state.balance.values.clear()
         if (history.isEmpty()) return@launch
 
-        var minY = history.first().toFloatDollar()
+        var minY = history.first().toDoubleDollar().toFloat()
         var maxY = minY
         history.forEach {
-            val x = it.toFloatDollar()
+            val x = it.toDoubleDollar()
             state.balance.values.add(x)
-            if (x < minY) minY = x
-            if (x > maxY) maxY = x
+            if (x < minY) minY = x.toFloat()
+            if (x > maxY) maxY = x.toFloat()
         }
 
         val ticksX = autoMonthTicks(dates.first(), dates.last(), graphTicksX)

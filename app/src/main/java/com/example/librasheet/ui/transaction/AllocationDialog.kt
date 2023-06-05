@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.librasheet.data.entity.Allocation
 import com.example.librasheet.data.entity.Category
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.data.toLongDollar
 import com.example.librasheet.ui.dialogs.DialogHolder
 import com.example.librasheet.ui.components.selectors.CategorySelector
@@ -44,7 +44,7 @@ class AllocationDialog(
     ) {
         isOpen = true
         name.value = allocation?.name ?: ""
-        value.value = allocation?.value?.toFloatDollar()?.toString() ?: ""
+        value.value = allocation?.value?.toDoubleDollar()?.toString() ?: ""
         category.value = allocation?.category ?: Category.None
         this.isIncome = isIncome
         this.onSave = onSave

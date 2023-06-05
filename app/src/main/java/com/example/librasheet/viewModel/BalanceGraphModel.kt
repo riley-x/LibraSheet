@@ -8,7 +8,7 @@ import com.example.librasheet.data.alignDates
 import com.example.librasheet.data.TimeSeries
 import com.example.librasheet.data.entity.Account
 import com.example.librasheet.data.stackedLineGraphValues
-import com.example.librasheet.data.toFloatDollar
+import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
@@ -71,15 +71,15 @@ class BalanceGraphModel(
         if (netIncome.isEmpty()) return
 
         val (values, axes) = withContext(Dispatchers.Default) {
-            val values = mutableListOf<Float>()
+            val values = mutableListOf<Double>()
             var minY = 0f
             var maxY = 0f
 
             netIncome.forEach {
-                val value = it.value.toFloatDollar()
+                val value = it.value.toDoubleDollar()
                 values.add(value)
-                if (value < minY) minY = value
-                if (value > maxY) maxY = value
+                if (value < minY) minY = value.toFloat()
+                if (value > maxY) maxY = value.toFloat()
             }
 
             val ticksX = autoMonthTicks(netIncome.first().date, netIncome.last().date, graphTicksX)
@@ -113,12 +113,12 @@ class BalanceGraphModel(
 
             /** Create axes **/
             val ticksX = autoMonthTicks(historyDateInts.first(), historyDateInts.last(), graphTicksX)
-            val (ticksY, order) = autoYTicksWithOrder(0f, maxY, graphTicksY)
+            val (ticksY, order) = autoYTicksWithOrder(0f, maxY.toFloat(), graphTicksY)
             val axes = AxesState(
                 ticksY = ticksY,
                 ticksX = ticksX,
                 minY = 0f,
-                maxY = maxY + maxY * graphYPad,
+                maxY = (maxY + maxY * graphYPad).toFloat(),
                 minX = 0f,
                 maxX = historyDateInts.lastIndex.toFloat(),
             )

@@ -10,18 +10,18 @@ import java.util.*
 import kotlin.math.roundToInt
 
 @Stable
-fun formatDollar(value: Float): String {
+fun formatDollar(value: Double): String {
     val format: NumberFormat = NumberFormat.getCurrencyInstance()
     return format.format(value)
 }
 @Stable
 fun formatDollar(value: Long): String {
     val format: NumberFormat = NumberFormat.getCurrencyInstance()
-    return format.format(value.toFloatDollar())
+    return format.format(value.toDoubleDollar())
 }
 
 @Stable
-fun format2Decimals(value: Float, length: Int = 0): String {
+fun format2Decimals(value: Double, length: Int = 0): String {
     val format = NumberFormat.getNumberInstance()
     format.minimumFractionDigits = 2
     format.maximumFractionDigits = 2
@@ -41,7 +41,7 @@ fun format1Decimal(value: Float, length: Int = 0): String {
 
 // NOTE: do not pre-multiply by 100!
 @Stable
-fun formatPercent(value: Float): String {
+fun formatPercent(value: Double): String {
     val format = NumberFormat.getPercentInstance()
     format.minimumFractionDigits = 2
     format.maximumFractionDigits = 2
@@ -76,7 +76,7 @@ fun SimpleDateFormat.parseOrNull(x: String) = try {
 
 
 @Stable
-fun formatOrder(x: Float, order: Int): String {
+fun formatOrder(x: Double, order: Int): String {
     val y = x.roundToInt()
     return when (order) {
         1_000_000 -> (y / 1_000_000).toString() + "m"

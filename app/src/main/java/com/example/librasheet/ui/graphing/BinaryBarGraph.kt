@@ -32,7 +32,7 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun binaryBarGraphDrawer(
-    values: SnapshotStateList<Float>,
+    values: SnapshotStateList<Double>,
     xAxisLoc: Float = 0f,
     aboveColor: Color = MaterialTheme.colors.primary,
     belowColor: Color = MaterialTheme.colors.error,
@@ -45,7 +45,7 @@ fun binaryBarGraphDrawer(
 
         values.forEachIndexed { index, value ->
             val x = it.userToPxX(index.toFloat())
-            val y = it.userToPxY(value)
+            val y = it.userToPxY(value.toFloat())
             drawRect(
                 color = if (value > xAxisLoc) aboveColor else belowColor,
                 topLeft = Offset(x - width / 2, minOf(y, axis)),

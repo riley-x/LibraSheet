@@ -27,12 +27,12 @@ import com.example.librasheet.viewModel.preview.previewStackedLineGraphAxes
 import kotlin.math.roundToInt
 
 
-typealias StackedLineGraphValue = Pair<Color, List<Float>>
+typealias StackedLineGraphValue = Pair<Color, List<Double>>
 
 data class StackedLineGraphState(
     val axes: MutableState<AxesState> = mutableStateOf(AxesState()),
     val values: SnapshotStateList<StackedLineGraphValue> = mutableStateListOf(),
-    val toString: MutableState<(Float) -> String> = mutableStateOf({ "$it" }),
+    val toString: MutableState<(Double) -> String> = mutableStateOf({ "$it" }),
 )
 
 
@@ -51,7 +51,7 @@ fun stackedLineGraphDrawer(
         values.forEach { (color, series) ->
             fun loc(i: Int) = Offset(
                 x = grapherInputs.userToPxX(i.toFloat()),
-                y = grapherInputs.userToPxY(series[i])
+                y = grapherInputs.userToPxY(series[i].toFloat())
             )
 
             val path = Path().apply {
@@ -84,7 +84,7 @@ fun stackedLineGraphHover(
     textDarkColor: Color = MaterialTheme.colors.background,
     indicatorWidth: Dp = 1.dp,
     labelYStartPad: Dp = 8.dp,
-    toString: (Float) -> String = { "$it" },
+    toString: (Double) -> String = { "$it" },
 ): DrawScope.(GrapherInputs) -> Unit {
     val textStyle = MaterialTheme.typography.overline
     return fun DrawScope.(it: GrapherInputs) {
@@ -113,8 +113,8 @@ fun stackedLineGraphHover(
             /** Get the label text layout **/
             val value = series[hoverLoc.value] -
                 if (index < values.lastIndex) values[index + 1].second[hoverLoc.value]
-                else 0f
-            if (value == 0f) continue
+                else 0.0
+            if (value == 0.0) continue
 
             val layoutResult = it.textMeasurer.measure(
                 text = AnnotatedString(toString(value)),
@@ -123,7 +123,7 @@ fun stackedLineGraphHover(
 
             /** Calculate the flag path **/
             val labelStartX = size.width - layoutResult.size.width
-            val labelCenterY = it.userToPxY(series[hoverLoc.value])
+            val labelCenterY = it.userToPxY(series[hoverLoc.value].toFloat())
             val labelHalfHeight = layoutResult.size.height / 2
             val labelTop = labelCenterY - labelHalfHeight
             val labelBottom = labelCenterY + labelHalfHeight

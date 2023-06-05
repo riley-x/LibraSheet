@@ -1,24 +1,13 @@
 package com.example.librasheet.viewModel
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.viewModelScope
 import com.example.librasheet.data.dao.TransactionFilters
 import com.example.librasheet.data.dao.TransactionWithDetails
 import com.example.librasheet.data.entity.*
-import com.example.librasheet.data.toFloatDollar
-import com.example.librasheet.data.toIntDate
-import com.example.librasheet.data.toLongDollar
-import com.example.librasheet.ui.components.formatDateIntSimple
-import com.example.librasheet.ui.components.parseOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.math.abs
-import kotlin.math.absoluteValue
 
 /** For the map of transaction details in the view model **/
 const val SettingsTransactionKeyBase = "settings"

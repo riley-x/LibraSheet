@@ -54,28 +54,28 @@ val previewIncomeCategories = mutableStateListOf(
         id = "Income_Compensation".toCategoryId(),
         color = Color(0xFF00BFA5),
         subCategories = emptyList(),
-        value = 2_750f,
+        value = 2_750.0,
     ),
     CategoryUi(
         category = previewIncomeCategories2[1],
         id = "Income_Cash Back".toCategoryId(),
         color = Color(0xFF6FAD48),
         subCategories = emptyList(),
-        value = 50.69f,
+        value = 50.69,
     ),
     CategoryUi(
         category = previewIncomeCategories2[2],
         id = "Income_Tax Return".toCategoryId(),
         color = Color(0xFF4899AD),
         subCategories = emptyList(),
-        value = 666.66f,
+        value = 666.66,
     ),
     CategoryUi(
         category = previewIncomeCategories2[3],
         id = "Income_Interest".toCategoryId(),
         color = Color(0xFF03C416),
         subCategories = emptyList(),
-        value = 52.36f,
+        value = 52.36,
     ),
 )
 
@@ -88,27 +88,27 @@ val previewExpenseCategories = mutableStateListOf(
         category = Category.None,
         id = "Expense_Housing".toCategoryId(),
         color = Color(0xFFCF814D),
-        value = 2_000f,
+        value = 2_000.0,
         subCategories = listOf(
             CategoryUi(
                 category = Category.None,
                 id = "Expense_Housing_Rent".toCategoryId(),
                 color = Color(0xFFE04A4A),
-                value = 1_700f,
+                value = 1_700.0,
                 subCategories = emptyList(),
             ),
             CategoryUi(
                 category = Category.None,
                 id = "Expense_Housing_Electricity".toCategoryId(),
                 color = Color(0xFFDDC318),
-                value = 200f,
+                value = 200.0,
                 subCategories = emptyList(),
             ),
             CategoryUi(
                 category = Category.None,
                 id = "Expense_Housing_Water".toCategoryId(),
                 color = Color(0xFF228FC2),
-                value = 100f,
+                value = 100.0,
                 subCategories = emptyList(),
             ),
         ),
@@ -118,14 +118,14 @@ val previewExpenseCategories = mutableStateListOf(
         id = "Expense_Zero".toCategoryId(),
         color = Color(0xFF03C416),
         subCategories = emptyList(),
-        value = 0f,
+        value = 0.0,
     ),
     CategoryUi(
         category = Category.None,
         id = "Expense_Social".toCategoryId(),
         color = Color(0xFF8C56B3),
         subCategories = emptyList(),
-        value = 600f,
+        value = 600.0,
     ),
 
 )
@@ -136,23 +136,23 @@ val previewExpanded = mutableStateMapOf(
 )
 
 val previewIncome = mutableStateListOf(
-    1151.21f,
-    1056f,
-    1203.65f,
-    1036.98f,
-    1405.31f,
-    925.82f,
-    1110.2f
+    1151.21,
+    1056.0,
+    1203.65,
+    1036.98,
+    1405.31,
+    925.82,
+    1110.2
 )
 
 val previewExpense = mutableStateListOf(
-    -543.12f,
-    -352.3f,
-    -1502.36f,
-    -600.25f,
-    -405.31f,
-    -1525.82f,
-    -410.2f
+    -543.12,
+    -352.3,
+    -1502.36,
+    -600.25,
+    -405.31,
+    -1525.82,
+    -410.2
 )
 
 
