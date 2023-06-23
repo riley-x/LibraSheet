@@ -92,6 +92,15 @@ class DragScope {
 val LocalDragScope = compositionLocalOf { DragScope() }
 
 
+private fun Set<Int>.isContiguous(start: Int) : Boolean {
+    if (isEmpty()) return true
+    val inc = if (first() > start) 1 else -1
+    for ((i, x) in withIndex()) {
+        if (x != start + (i+1) * inc) return false
+    }
+    return true
+}
+
 /**
  * This wrapper composable registers its content to be a reorder target. This means it is both a
  * draggable item and a drag destination. When it's the draggable item, the content is hidden and
@@ -137,10 +146,11 @@ fun DragToReorderTarget(
          */
         fun getOffset() =
             if (group != dragScope.groupId) 0
+            else if (size.height == 0) 0 // onGloballyPositioned has not run yet
             else if (index > dragScope.index) {
                 val targetY = originalPos.y - dragScope.contentSize.height
                 val thresholdY = targetY + size.height - minOf(size.height, dragScope.contentSize.height) / 2f
-                if (dragScope.originalPos.y + dragScope.offset > thresholdY) - dragScope.contentSize.height
+                if (dragScope.originalPos.y + dragScope.offset > thresholdY) -dragScope.contentSize.height
                 else 0
             }
             else if (index < dragScope.index) {
@@ -150,13 +160,14 @@ fun DragToReorderTarget(
             }
             else 0
 
-        val targetOffset by remember { derivedStateOf { getOffset() } }
+        val targetOffset by remember { derivedStateOf(::getOffset) }
         val offset = if (dragScope.isActive()) animateIntAsState(targetValue = targetOffset).value else targetOffset
 
         if (group == dragScope.groupId) {
             LaunchedEffect(targetOffset) {
                 if (targetOffset != 0) dragScope.affectedIndices.add(index)
                 else dragScope.affectedIndices.remove(index)
+                Log.d("Libra/DragToReorder", "drag changed: $group $index $targetOffset")
             }
         }
 
@@ -199,11 +210,13 @@ fun DragToReorderTarget(
                         }
                     },
                     onDragEnd = {
+//                        if (!dragScope.affectedIndices.isContiguous(index))
+//                            Log.w("Libra/DragToReorder", "DragScope affected indices not contiguous! ${dragScope.affectedIndices}")
                         val endIndex = if (dragScope.affectedIndices.isEmpty()) index
-                            else if (dragScope.affectedIndices.first() < index) dragScope.affectedIndices.min()
-                            else dragScope.affectedIndices.max()
-                        Log.d("Libra/DragToReorder", "drag end: $group $index $endIndex")
+                        else if (dragScope.affectedIndices.first() < index) dragScope.affectedIndices.min()
+                        else dragScope.affectedIndices.max()
                         Log.d("Libra/DragToReorder", "${dragScope.affectedIndices}")
+                        Log.d("Libra/DragToReorder", "drag end: $group $index $endIndex")
                         onDragEnd(group, index, endIndex)
                         dragScope.reset()
                     },
