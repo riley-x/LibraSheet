@@ -40,7 +40,12 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
     private val cashFlowModels = mutableStateMapOf<String, CashFlowModel>()
     fun getCashFlowModel(categoryId: String): CashFlowModel {
         val model = cashFlowModels.getOrPut(categoryId) {
-            CashFlowModel(viewModelScope, categories.data, categoryId.toCategoryId())
+            CashFlowModel(
+                scope = viewModelScope,
+                data = categories.data,
+                categoryId = categoryId.toCategoryId(),
+                updateDependencies=::updateDependencies
+            )
         }
         return model
     }
@@ -155,7 +160,7 @@ class LibraViewModel(internal val application: LibraApplication) : ViewModel() {
 }
 
 
-internal enum class Dependency {
+enum class Dependency {
     ACCOUNT_REORDER,
     ACCOUNT_COLOR,
     CATEGORY,

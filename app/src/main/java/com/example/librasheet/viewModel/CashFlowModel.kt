@@ -57,6 +57,7 @@ class CashFlowModel (
     private val data: CategoryData,
     categoryId: CategoryId,
     loadOnInit: Boolean = true,
+    private val updateDependencies: (Dependency) -> Unit = { },
 ) {
     var parentCategory by mutableStateOf(Category.None)
     private val multiplier = if (categoryId.superName == incomeName) 1f else -1f
@@ -296,11 +297,11 @@ class CashFlowModel (
 
     @Callback
     fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
-//        viewModel.categories.reorder()
         if (parentId == parentCategory.id.fullName) {
             categoryTotals.add(endIndex, categoryTotals.removeAt(startIndex))
             pie.add(endIndex, pie.removeAt(startIndex))
         }
-        // TODO database, subcats
+        data.reorder(parentId, startIndex, endIndex)
+        updateDependencies(Dependency.CATEGORY)
     }
 }
