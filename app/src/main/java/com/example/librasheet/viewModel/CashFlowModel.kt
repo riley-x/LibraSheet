@@ -134,13 +134,17 @@ class CashFlowModel (
         target.clear()
         target.addAll(parentCategory.subCategories.map { it.toUi(amounts, multiplier) })
 
+        /** Remember transactions don't have to be categorized with a subcategory, and can be
+         * categorized with only the parent category. So create an extra UI element to display these.
+         * However we don't use [Category.toUi] so we can exclude the subcategories.
+         **/
         val parentValue = multiplier * amounts.getOrDefault(parentCategory.key, 0.0)
         if (parentValue > 0f) {
             target.add(
                 CategoryUi(
-                    category = Category.Ignore,
-                    key = ignoreKey,
-                    id = CategoryId("Uncategorized"),
+                    category = parentCategory, // setting this correctly enables click-to-search-transactions
+                    key = ignoreKey, // CashFlowScreen checks this to not allow dragging
+                    id = CategoryId("Uncategorized"), // displayed name in CashFlowScreen
                     color = parentCategory.color,
                     value = parentValue,
                 )
@@ -301,6 +305,7 @@ class CashFlowModel (
 
     @Callback
     fun reorder(parentId: String, startIndex: Int, endIndex: Int) {
+        if (startIndex == endIndex) return
         if (parentId == parentCategory.id.fullName) {
             categoryTotals.add(endIndex, categoryTotals.removeAt(startIndex))
             pie.add(endIndex, pie.removeAt(startIndex))

@@ -130,7 +130,9 @@ fun DragToReorderTarget(
     content: @Composable (DragScope) -> Unit = { },
 ) {
     if (!enabled || index < 0) {
-        content(DragScope())
+        Box(modifier) {
+            content(DragScope())
+        }
     } else {
         val haptic = LocalHapticFeedback.current
         val dragScope = LocalDragScope.current
