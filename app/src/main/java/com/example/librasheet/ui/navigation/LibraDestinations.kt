@@ -21,6 +21,11 @@ interface LibraTab {
     val route: String // route of tab's home screen
     val graph: String // route of tab's graph
 }
+
+/**
+ * Base class for the income and spending tabs. The route is supplied the categoryId as an argument,
+ * which tells the navigation element which category to pull from the view model.
+ */
 abstract class CashFlowTab(
     val routeBase: String,
     val defaultArg: String

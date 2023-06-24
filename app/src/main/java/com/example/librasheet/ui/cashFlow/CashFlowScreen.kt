@@ -102,7 +102,7 @@ fun CashFlowScreen(
                                 Text(formatDollar(cat.value))
                             },
                             modifier = Modifier.clickable {
-                                if (category.subCategories.isNotEmpty()) onCategoryClick(category)
+                                onCategoryClick(category)
                             }
                         )
                     }

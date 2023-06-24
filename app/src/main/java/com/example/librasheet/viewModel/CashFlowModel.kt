@@ -216,6 +216,10 @@ class CashFlowModel (
         return Pair(0, 0)
     }
 
+    /**
+     * Safe version of List.subList() that clamps [start] and [end] to the list range.
+     * The returned list is therefore not necessarily [end] - [start] long.
+     */
     private fun <T> List<T>.safeSublist(start: Int, end: Int): List<T> {
         var newStart = start
         if (start < 0) newStart = 0
