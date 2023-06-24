@@ -26,7 +26,7 @@ import com.example.librasheet.viewModel.AccountScreenState
 import com.example.librasheet.viewModel.dataClasses.ImmutableList
 import com.example.librasheet.viewModel.preview.*
 
-private val tabs = ImmutableList(listOf("Balance", "Net Change"))
+private val tabs = ImmutableList(listOf("Balance", "Net Income"))
 
 
 @Composable

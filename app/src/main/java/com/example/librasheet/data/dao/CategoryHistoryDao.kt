@@ -27,10 +27,10 @@ interface CategoryHistoryDao {
 
     /**
      * Returns total income and expenses for a single account, per date (month). Income is set to
-     * seriesKey = 0 and expense seriesKey = 1. Note that the ignoreCategory is included here.
+     * seriesKey = 0 and expense seriesKey = 1. Note that the ignoreCategory is excluded here.
      */
     @Query("SELECT CASE WHEN value > 0 THEN 0 ELSE 1 END as seriesKey, date, SUM(value) as value FROM $categoryHistoryTable " +
-            "WHERE accountKey = :account AND value != 0 GROUP BY seriesKey, date " +
+            "WHERE accountKey = :account AND categoryKey != $ignoreKey AND value != 0 GROUP BY seriesKey, date " +
             "ORDER BY date")
     fun getIncomeAndExpense(account: Long): List<HistoryEntryBase>
 
