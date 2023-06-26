@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.librasheet.data.dao.TransactionFilters
+import com.example.librasheet.data.incrementMonthEnd
 import com.example.librasheet.ui.cashFlow.CashFlowScreen
 import com.example.librasheet.ui.dialogs.TimeRangeDialog
 import com.example.librasheet.viewModel.CashFlowCommonState
@@ -56,13 +57,12 @@ fun NavGraphBuilder.cashFlow(
             fun onCategoryClick(it: CategoryUi) {
                 if (it.subCategories.isNotEmpty()) navController.navigate(tab.route(it.category.id))
                 else {
-                    // TODO get dates
                     val (startDate, endDate) = when (CashFlowCommonState.tab.value) {
-                        0 -> Pair(null, null)
-                        else -> Pair(null, null)
+                        0 -> CashFlowCommonState.pieRangeDates.value
+                        else -> CashFlowCommonState.historyRangeDates.value
                     }
                     viewModel.transactionsSettings.filter(TransactionFilters(
-                        startDate = startDate,
+                        startDate = incrementMonthEnd(startDate, -1), // CashFlow dates are month ends but represent the whole month, so get month start
                         endDate = endDate,
                         category = it.category,
                         limit = 100,
