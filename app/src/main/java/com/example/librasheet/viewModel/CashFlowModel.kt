@@ -71,8 +71,8 @@ class CashFlowModel (
     /** Cached state values. We want all cash flow models to be in-sync on the below state values,
      * but we load them lazily. So we need to know when the current values are stale. **/
     private var currentTab = CashFlowCommonState.tab.value
-    private var currentPieRange = CashFlowCommonState.pieRangeDates.value
-    private var currentHistoryRange = CashFlowCommonState.historyRangeDates.value
+    private var currentPieRange = Pair(0, 0)
+    private var currentHistoryRange = Pair(0, 0)
 
     /** List of categories with totals displayed below the graphic. The averages list doubles as the
      * values used for the pie chart **/
@@ -91,10 +91,10 @@ class CashFlowModel (
     val isExpanded = mutableStateMapOf<String, MutableTransitionState<Boolean>>()
 
     init {
-        if (loadOnInit) load(data.find(categoryId).first)
+        if (loadOnInit) init(data.find(categoryId).first)
     }
 
-    private fun load(category: Category = parentCategory) {
+    private fun init(category: Category = parentCategory) {
         Log.d("Libra/CashFlowModel/load", "category=${category.id}")
         parentCategory = category
 
@@ -105,15 +105,19 @@ class CashFlowModel (
             history.values.clear()
             dates.clear()
         } else scope.launch {
-            loadPie()
+            setPieRange(CashFlowCommonState.pieRange.value)
             loadFullHistory()
-            loadHistory()
+            setHistoryRange(CashFlowCommonState.historyRange.value)
         }
     }
 
     /** We want all the cash flow screens to have the same tab and range, but we load lazily. This
      * function is called via a launched effect when the model is loaded by the composable. **/
     fun resyncState() {
+        // this function can be called while loadFullHistory() is suspended in init(). Make sure to
+        // not prematurely load the UI elements.
+        if (fullHistory.isEmpty()) return
+
         Log.d("Libra/CashFlowModel/resyncState", "${parentCategory.id}" +
                 " $currentTab-${CashFlowCommonState.tab.value}" +
                 " ${CashFlowCommonState.pieRange.value}: $currentPieRange-${CashFlowCommonState.pieRangeDates.value}" +
