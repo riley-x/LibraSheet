@@ -116,10 +116,9 @@ class CategoryData(
             Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
-            val earliest = historyDao.getEarliestDate()
-            firstMonthEnd = thisMonthEnd(earliest)
-            maxMonths = maxOf(1, monthDiff(thisMonthEnd, earliest))
-            Log.d("Libra/CategoryData/load", "maxMonths=$maxMonths thisMonth=$thisMonthEnd earliest=$earliest")
+            firstMonthEnd = historyDao.getEarliestDate()
+            maxMonths = maxOf(1, monthDiff(thisMonthEnd, firstMonthEnd))
+            Log.d("Libra/CategoryData/load", "maxMonths=$maxMonths thisMonth=$thisMonthEnd firstMonthEnd=$firstMonthEnd")
 
             yearAverage = historyDao.getTotals(lastYearEnd, lastMonthEnd).mapValues { it.value.toDoubleDollar() / minOf(maxMonths, 12) }
             allAverage = historyDao.getTotals(0, lastMonthEnd).mapValues { it.value.toDoubleDollar() / maxMonths }
