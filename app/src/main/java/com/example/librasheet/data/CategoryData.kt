@@ -46,7 +46,14 @@ class CategoryData(
 
     /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie
      * charts and display lists. **/
-    var maxMonths = 1 // used for averages. Excludes the current month
+    val today = Calendar.getInstance().toIntDate()
+    val thisMonthEnd = thisMonthEnd(today)
+    var firstMonthEnd = 0 // Set in loadValues
+    val lastMonthEnd = today.setDay(0)
+    val lastYearEnd = lastMonthEnd.addYears(-1)
+
+    var maxMonths = 1 // Max number of months stored in database. Excludes the current month.
+                      // Set in loadValues and used in averages.
     var currentMonth = emptyMap<Long, Double>()
     var yearAverage = emptyMap<Long, Double>()
     var allAverage = emptyMap<Long, Double>()
@@ -102,20 +109,17 @@ class CategoryData(
 
     fun loadValues(): List<Job> {
         val jobs = mutableListOf<Job>()
-        val today = Calendar.getInstance().toIntDate()
-        val thisMonth = thisMonthEnd(today)
-        val lastMonthEnd = today.setDay(0)
-        val lastYearEnd = lastMonthEnd.addYears(-1)
 
         /** Averages **/
         jobs.launchIO {
-            currentMonth = historyDao.getDate(thisMonth).mapValues { it.value.toDoubleDollar() }
+            currentMonth = historyDao.getDate(thisMonthEnd).mapValues { it.value.toDoubleDollar() }
             Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
             val earliest = historyDao.getEarliestDate()
-            maxMonths = maxOf(1, monthDiff(thisMonth, earliest))
-            Log.d("Libra/CategoryData/load", "maxMonths=$maxMonths thisMonth=$thisMonth earliest=$earliest")
+            firstMonthEnd = thisMonthEnd(earliest)
+            maxMonths = maxOf(1, monthDiff(thisMonthEnd, earliest))
+            Log.d("Libra/CategoryData/load", "maxMonths=$maxMonths thisMonth=$thisMonthEnd earliest=$earliest")
 
             yearAverage = historyDao.getTotals(lastYearEnd, lastMonthEnd).mapValues { it.value.toDoubleDollar() / minOf(maxMonths, 12) }
             allAverage = historyDao.getTotals(0, lastMonthEnd).mapValues { it.value.toDoubleDollar() / maxMonths }

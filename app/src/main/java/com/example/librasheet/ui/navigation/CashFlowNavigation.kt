@@ -30,21 +30,18 @@ fun NavGraphBuilder.cashFlow(
             val model = viewModel.getCashFlowModel(categoryId)
             LaunchedEffect(Unit) { model.resyncState() }
 
-            fun onSaveCustomTimeRange(start: Int, end: Int) {
-                CashFlowCommonState.customRangeStart.value = start
-                CashFlowCommonState.customRangeEnd.value = end
-                model.setPieRange(CategoryTimeRange.CUSTOM)
-                model.setHistoryRange(HistoryTimeRange.CUSTOM)
-            }
-
             fun openTimeRangeDialog() {
+                val range = if (CashFlowCommonState.tab.value == 0)
+                    CashFlowCommonState.pieRangeDates.value
+                    else CashFlowCommonState.historyRangeDates.value
+
                 if (viewModel.months.isNotEmpty())
                     timeRangeDialog.open(
                         viewModel.months.first(),
                         viewModel.months.last(),
-                        CashFlowCommonState.customRangeStart.value,
-                        CashFlowCommonState.customRangeEnd.value,
-                        ::onSaveCustomTimeRange
+                        range.first,
+                        range.second,
+                        model::setCustomTimeRange,
                     )
             }
 

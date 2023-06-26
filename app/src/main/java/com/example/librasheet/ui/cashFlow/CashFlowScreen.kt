@@ -42,7 +42,7 @@ fun CashFlowScreen(
     onPieTimeRange: (CategoryTimeRange) -> Unit = { },
     onHistoryTimeRange: (HistoryTimeRange) -> Unit = { },
 ) {
-    val defaultText by remember { derivedStateOf { CashFlowCommonState.customRangeDescription() } }
+    val defaultText by remember { derivedStateOf { CashFlowCommonState.rangeDescription() } }
     var hoverText by remember { mutableStateOf("") }
     fun updateHoverText(newText: String) { hoverText = newText }
 
