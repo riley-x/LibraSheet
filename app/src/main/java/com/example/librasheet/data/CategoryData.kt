@@ -44,16 +44,20 @@ class CategoryData(
     var historyDates = mutableListOf<Int>()
     var history = mutableMapOf<Long, MutableList<Long>>()
 
-    /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie
-     * charts and display lists. **/
+
     val today = Calendar.getInstance().toIntDate()
     val thisMonthEnd = thisMonthEnd(today)
-    var firstMonthEnd = 0 // Set in loadValues
+    /** month end date (YYYYMM00 format) for the first month available in the database **/
+    var firstMonthEnd = 0  // Set in loadValues
     val lastMonthEnd = today.setDay(0)
+    /** month end date (YYYYMM00 format) for the month one year ago. Excludes the current month,
+     * so if today is November 2023, returns October 2022 (20221100). **/
     val lastYearEnd = lastMonthEnd.addYears(-1)
+    /** Max number of months stored in database. Excludes the current month. **/
+    var maxMonths = 1 // Set in loadValues and used in averages.
 
-    var maxMonths = 1 // Max number of months stored in database. Excludes the current month.
-                      // Set in loadValues and used in averages.
+    /** Map categoryKey to value. This is inclusive of all accounts. These are used for the pie
+     * charts and display lists. **/
     var currentMonth = emptyMap<Long, Double>()
     var yearAverage = emptyMap<Long, Double>()
     var allAverage = emptyMap<Long, Double>()
@@ -73,19 +77,19 @@ class CategoryData(
         /** Index **/
         jobs.launchIO {
             lastRowId = dao.getMaxKey()
-            Log.d("Libra/CategoryData/load", "lastRowId=$lastRowId")
+            Log.d("Libra/CategoryData/loadCategories", "lastRowId=$lastRowId")
         }
 
         /** Categories **/
         jobs.launchIO {
             income.subCategories.clear()
             dao.getIncome().mapTo(income.subCategories) { it.toNestedCategory() }
-            Log.d("Libra/CategoryData/load", "income=${income.subCategories.size}")
+            Log.d("Libra/CategoryData/loadCategories", "income=${income.subCategories.size}")
         }
         jobs.launchIO {
             expense.subCategories.clear()
             dao.getExpense().mapTo(expense.subCategories) { it.toNestedCategory() }
-            Log.d("Libra/CategoryData/load", "expense=${expense.subCategories.size}")
+            Log.d("Libra/CategoryData/loadCategories", "expense=${expense.subCategories.size}")
         }
 
         return jobs
@@ -101,7 +105,7 @@ class CategoryData(
             /** Sum subCategories into parents. **/
             income.sumChildren(history)
             expense.sumChildren(history)
-            Log.d("Libra/CategoryData/load", "history=$history")
+            Log.d("Libra/CategoryData/loadHistory", "history=$history")
         }
 
         return jobs
@@ -113,12 +117,12 @@ class CategoryData(
         /** Averages **/
         jobs.launchIO {
             currentMonth = historyDao.getDate(thisMonthEnd).mapValues { it.value.toDoubleDollar() }
-            Log.d("Libra/CategoryData/load", "currentMonth=$currentMonth")
+            Log.d("Libra/CategoryData/loadValues", "currentMonth=$currentMonth")
         }
         jobs.launchIO {
             firstMonthEnd = historyDao.getEarliestDate()
             maxMonths = maxOf(1, monthDiff(thisMonthEnd, firstMonthEnd))
-            Log.d("Libra/CategoryData/load", "maxMonths=$maxMonths thisMonth=$thisMonthEnd firstMonthEnd=$firstMonthEnd")
+            Log.d("Libra/CategoryData/loadValues", "maxMonths=$maxMonths thisMonth=$thisMonthEnd firstMonthEnd=$firstMonthEnd")
 
             yearAverage = historyDao.getTotals(lastYearEnd, lastMonthEnd).mapValues { it.value.toDoubleDollar() / minOf(maxMonths, 12) }
             allAverage = historyDao.getTotals(0, lastMonthEnd).mapValues { it.value.toDoubleDollar() / maxMonths }
@@ -127,15 +131,15 @@ class CategoryData(
         /** Totals **/
         jobs.launchIO {
             yearTotal = historyDao.getTotals(lastYearEnd).mapValues { it.value.toDoubleDollar() }
-            Log.d("Libra/CategoryData/load", "yearTotal=$yearTotal")
+            Log.d("Libra/CategoryData/loadValues", "yearTotal=$yearTotal")
         }
         jobs.launchIO {
             fiveYearTotal = historyDao.getTotals(lastMonthEnd.addYears(-5)).mapValues { it.value.toDoubleDollar() }
-            Log.d("Libra/CategoryData/load", "fiveYearTotal=$fiveYearTotal")
+            Log.d("Libra/CategoryData/loadValues", "fiveYearTotal=$fiveYearTotal")
         }
         jobs.launchIO {
             allTotal = historyDao.getTotals(0).mapValues { it.value.toDoubleDollar() }
-            Log.d("Libra/CategoryData/load", "allTotal=$allTotal")
+            Log.d("Libra/CategoryData/loadValues", "allTotal=$allTotal")
         }
 
         return jobs

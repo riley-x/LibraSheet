@@ -15,7 +15,11 @@ import com.example.librasheet.viewModel.dataClasses.toUi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
+/**
+ * Handles common UI state members related to categories:
+ *      - Category lists in the settings screen
+ *      - Category lists for dropdown menus
+ */
 class CategoryModel(
     private val viewModel: LibraViewModel,
 ) {

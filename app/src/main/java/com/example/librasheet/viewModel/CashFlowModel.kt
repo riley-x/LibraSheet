@@ -4,11 +4,8 @@ import android.util.Log
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.example.librasheet.data.CategoryData
-import com.example.librasheet.data.addYears
+import com.example.librasheet.data.*
 import com.example.librasheet.data.entity.*
-import com.example.librasheet.data.stackedLineGraphValues
-import com.example.librasheet.data.toDoubleDollar
 import com.example.librasheet.ui.components.formatDateInt
 import com.example.librasheet.ui.components.formatOrder
 import com.example.librasheet.ui.graphing.*
@@ -228,8 +225,8 @@ class CashFlowModel (
         if (fullHistory.isEmpty()) return
 
         val range = when (CashFlowCommonState.historyRange.value) {
-            HistoryTimeRange.ONE_YEAR -> Pair(fullDates.size - 12, fullDates.size)
-            HistoryTimeRange.FIVE_YEARS -> Pair(fullDates.size - 60, fullDates.size)
+            HistoryTimeRange.ONE_YEAR -> Pair(fullDates.size - 13, fullDates.size)   // Extra month to include current month.
+            HistoryTimeRange.FIVE_YEARS -> Pair(fullDates.size - 61, fullDates.size) // Agrees also with dates set in [setHistoryRange], which uses offsets from [data.lastMonthEnd]
             HistoryTimeRange.ALL -> Pair(0, fullDates.size)
             HistoryTimeRange.CUSTOM -> getCustomRangeIndices()
         }
