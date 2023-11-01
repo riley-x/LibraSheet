@@ -63,7 +63,9 @@ class FilterTransactionDialogHolder(
     }
 }
 
-
+/**
+ * Composable for dialog that pop ups when filtering transactions.
+ */
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun FilterTransactionDialog(
@@ -104,12 +106,21 @@ fun FilterTransactionDialog(
         )
     }
 
+    fun clear() {
+        startDate = ""
+        endDate = ""
+        account = null
+        category = null
+        limit = "200"
+    }
+
     Dialog(
-        onCancel = onCancel,
+        cancelText = "Clear",
+        onDismiss = onCancel,
+        onCancel = ::clear,
         onOk = ::onOk,
         modifier = modifier,
     ) {
-
         Row {
             DateTextField(
                 value = startDate,

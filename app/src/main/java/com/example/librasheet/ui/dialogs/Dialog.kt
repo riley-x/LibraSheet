@@ -13,6 +13,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import com.example.librasheet.ui.theme.LibraSheetTheme
 
+/**
+ * Dialog master composable, with arbitrary content followed by a red "cancel" button and a green
+ * "ok" button.
+ *
+ * @param errorMessage A shortcut to print a red message after [content].
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Dialog(
@@ -23,11 +29,12 @@ fun Dialog(
     okText: String = "Ok",
     scrollable: Boolean = false,
     onCancel: () -> Unit = { },
+    onDismiss: () -> Unit = onCancel,
     onOk: () -> Unit = { },
     content: @Composable ColumnScope.() -> Unit = { },
 ) {
     AlertDialog(
-        onDismissRequest = onCancel,
+        onDismissRequest = onDismiss,
         /** This is needed to allow the dialog to resize if the content changes.
          * This really messes up the previews though.
          * See https://stackoverflow.com/questions/68469681/jetpack-compose-layout-changes-in-dialog-doesnt-update-the-size

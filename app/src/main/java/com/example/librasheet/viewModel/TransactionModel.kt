@@ -20,7 +20,7 @@ class TransactionModel(
 ) {
     private val dao = viewModel.application.database.transactionDao()
     private val defaultFilter = TransactionFilters(
-        limit = 100
+        limit = 200
     )
 
     /** Full list **/
