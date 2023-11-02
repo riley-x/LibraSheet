@@ -225,8 +225,8 @@ class CashFlowModel (
         if (fullHistory.isEmpty()) return
 
         val range = when (CashFlowCommonState.historyRange.value) {
-            HistoryTimeRange.ONE_YEAR -> Pair(fullDates.size - 13, fullDates.size)   // Extra month to include current month.
-            HistoryTimeRange.FIVE_YEARS -> Pair(fullDates.size - 61, fullDates.size) // Agrees also with dates set in [setHistoryRange], which uses offsets from [data.lastMonthEnd]
+            HistoryTimeRange.ONE_YEAR -> Pair(fullDates.size - 13, fullDates.size)   // Extra month to include current month,
+            HistoryTimeRange.FIVE_YEARS -> Pair(fullDates.size - 61, fullDates.size) // as is set in [setHistoryRange]
             HistoryTimeRange.ALL -> Pair(0, fullDates.size)
             HistoryTimeRange.CUSTOM -> getCustomRangeIndices()
         }
@@ -292,7 +292,7 @@ class CashFlowModel (
                 CashFlowCommonState.historyRangeDates.value = Pair(start, data.thisMonthEnd)
             }
             HistoryTimeRange.FIVE_YEARS -> {
-                val start = maxOf(data.firstMonthEnd, data.lastMonthEnd.addYears(-5))
+                val start = maxOf(data.firstMonthEnd, data.thisMonthEnd.addYears(-5))
                 CashFlowCommonState.historyRangeDates.value = Pair(start, data.thisMonthEnd)
             }
             HistoryTimeRange.ALL -> {

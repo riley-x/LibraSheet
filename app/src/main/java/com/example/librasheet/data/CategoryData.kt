@@ -50,9 +50,9 @@ class CategoryData(
     /** month end date (YYYYMM00 format) for the first month available in the database **/
     var firstMonthEnd = 0  // Set in loadValues
     val lastMonthEnd = today.setDay(0)
-    /** month end date (YYYYMM00 format) for the month one year ago. Excludes the current month,
-     * so if today is November 2023, returns October 2022 (20221100). **/
-    val lastYearEnd = lastMonthEnd.addYears(-1)
+    /** month end date (YYYYMM00 format) for the month one year ago.
+     * If today is November 2023, returns November 2022 (20221100). **/
+    val lastYearEnd = thisMonthEnd.addYears(-1)
     /** Max number of months stored in database. Excludes the current month. **/
     var maxMonths = 1 // Set in loadValues and used in averages.
 
